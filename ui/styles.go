@@ -1,6 +1,9 @@
 package ui
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/lipgloss"
+)
 
 const (
 	padding = 1
@@ -8,8 +11,8 @@ const (
 	mainPageLayoutLeftPanelWidthRatio  = 0.4
 	mainPageLayoutRightPanelWidthRatio = 0.6
 
-	mainPageLocalBranchesPanelHeightRatio  = 0.25
-	mainPageChangedFilesHeightRatio = 0.75
+	mainPageLocalBranchesPanelHeightRatio = 0.35
+	mainPageChangedFilesHeightRatio       = 0.65
 
 	mainPageLayoutTitlePanelHeight      = 1
 	mainPageKeyBindingLayoutPanelHeight = 1
@@ -17,7 +20,7 @@ const (
 
 var (
 	minWidth  = 90
-	minHeight = 30
+	minHeight = 28
 
 	// Base colors
 	colorPrimary   = lipgloss.Color("#00BFFF")
@@ -26,18 +29,22 @@ var (
 	colorAccent    = lipgloss.Color("#32CD32")
 	colorError     = lipgloss.Color("#FF5555")
 
+	// list component style
+	titleStyle = lipgloss.NewStyle().Foreground(colorHighlight).
+			Underline(true).
+			Bold(true)
+	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
+	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
+	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
+
 	// Styles
 	topBarStyle = lipgloss.NewStyle().
 			Foreground(colorPrimary).
 			Background(lipgloss.Color("#1E1E1E")).
-			Bold(true).
-			PaddingLeft(1).
-			Underline(true)
+			Bold(true)
 
 	bottomBarStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF")).
-			Background(lipgloss.Color("#303030")).
-			PaddingLeft(1)
+			Foreground(lipgloss.Color("#FFFFFF"))
 
 	sectionTitleStyle = lipgloss.NewStyle().
 				Foreground(colorHighlight).
@@ -60,6 +67,5 @@ var (
 
 	panelBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
-				BorderForeground(lipgloss.Color("#555555")).
-				Padding(0, 1)
+				BorderForeground(lipgloss.Color("#555555"))
 )
