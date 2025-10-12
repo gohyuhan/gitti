@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"gitti/types"
+	"sort"
 
 	"github.com/charmbracelet/bubbles/list"
 )
@@ -35,11 +36,18 @@ func ProcessGitUpdate(m *GittiModel, gitInfo types.GitInfo) {
 }
 
 func InitBranchList(m *GittiModel) {
+	keys := make([]string, 0, len(m.AllRepoBranches))
+	for k := range m.AllRepoBranches {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys) // alphabetically sort keys
+
 	items := []list.Item{
 		item(fmt.Sprintf("* %s", m.CurrentCheckedOutBranch)),
 	}
 
-	for _, branch := range m.AllRepoBranches {
+	for _, k := range keys {
+		branch := m.AllRepoBranches[k]
 		if !branch.CurrentCheckout {
 			items = append(items, item(branch.Name))
 		}

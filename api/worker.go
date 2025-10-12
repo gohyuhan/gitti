@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	defaultGitDaemonWorkerTick = 5
+	defaultGitDaemonWorkerTick = 1
 )
 
 // goroutine worker thread to act as a daemon that can be start and stop to get git latest info of the repo to update the UI in real time
