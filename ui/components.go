@@ -2,51 +2,60 @@ package ui
 
 import (
 	"fmt"
-	"strings"
-
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
+	"strings"
 )
 
 // -----------------------------------------------------------------------------
 // Gitti Main Page View
 // -----------------------------------------------------------------------------
-func renderTitleBar(width int) string {
-
+func renderTitleBar(width int, currentTab string) string {
 	distributedWidth := int(float64(width) * 0.33)
 
 	home := "[1] Home"
 	commitLogs := "[2] Commit Logs"
 	about := "[3] About Gitti"
 
-	homeWidth := max(0, (distributedWidth-lipgloss.Width(home))/2)
-	commitLogsWidth := max(0, (distributedWidth-lipgloss.Width(commitLogs))/2)
-	aboutWidth := max(0, (distributedWidth-lipgloss.Width(about))/2)
+	// Define styles for active and inactive tabs
+	activeTabStyle := topBarHighLightStyle
+	inactiveTabStyle := topBarStyle
+	// Apply styles based on currentTab
+	var homeStyled, commitLogsStyled, aboutStyled string
+	if currentTab == homeTab {
+		homeStyled = activeTabStyle.Render(home)
+		commitLogsStyled = inactiveTabStyle.Render(commitLogs)
+		aboutStyled = inactiveTabStyle.Render(about)
+	} else if currentTab == commitLogsTab {
+		homeStyled = inactiveTabStyle.Render(home)
+		commitLogsStyled = activeTabStyle.Render(commitLogs)
+		aboutStyled = inactiveTabStyle.Render(about)
+	} else if currentTab == aboutGittiTab {
+		homeStyled = inactiveTabStyle.Render(home)
+		commitLogsStyled = inactiveTabStyle.Render(commitLogs)
+		aboutStyled = activeTabStyle.Render(about)
+	} else {
+		// Fallback: no highlight if currentTab is invalid
+		homeStyled = inactiveTabStyle.Render(home)
+		commitLogsStyled = inactiveTabStyle.Render(commitLogs)
+		aboutStyled = inactiveTabStyle.Render(about)
+	}
 
-	titleLine := strings.Repeat(" ", homeWidth) + home + strings.Repeat(" ", homeWidth) + strings.Repeat(" ", commitLogsWidth) + commitLogs + strings.Repeat(" ", commitLogsWidth) + strings.Repeat(" ", aboutWidth) + about + strings.Repeat(" ", aboutWidth)
+	// Calculate spacing
+	homeWidth := max(0, (distributedWidth-lipgloss.Width(homeStyled))/2)
+	commitLogsWidth := max(0, (distributedWidth-lipgloss.Width(commitLogsStyled))/2)
+	aboutWidth := max(0, (distributedWidth-lipgloss.Width(aboutStyled))/2)
+
+	// Combine styled tabs with spacing
+	titleLine := strings.Repeat(" ", homeWidth) + homeStyled +
+		strings.Repeat(" ", homeWidth) + strings.Repeat(" ", commitLogsWidth) + commitLogsStyled +
+		strings.Repeat(" ", commitLogsWidth) + strings.Repeat(" ", aboutWidth) + aboutStyled +
+		strings.Repeat(" ", aboutWidth)
+
 	return topBarStyle.Width(width).Height(mainPageLayoutTitlePanelHeight).Render(titleLine)
 }
 
 // Render the Local Branches panel (top 25%)
 func renderLocalBranchesPanel(width int, height int, m GittiModel) string {
-	items := []list.Item{
-		item(fmt.Sprintf("* %s", m.CurrentCheckedOutBranch)),
-	}
-
-	for _, branch := range m.AllRepoBranches {
-		if !branch.CurrentCheckout {
-			items = append(items, item(branch.Name))
-		}
-	}
-
-	m.CurrentRepoBranchesInfo = list.New(items, itemDelegate{}, width, height)
-	m.CurrentRepoBranchesInfo.Title = "[b]  Branches:"
-	m.CurrentRepoBranchesInfo.SetShowStatusBar(false)
-	m.CurrentRepoBranchesInfo.SetFilteringEnabled(false)
-	m.CurrentRepoBranchesInfo.SetShowHelp(false)
-	m.CurrentRepoBranchesInfo.Styles.Title = titleStyle
-	m.CurrentRepoBranchesInfo.Styles.PaginationStyle = paginationStyle
-
 	return panelBorderStyle.
 		Width(width).
 		Height(height).
@@ -96,20 +105,11 @@ func GittiMainPageView(m GittiModel) string {
 
 	keys := []string{"[c] Commit", "[p] Push", "[f] Fetch", "[q] Quit"}
 
-	// Compute panel widths
-	leftPanelWidth := int(float64(m.Width) * mainPageLayoutLeftPanelWidthRatio)
-	fileDiffPanelWidth := m.Width - leftPanelWidth - 4 // adjust for borders/padding
-
-	coreContentHeight := m.Height - mainPageLayoutTitlePanelHeight - padding - mainPageKeyBindingLayoutPanelHeight - padding
-	fileDiffPanelHeight := coreContentHeight
-	localBranchesPanelHeight := int(float64(coreContentHeight)*mainPageLocalBranchesPanelHeightRatio) - padding
-	changedFilesPanelHeight := int(float64(coreContentHeight) * mainPageChangedFilesHeightRatio)
-
 	// --- Components ---
-	topBar := renderTitleBar(m.Width)
-	localBranchesPanel := renderLocalBranchesPanel(leftPanelWidth, localBranchesPanelHeight, m)
-	changedFilesPanel := renderChangedFilesPanel(leftPanelWidth, changedFilesPanelHeight)
-	fileDiffPanel := renderFileDiffPanel(fileDiffPanelWidth, fileDiffPanelHeight, m)
+	topBar := renderTitleBar(m.Width, m.CurrentTab)
+	localBranchesPanel := renderLocalBranchesPanel(m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight, m)
+	changedFilesPanel := renderChangedFilesPanel(m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight)
+	fileDiffPanel := renderFileDiffPanel(m.HomeTabFileDiffPanelWidth, m.HomeTabFileDiffPanelHeight, m)
 	bottomBar := renderKeyBindingPanel(keys, m.Width)
 
 	leftPanel := lipgloss.JoinVertical(lipgloss.Left, localBranchesPanel, changedFilesPanel)

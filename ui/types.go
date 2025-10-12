@@ -7,9 +7,17 @@ import (
 )
 
 type GittiModel struct {
+	CurrentTab                        string
+	CurrentSelectedContainer          string
 	RepoPath                          string
 	Width                             int
 	Height                            int
+	HomeTabLeftPanelWidth             int
+	HomeTabFileDiffPanelWidth         int
+	HomeTabCoreContentHeight          int
+	HomeTabFileDiffPanelHeight        int
+	HomeTabLocalBranchesPanelHeight   int
+	HomeTabChangedFilesPanelHeight    int
 	AllRepoBranches                   []types.BranchesInfo
 	CurrentRepoBranchesInfo           list.Model
 	CurrentCheckedOutBranch           string

@@ -28,6 +28,7 @@ var (
 	colorHighlight = lipgloss.Color("#FFD700")
 	colorAccent    = lipgloss.Color("#32CD32")
 	colorError     = lipgloss.Color("#FF5555")
+	colorBasic     = lipgloss.Color("#FFFFFF")
 
 	// list component style
 	titleStyle = lipgloss.NewStyle().Foreground(colorHighlight).
@@ -39,12 +40,16 @@ var (
 
 	// Styles
 	topBarStyle = lipgloss.NewStyle().
-			Foreground(colorPrimary).
+			Foreground(colorBasic).
 			Background(lipgloss.Color("#1E1E1E")).
-			Bold(true)
+			Bold(false)
+	topBarHighLightStyle = lipgloss.NewStyle().
+				Foreground(colorPrimary).
+				Background(lipgloss.Color("#1E1E1E")).
+				Bold(true)
 
 	bottomBarStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#FFFFFF"))
+			Foreground(colorBasic)
 
 	sectionTitleStyle = lipgloss.NewStyle().
 				Foreground(colorHighlight).

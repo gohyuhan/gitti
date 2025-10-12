@@ -2,14 +2,13 @@ package ui
 
 import (
 	"fmt"
+	"github.com/charmbracelet/bubbles/list"
+	tea "github.com/charmbracelet/bubbletea"
 	"gitti/api/git"
 	"gitti/types"
 	"io"
 	"os"
 	"strings"
-
-	"github.com/charmbracelet/bubbles/list"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 // implementation for list compoenent
@@ -41,6 +40,8 @@ func NewGittiModel() GittiModel {
 		panic(fmt.Sprintf("Failed to get current working directory: %v", err))
 	}
 	gitti := GittiModel{
+		CurrentTab:                        homeTab,
+		CurrentSelectedContainer:          None,
 		RepoPath:                          repoPath,
 		Width:                             0,
 		Height:                            0,
@@ -67,6 +68,8 @@ func NewGittiModel() GittiModel {
 		panic(fmt.Sprintf("[%v], %s", statusCode, getGitInfoErr.Error()))
 	}
 
+	InitBranchList(&gitti)
+
 	return gitti
 }
 
@@ -83,17 +86,26 @@ func (m GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.Width = msg.Width
 		m.Height = msg.Height
+
+		// Compute panel widths
+		m.HomeTabLeftPanelWidth = int(float64(m.Width) * mainPageLayoutLeftPanelWidthRatio)
+		m.HomeTabFileDiffPanelWidth = m.Width - m.HomeTabLeftPanelWidth - 4 // adjust for borders/padding
+
+		m.HomeTabCoreContentHeight = m.Height - mainPageLayoutTitlePanelHeight - padding - mainPageKeyBindingLayoutPanelHeight - padding
+		m.HomeTabFileDiffPanelHeight = m.HomeTabCoreContentHeight
+		m.HomeTabLocalBranchesPanelHeight = int(float64(m.HomeTabCoreContentHeight)*mainPageLocalBranchesPanelHeightRatio) - padding
+		m.HomeTabChangedFilesPanelHeight = int(float64(m.HomeTabCoreContentHeight) * mainPageChangedFilesHeightRatio)
+
+		// update all components Width and Height
+		m.CurrentRepoBranchesInfo.SetWidth(m.HomeTabLeftPanelWidth)
+		m.CurrentRepoBranchesInfo.SetHeight(m.HomeTabLocalBranchesPanelHeight)
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q", "Q", "esc":
-			return m, tea.Quit
-		}
+		return GittiKeyInteraction(msg, m)
 	}
 
 	var cmd tea.Cmd
 	m.CurrentRepoBranchesInfo, cmd = m.CurrentRepoBranchesInfo.Update(msg)
 	return m, cmd
-	return m, nil
 }
 
 func (m GittiModel) View() string {
