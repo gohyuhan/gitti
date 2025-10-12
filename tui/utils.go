@@ -25,20 +25,6 @@ var (
 )
 
 func ProcessGitUpdate(m *GittiModel, gitInfo types.GitInfo) {
-	// 1. Check if the newly received selected branch info from git was identical with current state of selected branch
-	if m.CurrentCheckedOutBranch != gitInfo.CurrentCheckedOutBranch {
-		ReInitGittiModelStateInfoForGit(m, gitInfo)
-		return
-	}
-
-	if m.CurrentSelectedFiles != gitInfo.CurrentSelectedFile {
-		ReInitGittiModelStateInfoForGit(m, gitInfo)
-		return
-	}
-	return
-}
-
-func ReInitGittiModelStateInfoForGit(m *GittiModel, gitInfo types.GitInfo) {
 	m.CurrentCheckedOutBranch = gitInfo.CurrentCheckedOutBranch
 	m.CurrentSelectedFiles = gitInfo.CurrentSelectedFile
 	m.AllRepoBranches = gitInfo.AllBranches
@@ -66,6 +52,12 @@ func InitBranchList(m *GittiModel) {
 	m.CurrentRepoBranchesInfo.SetShowHelp(false)
 	m.CurrentRepoBranchesInfo.Styles.Title = titleStyle
 	m.CurrentRepoBranchesInfo.Styles.PaginationStyle = paginationStyle
+
+	if m.NavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfo.Items())-1 {
+		m.CurrentRepoBranchesInfo.Select(len(m.CurrentRepoBranchesInfo.Items()) - 1)
+	} else {
+		m.CurrentRepoBranchesInfo.Select(m.NavigationIndexPosition.LocalBranchComponent)
+	}
 
 	return
 }

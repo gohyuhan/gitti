@@ -24,11 +24,18 @@ type GittiModel struct {
 	CurrentCheckedOutBranch           string
 	CurrentSelectedFiles              string
 	CurrentSelectedFilesIndexPosition int
-	AllChangedFiles                   map[string]string
+	AllChangedFiles                   map[string]types.FilesInfo
 	RemoteOrigin                      string
 	UserName                          string
 	UserEmail                         string
 	GitWorkerDaemon                   api.GittiDaemonWorker
+	NavigationIndexPosition           GittiComponentsCurrentNavigationIndexPosition
+}
+
+// to record the current navigation index position
+type GittiComponentsCurrentNavigationIndexPosition struct {
+	LocalBranchComponent  int
+	FilesChangesComponent int
 }
 
 // for list component

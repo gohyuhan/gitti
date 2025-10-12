@@ -28,6 +28,7 @@ func NewGittiModel(repoPath string, gitWorkerDaemon *api.GittiDaemonWorker) Gitt
 		UserName:                          "",
 		UserEmail:                         "",
 		GitWorkerDaemon:                   *gitWorkerDaemon,
+		NavigationIndexPosition:           GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, FilesChangesComponent: 0},
 	}
 
 	isSuccess, statusCode, getGitInfoErr, gitInfo := git.GetGitInfo(

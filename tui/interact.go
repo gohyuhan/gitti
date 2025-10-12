@@ -19,12 +19,16 @@ func GittiKeyInteraction(msg tea.KeyMsg, m GittiModel) (GittiModel, tea.Cmd) {
 		return m, nil
 	case "up", "k":
 		if m.CurrentTab == homeTab && m.CurrentSelectedContainer == localBranchComponent && m.CurrentRepoBranchesInfo.Index() > 0 {
-			m.CurrentRepoBranchesInfo.Select(m.CurrentRepoBranchesInfo.Index() - 1)
+			latestIndex := m.CurrentRepoBranchesInfo.Index() - 1
+			m.CurrentRepoBranchesInfo.Select(latestIndex)
+			m.NavigationIndexPosition.LocalBranchComponent = latestIndex
 		}
 		return m, nil
 	case "down", "j":
 		if m.CurrentTab == homeTab && m.CurrentSelectedContainer == localBranchComponent && m.CurrentRepoBranchesInfo.Index() < len(m.CurrentRepoBranchesInfo.Items())-1 {
-			m.CurrentRepoBranchesInfo.Select(m.CurrentRepoBranchesInfo.Index() + 1)
+			latestIndex := m.CurrentRepoBranchesInfo.Index() + 1
+			m.CurrentRepoBranchesInfo.Select(latestIndex)
+			m.NavigationIndexPosition.LocalBranchComponent = latestIndex
 		}
 		return m, nil
 	}

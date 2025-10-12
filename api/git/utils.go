@@ -107,8 +107,8 @@ func GetAllBranches(repo *git.Repository, currentCheckedOutBranch string) map[st
 	return branchesInfoArray
 }
 
-func GetAllChangedFilesInWorkTree(repo *git.Repository) (map[string]string, string) {
-	changedFiles := map[string]string{}
+func GetAllChangedFilesInWorkTree(repo *git.Repository) (map[string]types.FilesInfo, string) {
+	changedFiles := map[string]types.FilesInfo{}
 	var firstFile string
 	wt, err := repo.Worktree()
 	if err != nil {
@@ -126,7 +126,10 @@ func GetAllChangedFilesInWorkTree(repo *git.Repository) (map[string]string, stri
 
 	for file := range status {
 		fileName := fmt.Sprintf("%v", file)
-		changedFiles[fileName] = fileName
+		changedFiles[fileName] = types.FilesInfo{
+			Name:             fileName,
+			IncludedForStage: true,
+		}
 
 		if firstFile == "" {
 			firstFile = fileName
