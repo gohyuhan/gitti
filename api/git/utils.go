@@ -83,8 +83,8 @@ func GetCurrentBranch(repo *git.Repository) string {
 	return ""
 }
 
-func GetAllBranches(repo *git.Repository, currentCheckedOutBranch string) []types.BranchesInfo {
-	branchesInfoArray := []types.BranchesInfo{}
+func GetAllBranches(repo *git.Repository, currentCheckedOutBranch string) map[string]types.BranchesInfo {
+	branchesInfoArray := map[string]types.BranchesInfo{}
 	branches, err := repo.Branches()
 	if err != nil {
 		return branchesInfoArray
@@ -96,10 +96,10 @@ func GetAllBranches(repo *git.Repository, currentCheckedOutBranch string) []type
 		if branchName == currentCheckedOutBranch {
 			isCheckout = true
 		}
-		branchesInfoArray = append(branchesInfoArray, types.BranchesInfo{
+		branchesInfoArray[branchName] = types.BranchesInfo{
 			Name:            branchName,
 			CurrentCheckout: isCheckout,
-		})
+		}
 
 		return nil
 	})
@@ -107,8 +107,9 @@ func GetAllBranches(repo *git.Repository, currentCheckedOutBranch string) []type
 	return branchesInfoArray
 }
 
-func GetAllChangedFilesInWorkTree(repo *git.Repository) []string {
-	changedFiles := []string{}
+func GetAllChangedFilesInWorkTree(repo *git.Repository) (map[string]string, string) {
+	changedFiles := map[string]string{}
+	var firstFile string
 	wt, err := repo.Worktree()
 	if err != nil {
 		panic("Unusual Rare Error of can't retrieve worktree, you might wanna reinit the repo or continue with git cli")
@@ -120,12 +121,17 @@ func GetAllChangedFilesInWorkTree(repo *git.Repository) []string {
 	}
 
 	if len(status) == 0 {
-		return changedFiles
+		return changedFiles, ""
 	}
 
-	for file, _ := range status {
-		changedFiles = append(changedFiles, fmt.Sprintf("- %v", file))
+	for file := range status {
+		fileName := fmt.Sprintf("%v", file)
+		changedFiles[fileName] = fileName
+
+		if firstFile == "" {
+			firstFile = fileName
+		}
 	}
 
-	return changedFiles
+	return changedFiles, firstFile
 }

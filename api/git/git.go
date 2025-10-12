@@ -6,11 +6,8 @@ import (
 	"gitti/types"
 )
 
-func GetInitialGitInfo(
-	repoPath string,
-) (bool, int, error, types.GitInitialInfo) {
-
-	gitInitialInfo := types.GitInitialInfo{CurrentSelectedFile: ""}
+func GetGitInfo(repoPath string) (bool, int, error, types.GitInfo) {
+	gitInitialInfo := types.GitInfo{CurrentSelectedFile: ""}
 
 	// 1. Open the git repo path from the provided path
 	repo, err := git.PlainOpen(repoPath)
@@ -31,10 +28,10 @@ func GetInitialGitInfo(
 	gitInitialInfo.AllBranches = allBranches
 
 	// 4. Get all the files that are modified/had chnages
-	allChangedFiles := GetAllChangedFilesInWorkTree(repo)
+	allChangedFiles, firstFileEntry := GetAllChangedFilesInWorkTree(repo)
 	gitInitialInfo.AllChangedFiles = allChangedFiles
 	if len(allChangedFiles) > 0 {
-		gitInitialInfo.CurrentSelectedFile = allChangedFiles[0]
+		gitInitialInfo.CurrentSelectedFile = firstFileEntry
 	}
 
 	return true, getGitInfoSuccessfully, nil, gitInitialInfo

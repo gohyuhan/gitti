@@ -1,8 +1,8 @@
 package types
 
-type GitInitialInfo struct {
+type GitInfo struct {
 	CurrentCheckedOutBranch string
-	AllBranches             []BranchesInfo
-	AllChangedFiles         []string
+	AllBranches             map[string]BranchesInfo
+	AllChangedFiles         map[string]string
 	CurrentSelectedFile     string
 }

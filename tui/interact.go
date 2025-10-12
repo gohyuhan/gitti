@@ -1,0 +1,32 @@
+package tui
+
+import tea "github.com/charmbracelet/bubbletea"
+
+// the function to handle bubbletea key interactions
+func GittiKeyInteraction(msg tea.KeyMsg, m GittiModel) (GittiModel, tea.Cmd) {
+	switch msg.String() {
+	case "ctrl+c", "q", "Q", "esc":
+		m.GitWorkerDaemon.Stop()
+		return m, tea.Quit
+	case "b", "B":
+		if m.CurrentTab == homeTab {
+			if m.CurrentSelectedContainer != localBranchComponent {
+				m.CurrentSelectedContainer = localBranchComponent
+			} else {
+				m.CurrentSelectedContainer = None
+			}
+		}
+		return m, nil
+	case "up", "k":
+		if m.CurrentTab == homeTab && m.CurrentSelectedContainer == localBranchComponent && m.CurrentRepoBranchesInfo.Index() > 0 {
+			m.CurrentRepoBranchesInfo.Select(m.CurrentRepoBranchesInfo.Index() - 1)
+		}
+		return m, nil
+	case "down", "j":
+		if m.CurrentTab == homeTab && m.CurrentSelectedContainer == localBranchComponent && m.CurrentRepoBranchesInfo.Index() < len(m.CurrentRepoBranchesInfo.Items())-1 {
+			m.CurrentRepoBranchesInfo.Select(m.CurrentRepoBranchesInfo.Index() + 1)
+		}
+		return m, nil
+	}
+	return m, nil
+}
