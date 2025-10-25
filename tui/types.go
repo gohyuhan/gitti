@@ -29,8 +29,29 @@ type GittiComponentsCurrentNavigationIndexPosition struct {
 	ModifiedFilesComponent int
 }
 
-// for list component
-type itemStringDelegate struct{}
-type itemString string
+// for list component of git branch
+type gitBranchItemDelegate struct{}
+type gitBranchItem struct {
+	BranchName   string
+	IsCheckedOut bool
+}
 
+func (i gitBranchItem) FilterValue() string {
+	return i.BranchName
+}
+
+// for list component of git modified files
+type gitModifiedFilesItemDelegate struct{}
+type gitModifiedFilesItem struct {
+	FileName         string
+	IndexState       string
+	WorkTree         string
+	SelectedForStage bool
+}
+
+func (i gitModifiedFilesItem) FilterValue() string {
+	return i.FileName
+}
+
+// tea msg
 type GitUpdateMsg string

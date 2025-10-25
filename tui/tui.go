@@ -16,8 +16,8 @@ func NewGittiModel(repoPath string) GittiModel {
 		RepoPath:                              repoPath,
 		Width:                                 0,
 		Height:                                0,
-		CurrentRepoBranchesInfo:               list.New([]list.Item{}, itemStringDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfo:          list.New([]list.Item{}, itemStringDelegate{}, 0, 0),
+		CurrentRepoBranchesInfo:               list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfo:          list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
 		CurrentSelectedFileDiffViewport:       viewport.New(0, 0),
 		CurrentSelectedFileDiffViewportOffset: 0,
 		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
@@ -39,26 +39,8 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.Width = msg.Width
 		m.Height = msg.Height
-
-		// Compute panel widths
-		m.HomeTabLeftPanelWidth = int(float64(m.Width) * mainPageLayoutLeftPanelWidthRatio)
-		m.HomeTabFileDiffPanelWidth = m.Width - m.HomeTabLeftPanelWidth - 4 // adjust for borders/padding
-
-		m.HomeTabCoreContentHeight = m.Height - mainPageKeyBindingLayoutPanelHeight - 2*padding
-		m.HomeTabFileDiffPanelHeight = m.HomeTabCoreContentHeight
-		m.HomeTabLocalBranchesPanelHeight = int(float64(m.HomeTabCoreContentHeight)*mainPageLocalBranchesPanelHeightRatio) - 2*padding
-		m.HomeTabChangedFilesPanelHeight = m.HomeTabCoreContentHeight - m.HomeTabLocalBranchesPanelHeight - 2*padding
-
-		// update all components Width and Height
-		m.CurrentRepoBranchesInfo.SetWidth(m.HomeTabLeftPanelWidth)
-		m.CurrentRepoBranchesInfo.SetHeight(m.HomeTabLocalBranchesPanelHeight)
-
-		// update viewport
-		m.CurrentSelectedFileDiffViewport.Height = m.HomeTabFileDiffPanelHeight - 1 //some margin
-		m.CurrentSelectedFileDiffViewport.Width = m.HomeTabFileDiffPanelWidth
-		m.CurrentSelectedFileDiffViewportOffset = max(0, int(m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent()*float64(m.CurrentSelectedFileDiffViewportOffset))-1)
-		m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
-
+		// recompute layout instantly
+		TuiWindowSizing(m)
 	case tea.KeyMsg:
 		return GittiKeyInteraction(msg, m)
 	case GitUpdateMsg:
@@ -70,14 +52,14 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			ProcessGitUpdate(m)
 		}
 		return m, nil
+	case tea.MouseMsg:
+		return GittiMouseInteraction(msg, m)
 	}
 
 	var cmd tea.Cmd
 	m.CurrentRepoBranchesInfo, cmd = m.CurrentRepoBranchesInfo.Update(msg)
 	m.CurrentRepoModifiedFilesInfo, cmd = m.CurrentRepoModifiedFilesInfo.Update(msg)
-	if m.CurrentSelectedContainer == FileDiffComponent {
-		m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
-	}
+
 	return m, cmd
 }
 
@@ -88,18 +70,49 @@ func (m *GittiModel) View() string {
 // -----------------------------------------------------------------------------
 // implementation for list compoenent
 // -----------------------------------------------------------------------------
-
-func (i itemString) FilterValue() string                             { return "" }
-func (d itemStringDelegate) Height() int                             { return 1 }
-func (d itemStringDelegate) Spacing() int                            { return 0 }
-func (d itemStringDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d itemStringDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(itemString)
+func (d gitModifiedFilesItemDelegate) Height() int                             { return 1 }
+func (d gitModifiedFilesItemDelegate) Spacing() int                            { return 0 }
+func (d gitModifiedFilesItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(gitModifiedFilesItem)
 	if !ok {
 		return
 	}
 
-	str := fmt.Sprintf("%s", i)
+	str := fmt.Sprintf(" [ ] %s", i.FileName)
+	if i.SelectedForStage {
+		str = fmt.Sprintf(" [X] %s", i.FileName)
+	}
+
+	componentWidth := m.Width() - 5
+	str = TruncateString(str, componentWidth)
+
+	fn := itemStyle.Render
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return selectedItemStyle.Render("> " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(str))
+}
+
+func (d gitBranchItemDelegate) Height() int                             { return 1 }
+func (d gitBranchItemDelegate) Spacing() int                            { return 0 }
+func (d gitBranchItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(gitBranchItem)
+	if !ok {
+		return
+	}
+
+	str := fmt.Sprintf("   %s", i.BranchName)
+	if i.IsCheckedOut {
+		str = fmt.Sprintf(" * %s", i.BranchName)
+	}
+
+	componentWidth := m.Width() - 5
+	str = TruncateString(str, componentWidth)
 
 	fn := itemStyle.Render
 	if index == m.Index() {

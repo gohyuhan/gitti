@@ -8,10 +8,15 @@ import (
 
 var GITBRANCH *GitBranch
 
+type BranchInfo struct {
+	BranchName   string
+	IsCheckedOut bool
+}
+
 type GitBranch struct {
 	RepoPath        string
-	CurrentCheckOut string
-	AllBranches     []string
+	CurrentCheckOut BranchInfo
+	AllBranches     []BranchInfo
 	ErrorLog        []error
 }
 
@@ -24,7 +29,7 @@ func InitGitBranch(repoPath string) {
 
 func (gb *GitBranch) GetLatestBranchesinfo() {
 	gitArgs := []string{"branch"}
-	allBranches := []string{}
+	allBranches := []BranchInfo{}
 
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gb.RepoPath
@@ -34,7 +39,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	}
 
 	gitBranches := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
-	gb.AllBranches = make([]string, 0, max(0, len(gitBranches)-1))
+	gb.AllBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommited branch
 	if len(gitBranches) < 1 {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
@@ -45,7 +50,10 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 			gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
 		}
 		gitBranches = strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
-		gb.CurrentCheckOut = gitBranches[0]
+		gb.CurrentCheckOut = BranchInfo{
+			BranchName:   gitBranches[0],
+			IsCheckedOut: true,
+		}
 	}
 
 	for _, branch := range gitBranches {
@@ -53,9 +61,15 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 
 		if strings.HasPrefix(branch, "*") {
 			branch = strings.TrimSpace(strings.TrimPrefix(branch, "*"))
-			gb.CurrentCheckOut = branch
+			gb.CurrentCheckOut = BranchInfo{
+				BranchName:   branch,
+				IsCheckedOut: true,
+			}
 		} else {
-			allBranches = append(allBranches, branch)
+			allBranches = append(allBranches, BranchInfo{
+				BranchName:   branch,
+				IsCheckedOut: false,
+			})
 		}
 	}
 

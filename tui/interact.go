@@ -8,8 +8,6 @@ import (
 
 // the function to handle bubbletea key interactions
 func GittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
-
 	switch msg.String() {
 	case "ctrl+c":
 		api.GITDAEMON.Stop()
@@ -55,7 +53,7 @@ func GittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfo.SelectedItem()
 			var fileName string
 			if currentSelectedModifiedFile != nil {
-				fileName = ReturnFileNameFromSelectedItemList(currentSelectedModifiedFile)
+				fileName = currentSelectedModifiedFile.(gitModifiedFilesItem).FileName
 				git.GITFILES.ToggleFilesStageStatus(fileName)
 			}
 		}
@@ -76,11 +74,9 @@ func GittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 				m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
 				ReinitAndRenderModifiedFileDiffViewPort(m)
 			}
-		case FileDiffComponent:
-			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
-			return m, cmd
 		}
 		return m, nil
+
 	case "down", "j":
 		switch m.CurrentSelectedContainer {
 		case LocalBranchComponent:
@@ -97,20 +93,60 @@ func GittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 				m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
 				ReinitAndRenderModifiedFileDiffViewPort(m)
 			}
+		}
+		return m, nil
+
+	case "left", "h":
+		switch m.CurrentSelectedContainer {
+		case FileDiffComponent:
+			m.CurrentSelectedFileDiffViewportOffset = max(0, m.CurrentSelectedFileDiffViewportOffset-1)
+			m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
+		}
+		return m, nil
+
+	case "right", "l":
+		switch m.CurrentSelectedContainer {
+		case FileDiffComponent:
+			if m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent() < 1 {
+				m.CurrentSelectedFileDiffViewportOffset = m.CurrentSelectedFileDiffViewportOffset + 1
+			}
+			m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
+		}
+		return m, nil
+	}
+
+	return m, nil
+}
+
+func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+	switch msg.String() {
+	case "wheel left":
+		switch m.CurrentSelectedContainer {
+		case FileDiffComponent:
+			m.CurrentSelectedFileDiffViewportOffset = max(0, m.CurrentSelectedFileDiffViewportOffset-1)
+			m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
+		}
+	case "wheel right":
+		switch m.CurrentSelectedContainer {
+		case FileDiffComponent:
+			if m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent() < 1 {
+				m.CurrentSelectedFileDiffViewportOffset = m.CurrentSelectedFileDiffViewportOffset + 1
+			}
+			m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
+		}
+	case "wheel up":
+		switch m.CurrentSelectedContainer {
 		case FileDiffComponent:
 			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 			return m, cmd
 		}
-		return m, nil
-	case "left", "h":
-		m.CurrentSelectedFileDiffViewportOffset = max(0, m.CurrentSelectedFileDiffViewportOffset-2)
-		m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
-	case "right", "l":
-		if m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent() < 1 {
-			m.CurrentSelectedFileDiffViewportOffset = m.CurrentSelectedFileDiffViewportOffset + 2
+	case "wheel down":
+		switch m.CurrentSelectedContainer {
+		case FileDiffComponent:
+			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
+			return m, cmd
 		}
-
-		m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
 	}
 	return m, nil
 }

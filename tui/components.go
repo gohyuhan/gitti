@@ -41,6 +41,7 @@ func renderFileDiffPanel(width int, height int, m *GittiModel) string {
 		Width(width).
 		Height(height).
 		UnsetMaxWidth().
+		UnsetMaxHeight().
 		Render(m.CurrentSelectedFileDiffViewport.View())
 }
 

@@ -8,8 +8,8 @@ import (
 const (
 	padding = 1
 
-	mainPageLayoutLeftPanelWidthRatio  = 0.25
-	mainPageLayoutRightPanelWidthRatio = 0.75
+	mainPageLayoutLeftPanelWidthRatio  = 0.3
+	mainPageLayoutRightPanelWidthRatio = 0.7
 
 	mainPageLocalBranchesPanelHeightRatio = 0.4
 	mainPageChangedFilesHeightRatio       = 0.6
@@ -54,14 +54,6 @@ var (
 				Foreground(colorHighlight).
 				Underline(true).
 				Bold(true)
-
-	listItemCheckedStyle = lipgloss.NewStyle().
-				Foreground(colorAccent).
-				SetString("[✓]")
-
-	listItemUncheckedStyle = lipgloss.NewStyle().
-				Foreground(colorError).
-				SetString("[ ]")
 
 	diffOldLineStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("#FF6B6B"))

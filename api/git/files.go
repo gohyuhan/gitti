@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"os/exec"
+	"runtime"
 	"strings"
 )
 
@@ -87,18 +88,35 @@ func (gf *GitFiles) GetGitFilesStatus() {
 }
 
 // get the file diff content
-func (gf *GitFiles) GetFilesDiffInfo(fileName string) []FileDiffLine {
-	gitArgs := []string{"diff", "HEAD", "-U99999", fileName}
+func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
+	gitArgs := []string{"diff", "HEAD", "--diff-filter=ADM", "-U99999", "--", fileStatus.FileName}
+	// the file is untracked
+	if fileStatus.WorkTree == "?" || fileStatus.IndexState == "?" {
+		// empty file for git diff --no-index to compares two arbitrary files outside the Git index.
+		nullFile := "/dev/null"
+		if runtime.GOOS == "windows" {
+			nullFile = "NUL"
+		}
+		gitArgs = []string{"diff", "--no-index", "-U99999", nullFile, "--", fileStatus.FileName}
+	}
 
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gf.RepoPath
 	gitOutput, err := cmd.Output()
 	if err != nil {
-		gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
-		return nil
+		exitError, ok := err.(*exec.ExitError)
+		if ok {
+			if exitError.ExitCode() != 1 {
+				gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
+				return nil
+			}
+		} else {
+			gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
+			return nil
+		}
 	}
 
-	fileDiffOneLineString := strings.Split(string(gitOutput), "@@")
+	fileDiffOneLineString := strings.SplitN(string(gitOutput), "@@", 3)
 	if len(fileDiffOneLineString) < 3 {
 		gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("There is no diff for the selected file or the file format is not supported for preview"))
 		return nil
