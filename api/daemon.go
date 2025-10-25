@@ -95,11 +95,11 @@ func (gd *GitDaemon) Start() {
 			case event := <-gd.Watcher.Events:
 				if gd.isRelevantEvent(event) {
 					go func() {
-						gd.DebounceMU.Lock()
 						if !gd.Paused {
+							gd.DebounceMU.Lock()
 							gd.resetDebounce()
+							gd.DebounceMU.Unlock()
 						}
-						gd.DebounceMU.Unlock()
 					}()
 				}
 			case err := <-gd.Watcher.Errors:
@@ -107,24 +107,25 @@ func (gd *GitDaemon) Start() {
 
 			case <-gd.WatcherTimer.C:
 				go func() {
-					gd.GitMU.Lock()
 					if !gd.Paused && gd.UpdateChannel != nil {
+						gd.GitMU.Lock()
 						git.GetUpdatedGitInfo(gd.UpdateChannel)
+						gd.GitMU.Unlock()
 					}
-					gd.GitMU.Unlock()
 				}()
 			case <-gd.GitFilesPassiveTimer.C:
 				go func() {
-					gd.GitMU.Lock()
 					if !gd.Paused {
+						gd.GitMU.Lock()
 						git.GITFILES.GetGitFilesStatus()
 						gd.UpdateChannel <- git.GENERAL_GIT_UPDATE
+						gd.GitMU.Unlock()
 					}
 					gd.GitFilesPassiveTimer.Reset(gd.GitFilesPassiveRefreshDur)
-					gd.GitMU.Unlock()
 				}()
 			case <-gd.GitFetchPassiveTimer.C:
 				go func() {
+					// for git fetch
 					gd.GitFetchPassiveTimer.Reset(gd.GitFetchPassiveRefreshDur)
 				}()
 			case <-gd.StopChannel:
