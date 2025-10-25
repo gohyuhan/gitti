@@ -1,16 +1,14 @@
 package tui
 
 import (
-	"gitti/api"
-
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func StartGitUpdateListener(p *tea.Program, w *api.GittiDaemonWorker) {
+func StartGitUpdateListener(p *tea.Program, updateChannel chan string) {
 	go func() {
-		for gitInfo := range w.ListenToUpdateChannel() {
+		for updateEvent := range updateChannel {
 			// Push message into the Bubble Tea runtime
-			p.Send(GitUpdateMsg(gitInfo))
+			p.Send(GitUpdateMsg(updateEvent))
 		}
 	}()
 }

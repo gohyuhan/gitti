@@ -2,9 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"gitti/api"
-	"gitti/api/git"
-	"gitti/types"
 	"io"
 	"strings"
 
@@ -12,41 +9,15 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func NewGittiModel(repoPath string, gitWorkerDaemon *api.GittiDaemonWorker) GittiModel {
+func NewGittiModel(repoPath string) GittiModel {
 	gitti := GittiModel{
-		CurrentTab:                        homeTab,
-		CurrentSelectedContainer:          None,
-		RepoPath:                          repoPath,
-		Width:                             0,
-		Height:                            0,
-		AllRepoBranches:                   map[string]types.BranchesInfo{},
-		CurrentRepoBranchesInfo:           list.New([]list.Item{}, itemDelegate{}, 0, 0),
-		CurrentCheckedOutBranch:           "",
-		CurrentSelectedFiles:              "",
-		CurrentSelectedFilesIndexPosition: 0,
-		RemoteOrigin:                      "",
-		UserName:                          "",
-		UserEmail:                         "",
-		GitWorkerDaemon:                   *gitWorkerDaemon,
-		NavigationIndexPosition:           GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, FilesChangesComponent: 0},
+		CurrentSelectedContainer: None,
+		RepoPath:                 repoPath,
+		Width:                    0,
+		Height:                   0,
+		CurrentRepoBranchesInfo:  list.New([]list.Item{}, itemDelegate{}, 0, 0),
+		NavigationIndexPosition:  GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, FilesChangesComponent: 0},
 	}
-
-	isSuccess, statusCode, getGitInfoErr, gitInfo := git.GetGitInfo(
-		gitti.RepoPath,
-	)
-
-	gitti.CurrentCheckedOutBranch = gitInfo.CurrentCheckedOutBranch
-	gitti.AllRepoBranches = gitInfo.AllBranches
-	gitti.CurrentSelectedFiles = gitInfo.CurrentSelectedFile
-	gitti.AllChangedFiles = gitInfo.AllChangedFiles
-
-	if !isSuccess && getGitInfoErr != nil {
-		panic(fmt.Sprintf("[%v], %s", statusCode, getGitInfoErr.Error()))
-	}
-
-	InitBranchList(&gitti)
-
-	gitti.GitWorkerDaemon.Start()
 
 	return gitti
 }
@@ -55,11 +26,11 @@ func NewGittiModel(repoPath string, gitWorkerDaemon *api.GittiDaemonWorker) Gitt
 // Bubble Tea standard functions
 // -----------------------------------------------------------------------------
 
-func (m GittiModel) Init() tea.Cmd {
+func (m *GittiModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.Width = msg.Width
@@ -80,7 +51,7 @@ func (m GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		return GittiKeyInteraction(msg, m)
 	case GitUpdateMsg:
-		ProcessGitUpdate(&m, types.GitInfo(msg))
+		ProcessGitUpdate(m)
 		return m, nil
 	}
 
@@ -107,7 +78,7 @@ func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		return
 	}
 
-	str := fmt.Sprintf("%d. %s", index+1, i)
+	str := fmt.Sprintf("%s", i)
 
 	fn := itemStyle.Render
 	if index == m.Index() {

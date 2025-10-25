@@ -2,10 +2,8 @@ package tui
 
 import (
 	"fmt"
-	"gitti/types"
-	"sort"
-
 	"github.com/charmbracelet/bubbles/list"
+	"gitti/api/git"
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -17,40 +15,18 @@ var (
 	fileDiffComponent     = "B3"
 )
 
-// this is for tab ( there will be 4 tab for now, initialzation tab(only accesible when user's repo was not git initialized yet), home tab, commit logs tab, about gitti tab )
-var (
-	initializationTab = "A"
-	homeTab           = "B"
-	commitLogsTab     = "C"
-	aboutGittiTab     = "D"
-)
-
-func ProcessGitUpdate(m *GittiModel, gitInfo types.GitInfo) {
-	m.CurrentCheckedOutBranch = gitInfo.CurrentCheckedOutBranch
-	m.CurrentSelectedFiles = gitInfo.CurrentSelectedFile
-	m.AllRepoBranches = gitInfo.AllBranches
-	m.AllChangedFiles = gitInfo.AllChangedFiles
-
+func ProcessGitUpdate(m *GittiModel) {
 	InitBranchList(m)
 	return
 }
 
 func InitBranchList(m *GittiModel) {
-	keys := make([]string, 0, len(m.AllRepoBranches))
-	for k := range m.AllRepoBranches {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys) // alphabetically sort keys
-
 	items := []list.Item{
-		item(fmt.Sprintf("* %s", m.CurrentCheckedOutBranch)),
+		item(fmt.Sprintf("* %s", git.GITBRANCH.CurrentCheckOut)),
 	}
 
-	for _, k := range keys {
-		branch := m.AllRepoBranches[k]
-		if !branch.CurrentCheckout {
-			items = append(items, item(branch.Name))
-		}
+	for _, branch := range git.GITBRANCH.AllBranches {
+		items = append(items, item(fmt.Sprintf("  %s", branch)))
 	}
 
 	m.CurrentRepoBranchesInfo = list.New(items, itemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight)
