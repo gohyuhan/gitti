@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"fmt"
 	"github.com/charmbracelet/lipgloss"
 	"strings"
 )
@@ -10,33 +9,39 @@ import (
 // Gitti Main Page View
 // -----------------------------------------------------------------------------
 // Render the Local Branches panel (top 25%)
-func renderLocalBranchesPanel(width int, height int, m GittiModel) string {
-	return panelBorderStyle.
+func renderLocalBranchesPanel(width int, height int, m *GittiModel) string {
+	borderStyle := panelBorderStyle
+	if m.CurrentSelectedContainer == LocalBranchComponent {
+		borderStyle = selectedBorderStyle
+	}
+	return borderStyle.
 		Width(width).
 		Height(height).
 		Render(m.CurrentRepoBranchesInfo.View())
 }
 
 // Render the Changed Files panel (bottom 75%)
-func renderChangedFilesPanel(width int, height int) string {
-	content := sectionTitleStyle.Render("Changed Files:") + "\n" +
-		fmt.Sprintf("  %s main.go\n", listItemCheckedStyle) +
-		fmt.Sprintf("  %s ui/view.go\n", listItemUncheckedStyle) +
-		fmt.Sprintf("  %s internal/git/commit.go\n", listItemCheckedStyle)
-
-	return panelBorderStyle.
+func renderChangedFilesPanel(width int, height int, m *GittiModel) string {
+	borderStyle := panelBorderStyle
+	if m.CurrentSelectedContainer == ModifiedFilesComponent {
+		borderStyle = selectedBorderStyle
+	}
+	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(content)
+		Render(m.CurrentRepoModifiedFilesInfo.View())
 }
 
-func renderFileDiffPanel(width int, height int, m GittiModel) string {
-	diffTitle := sectionTitleStyle.Render("Diff Viewer:") + "\n\n"
-
-	diffContent := diffOldLineStyle.Render("- func oldLine() {}\n") +
-		diffNewLineStyle.Render("+ func newLine() {}\n")
-
-	return panelBorderStyle.Width(width).Height(height).Render(diffTitle + diffContent)
+func renderFileDiffPanel(width int, height int, m *GittiModel) string {
+	borderStyle := panelBorderStyle
+	if m.CurrentSelectedContainer == FileDiffComponent {
+		borderStyle = selectedBorderStyle
+	}
+	return borderStyle.
+		Width(width).
+		Height(height).
+		UnsetMaxWidth().
+		Render(m.CurrentSelectedFileDiffViewport.View())
 }
 
 func renderKeyBindingPanel(keys []string, width int) string {
@@ -52,7 +57,7 @@ func renderKeyBindingPanel(keys []string, width int) string {
 	return bottomBarStyle.Width(width).Height(mainPageKeyBindingLayoutPanelHeight).Render(keyBindingLine)
 }
 
-func GittiMainPageView(m GittiModel) string {
+func GittiMainPageView(m *GittiModel) string {
 	if m.Width < minWidth || m.Height < minHeight {
 		return "Terminal too small — resize to continue."
 	}
@@ -61,7 +66,7 @@ func GittiMainPageView(m GittiModel) string {
 
 	// --- Components ---
 	localBranchesPanel := renderLocalBranchesPanel(m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight, m)
-	changedFilesPanel := renderChangedFilesPanel(m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight)
+	changedFilesPanel := renderChangedFilesPanel(m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight, m)
 	fileDiffPanel := renderFileDiffPanel(m.HomeTabFileDiffPanelWidth, m.HomeTabFileDiffPanelHeight, m)
 	bottomBar := renderKeyBindingPanel(keys, m.Width)
 

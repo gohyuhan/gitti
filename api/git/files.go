@@ -27,17 +27,18 @@ type FileDiffLine struct {
 }
 
 type GitFiles struct {
-	RepoPath            string
-	CurrentSelectedFile string
-	FilesStatus         []FileStatus
-	ErrorLog            []error
+	RepoPath      string
+	FilesStatus   []FileStatus
+	FilesPosition map[string]int
+	UpdateChannel chan string
+	ErrorLog      []error
 }
 
-func InitGitFile(repoPath string) {
+func InitGitFile(repoPath string, updateChannel chan string) {
 	gitFiles := GitFiles{
-		RepoPath:            repoPath,
-		FilesStatus:         make([]FileStatus, 0),
-		CurrentSelectedFile: "",
+		RepoPath:      repoPath,
+		FilesStatus:   make([]FileStatus, 0),
+		UpdateChannel: updateChannel,
 	}
 	GITFILES = &gitFiles
 }
@@ -52,12 +53,12 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES ERROR]: %w", err))
 	}
 
-	files := strings.SplitSeq(strings.TrimRight(string(gitOutput), "\n"), "\n")
+	files := strings.Split(strings.TrimRight(string(gitOutput), "\n"), "\n")
 
-	currentModifiedFiles := []string{}
 	modifiedFilesStatus := []FileStatus{}
+	modifiedFilesPositionHashmap := make(map[string]int)
 
-	for file := range files {
+	for index, file := range files {
 		if len(file) < 3 {
 			continue
 		}
@@ -66,23 +67,22 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		worktree := string(file[1])
 		fileName := strings.TrimSpace(file[3:])
 
+		// check if this was also in the previsou list before any update to the list and retrieve back the SelectedForStage info
+		fileIndex, exist := gf.FilesPosition[fileName]
+		selectedForStage := true
+		if exist {
+			selectedForStage = gf.FilesStatus[fileIndex].SelectedForStage
+		}
+
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
 			FileName:         fileName,
 			IndexState:       indexState,
 			WorkTree:         worktree,
-			SelectedForStage: true,
+			SelectedForStage: selectedForStage,
 		})
-		currentModifiedFiles = append(currentModifiedFiles, fileName)
+		modifiedFilesPositionHashmap[fileName] = index
 	}
-
-	// to reassign the current file if the new files doesn't contain the current selected GetGitFilesStatus
-	if len(currentModifiedFiles) < 1 {
-		gf.CurrentSelectedFile = ""
-	} else {
-		if !Contains(currentModifiedFiles, gf.CurrentSelectedFile) || gf.CurrentSelectedFile == "" {
-			gf.CurrentSelectedFile = currentModifiedFiles[0]
-		}
-	}
+	gf.FilesPosition = modifiedFilesPositionHashmap
 	gf.FilesStatus = modifiedFilesStatus
 }
 
@@ -121,4 +121,16 @@ func (gf *GitFiles) GetFilesDiffInfo(fileName string) []FileDiffLine {
 	}
 
 	return fileDiff
+}
+
+func (gf *GitFiles) ToggleFilesStageStatus(fileName string) {
+	fileIndex, exist := gf.FilesPosition[fileName]
+	if exist {
+		if gf.FilesStatus[fileIndex].SelectedForStage {
+			gf.FilesStatus[fileIndex].SelectedForStage = false
+		} else {
+			gf.FilesStatus[fileIndex].SelectedForStage = true
+		}
+		gf.UpdateChannel <- GIT_FILES_STATUS_UPDATE
+	}
 }

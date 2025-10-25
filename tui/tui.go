@@ -2,21 +2,25 @@ package tui
 
 import (
 	"fmt"
+	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/viewport"
+	tea "github.com/charmbracelet/bubbletea"
+	"gitti/api/git"
 	"io"
 	"strings"
-
-	"github.com/charmbracelet/bubbles/list"
-	tea "github.com/charmbracelet/bubbletea"
 )
 
 func NewGittiModel(repoPath string) GittiModel {
 	gitti := GittiModel{
-		CurrentSelectedContainer: None,
-		RepoPath:                 repoPath,
-		Width:                    0,
-		Height:                   0,
-		CurrentRepoBranchesInfo:  list.New([]list.Item{}, itemDelegate{}, 0, 0),
-		NavigationIndexPosition:  GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, FilesChangesComponent: 0},
+		CurrentSelectedContainer:              ModifiedFilesComponent,
+		RepoPath:                              repoPath,
+		Width:                                 0,
+		Height:                                0,
+		CurrentRepoBranchesInfo:               list.New([]list.Item{}, itemStringDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfo:          list.New([]list.Item{}, itemStringDelegate{}, 0, 0),
+		CurrentSelectedFileDiffViewport:       viewport.New(0, 0),
+		CurrentSelectedFileDiffViewportOffset: 0,
+		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
 	}
 
 	return gitti
@@ -40,27 +44,44 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.HomeTabLeftPanelWidth = int(float64(m.Width) * mainPageLayoutLeftPanelWidthRatio)
 		m.HomeTabFileDiffPanelWidth = m.Width - m.HomeTabLeftPanelWidth - 4 // adjust for borders/padding
 
-		m.HomeTabCoreContentHeight = m.Height - mainPageLayoutTitlePanelHeight - padding - mainPageKeyBindingLayoutPanelHeight - padding
+		m.HomeTabCoreContentHeight = m.Height - mainPageKeyBindingLayoutPanelHeight - 2*padding
 		m.HomeTabFileDiffPanelHeight = m.HomeTabCoreContentHeight
-		m.HomeTabLocalBranchesPanelHeight = int(float64(m.HomeTabCoreContentHeight)*mainPageLocalBranchesPanelHeightRatio) - padding
-		m.HomeTabChangedFilesPanelHeight = int(float64(m.HomeTabCoreContentHeight) * mainPageChangedFilesHeightRatio)
+		m.HomeTabLocalBranchesPanelHeight = int(float64(m.HomeTabCoreContentHeight)*mainPageLocalBranchesPanelHeightRatio) - 2*padding
+		m.HomeTabChangedFilesPanelHeight = m.HomeTabCoreContentHeight - m.HomeTabLocalBranchesPanelHeight - 2*padding
 
 		// update all components Width and Height
 		m.CurrentRepoBranchesInfo.SetWidth(m.HomeTabLeftPanelWidth)
 		m.CurrentRepoBranchesInfo.SetHeight(m.HomeTabLocalBranchesPanelHeight)
+
+		// update viewport
+		m.CurrentSelectedFileDiffViewport.Height = m.HomeTabFileDiffPanelHeight - 1 //some margin
+		m.CurrentSelectedFileDiffViewport.Width = m.HomeTabFileDiffPanelWidth
+		m.CurrentSelectedFileDiffViewportOffset = max(0, int(m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent()*float64(m.CurrentSelectedFileDiffViewportOffset))-1)
+		m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
+
 	case tea.KeyMsg:
 		return GittiKeyInteraction(msg, m)
 	case GitUpdateMsg:
-		ProcessGitUpdate(m)
+		updateEvent := string(msg)
+		switch updateEvent {
+		case git.GIT_FILES_STATUS_UPDATE:
+			InitModifiedFilesList(m)
+		default:
+			ProcessGitUpdate(m)
+		}
 		return m, nil
 	}
 
 	var cmd tea.Cmd
 	m.CurrentRepoBranchesInfo, cmd = m.CurrentRepoBranchesInfo.Update(msg)
+	m.CurrentRepoModifiedFilesInfo, cmd = m.CurrentRepoModifiedFilesInfo.Update(msg)
+	if m.CurrentSelectedContainer == FileDiffComponent {
+		m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
+	}
 	return m, cmd
 }
 
-func (m GittiModel) View() string {
+func (m *GittiModel) View() string {
 	return GittiMainPageView(m)
 }
 
@@ -68,12 +89,12 @@ func (m GittiModel) View() string {
 // implementation for list compoenent
 // -----------------------------------------------------------------------------
 
-func (i item) FilterValue() string                             { return "" }
-func (d itemDelegate) Height() int                             { return 1 }
-func (d itemDelegate) Spacing() int                            { return 0 }
-func (d itemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(item)
+func (i itemString) FilterValue() string                             { return "" }
+func (d itemStringDelegate) Height() int                             { return 1 }
+func (d itemStringDelegate) Spacing() int                            { return 0 }
+func (d itemStringDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d itemStringDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(itemString)
 	if !ok {
 		return
 	}

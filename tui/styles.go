@@ -8,13 +8,12 @@ import (
 const (
 	padding = 1
 
-	mainPageLayoutLeftPanelWidthRatio  = 0.4
-	mainPageLayoutRightPanelWidthRatio = 0.6
+	mainPageLayoutLeftPanelWidthRatio  = 0.25
+	mainPageLayoutRightPanelWidthRatio = 0.75
 
-	mainPageLocalBranchesPanelHeightRatio = 0.35
-	mainPageChangedFilesHeightRatio       = 0.65
+	mainPageLocalBranchesPanelHeightRatio = 0.4
+	mainPageChangedFilesHeightRatio       = 0.6
 
-	mainPageLayoutTitlePanelHeight      = 1
 	mainPageKeyBindingLayoutPanelHeight = 1
 )
 
@@ -73,4 +72,7 @@ var (
 	panelBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
 				BorderForeground(lipgloss.Color("#555555"))
+	selectedBorderStyle = lipgloss.NewStyle().
+				Border(lipgloss.DoubleBorder()).
+				BorderForeground(colorBasic)
 )

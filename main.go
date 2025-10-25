@@ -23,7 +23,7 @@ func main() {
 	// various initialization
 	debounceMS := 500 * time.Millisecond
 	git.InitGitBranch(repoPath)
-	git.InitGitFile(repoPath)
+	git.InitGitFile(repoPath, updateChannel)
 	git.GitCommitInit(repoPath, false)
 	api.InitGitDaemon(repoPath, debounceMS, updateChannel)
 
