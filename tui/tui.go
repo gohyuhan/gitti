@@ -16,8 +16,8 @@ func NewGittiModel(repoPath string) GittiModel {
 		RepoPath:                              repoPath,
 		Width:                                 0,
 		Height:                                0,
-		CurrentRepoBranchesInfo:               list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfo:          list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
+		CurrentRepoBranchesInfoList:           list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfoList:      list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
 		CurrentSelectedFileDiffViewport:       viewport.New(0, 0),
 		CurrentSelectedFileDiffViewportOffset: 0,
 		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
@@ -57,8 +57,8 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	var cmd tea.Cmd
-	m.CurrentRepoBranchesInfo, cmd = m.CurrentRepoBranchesInfo.Update(msg)
-	m.CurrentRepoModifiedFilesInfo, cmd = m.CurrentRepoModifiedFilesInfo.Update(msg)
+	m.CurrentRepoBranchesInfoList, cmd = m.CurrentRepoBranchesInfoList.Update(msg)
+	m.CurrentRepoModifiedFilesInfoList, cmd = m.CurrentRepoModifiedFilesInfoList.Update(msg)
 
 	return m, cmd
 }

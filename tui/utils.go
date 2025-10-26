@@ -12,7 +12,7 @@ import (
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
 const (
-	None = "0"
+	NoneSelected = "0"
 
 	LocalBranchComponent   = "C1"
 	ModifiedFilesComponent = "C2"
@@ -30,8 +30,8 @@ func TuiWindowSizing(m *GittiModel) {
 	m.HomeTabChangedFilesPanelHeight = m.HomeTabCoreContentHeight - m.HomeTabLocalBranchesPanelHeight - 2*padding
 
 	// update all components Width and Height
-	m.CurrentRepoBranchesInfo.SetWidth(m.HomeTabLeftPanelWidth)
-	m.CurrentRepoBranchesInfo.SetHeight(m.HomeTabLocalBranchesPanelHeight)
+	m.CurrentRepoBranchesInfoList.SetWidth(m.HomeTabLeftPanelWidth)
+	m.CurrentRepoBranchesInfoList.SetHeight(m.HomeTabLocalBranchesPanelHeight)
 
 	// update viewport
 	m.CurrentSelectedFileDiffViewport.Height = m.HomeTabFileDiffPanelHeight - 1 //some margin
@@ -57,18 +57,18 @@ func InitBranchList(m *GittiModel) {
 		items = append(items, gitBranchItem(branch))
 	}
 
-	m.CurrentRepoBranchesInfo = list.New(items, gitBranchItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight)
-	m.CurrentRepoBranchesInfo.Title = "[b]  Branches:"
-	m.CurrentRepoBranchesInfo.SetShowStatusBar(false)
-	m.CurrentRepoBranchesInfo.SetFilteringEnabled(false)
-	m.CurrentRepoBranchesInfo.SetShowHelp(false)
-	m.CurrentRepoBranchesInfo.Styles.Title = titleStyle
-	m.CurrentRepoBranchesInfo.Styles.PaginationStyle = paginationStyle
+	m.CurrentRepoBranchesInfoList = list.New(items, gitBranchItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight)
+	m.CurrentRepoBranchesInfoList.Title = "[b]  Branches:"
+	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
+	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
+	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
+	m.CurrentRepoBranchesInfoList.Styles.Title = titleStyle
+	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = paginationStyle
 
-	if m.NavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfo.Items())-1 {
-		m.CurrentRepoBranchesInfo.Select(len(m.CurrentRepoBranchesInfo.Items()) - 1)
+	if m.NavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
+		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)
 	} else {
-		m.CurrentRepoBranchesInfo.Select(m.NavigationIndexPosition.LocalBranchComponent)
+		m.CurrentRepoBranchesInfoList.Select(m.NavigationIndexPosition.LocalBranchComponent)
 	}
 
 	return
@@ -82,7 +82,7 @@ func InitModifiedFilesList(m *GittiModel) {
 	}
 
 	// get the previous selected file and see if it was within the new list if yes get the latest position of the previous selected file
-	previousSelectedFile := m.CurrentRepoBranchesInfo.SelectedItem()
+	previousSelectedFile := m.CurrentRepoBranchesInfoList.SelectedItem()
 	selectedFilesPosition := -1
 
 	for index, item := range items {
@@ -92,26 +92,26 @@ func InitModifiedFilesList(m *GittiModel) {
 		}
 	}
 
-	m.CurrentRepoModifiedFilesInfo = list.New(items, gitModifiedFilesItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight)
-	m.CurrentRepoModifiedFilesInfo.Title = "[f] 📄 Modified Files:"
-	m.CurrentRepoModifiedFilesInfo.SetShowStatusBar(false)
-	m.CurrentRepoModifiedFilesInfo.SetFilteringEnabled(false)
-	m.CurrentRepoModifiedFilesInfo.SetShowHelp(false)
-	m.CurrentRepoModifiedFilesInfo.SetShowPagination(false)
-	m.CurrentRepoModifiedFilesInfo.Styles.Title = titleStyle
+	m.CurrentRepoModifiedFilesInfoList = list.New(items, gitModifiedFilesItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight)
+	m.CurrentRepoModifiedFilesInfoList.Title = "[f] 📄 Modified Files:"
+	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
+	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
+	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
+	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
+	m.CurrentRepoModifiedFilesInfoList.Styles.Title = titleStyle
 
 	if len(items) < 1 {
 		return
 	}
 
 	if selectedFilesPosition >= 0 {
-		m.CurrentRepoModifiedFilesInfo.Select(selectedFilesPosition)
+		m.CurrentRepoModifiedFilesInfoList.Select(selectedFilesPosition)
 		m.NavigationIndexPosition.ModifiedFilesComponent = selectedFilesPosition
 	} else {
-		if m.NavigationIndexPosition.ModifiedFilesComponent > len(m.CurrentRepoModifiedFilesInfo.Items())-1 {
-			m.CurrentRepoModifiedFilesInfo.Select(len(m.CurrentRepoModifiedFilesInfo.Items()) - 1)
+		if m.NavigationIndexPosition.ModifiedFilesComponent > len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
+			m.CurrentRepoModifiedFilesInfoList.Select(len(m.CurrentRepoModifiedFilesInfoList.Items()) - 1)
 		} else {
-			m.CurrentRepoModifiedFilesInfo.Select(m.NavigationIndexPosition.ModifiedFilesComponent)
+			m.CurrentRepoModifiedFilesInfoList.Select(m.NavigationIndexPosition.ModifiedFilesComponent)
 		}
 	}
 	return
@@ -127,7 +127,7 @@ func ReinitAndRenderModifiedFileDiffViewPort(m *GittiModel) {
 
 // for the current selected modified file preview viewport
 func RenderModifiedFilesDiffViewPort(m *GittiModel) {
-	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfo.SelectedItem()
+	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
 		fileStatus = git.FileStatus(currentSelectedModifiedFile.(gitModifiedFilesItem))
@@ -178,7 +178,7 @@ func TruncateString(s string, width int) string {
 	}
 	runes := []rune(s)
 	if width > 1 {
-		return string(runes[:width-1]) + "…"
+		return string(runes[:width-3]) + "…  "
 	}
 	return string(runes[:width])
 }

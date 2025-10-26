@@ -16,8 +16,8 @@ type GittiModel struct {
 	HomeTabFileDiffPanelHeight            int
 	HomeTabLocalBranchesPanelHeight       int
 	HomeTabChangedFilesPanelHeight        int
-	CurrentRepoBranchesInfo               list.Model
-	CurrentRepoModifiedFilesInfo          list.Model
+	CurrentRepoBranchesInfoList           list.Model
+	CurrentRepoModifiedFilesInfoList      list.Model
 	CurrentSelectedFileDiffViewport       viewport.Model
 	CurrentSelectedFileDiffViewportOffset int
 	NavigationIndexPosition               GittiComponentsCurrentNavigationIndexPosition
