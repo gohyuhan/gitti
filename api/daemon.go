@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"gitti/api/git"
+	"gitti/settings"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -14,48 +15,48 @@ import (
 )
 
 type GitDaemon struct {
-	RepoPath                  string
-	Watcher                   *fsnotify.Watcher
-	DebounceDur               time.Duration
-	GitFilesPassiveRefreshDur time.Duration
-	GitFetchPassiveRefreshDur time.Duration
-	Paused                    bool
-	DebounceMU                sync.Mutex
-	GitMU                     sync.Mutex
-	WatcherTimer              *time.Timer
-	GitFilesPassiveTimer      *time.Timer
-	GitFetchPassiveTimer      *time.Timer
-	StopChannel               chan struct{}
-	ErrorLog                  []error
-	UpdateChannel             chan string // to communicate back to main thread for an update event
+	RepoPath                 string
+	Watcher                  *fsnotify.Watcher
+	DebounceDur              time.Duration
+	GitFilesActiveRefreshDur time.Duration
+	GitFetchActiveRefreshDur time.Duration
+	Paused                   bool
+	GitMU                    sync.Mutex
+	WatcherTimer             *time.Timer
+	GitFilesActiveTimer      *time.Timer
+	GitFetchActiveTimer      *time.Timer
+	StopChannel              chan struct{}
+	ErrorLog                 []error
+	UpdateChannel            chan string // to communicate back to main thread for an update event
 }
 
 var GITDAEMON *GitDaemon
 
-func InitGitDaemon(repoPath string, debounce time.Duration, updateChannel chan string) {
+func InitGitDaemon(repoPath string, updateChannel chan string) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		return
 	}
 
-	gitFilesPassiveRefreshDur := 2 * time.Second
-	gitFetchPassiveRefreshDur := 60 * time.Second
+	debounce := time.Duration(settings.GITTICONFIGSETTINGS.FileWatcherDebounceMS) * time.Millisecond
+	gitFilesActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFilesActiveRefreshDurationMS) * time.Millisecond
+	gitFetchActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFetchDurationMS) * time.Millisecond
 	gd := &GitDaemon{
-		RepoPath:                  filepath.Join(repoPath, ".git"),
-		Watcher:                   w,
-		DebounceDur:               debounce,
-		GitFilesPassiveRefreshDur: gitFilesPassiveRefreshDur,
-		GitFetchPassiveRefreshDur: gitFetchPassiveRefreshDur,
-		WatcherTimer:              time.NewTimer(debounce), // milliseconds
-		GitFilesPassiveTimer:      time.NewTimer(gitFilesPassiveRefreshDur),
-		GitFetchPassiveTimer:      time.NewTimer(gitFetchPassiveRefreshDur),
-		StopChannel:               make(chan struct{}),
-		ErrorLog:                  make([]error, 0),
-		UpdateChannel:             updateChannel,
+		RepoPath:                 filepath.Join(repoPath, ".git"),
+		Watcher:                  w,
+		DebounceDur:              debounce,
+		GitFilesActiveRefreshDur: gitFilesActiveRefreshDur,
+		GitFetchActiveRefreshDur: gitFetchActiveRefreshDur,
+		WatcherTimer:             time.NewTimer(debounce), // milliseconds
+		GitFilesActiveTimer:      time.NewTimer(gitFilesActiveRefreshDur),
+		GitFetchActiveTimer:      time.NewTimer(gitFetchActiveRefreshDur),
+		StopChannel:              make(chan struct{}),
+		ErrorLog:                 make([]error, 0),
+		UpdateChannel:            updateChannel,
 	}
 	gd.WatcherTimer.Stop()
-	gd.GitFilesPassiveTimer.Stop()
-	gd.GitFetchPassiveTimer.Stop()
+	gd.GitFilesActiveTimer.Stop()
+	gd.GitFetchActiveTimer.Stop()
 	gd.WatchPath()
 
 	GITDAEMON = gd
@@ -87,8 +88,8 @@ func (gd *GitDaemon) Start() {
 			git.GetUpdatedGitInfo(gd.UpdateChannel)
 		}
 		gd.GitMU.Unlock()
-		gd.GitFilesPassiveTimer.Reset(gd.GitFilesPassiveRefreshDur)
-		gd.GitFetchPassiveTimer.Reset(gd.GitFetchPassiveRefreshDur)
+		gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
+		gd.GitFetchActiveTimer.Reset(gd.GitFetchActiveRefreshDur)
 		// loop to stay active
 		for {
 			select {
@@ -96,9 +97,7 @@ func (gd *GitDaemon) Start() {
 				if gd.isRelevantEvent(event) {
 					go func() {
 						if !gd.Paused {
-							gd.DebounceMU.Lock()
 							gd.resetDebounce()
-							gd.DebounceMU.Unlock()
 						}
 					}()
 				}
@@ -113,7 +112,7 @@ func (gd *GitDaemon) Start() {
 						gd.GitMU.Unlock()
 					}
 				}()
-			case <-gd.GitFilesPassiveTimer.C:
+			case <-gd.GitFilesActiveTimer.C:
 				go func() {
 					if !gd.Paused {
 						gd.GitMU.Lock()
@@ -121,12 +120,12 @@ func (gd *GitDaemon) Start() {
 						gd.UpdateChannel <- git.GENERAL_GIT_UPDATE
 						gd.GitMU.Unlock()
 					}
-					gd.GitFilesPassiveTimer.Reset(gd.GitFilesPassiveRefreshDur)
+					gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
 				}()
-			case <-gd.GitFetchPassiveTimer.C:
+			case <-gd.GitFetchActiveTimer.C:
 				go func() {
 					// for git fetch
-					gd.GitFetchPassiveTimer.Reset(gd.GitFetchPassiveRefreshDur)
+					gd.GitFetchActiveTimer.Reset(gd.GitFetchActiveRefreshDur)
 				}()
 			case <-gd.StopChannel:
 				gd.Watcher.Close()

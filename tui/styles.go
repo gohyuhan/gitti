@@ -6,21 +6,14 @@ import (
 )
 
 const (
-	padding = 1
+	minWidth  = 90
+	minHeight = 28
 
-	mainPageLayoutLeftPanelWidthRatio  = 0.3
-	mainPageLayoutRightPanelWidthRatio = 0.7
-
-	mainPageLocalBranchesPanelHeightRatio = 0.4
-	mainPageChangedFilesHeightRatio       = 0.6
-
+	padding                             = 1
 	mainPageKeyBindingLayoutPanelHeight = 1
 )
 
 var (
-	minWidth  = 90
-	minHeight = 28
-
 	// Base colors
 	colorPrimary   = lipgloss.Color("#00BFFF")
 	colorSecondary = lipgloss.Color("#AAAAAA")
@@ -33,9 +26,9 @@ var (
 	titleStyle = lipgloss.NewStyle().Foreground(colorHighlight).
 			Underline(true).
 			Bold(true)
-	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
+	itemStyle         = lipgloss.NewStyle().PaddingLeft(2)
 	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
-	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
+	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(2)
 
 	// Styles
 	topBarStyle = lipgloss.NewStyle().

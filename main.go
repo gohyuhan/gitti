@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"gitti/api"
 	"gitti/api/git"
+	"gitti/settings"
 	"gitti/tui"
 	"os"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -21,11 +21,11 @@ func main() {
 	updateChannel := make(chan string)
 
 	// various initialization
-	debounceMS := 500 * time.Millisecond
+	settings.InitOrReadConfig("gitti")
 	git.InitGitBranch(repoPath)
 	git.InitGitFile(repoPath, updateChannel)
-	git.GitCommitInit(repoPath, false)
-	api.InitGitDaemon(repoPath, debounceMS, updateChannel)
+	// git.GitCommitInit(repoPath, false) // not included in v0.1.0
+	api.InitGitDaemon(repoPath, updateChannel)
 
 	// start the Git Daemon
 	api.GITDAEMON.Start()

@@ -45,7 +45,7 @@ func InitGitFile(repoPath string, updateChannel chan string) {
 }
 
 func (gf *GitFiles) GetGitFilesStatus() {
-	gitArgs := []string{"status", "--porcelain"}
+	gitArgs := []string{"status", "--porcelain", "-uall"}
 
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gf.RepoPath

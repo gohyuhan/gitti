@@ -9,9 +9,11 @@ const (
 func GetUpdatedGitInfo(updateChannel chan string) {
 	GITFILES.GetGitFilesStatus()
 	GITBRANCH.GetLatestBranchesinfo()
-	go func() {
-		GITCOMMIT.GetLatestGitCommitInfoAndDAG(updateChannel)
-	}()
+
+	// not included in v0.1.0
+	// go func() {
+	// 	GITCOMMIT.GetLatestGitCommitInfoAndDAG(updateChannel)
+	// }()
 
 	updateChannel <- GENERAL_GIT_UPDATE
 }

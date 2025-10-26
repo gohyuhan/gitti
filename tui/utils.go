@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"gitti/api/git"
+	"gitti/settings"
 	"unicode/utf8"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -20,12 +21,12 @@ const (
 
 func TuiWindowSizing(m *GittiModel) {
 	// Compute panel widths
-	m.HomeTabLeftPanelWidth = int(float64(m.Width) * mainPageLayoutLeftPanelWidthRatio)
+	m.HomeTabLeftPanelWidth = int(float64(m.Width) * settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio)
 	m.HomeTabFileDiffPanelWidth = m.Width - m.HomeTabLeftPanelWidth - 4 // adjust for borders/padding
 
 	m.HomeTabCoreContentHeight = m.Height - mainPageKeyBindingLayoutPanelHeight - 2*padding
 	m.HomeTabFileDiffPanelHeight = m.HomeTabCoreContentHeight
-	m.HomeTabLocalBranchesPanelHeight = int(float64(m.HomeTabCoreContentHeight)*mainPageLocalBranchesPanelHeightRatio) - 2*padding
+	m.HomeTabLocalBranchesPanelHeight = int(float64(m.HomeTabCoreContentHeight)*settings.GITTICONFIGSETTINGS.GitBranchComponentHeightRatio) - 2*padding
 	m.HomeTabChangedFilesPanelHeight = m.HomeTabCoreContentHeight - m.HomeTabLocalBranchesPanelHeight - 2*padding
 
 	// update all components Width and Height
