@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"gitti/api/git"
+	"gitti/i18n"
 	"gitti/settings"
 	"unicode/utf8"
 
@@ -58,7 +59,7 @@ func InitBranchList(m *GittiModel) {
 	}
 
 	m.CurrentRepoBranchesInfoList = list.New(items, gitBranchItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight)
-	m.CurrentRepoBranchesInfoList.Title = "[b]  Branches:"
+	m.CurrentRepoBranchesInfoList.Title = fmt.Sprintf("[b]  %s:", i18n.LANGUAGEMAPPING.Branches)
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
@@ -93,7 +94,7 @@ func InitModifiedFilesList(m *GittiModel) {
 	}
 
 	m.CurrentRepoModifiedFilesInfoList = list.New(items, gitModifiedFilesItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight)
-	m.CurrentRepoModifiedFilesInfoList.Title = "[f] 📄 Modified Files:"
+	m.CurrentRepoModifiedFilesInfoList.Title = fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles)
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
@@ -141,7 +142,7 @@ func RenderModifiedFilesDiffViewPort(m *GittiModel) {
 	modifiedDiffRowNum := 0
 	fileDiff := git.GITFILES.GetFilesDiffInfo(fileStatus)
 	if fileDiff == nil {
-		vpLine += "The current selected file type is not supported for preview"
+		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
 		m.CurrentSelectedFileDiffViewport.SetContent(vpLine)
 		return
 	}

@@ -2,24 +2,9 @@ package tui
 
 import (
 	"fmt"
-
 	"github.com/charmbracelet/lipgloss"
+	"gitti/i18n"
 )
-
-var KeyBindingHashmap = map[string]interface{}{
-	NoneSelected: []string{"[b] branch component", "[f] files component", "[esc] quit"},
-	LocalBranchComponent: map[string]interface{}{
-		"IsCheckOut": []string{"[s] stash all file(s)", "[u] unstage all file(s)", "[esc] unselect component"},
-		"Default":    []string{"[enter] switch branch", "[s] stash all file(s)", "[u] unstage all file(s)", "[esc] unselect component"},
-		"None":       []string{"[esc] unselect component"},
-	},
-	ModifiedFilesComponent: map[string]interface{}{
-		"IsStaged": []string{"[s] unstage this change", "[enter] view modified content", "[esc] unselect component"},
-		"Default":  []string{"[s] stage this change", "[enter] view modified content", "[esc] unselect component"},
-		"None":     []string{"[esc] unselect component"},
-	},
-	FileDiffComponent: []string{"[←/→] move left and right", "[↑/↓] move up and down", "[esc] back to file compoenent"},
-}
 
 // -----------------------------------------------------------------------------
 // Gitti Main Page View
@@ -65,33 +50,33 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 	var keys []string
 	switch m.CurrentSelectedContainer {
 	case NoneSelected:
-		keys = KeyBindingHashmap[NoneSelected].([]string)
+		keys = i18n.LANGUAGEMAPPING.KeyBindingNoneSelected
 	case LocalBranchComponent:
 		CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 		if CurrentSelectedBranch == nil {
-			keys = KeyBindingHashmap[LocalBranchComponent].(map[string]interface{})["None"].([]string)
+			keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentNone
 		} else {
 			isCurrentSelectedBranchCheckedOutBranch := CurrentSelectedBranch.(gitBranchItem).IsCheckedOut
 			if isCurrentSelectedBranchCheckedOutBranch {
-				keys = KeyBindingHashmap[LocalBranchComponent].(map[string]interface{})["IsCheckOut"].([]string)
+				keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentIsCheckOut
 			} else {
-				keys = KeyBindingHashmap[LocalBranchComponent].(map[string]interface{})["Default"].([]string)
+				keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentDefault
 			}
 		}
 	case ModifiedFilesComponent:
 		CurrentSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 		if CurrentSelectedFile == nil {
-			keys = KeyBindingHashmap[ModifiedFilesComponent].(map[string]interface{})["None"].([]string)
+			keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentNone
 		} else {
 			isFileStaged := CurrentSelectedFile.(gitModifiedFilesItem).SelectedForStage
 			if isFileStaged {
-				keys = KeyBindingHashmap[ModifiedFilesComponent].(map[string]interface{})["IsStaged"].([]string)
+				keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentIsStaged
 			} else {
-				keys = KeyBindingHashmap[ModifiedFilesComponent].(map[string]interface{})["Default"].([]string)
+				keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
 			}
 		}
 	case FileDiffComponent:
-		keys = KeyBindingHashmap[FileDiffComponent].([]string)
+		keys = i18n.LANGUAGEMAPPING.KeyBindingFileDiffComponent
 	}
 
 	distributedWidth := width / len(keys)
@@ -116,7 +101,7 @@ func GittiMainPageView(m *GittiModel) string {
 	if m.Width < minWidth || m.Height < minHeight {
 		title := lipgloss.NewStyle().
 			Bold(true).
-			Render("Terminal too small — resize to continue.")
+			Render(i18n.LANGUAGEMAPPING.TerminalSizeWarning)
 
 		// Styles for the metric labels and values
 		labelStyle := lipgloss.NewStyle()
@@ -124,15 +109,15 @@ func GittiMainPageView(m *GittiModel) string {
 		failStyle := lipgloss.NewStyle().Foreground(colorError)
 
 		// Height
-		heightStatus := passStyle.Render(fmt.Sprintf("Current height: %v", m.Height))
+		heightStatus := passStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalHeight, m.Height))
 		if m.Height < minHeight {
-			heightStatus = failStyle.Render(fmt.Sprintf("Current height: %v", m.Height))
+			heightStatus = failStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Height))
 		}
 
 		// Width
-		widthStatus := passStyle.Render(fmt.Sprintf("Current width: %v", m.Width))
+		widthStatus := passStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Width))
 		if m.Width < minWidth {
-			widthStatus = failStyle.Render(fmt.Sprintf("Current width: %v", m.Width))
+			widthStatus = failStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Width))
 		}
 
 		// Combine formatted text
@@ -141,8 +126,8 @@ func GittiMainPageView(m *GittiModel) string {
 			title,
 			fmt.Sprintf(
 				"\n%s %d\n%s %d\n%s\n%s",
-				labelStyle.Render("Minimum required height:"), minHeight,
-				labelStyle.Render("Minimum required width:"), minWidth,
+				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalHeight)), minHeight,
+				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalWidth)), minWidth,
 				heightStatus,
 				widthStatus,
 			),

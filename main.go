@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gitti/api"
 	"gitti/api/git"
+	"gitti/i18n"
 	"gitti/settings"
 	"gitti/tui"
 	"os"
@@ -22,6 +23,7 @@ func main() {
 
 	// various initialization
 	settings.InitOrReadConfig("gitti")
+	i18n.InitGittiLanguageMapping(settings.GITTICONFIGSETTINGS.LanguageCode)
 	git.InitGitBranch(repoPath)
 	git.InitGitFile(repoPath, updateChannel)
 	// git.GitCommitInit(repoPath, false) // not included in v0.1.0
@@ -40,9 +42,7 @@ func main() {
 	tui.StartGitUpdateListener(gitti, updateChannel)
 
 	if _, err := gitti.Run(); err != nil {
-		fmt.Printf("Alas, there's been an error: %v", err)
 		api.GITDAEMON.Stop()
-		os.Exit(1)
+		panic(fmt.Sprintf("Alas, there's been an error: %v", err))
 	}
-
 }
