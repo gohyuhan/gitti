@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -112,7 +114,47 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 
 func GittiMainPageView(m *GittiModel) string {
 	if m.Width < minWidth || m.Height < minHeight {
-		return "Terminal too small — resize to continue."
+		title := lipgloss.NewStyle().
+			Bold(true).
+			Render("Terminal too small — resize to continue.")
+
+		// Styles for the metric labels and values
+		labelStyle := lipgloss.NewStyle()
+		passStyle := lipgloss.NewStyle().Foreground(colorAccent)
+		failStyle := lipgloss.NewStyle().Foreground(colorError)
+
+		// Height
+		heightStatus := passStyle.Render(fmt.Sprintf("Current height: %v", m.Height))
+		if m.Height < minHeight {
+			heightStatus = failStyle.Render(fmt.Sprintf("Current height: %v", m.Height))
+		}
+
+		// Width
+		widthStatus := passStyle.Render(fmt.Sprintf("Current width: %v", m.Width))
+		if m.Width < minWidth {
+			widthStatus = failStyle.Render(fmt.Sprintf("Current width: %v", m.Width))
+		}
+
+		// Combine formatted text
+		warningLine := lipgloss.JoinVertical(
+			lipgloss.Center,
+			title,
+			fmt.Sprintf(
+				"\n%s %d\n%s %d\n%s\n%s",
+				labelStyle.Render("Minimum required height:"), minHeight,
+				labelStyle.Render("Minimum required width:"), minWidth,
+				heightStatus,
+				widthStatus,
+			),
+		)
+
+		centered := lipgloss.NewStyle().
+			Width(m.Width).
+			Height(m.Height).
+			Align(lipgloss.Center, lipgloss.Center).
+			Render(warningLine)
+
+		return centered
 	}
 
 	// --- Components ---

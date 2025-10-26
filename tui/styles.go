@@ -18,8 +18,8 @@ var (
 	colorPrimary   = lipgloss.Color("#00BFFF")
 	colorSecondary = lipgloss.Color("#AAAAAA")
 	colorHighlight = lipgloss.Color("#FFD700")
-	colorAccent    = lipgloss.Color("#32CD32")
-	colorError     = lipgloss.Color("#FF5555")
+	colorAccent    = lipgloss.Color("#98FB98")
+	colorError     = lipgloss.Color("#FF6B6B")
 	colorBasic     = lipgloss.Color("#FFFFFF")
 
 	// list component style
@@ -49,10 +49,10 @@ var (
 				Bold(true)
 
 	diffOldLineStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("#FF6B6B"))
+				Foreground(colorError)
 
 	diffNewLineStyle = lipgloss.NewStyle().
-				Foreground(lipgloss.Color("#98FB98"))
+				Foreground(colorAccent)
 
 	panelBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
