@@ -75,3 +75,11 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 
 	gb.AllBranches = allBranches
 }
+
+func SetGitInitDefaultBranch(branchName string, cwd string) {
+	gitArgs := []string{"config", "--global", "init.defaultBranch", branchName}
+
+	cmd := exec.Command("git", gitArgs...)
+	cmd.Dir = cwd
+	_ = cmd.Run()
+}

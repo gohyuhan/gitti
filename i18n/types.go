@@ -6,6 +6,14 @@ package i18n
 // -------------------------------------------------------
 //
 // var EN = LanguageMapping{
+// 	FlagLangCode:               "set the language code, e.g. 'EN', 'JP', 'ZH-CN', 'ZH-TW'...",
+// 	FlagInitDefaultBranch:      "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
+// 	FlagGlobal:                 "also apply to system git if supported",
+// 	FailToGetCWD:               "Failed to get current working directory:",
+// 	TuiRunFail:                 "Alas, there's been an error",
+// LanguageNotSupportedPanic:  "is not supported, Please choose between [EN, JP, ZH-TW, ZH-CN]",
+// GittiDefaultBranchSet:              "Gitti default init branch set to '%s'",
+// GittiDefaultAndGitDefaultBranchSet: "Both gitti and git default init branch set to '%s'",
 // 	Branches:                   "Branches",
 // 	ModifiedFiles:              "Modified Files",
 // 	FileTypeUnSupportedPreview: "The current selected file type is not supported for preview",
@@ -54,6 +62,20 @@ package i18n
 // }
 
 type LanguageMapping struct {
+	// flag expalnation
+	FlagLangCode          string
+	FlagInitDefaultBranch string
+	FlagGlobal            string
+	// Run Error
+	FailToGetCWD string
+	TuiRunFail   string
+	// i18n
+	LanguageNotSupportedPanic string
+	LanguageSet               string
+	// init default branch
+	GittiDefaultBranchSet              string
+	GittiDefaultAndGitDefaultBranchSet string
+	// Gitti UI text
 	Branches                   string
 	ModifiedFiles              string
 	FileTypeUnSupportedPreview string

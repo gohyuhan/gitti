@@ -1,14 +1,23 @@
 package i18n
 
-var ZH_TW = LanguageMapping{
-	Branches:                   "分支",
-	ModifiedFiles:              "已修改的檔案",
-	FileTypeUnSupportedPreview: "目前選擇的檔案類型不支援預覽",
-	TerminalSizeWarning:        "終端機太小 — 請調整大小以繼續。",
-	CurrentTerminalHeight:      "目前高度",
-	MinimumTerminalHeight:      "最小需求高度",
-	CurrentTerminalWidth:       "目前寬度",
-	MinimumTerminalWidth:       "最小需求寬度",
+var zH_TW = LanguageMapping{
+	FlagLangCode:                       "設定語言代碼，例如：'EN'、'JP'、'ZH-CN'、'ZH-TW'...",
+	FlagInitDefaultBranch:              "設定 git init 的預設分支.\n此設定僅影響透過 gitti 執行的 git init.\n若要讓 git 本身預設使用此分支名稱，請同時加上 '--global' 參數.",
+	FlagGlobal:                         "同時套用至系統 git（若支援）",
+	FailToGetCWD:                       "無法取得目前工作目錄",
+	TuiRunFail:                         "發生錯誤",
+	LanguageNotSupportedPanic:          "不支援[%s]，請選擇 %v 之一",
+	LanguageSet:                        "語言已設定為 %s",
+	GittiDefaultBranchSet:              "Gitti 預設初始化分支已設為「%s」",
+	GittiDefaultAndGitDefaultBranchSet: "Gitti 和 Git 的預設初始化分支已設為「%s」",
+	Branches:                           "分支",
+	ModifiedFiles:                      "已修改的檔案",
+	FileTypeUnSupportedPreview:         "目前選擇的檔案類型不支援預覽",
+	TerminalSizeWarning:                "終端機太小 — 請調整大小以繼續。",
+	CurrentTerminalHeight:              "目前高度",
+	MinimumTerminalHeight:              "最小需求高度",
+	CurrentTerminalWidth:               "目前寬度",
+	MinimumTerminalWidth:               "最小需求寬度",
 	KeyBindingNoneSelected: []string{
 		"[b] 分支元件",
 		"[f] 檔案元件",

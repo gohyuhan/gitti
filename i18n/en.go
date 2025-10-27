@@ -1,14 +1,23 @@
 package i18n
 
-var EN = LanguageMapping{
-	Branches:                   "Branches",
-	ModifiedFiles:              "Modified Files",
-	FileTypeUnSupportedPreview: "The current selected file type is not supported for preview",
-	TerminalSizeWarning:        "Terminal too small — resize to continue.",
-	CurrentTerminalHeight:      "Current height",
-	MinimumTerminalHeight:      "Minimum required height",
-	CurrentTerminalWidth:       "Current width",
-	MinimumTerminalWidth:       "Minimum required height",
+var eN = LanguageMapping{
+	FlagLangCode:                       "set the language code, e.g. 'EN', 'JP', 'ZH-CN', 'ZH-TW'...",
+	FlagInitDefaultBranch:              "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
+	FlagGlobal:                         "also apply to system git if supported",
+	FailToGetCWD:                       "Failed to get current working directory",
+	TuiRunFail:                         "Alas, there's been an error",
+	LanguageNotSupportedPanic:          "[%s] is not supported, Please choose between %v",
+	LanguageSet:                        "Language set to %s",
+	GittiDefaultBranchSet:              "Gitti default init branch set to '%s'",
+	GittiDefaultAndGitDefaultBranchSet: "Both gitti and git default init branch set to '%s'",
+	Branches:                           "Branches",
+	ModifiedFiles:                      "Modified Files",
+	FileTypeUnSupportedPreview:         "The current selected file type is not supported for preview",
+	TerminalSizeWarning:                "Terminal too small — resize to continue.",
+	CurrentTerminalHeight:              "Current height",
+	MinimumTerminalHeight:              "Minimum required height",
+	CurrentTerminalWidth:               "Current width",
+	MinimumTerminalWidth:               "Minimum required height",
 	KeyBindingNoneSelected: []string{
 		"[b] branch component",
 		"[f] files component",

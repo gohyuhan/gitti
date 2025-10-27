@@ -12,18 +12,8 @@ func GetUpdatedGitInfo(updateChannel chan string) {
 
 	// not included in v0.1.0
 	// go func() {
-	// 	GITCOMMIT.GetLatestGitCommitInfoAndDAG(updateChannel)
+	// 	GITCOMMIT.GetLatestGitCommitLogInfoAndDAG(updateChannel)
 	// }()
 
 	updateChannel <- GENERAL_GIT_UPDATE
-}
-
-// Contains is a generic helper function to check for the existence of an item in a slice.
-func Contains[T comparable](slice []T, item T) bool {
-	for _, v := range slice {
-		if v == item {
-			return true
-		}
-	}
-	return false
 }

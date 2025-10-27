@@ -1,11 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"gitti/api"
-	"gitti/api/git"
 	"gitti/i18n"
-	"gitti/settings"
 	"gitti/tui"
 	"os"
 
@@ -15,34 +14,47 @@ import (
 func main() {
 	repoPath, err := os.Getwd()
 	if err != nil {
-		panic(fmt.Sprintf("Failed to get current working directory: %v", err))
+		fmt.Printf("%s: %v", i18n.LANGUAGEMAPPING.FailToGetCWD, err)
+		os.Exit(1)
 	}
 
-	// create the channel that will be the bring to emit update event back to main thread
-	updateChannel := make(chan string)
+	InitGlobalSettingAndLanguage()
+	langCode := flag.String("set-langcode", "", i18n.LANGUAGEMAPPING.FlagLangCode)
+	defaultInitBranch := flag.String("set-init-dbranch", "", i18n.LANGUAGEMAPPING.FlagInitDefaultBranch)
+	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
 
-	// various initialization
-	settings.InitOrReadConfig("gitti")
-	i18n.InitGittiLanguageMapping(settings.GITTICONFIGSETTINGS.LanguageCode)
-	git.InitGitBranch(repoPath)
-	git.InitGitFile(repoPath, updateChannel)
-	// git.GitCommitInit(repoPath, false) // not included in v0.1.0
-	api.InitGitDaemon(repoPath, updateChannel)
+	flag.Parse()
 
-	// start the Git Daemon
-	api.GITDAEMON.Start()
+	switch {
+	case *langCode != "":
+		SetLanguage(*langCode)
+	case *defaultInitBranch != "" && *applyToSystemGit:
+		SetGlobalInitBranch(*defaultInitBranch, repoPath)
+	case *defaultInitBranch != "" && !*applyToSystemGit:
+		SetInitBranch(*defaultInitBranch)
+	default:
+		// create the channel that will be the bring to emit update event back to main thread
+		updateChannel := make(chan string)
 
-	gittiUiModel := tui.NewGittiModel(repoPath)
-	gitti := tea.NewProgram(
-		&gittiUiModel,
-		tea.WithAltScreen(), // ← enables full-screen TUI mode
-		tea.WithMouseCellMotion(),
-	)
+		// initialization
+		InitGitAndAPI(repoPath, updateChannel)
 
-	tui.StartGitUpdateListener(gitti, updateChannel)
+		// start the Git Daemon
+		api.GITDAEMON.Start()
 
-	if _, err := gitti.Run(); err != nil {
-		api.GITDAEMON.Stop()
-		panic(fmt.Sprintf("Alas, there's been an error: %v", err))
+		gittiUiModel := tui.NewGittiModel(repoPath)
+		gitti := tea.NewProgram(
+			&gittiUiModel,
+			tea.WithAltScreen(), // ← enables full-screen TUI mode
+			tea.WithMouseCellMotion(),
+		)
+
+		tui.StartGitUpdateListener(gitti, updateChannel)
+
+		if _, err := gitti.Run(); err != nil {
+			api.GITDAEMON.Stop()
+			fmt.Printf("%s: %v", i18n.LANGUAGEMAPPING.TuiRunFail, err)
+			os.Exit(1)
+		}
 	}
 }

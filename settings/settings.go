@@ -2,9 +2,11 @@ package settings
 
 import (
 	"encoding/json"
+	"gitti/api/git"
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 )
 
 var GITTICONFIGSETTINGS *GittiConfigSettings
@@ -33,15 +35,17 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	LanguageCode:                    "EN",
 }
 
+const AppName = "gitti"
+
 // getConfigPath returns the config.json path (creates directories if needed)
 //
 // *Example on MacOs : /Users/<USER_NAME>/Library/Application Support/gitti/config.json
-func getConfigPath(appName string) (string, error) {
+func getConfigPath() (string, error) {
 	dir, err := os.UserConfigDir()
 	if err != nil {
 		return "", err
 	}
-	appDir := filepath.Join(dir, appName)
+	appDir := filepath.Join(dir, AppName)
 	if err := os.MkdirAll(appDir, 0o755); err != nil {
 		return "", err
 	}
@@ -49,10 +53,10 @@ func getConfigPath(appName string) (string, error) {
 }
 
 // InitOrReadConfig loads existing config, ensures schema correctness, or creates default.
-func InitOrReadConfig(appName string) {
+func InitOrReadConfig() {
 	GITTICONFIGSETTINGS = &GittiDefaultConfigSettings
 
-	cfgPath, err := getConfigPath(appName)
+	cfgPath, err := getConfigPath()
 	if err != nil {
 		return
 	}
@@ -137,4 +141,23 @@ func saveConfig(cfgPath string, cfg GittiConfigSettings) {
 	enc := json.NewEncoder(file)
 	enc.SetIndent("", "  ")
 	_ = enc.Encode(cfg)
+}
+
+func UpdateLanguageCode(languageCode string) {
+	GITTICONFIGSETTINGS.LanguageCode = strings.ToUpper(languageCode)
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
+
+func UpdatedDefaultBranch(branchName string, applyToGit bool, cwd string) {
+	GITTICONFIGSETTINGS.GitInitDefaultBranch = branchName
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+		if applyToGit {
+			git.SetGitInitDefaultBranch(branchName, cwd)
+		}
+	}
 }
