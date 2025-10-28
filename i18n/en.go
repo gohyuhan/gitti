@@ -1,7 +1,7 @@
 package i18n
 
 var eN = LanguageMapping{
-	FlagLangCode:                       "set the language code, e.g. 'EN', 'JP', 'ZH-CN', 'ZH-TW'...",
+	FlagLangCode:                       "set the language code, e.g. 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
 	FlagGlobal:                         "also apply to system git if supported",
 	FailToGetCWD:                       "Failed to get current working directory",

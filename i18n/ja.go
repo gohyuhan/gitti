@@ -1,7 +1,7 @@
 package i18n
 
-var jP = LanguageMapping{
-	FlagLangCode:                       "言語コードを設定します。例: 'EN', 'JP', 'ZH-CN', 'ZH-TW'...",
+var jA = LanguageMapping{
+	FlagLangCode:                       "言語コードを設定します。例: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "git init のデフォルトブランチを設定します.\nこれは gitti を通して行われる git init にのみ影響します.\ngit 自体のデフォルトブランチ名を変更するには、'--global' フラグも追加してください.",
 	FlagGlobal:                         "システムの git にも適用します（対応している場合）",
 	FailToGetCWD:                       "現在の作業ディレクトリの取得に失敗しました",

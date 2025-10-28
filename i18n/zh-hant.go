@@ -1,7 +1,7 @@
 package i18n
 
-var zH_TW = LanguageMapping{
-	FlagLangCode:                       "設定語言代碼，例如：'EN'、'JP'、'ZH-CN'、'ZH-TW'...",
+var zH_HANT = LanguageMapping{
+	FlagLangCode:                       "設定語言代碼，例如：'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "設定 git init 的預設分支.\n此設定僅影響透過 gitti 執行的 git init.\n若要讓 git 本身預設使用此分支名稱，請同時加上 '--global' 參數.",
 	FlagGlobal:                         "同時套用至系統 git（若支援）",
 	FailToGetCWD:                       "無法取得目前工作目錄",
