@@ -65,7 +65,7 @@ var zH_HANS = LanguageMapping{
 		"[tab] 移动到下一个输入框",
 		"[shift+tab] 移动到上一个输入框",
 		"[esc] 取消",
-		"[%s+enter] 提交更改",
+		"[ctrl+enter] 提交更改",
 	},
 	CommitPopUpMessageTitle:                      "* 提交信息",
 	CommitPopUpMessageInputPlaceHolder:           "输入提交信息",

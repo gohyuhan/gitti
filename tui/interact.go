@@ -54,7 +54,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 			}
 		}
 
-	case "ctrl+enter", "cmd+enter":
+	case "ctrl+enter":
 		switch m.PopUpType {
 		case CommitPopUp:
 			// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully

@@ -65,7 +65,7 @@ var eN = LanguageMapping{
 		"[tab] move to next input",
 		"[shift+tab] move to previous input",
 		"[esc] cancel",
-		"[%s+enter] commit changes",
+		"[ctrl+enter] commit changes",
 	},
 	CommitPopUpMessageTitle:                      "* Commit Message",
 	CommitPopUpMessageInputPlaceHolder:           "Enter commit message",

@@ -65,7 +65,7 @@ var jA = LanguageMapping{
 		"[tab] 次の入力欄に移動",
 		"[shift+tab] 前の入力欄に移動",
 		"[esc] キャンセル",
-		"[%s+enter] 変更をコミット",
+		"[ctrl+enter] 変更をコミット",
 	},
 	CommitPopUpMessageTitle:                      "* コミットメッセージ",
 	CommitPopUpMessageInputPlaceHolder:           "コミットメッセージを入力",
