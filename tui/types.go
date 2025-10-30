@@ -1,8 +1,10 @@
 package tui
 
 import (
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/viewport"
+	"github.com/charmbracelet/bubbles/v2/list"
+	"github.com/charmbracelet/bubbles/v2/textarea"
+	"github.com/charmbracelet/bubbles/v2/textinput"
+	"github.com/charmbracelet/bubbles/v2/viewport"
 )
 
 type GittiModel struct {
@@ -21,6 +23,17 @@ type GittiModel struct {
 	CurrentSelectedFileDiffViewport       viewport.Model
 	CurrentSelectedFileDiffViewportOffset int
 	NavigationIndexPosition               GittiComponentsCurrentNavigationIndexPosition
+	ShowPopUp                             bool
+	PopUpType                             string
+	PopUpModel                            interface{}
+	IsTyping                              bool
+}
+
+type CommitPopUpModel struct {
+	MessageTextInput         textinput.Model // input index 1
+	DescriptionTextAreaInput textarea.Model  // input index 2
+	TotalInputCount          int             // to tell us how many input were there
+	CurrentActiveInputIndex  int             // to tell us which input should be shown as highlighted/focus and be updated
 }
 
 // to record the current navigation index position

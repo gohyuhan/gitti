@@ -35,6 +35,10 @@ func SetGlobalInitBranch(branchName string, cwd string) {
 }
 
 func InitGitAndAPI(repoPath string, updateChannel chan string) {
+	// check if git is installed in system if not, exit(1)
+	api.IsGitInstalled(repoPath)
+	// check if the user repo is git inited, is not prompt user to init it
+	api.IsRepoGitInitialized(repoPath)
 	// various initialization
 	git.InitGitBranch(repoPath)
 	git.InitGitFile(repoPath, updateChannel)

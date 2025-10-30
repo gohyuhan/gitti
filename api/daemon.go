@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/fsnotify/fsnotify"
 	"gitti/api/git"
 	"gitti/settings"
 	"io/fs"
@@ -10,8 +11,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/fsnotify/fsnotify"
 )
 
 type GitDaemon struct {
@@ -85,7 +84,7 @@ func (gd *GitDaemon) Start() {
 		// Initial call to get info of git
 		gd.GitMU.Lock()
 		if !gd.Paused && gd.UpdateChannel != nil {
-			git.GetUpdatedGitInfo(gd.UpdateChannel)
+			GetUpdatedGitInfo(gd.UpdateChannel)
 		}
 		gd.GitMU.Unlock()
 		gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
@@ -108,7 +107,7 @@ func (gd *GitDaemon) Start() {
 				go func() {
 					if !gd.Paused && gd.UpdateChannel != nil {
 						gd.GitMU.Lock()
-						git.GetUpdatedGitInfo(gd.UpdateChannel)
+						GetUpdatedGitInfo(gd.UpdateChannel)
 						gd.GitMU.Unlock()
 					}
 				}()

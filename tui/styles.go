@@ -1,8 +1,7 @@
 package tui
 
 import (
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/v2"
 )
 
 const (
@@ -11,6 +10,9 @@ const (
 
 	padding                             = 1
 	mainPageKeyBindingLayoutPanelHeight = 1
+
+	maxLeftPanelWidth   = 80
+	maxCommitPopUpWidth = 100
 )
 
 var (
@@ -26,9 +28,9 @@ var (
 	titleStyle = lipgloss.NewStyle().Foreground(colorHighlight).
 			Underline(true).
 			Bold(true)
-	itemStyle         = lipgloss.NewStyle().PaddingLeft(2)
-	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
-	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(2)
+	itemStyle         = lipgloss.NewStyle()
+	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
+	paginationStyle   = lipgloss.NewStyle()
 
 	// Styles
 	topBarStyle = lipgloss.NewStyle().
@@ -56,8 +58,17 @@ var (
 
 	panelBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
+				Padding(0).
+				Margin(0).
 				BorderForeground(lipgloss.Color("#555555"))
 	selectedBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.DoubleBorder()).
+				Padding(0).
+				Margin(0).
+				BorderForeground(colorBasic)
+	popUpBorderStyle = lipgloss.NewStyle().
+				Border(lipgloss.ThickBorder()).
+				Padding(0).
+				Margin(0).
 				BorderForeground(colorBasic)
 )

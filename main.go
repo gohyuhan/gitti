@@ -8,7 +8,7 @@ import (
 	"gitti/tui"
 	"os"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "github.com/charmbracelet/bubbletea/v2"
 )
 
 func main() {
@@ -19,8 +19,8 @@ func main() {
 	}
 
 	InitGlobalSettingAndLanguage()
-	langCode := flag.String("set-langcode", "", i18n.LANGUAGEMAPPING.FlagLangCode)
-	defaultInitBranch := flag.String("set-init-dbranch", "", i18n.LANGUAGEMAPPING.FlagInitDefaultBranch)
+	langCode := flag.String("language", "", i18n.LANGUAGEMAPPING.FlagLangCode)
+	defaultInitBranch := flag.String("init-dbranch", "", i18n.LANGUAGEMAPPING.FlagInitDefaultBranch)
 	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
 
 	flag.Parse()
@@ -45,8 +45,6 @@ func main() {
 		gittiUiModel := tui.NewGittiModel(repoPath)
 		gitti := tea.NewProgram(
 			&gittiUiModel,
-			tea.WithAltScreen(), // ← enables full-screen TUI mode
-			tea.WithMouseCellMotion(),
 		)
 
 		tui.StartGitUpdateListener(gitti, updateChannel)

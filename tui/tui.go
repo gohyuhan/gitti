@@ -2,15 +2,20 @@ package tui
 
 import (
 	"fmt"
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/viewport"
-	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/bubbles/v2/list"
+	"github.com/charmbracelet/bubbles/v2/viewport"
+	tea "github.com/charmbracelet/bubbletea/v2"
 	"gitti/api/git"
 	"io"
 	"strings"
 )
 
 func NewGittiModel(repoPath string) GittiModel {
+	vp := viewport.New()
+	vp.SoftWrap = false
+	vp.MouseWheelEnabled = true
+	vp.SetHorizontalStep(1)
+	vp.MouseWheelDelta = 1
 	gitti := GittiModel{
 		CurrentSelectedContainer:              ModifiedFilesComponent,
 		RepoPath:                              repoPath,
@@ -18,9 +23,13 @@ func NewGittiModel(repoPath string) GittiModel {
 		Height:                                0,
 		CurrentRepoBranchesInfoList:           list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
 		CurrentRepoModifiedFilesInfoList:      list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
-		CurrentSelectedFileDiffViewport:       viewport.New(0, 0),
+		CurrentSelectedFileDiffViewport:       vp,
 		CurrentSelectedFileDiffViewportOffset: 0,
 		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
+		ShowPopUp:                             false,
+		PopUpType:                             None,
+		PopUpModel:                            struct{}{},
+		IsTyping:                              false,
 	}
 
 	return gitti
@@ -63,8 +72,12 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
-func (m *GittiModel) View() string {
-	return GittiMainPageView(m)
+func (m *GittiModel) View() tea.View {
+	var v tea.View
+	v.SetContent(GittiMainPageView(m))
+	v.AltScreen = true
+	v.MouseMode = tea.MouseModeCellMotion
+	return v
 }
 
 // -----------------------------------------------------------------------------

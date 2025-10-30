@@ -1,7 +1,9 @@
 package i18n
 
 import (
+	"fmt"
 	"gitti/utils"
+	"runtime"
 	"strings"
 )
 
@@ -26,6 +28,11 @@ func InitGittiLanguageMapping(languageCode string) {
 	default:
 		LANGUAGEMAPPING = &eN
 	}
+	powerKey := "ctrl"
+	if runtime.GOOS == "darwin" {
+		powerKey = "⌘"
+	}
+	LANGUAGEMAPPING.KeyBindingForCommitPopUp[len(LANGUAGEMAPPING.KeyBindingForCommitPopUp)-1] = fmt.Sprintf(LANGUAGEMAPPING.KeyBindingForCommitPopUp[len(LANGUAGEMAPPING.KeyBindingForCommitPopUp)-1], powerKey)
 }
 
 func IsLanguageCodeSupported(languageCode string) bool {

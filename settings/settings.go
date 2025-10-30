@@ -36,6 +36,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 }
 
 const AppName = "gitti"
+const AppVersion = "v0.1.0"
 
 // getConfigPath returns the config.json path (creates directories if needed)
 //

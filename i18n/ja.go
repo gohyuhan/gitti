@@ -1,7 +1,7 @@
 package i18n
 
 var jA = LanguageMapping{
-	FlagLangCode:                       "言語コードを設定します。例: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
+	FlagLangCode:                       "言語コードを設定します. 例: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "git init のデフォルトブランチを設定します.\nこれは gitti を通して行われる git init にのみ影響します.\ngit 自体のデフォルトブランチ名を変更するには、'--global' フラグも追加してください.",
 	FlagGlobal:                         "システムの git にも適用します（対応している場合）",
 	FailToGetCWD:                       "現在の作業ディレクトリの取得に失敗しました",
@@ -10,10 +10,14 @@ var jA = LanguageMapping{
 	LanguageSet:                        "言語を %s に設定しました",
 	GittiDefaultBranchSet:              "Gitti のデフォルト初期ブランチが「%s」に設定されました",
 	GittiDefaultAndGitDefaultBranchSet: "Gitti と Git のデフォルト初期ブランチが「%s」に設定されました",
+	GitNotInstalledError:               "システムに Git がインストールされていません。Gitti を使用するには Git が必要です.",
+	GitNotInitPrompt:                   "現在のディレクトリは Git リポジトリとして初期化されていません. 初期化しますか？ (y/n): ",
+	GitInitRefuse:                      "Gitti 終了。Gitti は Git 初期化済みリポジトリでのみ動作します.",
+	GitInitPromptInvalidInput:          "無効な入力です。[Y/y] または [N/n] を入力してください.",
 	Branches:                           "ブランチ",
 	ModifiedFiles:                      "変更されたファイル",
 	FileTypeUnSupportedPreview:         "現在選択されているファイル形式はプレビューに対応していません",
-	TerminalSizeWarning:                "端末サイズが小さすぎます — サイズを変更してください。",
+	TerminalSizeWarning:                "端末サイズが小さすぎます — サイズを変更してください.",
 	CurrentTerminalHeight:              "現在の高さ",
 	MinimumTerminalHeight:              "必要な最小の高さ",
 	CurrentTerminalWidth:               "現在の幅",
@@ -39,11 +43,13 @@ var jA = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[s] この変更をアンステージ",
+		"[c] コミット",
 		"[enter] 変更内容を表示",
 		"[esc] コンポーネント選択を解除",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[s] この変更をステージ",
+		"[c] コミット",
 		"[enter] 変更内容を表示",
 		"[esc] コンポーネント選択を解除",
 	},
@@ -55,4 +61,14 @@ var jA = LanguageMapping{
 		"[↑/↓] 上下に移動",
 		"[esc] ファイルコンポーネントに戻る",
 	},
+	KeyBindingForCommitPopUp: []string{
+		"[tab] 次の入力欄に移動",
+		"[shift+tab] 前の入力欄に移動",
+		"[esc] キャンセル",
+		"[%s+enter] 変更をコミット",
+	},
+	CommitPopUpMessageTitle:                      "* コミットメッセージ",
+	CommitPopUpMessageInputPlaceHolder:           "コミットメッセージを入力",
+	CommitPopUpDescriptionTitle:                  "説明",
+	CommitPopUpCommitDescriptionInputPlaceHolder: "コミットの詳細を記述...",
 }

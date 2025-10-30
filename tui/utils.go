@@ -7,8 +7,10 @@ import (
 	"gitti/settings"
 	"unicode/utf8"
 
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/bubbles/v2/list"
+	"github.com/charmbracelet/bubbles/v2/textarea"
+	"github.com/charmbracelet/bubbles/v2/textinput"
+	"github.com/charmbracelet/lipgloss/v2"
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -20,23 +22,34 @@ const (
 	FileDiffComponent      = "C3"
 )
 
+const (
+	None           = "None"
+	CommitPopUp    = "CommitPopUp"
+	CommitLogPopUp = "CommitLogPopUp"
+)
+
 func TuiWindowSizing(m *GittiModel) {
 	// Compute panel widths
-	m.HomeTabLeftPanelWidth = int(float64(m.Width) * settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio)
-	m.HomeTabFileDiffPanelWidth = m.Width - m.HomeTabLeftPanelWidth - 4 // adjust for borders/padding
+	m.HomeTabLeftPanelWidth = min(int(float64(m.Width)*settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio), maxLeftPanelWidth)
+	m.HomeTabFileDiffPanelWidth = m.Width - m.HomeTabLeftPanelWidth
 
 	m.HomeTabCoreContentHeight = m.Height - mainPageKeyBindingLayoutPanelHeight - 2*padding
 	m.HomeTabFileDiffPanelHeight = m.HomeTabCoreContentHeight
-	m.HomeTabLocalBranchesPanelHeight = int(float64(m.HomeTabCoreContentHeight)*settings.GITTICONFIGSETTINGS.GitBranchComponentHeightRatio) - 2*padding
-	m.HomeTabChangedFilesPanelHeight = m.HomeTabCoreContentHeight - m.HomeTabLocalBranchesPanelHeight - 2*padding
+
+	leftPanelRemainingHeight := m.HomeTabCoreContentHeight - 3 // this is after reserving the height for the gitti version panel
+	m.HomeTabLocalBranchesPanelHeight = int(float64(leftPanelRemainingHeight)*settings.GITTICONFIGSETTINGS.GitBranchComponentHeightRatio) - 2*padding
+	m.HomeTabChangedFilesPanelHeight = leftPanelRemainingHeight - m.HomeTabLocalBranchesPanelHeight - 2*padding
 
 	// update all components Width and Height
-	m.CurrentRepoBranchesInfoList.SetWidth(m.HomeTabLeftPanelWidth)
+	m.CurrentRepoBranchesInfoList.SetWidth(m.HomeTabLeftPanelWidth - 2)
 	m.CurrentRepoBranchesInfoList.SetHeight(m.HomeTabLocalBranchesPanelHeight)
 
+	m.CurrentRepoModifiedFilesInfoList.SetWidth(m.HomeTabLeftPanelWidth - 2)
+	m.CurrentRepoModifiedFilesInfoList.SetHeight(m.HomeTabChangedFilesPanelHeight)
+
 	// update viewport
-	m.CurrentSelectedFileDiffViewport.Height = m.HomeTabFileDiffPanelHeight - 1 //some margin
-	m.CurrentSelectedFileDiffViewport.Width = m.HomeTabFileDiffPanelWidth
+	m.CurrentSelectedFileDiffViewport.SetHeight(m.HomeTabFileDiffPanelHeight) //some margin
+	m.CurrentSelectedFileDiffViewport.SetWidth(m.HomeTabFileDiffPanelWidth - 2)
 	m.CurrentSelectedFileDiffViewportOffset = max(0, int(m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent()*float64(m.CurrentSelectedFileDiffViewportOffset))-1)
 	m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
 	m.CurrentSelectedFileDiffViewport.SetYOffset(m.CurrentSelectedFileDiffViewport.YOffset)
@@ -83,7 +96,7 @@ func InitModifiedFilesList(m *GittiModel) {
 	}
 
 	// get the previous selected file and see if it was within the new list if yes get the latest position of the previous selected file
-	previousSelectedFile := m.CurrentRepoBranchesInfoList.SelectedItem()
+	previousSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	selectedFilesPosition := -1
 
 	for index, item := range items {
@@ -182,4 +195,23 @@ func TruncateString(s string, width int) string {
 		return string(runes[:width-3]) + "…  "
 	}
 	return string(runes[:width])
+}
+
+func InitCommitPopUpModel(m *GittiModel) {
+	CommitMessageTextInput := textinput.New()
+	CommitMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolder
+	CommitMessageTextInput.Focus()
+
+	CommitDescriptionTextAreaInput := textarea.New()
+	CommitDescriptionTextAreaInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpCommitDescriptionInputPlaceHolder
+	CommitDescriptionTextAreaInput.ShowLineNumbers = false
+	CommitDescriptionTextAreaInput.SetHeight(5)
+	CommitDescriptionTextAreaInput.Blur()
+
+	m.PopUpModel = &CommitPopUpModel{
+		MessageTextInput:         CommitMessageTextInput,
+		DescriptionTextAreaInput: CommitDescriptionTextAreaInput,
+		TotalInputCount:          2,
+		CurrentActiveInputIndex:  1,
+	}
 }
