@@ -35,6 +35,7 @@ type GitCommitPopUpModel struct {
 	TotalInputCount          int             // to tell us how many input were there
 	CurrentActiveInputIndex  int             // to tell us which input should be shown as highlighted/focus and be updated
 	GitCommitOutputViewport  viewport.Model
+	IsProcessing             bool // indicator to prevent multiple thread spawning reacting to the key binding trigger
 }
 
 // to record the current navigation index position

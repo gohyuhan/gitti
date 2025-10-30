@@ -57,23 +57,28 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 	case "ctrl+enter":
 		switch m.PopUpType {
 		case CommitPopUp:
+			// once they start for commit process, reinit the input focus
+			m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Focus()
+			m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex = 1
 			// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
 			// also do not start any git operation is message is no provided
-			go func() {
-				message := m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Value()
-				description := m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Value()
-				if len(message) < 1 {
-					return
-				}
-				git.GITCOMMIT.GitStage()
-				exitStatusCode := git.GITCOMMIT.GitCommit(message, description)
-				if exitStatusCode == 0 {
-					m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.SetValue("")
-					m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.SetValue("")
-				}
-			}()
+			if !m.PopUpModel.(*GitCommitPopUpModel).IsProcessing {
+				go func() {
+					m.PopUpModel.(*GitCommitPopUpModel).IsProcessing = true
+					message := m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Value()
+					description := m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Value()
+					if len(message) < 1 {
+						return
+					}
+					git.GITCOMMIT.GitStage()
+					exitStatusCode := git.GITCOMMIT.GitCommit(message, description)
+					if exitStatusCode == 0 {
+						m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.SetValue("")
+						m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.SetValue("")
+					}
+				}()
+			}
 		}
-
 		return m, nil
 	}
 	switch m.PopUpType {
