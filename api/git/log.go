@@ -215,7 +215,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 				DateTime:         dateTime,
 			})
 
-			updateChannel <- GIT_COMMIT_UPDATE
+			updateChannel <- GIT_COMMIT_LOG_UPDATE
 		}
 	}
 

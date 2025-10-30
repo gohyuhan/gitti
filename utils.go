@@ -42,6 +42,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) {
 	// various initialization
 	git.InitGitBranch(repoPath)
 	git.InitGitFile(repoPath, updateChannel)
+	git.InitGitCommit(repoPath, updateChannel)
 	// git.InitGitCommitLog(repoPath, false) // not included in v0.1.0
 	api.InitGitDaemon(repoPath, updateChannel)
 }

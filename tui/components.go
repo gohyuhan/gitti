@@ -217,14 +217,14 @@ func renderPopUpComponent(m *GittiModel) string {
 
 func createCommitPopUp(m *GittiModel) string {
 	popUpWidth := min(maxCommitPopUpWidth, int(float64(m.Width)*0.8))
-	m.PopUpModel.(*CommitPopUpModel).MessageTextInput.SetWidth(popUpWidth - 4)
-	m.PopUpModel.(*CommitPopUpModel).DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
+	m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.SetWidth(popUpWidth - 4)
+	m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
 
 	// Rendered content
 	title := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitle)
-	inputView := m.PopUpModel.(*CommitPopUpModel).MessageTextInput.View()
+	inputView := m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.View()
 	descLabel := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpDescriptionTitle)
-	descView := m.PopUpModel.(*CommitPopUpModel).DescriptionTextAreaInput.View()
+	descView := m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.View()
 
 	content := lipgloss.JoinVertical(
 		lipgloss.Left,

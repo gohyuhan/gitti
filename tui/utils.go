@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/textarea"
 	"github.com/charmbracelet/bubbles/v2/textinput"
+	"github.com/charmbracelet/bubbles/v2/viewport"
 	"github.com/charmbracelet/lipgloss/v2"
 )
 
@@ -23,9 +24,8 @@ const (
 )
 
 const (
-	None           = "None"
-	CommitPopUp    = "CommitPopUp"
-	CommitLogPopUp = "CommitLogPopUp"
+	None        = "None"
+	CommitPopUp = "CommitPopUp"
 )
 
 func TuiWindowSizing(m *GittiModel) {
@@ -197,7 +197,7 @@ func TruncateString(s string, width int) string {
 	return string(runes[:width])
 }
 
-func InitCommitPopUpModel(m *GittiModel) {
+func InitGitCommitPopUpModel(m *GittiModel) {
 	CommitMessageTextInput := textinput.New()
 	CommitMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolder
 	CommitMessageTextInput.Focus()
@@ -208,10 +208,16 @@ func InitCommitPopUpModel(m *GittiModel) {
 	CommitDescriptionTextAreaInput.SetHeight(5)
 	CommitDescriptionTextAreaInput.Blur()
 
-	m.PopUpModel = &CommitPopUpModel{
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+
+	m.PopUpModel = &GitCommitPopUpModel{
 		MessageTextInput:         CommitMessageTextInput,
 		DescriptionTextAreaInput: CommitDescriptionTextAreaInput,
 		TotalInputCount:          2,
 		CurrentActiveInputIndex:  1,
+		GitCommitOutputViewport:  vp,
 	}
 }

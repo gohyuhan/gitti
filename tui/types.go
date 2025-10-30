@@ -29,11 +29,12 @@ type GittiModel struct {
 	IsTyping                              bool
 }
 
-type CommitPopUpModel struct {
+type GitCommitPopUpModel struct {
 	MessageTextInput         textinput.Model // input index 1
 	DescriptionTextAreaInput textarea.Model  // input index 2
 	TotalInputCount          int             // to tell us how many input were there
 	CurrentActiveInputIndex  int             // to tell us which input should be shown as highlighted/focus and be updated
+	GitCommitOutputViewport  viewport.Model
 }
 
 // to record the current navigation index position

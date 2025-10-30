@@ -19,6 +19,7 @@ func GittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
+		git.GITCOMMIT.KillCommit()
 		m.ShowPopUp = false
 		m.IsTyping = false
 		return m, nil
@@ -26,14 +27,14 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 	case "tab":
 		switch m.PopUpType {
 		case CommitPopUp:
-			m.PopUpModel.(*CommitPopUpModel).CurrentActiveInputIndex = min(m.PopUpModel.(*CommitPopUpModel).CurrentActiveInputIndex+1, m.PopUpModel.(*CommitPopUpModel).TotalInputCount)
-			switch m.PopUpModel.(*CommitPopUpModel).CurrentActiveInputIndex {
+			m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex = min(m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex+1, m.PopUpModel.(*GitCommitPopUpModel).TotalInputCount)
+			switch m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex {
 			case 1:
-				m.PopUpModel.(*CommitPopUpModel).MessageTextInput.Focus()
-				m.PopUpModel.(*CommitPopUpModel).DescriptionTextAreaInput.Blur()
+				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Focus()
+				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Blur()
 			case 2:
-				m.PopUpModel.(*CommitPopUpModel).MessageTextInput.Blur()
-				m.PopUpModel.(*CommitPopUpModel).DescriptionTextAreaInput.Focus()
+				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Blur()
+				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Focus()
 			}
 		}
 		return m, nil
@@ -42,21 +43,42 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 	case "shift+tab":
 		switch m.PopUpType {
 		case CommitPopUp:
-			m.PopUpModel.(*CommitPopUpModel).CurrentActiveInputIndex = max(m.PopUpModel.(*CommitPopUpModel).CurrentActiveInputIndex-1, 1)
-			switch m.PopUpModel.(*CommitPopUpModel).CurrentActiveInputIndex {
+			m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex = max(m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex-1, 1)
+			switch m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex {
 			case 1:
-				m.PopUpModel.(*CommitPopUpModel).MessageTextInput.Focus()
-				m.PopUpModel.(*CommitPopUpModel).DescriptionTextAreaInput.Blur()
+				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Focus()
+				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Blur()
 			case 2:
-				m.PopUpModel.(*CommitPopUpModel).MessageTextInput.Blur()
-				m.PopUpModel.(*CommitPopUpModel).DescriptionTextAreaInput.Focus()
+				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Blur()
+				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Focus()
 			}
 		}
+
+	case "ctrl+enter", "cmd+enter":
+		switch m.PopUpType {
+		case CommitPopUp:
+			// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
+			// also do not start any git operation is message is no provided
+			go func() {
+				message := m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Value()
+				description := m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Value()
+				if len(message) < 1 {
+					return
+				}
+				git.GITCOMMIT.GitStage()
+				exitStatusCode := git.GITCOMMIT.GitCommit(message, description)
+				if exitStatusCode == 0 {
+					m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.SetValue("")
+					m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.SetValue("")
+				}
+			}()
+		}
+
 		return m, nil
 	}
 	switch m.PopUpType {
 	case CommitPopUp:
-		commitPopUpModel := m.PopUpModel.(*CommitPopUpModel)
+		commitPopUpModel := m.PopUpModel.(*GitCommitPopUpModel)
 
 		switch commitPopUpModel.CurrentActiveInputIndex {
 		case 1:
@@ -98,8 +120,8 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			m.ShowPopUp = true
 			m.PopUpType = CommitPopUp
 			// if the current pop up model is not commit pop up model, then init it
-			if _, ok := m.PopUpModel.(*CommitPopUpModel); !ok {
-				InitCommitPopUpModel(m)
+			if _, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
+				InitGitCommitPopUpModel(m)
 			}
 			m.IsTyping = true
 		}
