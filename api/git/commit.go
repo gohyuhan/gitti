@@ -70,6 +70,11 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 	cmd.Stderr = cmd.Stdout
 
 	gc.GitCommitProcess = cmd
+	defer func() {
+		// ensure cleanup even if Start or Wait fails
+		gc.GitCommitProcess = nil
+	}()
+
 	if err := cmd.Start(); err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
@@ -114,7 +119,6 @@ func (gc *GitCommit) GitPush() {
 
 func (gc *GitCommit) KillCommit() {
 	if gc.GitCommitProcess != nil && gc.GitCommitProcess.Process != nil {
-		fmt.Println("Killing process...")
 		_ = gc.GitCommitProcess.Process.Kill()
 		gc.GitCommitProcess = nil
 	}
