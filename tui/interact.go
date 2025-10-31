@@ -8,7 +8,7 @@ import (
 )
 
 // the function to handle bubbletea key interactions
-func GittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	if m.IsTyping {
 		return handleTypingKeyBindingInteraction(msg, m)
 	} else {
@@ -19,9 +19,7 @@ func GittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
-		git.GITCOMMIT.KillCommit()
-		m.ShowPopUp = false
-		m.IsTyping = false
+		gitCommitCancelService(m)
 		return m, nil
 	// in typing mode, tab is move to next input
 	case "tab":
@@ -63,20 +61,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 			// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
 			// also do not start any git operation is message is no provided
 			if !m.PopUpModel.(*GitCommitPopUpModel).IsProcessing {
-				go func() {
-					m.PopUpModel.(*GitCommitPopUpModel).IsProcessing = true
-					message := m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Value()
-					description := m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Value()
-					if len(message) < 1 {
-						return
-					}
-					git.GITCOMMIT.GitStage()
-					exitStatusCode := git.GITCOMMIT.GitCommit(message, description)
-					if exitStatusCode == 0 {
-						m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.SetValue("")
-						m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.SetValue("")
-					}
-				}()
+				gitCommitService(m)
 			}
 		}
 		return m, nil
@@ -126,7 +111,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			m.PopUpType = CommitPopUp
 			// if the current pop up model is not commit pop up model, then init it
 			if _, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
-				InitGitCommitPopUpModel(m)
+				initGitCommitPopUpModel(m)
 			}
 			m.IsTyping = true
 		}
@@ -166,62 +151,57 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 	case "up", "k":
-		switch m.CurrentSelectedContainer {
-		case LocalBranchComponent:
-			if m.CurrentRepoBranchesInfoList.Index() > 0 {
-				latestIndex := m.CurrentRepoBranchesInfoList.Index() - 1
-				m.CurrentRepoBranchesInfoList.Select(latestIndex)
-				m.NavigationIndexPosition.LocalBranchComponent = latestIndex
+		if !m.ShowPopUp {
+			switch m.CurrentSelectedContainer {
+			case LocalBranchComponent:
+				if m.CurrentRepoBranchesInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoBranchesInfoList.Index() - 1
+					m.CurrentRepoBranchesInfoList.Select(latestIndex)
+					m.NavigationIndexPosition.LocalBranchComponent = latestIndex
+				}
+			case ModifiedFilesComponent:
+				if m.CurrentRepoModifiedFilesInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() - 1
+					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
+					m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
+					reinitAndRenderModifiedFileDiffViewPort(m)
+				}
+			case FileDiffComponent:
+				m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
+				return m, cmd
 			}
-		case ModifiedFilesComponent:
-			if m.CurrentRepoModifiedFilesInfoList.Index() > 0 {
-				latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() - 1
-				m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
-				m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
-				ReinitAndRenderModifiedFileDiffViewPort(m)
-			}
-		case FileDiffComponent:
-			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
-			return m, cmd
 		}
 		return m, nil
 	case "down", "j":
-		switch m.CurrentSelectedContainer {
-		case LocalBranchComponent:
-			if m.CurrentRepoBranchesInfoList.Index() < len(m.CurrentRepoBranchesInfoList.Items())-1 {
-				latestIndex := m.CurrentRepoBranchesInfoList.Index() + 1
-				m.CurrentRepoBranchesInfoList.Select(latestIndex)
-				m.NavigationIndexPosition.LocalBranchComponent = latestIndex
-
+		if !m.ShowPopUp {
+			switch m.CurrentSelectedContainer {
+			case LocalBranchComponent:
+				if m.CurrentRepoBranchesInfoList.Index() < len(m.CurrentRepoBranchesInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoBranchesInfoList.Index() + 1
+					m.CurrentRepoBranchesInfoList.Select(latestIndex)
+					m.NavigationIndexPosition.LocalBranchComponent = latestIndex
+				}
+			case ModifiedFilesComponent:
+				if m.CurrentRepoModifiedFilesInfoList.Index() < len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
+					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
+					m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
+					reinitAndRenderModifiedFileDiffViewPort(m)
+				}
+			case FileDiffComponent:
+				m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
+				return m, cmd
 			}
-		case ModifiedFilesComponent:
-			if m.CurrentRepoModifiedFilesInfoList.Index() < len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
-				latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
-				m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
-				m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
-				ReinitAndRenderModifiedFileDiffViewPort(m)
-			}
-		case FileDiffComponent:
-			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
-			return m, cmd
 		}
 		return m, nil
-
 	case "left", "h":
-		switch m.CurrentSelectedContainer {
-		case FileDiffComponent:
-			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
-			return m, cmd
+		if !m.ShowPopUp {
+			m.CurrentSelectedFileDiffViewport.MoveLeft(1)
 		}
-		return m, nil
-
 	case "right", "l":
-		switch m.CurrentSelectedContainer {
-		case FileDiffComponent:
-			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
-			return m, cmd
+		if !m.ShowPopUp {
+			m.CurrentSelectedFileDiffViewport.MoveRight(1)
 		}
-		return m, nil
 	}
 	return m, nil
 }
@@ -230,30 +210,20 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "wheelleft":
-		switch m.CurrentSelectedContainer {
-		case FileDiffComponent:
-			// mouse left right scroll doesn't seem to be supported yet
-			m.CurrentSelectedFileDiffViewportOffset = max(0, m.CurrentSelectedFileDiffViewportOffset-1)
-			m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
+		if !m.ShowPopUp {
+			m.CurrentSelectedFileDiffViewport.MoveLeft(1)
 		}
 	case "wheelright":
-		switch m.CurrentSelectedContainer {
-		case FileDiffComponent:
-			// mouse left right scroll doesn't seem to be supported yet
-			if m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent() < 1 {
-				m.CurrentSelectedFileDiffViewportOffset = m.CurrentSelectedFileDiffViewportOffset + 1
-			}
-			m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
+		if !m.ShowPopUp {
+			m.CurrentSelectedFileDiffViewport.MoveRight(1)
 		}
 	case "wheelup":
-		switch m.CurrentSelectedContainer {
-		case FileDiffComponent:
+		if !m.ShowPopUp {
 			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 			return m, cmd
 		}
 	case "wheeldown":
-		switch m.CurrentSelectedContainer {
-		case FileDiffComponent:
+		if !m.ShowPopUp {
 			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 			return m, cmd
 		}
