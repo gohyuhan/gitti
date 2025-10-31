@@ -60,6 +60,7 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gc.RepoPath
+	cmd.Stderr = cmd.Stdout
 
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
@@ -67,7 +68,6 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
-	cmd.Stderr = cmd.Stdout
 
 	gc.GitCommitProcess = cmd
 	defer func() {
@@ -83,6 +83,7 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 	// Stream combined output
 	go func() {
 		scanner := bufio.NewScanner(stdout)
+		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 		for scanner.Scan() {
 			line := scanner.Text()
 			gc.GitCommitOutput = append(gc.GitCommitOutput, line)
@@ -115,6 +116,10 @@ func (gc *GitCommit) GitPush() {
 	// if err != nil {
 	// 	gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
 	// }
+}
+
+func (gc *GitCommit) ClearGitCommitOutput() {
+	gc.GitCommitOutput = []string{}
 }
 
 func (gc *GitCommit) KillCommit() {

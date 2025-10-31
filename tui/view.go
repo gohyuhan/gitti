@@ -1,0 +1,106 @@
+package tui
+
+import (
+	"fmt"
+	"gitti/i18n"
+	"gitti/settings"
+
+	"github.com/charmbracelet/lipgloss/v2"
+)
+
+// -----------------------------------------------------------------------------
+// Gitti Main Page View
+// -----------------------------------------------------------------------------
+func gittiMainPageView(m *GittiModel) string {
+	if m.Width < minWidth || m.Height < minHeight {
+		title := lipgloss.NewStyle().
+			Bold(true).
+			Render(i18n.LANGUAGEMAPPING.TerminalSizeWarning)
+
+		// Styles for the metric labels and values
+		labelStyle := lipgloss.NewStyle()
+		passStyle := lipgloss.NewStyle().Foreground(colorAccent)
+		failStyle := lipgloss.NewStyle().Foreground(colorError)
+
+		// Height
+		heightStatus := passStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalHeight, m.Height))
+		if m.Height < minHeight {
+			heightStatus = failStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Height))
+		}
+
+		// Width
+		widthStatus := passStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Width))
+		if m.Width < minWidth {
+			widthStatus = failStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Width))
+		}
+
+		// Combine formatted text
+		warningLine := lipgloss.JoinVertical(
+			lipgloss.Center,
+			title,
+			fmt.Sprintf(
+				"\n%s %d\n%s %d\n%s\n%s",
+				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalHeight)), minHeight,
+				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalWidth)), minWidth,
+				heightStatus,
+				widthStatus,
+			),
+		)
+
+		centered := lipgloss.NewStyle().
+			Width(m.Width).
+			Height(m.Height).
+			Align(lipgloss.Center, lipgloss.Center).
+			Render(warningLine)
+
+		return centered
+	}
+
+	// --- Components ---
+	gittiVersionPanel := panelBorderStyle.Width(m.HomeTabLeftPanelWidth).Height(1).Render(fmt.Sprintf("%s %s", settings.AppName, settings.AppVersion))
+	localBranchesPanel := renderLocalBranchesPanel(m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight, m)
+	changedFilesPanel := renderChangedFilesPanel(m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight, m)
+	fileDiffPanel := renderFileDiffPanel(m.HomeTabFileDiffPanelWidth, m.HomeTabFileDiffPanelHeight, m)
+	bottomBar := renderKeyBindingPanel(m.Width, m)
+
+	leftPanel := lipgloss.JoinVertical(lipgloss.Left, gittiVersionPanel, localBranchesPanel, changedFilesPanel)
+
+	// Combine panels horizontally with explicit top alignment
+	content := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, fileDiffPanel)
+
+	// Stack vertically with explicit left alignment
+	mainView := lipgloss.JoinVertical(lipgloss.Left, content, bottomBar)
+
+	if m.ShowPopUp {
+		// --- SETUP THE CANVAS ---
+		// Create a new canvas that will hold all our layers.
+		canvas := lipgloss.NewCanvas()
+
+		// Create the base layer from our main UI string.
+		// It has no offset (X:0, Y:0) and is the bottom-most layer (Z:0).
+		baseLayer := lipgloss.NewLayer(mainView)
+		canvas.AddLayers(baseLayer)
+		// Render the popup view into a string.
+		popUpComponent := renderPopUpComponent(m)
+
+		// Calculate the X and Y coordinates to center the popup.
+		// We need the popup's dimensions for this.
+		popUpWidth := lipgloss.Width(popUpComponent)
+		popUpHeight := lipgloss.Height(popUpComponent)
+		x := (m.Width - popUpWidth) / 2
+		y := (m.Height - popUpHeight) / 2
+
+		// Create a new layer for the popup.
+		// Position it using the calculated X and Y.
+		// Give it a higher Z-index to ensure it's drawn on top.
+		popUpLayer := lipgloss.NewLayer(popUpComponent).X(x).Y(y).Z(1)
+
+		// Add the popup layer to the canvas.
+		canvas.AddLayers(popUpLayer)
+		// Render the entire canvas with all its layers into the final string.
+		return canvas.Render()
+
+	}
+
+	return mainView
+}

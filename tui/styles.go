@@ -13,6 +13,8 @@ const (
 
 	maxLeftPanelWidth   = 80
 	maxCommitPopUpWidth = 100
+
+	popUpGitCommitOutputViewPortHeight = 8
 )
 
 var (
@@ -31,6 +33,9 @@ var (
 	itemStyle         = lipgloss.NewStyle()
 	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
 	paginationStyle   = lipgloss.NewStyle()
+
+	themeStyle = lipgloss.NewStyle().
+			Background(lipgloss.Color("#1b1b1b"))
 
 	// Styles
 	topBarStyle = lipgloss.NewStyle().
@@ -60,15 +65,18 @@ var (
 				Border(lipgloss.RoundedBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(lipgloss.Color("#555555"))
+				BorderForeground(lipgloss.Color("#555555")).
+				Background(lipgloss.Color("#1b1b1b"))
 	selectedBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.DoubleBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(colorBasic)
+				BorderForeground(colorBasic).
+				Background(lipgloss.Color("#1b1b1b"))
 	popUpBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.ThickBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(colorBasic)
+				BorderForeground(colorBasic).
+				Background(lipgloss.Color("#1b1b1b"))
 )

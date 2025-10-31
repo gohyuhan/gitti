@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func SetLanguage(langCode string) {
+func setLanguage(langCode string) {
 	if i18n.IsLanguageCodeSupported(langCode) {
 		settings.UpdateLanguageCode(langCode)
 		fmt.Printf(i18n.LANGUAGEMAPPING.LanguageSet+"\n", langCode)
@@ -21,20 +21,20 @@ func SetLanguage(langCode string) {
 }
 
 // set the default git init branch name only for gitti
-func SetInitBranch(branchName string) {
+func setInitBranch(branchName string) {
 	settings.UpdatedDefaultBranch(branchName, false, "")
 	fmt.Printf(i18n.LANGUAGEMAPPING.GittiDefaultBranchSet+"\n", branchName)
 	os.Exit(0)
 }
 
 // set the default git init branch name for both gitti and git
-func SetGlobalInitBranch(branchName string, cwd string) {
+func setGlobalInitBranch(branchName string, cwd string) {
 	settings.UpdatedDefaultBranch(branchName, true, cwd)
 	fmt.Printf(i18n.LANGUAGEMAPPING.GittiDefaultAndGitDefaultBranchSet+"\n", branchName)
 	os.Exit(0)
 }
 
-func InitGitAndAPI(repoPath string, updateChannel chan string) {
+func initGitAndAPI(repoPath string, updateChannel chan string) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
 	// check if the user repo is git inited, is not prompt user to init it
@@ -47,7 +47,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) {
 	api.InitGitDaemon(repoPath, updateChannel)
 }
 
-func InitGlobalSettingAndLanguage() {
+func initGlobalSettingAndLanguage() {
 	settings.InitOrReadConfig()
 	i18n.InitGittiLanguageMapping(settings.GITTICONFIGSETTINGS.LanguageCode)
 }

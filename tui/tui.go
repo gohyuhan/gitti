@@ -49,16 +49,18 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Width = msg.Width
 		m.Height = msg.Height
 		// recompute layout instantly
-		TuiWindowSizing(m)
+		tuiWindowSizing(m)
 	case tea.KeyMsg:
-		return GittiKeyInteraction(msg, m)
+		return gittiKeyInteraction(msg, m)
 	case GitUpdateMsg:
 		updateEvent := string(msg)
 		switch updateEvent {
 		case git.GIT_FILES_STATUS_UPDATE:
-			InitModifiedFilesList(m)
+			initModifiedFilesList(m)
+		case git.GIT_COMMIT_OUTPUT_UPDATE:
+			updatePopUpCommitOutputViewPort(m)
 		default:
-			ProcessGitUpdate(m)
+			processGitUpdate(m)
 		}
 		return m, nil
 	case tea.MouseMsg:
@@ -74,7 +76,7 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *GittiModel) View() tea.View {
 	var v tea.View
-	v.SetContent(GittiMainPageView(m))
+	v.SetContent(themeStyle.Render(gittiMainPageView(m)))
 	v.AltScreen = true
 	v.MouseMode = tea.MouseModeCellMotion
 	return v
@@ -98,7 +100,7 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 	}
 
 	componentWidth := m.Width() - 5
-	str = TruncateString(str, componentWidth)
+	str = truncateString(str, componentWidth)
 
 	fn := itemStyle.Render
 	if index == m.Index() {
@@ -125,7 +127,7 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	}
 
 	componentWidth := m.Width() - 5
-	str = TruncateString(str, componentWidth)
+	str = truncateString(str, componentWidth)
 
 	fn := itemStyle.Render
 	if index == m.Index() {

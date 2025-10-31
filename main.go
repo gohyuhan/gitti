@@ -18,7 +18,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	InitGlobalSettingAndLanguage()
+	initGlobalSettingAndLanguage()
 	langCode := flag.String("language", "", i18n.LANGUAGEMAPPING.FlagLangCode)
 	defaultInitBranch := flag.String("init-dbranch", "", i18n.LANGUAGEMAPPING.FlagInitDefaultBranch)
 	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
@@ -27,17 +27,17 @@ func main() {
 
 	switch {
 	case *langCode != "":
-		SetLanguage(*langCode)
+		setLanguage(*langCode)
 	case *defaultInitBranch != "" && *applyToSystemGit:
-		SetGlobalInitBranch(*defaultInitBranch, repoPath)
+		setGlobalInitBranch(*defaultInitBranch, repoPath)
 	case *defaultInitBranch != "" && !*applyToSystemGit:
-		SetInitBranch(*defaultInitBranch)
+		setInitBranch(*defaultInitBranch)
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		updateChannel := make(chan string)
 
 		// initialization
-		InitGitAndAPI(repoPath, updateChannel)
+		initGitAndAPI(repoPath, updateChannel)
 
 		// start the Git Daemon
 		api.GITDAEMON.Start()
