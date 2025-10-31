@@ -60,7 +60,6 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gc.RepoPath
-	cmd.Stderr = cmd.Stdout
 
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
@@ -68,6 +67,7 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
+	cmd.Stderr = cmd.Stdout
 
 	gc.GitCommitProcess = cmd
 	defer func() {
