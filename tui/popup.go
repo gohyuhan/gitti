@@ -80,10 +80,12 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 	if ok {
 		popUp.GitCommitOutputViewport.SetWidth(min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		var gitCommitOutputLog string
-		for _, line := range git.GITCOMMIT.GitCommitOutput {
+		logs := git.GITCOMMIT.GitCommitOutput
+		for _, line := range logs {
 			logLine := lipgloss.NewStyle().Foreground(colorBasic).Render(line)
 			gitCommitOutputLog += logLine + "\n"
 		}
 		popUp.GitCommitOutputViewport.SetContent(gitCommitOutputLog)
+		popUp.GitCommitOutputViewport.ViewDown()
 	}
 }
