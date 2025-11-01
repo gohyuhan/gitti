@@ -25,50 +25,65 @@ func renderPopUpComponent(m *GittiModel) string {
 }
 
 func renderGitCommitPopUp(m *GittiModel) string {
-	popUpWidth := min(maxCommitPopUpWidth, int(float64(m.Width)*0.8))
-	m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.SetWidth(popUpWidth - 4)
-	m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
+	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+	if ok {
+		popUpWidth := min(maxCommitPopUpWidth, int(float64(m.Width)*0.8))
+		popUp.MessageTextInput.SetWidth(popUpWidth - 4)
+		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
 
-	// Rendered content
-	title := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitle)
-	inputView := m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.View()
-	descLabel := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpDescriptionTitle)
-	descView := m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.View()
+		// Rendered content
+		title := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitle)
+		inputView := popUp.MessageTextInput.View()
+		descLabel := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpDescriptionTitle)
+		descView := popUp.DescriptionTextAreaInput.View()
 
-	content := lipgloss.JoinVertical(
-		lipgloss.Left,
-		title,
-		inputView,
-		"", // 1-line padding
-		descLabel,
-		descView,
-	)
-	gitCommitOutputViewport := m.PopUpModel.(*GitCommitPopUpModel).GitCommitOutputViewport
-	if gitCommitOutputViewport.GetContent() != "" {
-		logViewPort := panelBorderStyle.Width(popUpWidth - 2).Height(popUpGitCommitOutputViewPortHeight + 2).Render(gitCommitOutputViewport.View())
-		content = lipgloss.JoinVertical(
+		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			inputView,
 			"", // 1-line padding
 			descLabel,
 			descView,
-			"",
-			logViewPort,
 		)
+		if popUp.GitCommitOutputViewport.GetContent() != "" {
+			logViewPort := panelBorderStyle.
+				Width(popUpWidth - 2).
+				Height(popUpGitCommitOutputViewPortHeight + 2).
+				Render(popUp.GitCommitOutputViewport.View())
+			if popUp.HasError {
+				logViewPort = panelBorderStyle.
+					BorderForeground(colorError).
+					Width(popUpWidth - 2).
+					Height(popUpGitCommitOutputViewPortHeight + 2).
+					Render(popUp.GitCommitOutputViewport.View())
+			}
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				inputView,
+				"", // 1-line padding
+				descLabel,
+				descView,
+				"",
+				logViewPort,
+			)
+		}
+		return popUpBorderStyle.Width(popUpWidth).Render(content)
 	}
-	return popUpBorderStyle.Width(popUpWidth).Render(content)
+	return ""
 }
 
 // to update the commit output log for git commit
 // this also take care of log by pre commit and post commit
 func updatePopUpCommitOutputViewPort(m *GittiModel) {
-	gitCommitOutputViewport := &m.PopUpModel.(*GitCommitPopUpModel).GitCommitOutputViewport
-	gitCommitOutputViewport.SetWidth(min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-	var gitCommitOutputLog string
-	for _, line := range git.GITCOMMIT.GitCommitOutput {
-		logLine := lipgloss.NewStyle().Foreground(colorBasic).Render(line)
-		gitCommitOutputLog += logLine + "\n"
+	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+	if ok {
+		popUp.GitCommitOutputViewport.SetWidth(min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		var gitCommitOutputLog string
+		for _, line := range git.GITCOMMIT.GitCommitOutput {
+			logLine := lipgloss.NewStyle().Foreground(colorBasic).Render(line)
+			gitCommitOutputLog += logLine + "\n"
+		}
+		popUp.GitCommitOutputViewport.SetContent(gitCommitOutputLog)
 	}
-	gitCommitOutputViewport.SetContent(gitCommitOutputLog)
 }

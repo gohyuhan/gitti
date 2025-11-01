@@ -113,5 +113,6 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		CurrentActiveInputIndex:  1,
 		GitCommitOutputViewport:  vp,
 		IsProcessing:             false,
+		HasError:                 false,
 	}
 }
