@@ -76,7 +76,7 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *GittiModel) View() tea.View {
 	var v tea.View
-	v.SetContent(themeStyle.Render(gittiMainPageView(m)))
+	v.SetContent(gittiMainPageView(m))
 	v.AltScreen = true
 	v.MouseMode = tea.MouseModeCellMotion
 	return v
@@ -105,7 +105,7 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 	fn := itemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Render("> " + strings.Join(s, " "))
+			return selectedItemStyle.Width(m.Width()).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
 
@@ -132,7 +132,7 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	fn := itemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Render("> " + strings.Join(s, " "))
+			return selectedItemStyle.Width(m.Width()).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
 

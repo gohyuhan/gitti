@@ -25,28 +25,19 @@ var (
 	colorAccent    = lipgloss.Color("#98FB98")
 	colorError     = lipgloss.Color("#FF6B6B")
 	colorBasic     = lipgloss.Color("#FFFFFF")
-
+	// colorTheme     = lipgloss.Color("#1b1b1b")
+	colorTheme = lipgloss.Color("#00BFFF")
 	// list component style
 	titleStyle = lipgloss.NewStyle().Foreground(colorHighlight).
 			Underline(true).
 			Bold(true)
 	itemStyle         = lipgloss.NewStyle()
-	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
+	selectedItemStyle = lipgloss.NewStyle().Foreground(colorPrimary)
 	paginationStyle   = lipgloss.NewStyle()
 
-	themeStyle = lipgloss.NewStyle().
-			Background(lipgloss.Color("#1b1b1b"))
+	lineStyle = lipgloss.NewStyle()
 
 	// Styles
-	topBarStyle = lipgloss.NewStyle().
-			Foreground(colorBasic).
-			Background(lipgloss.Color("#1E1E1E")).
-			Bold(false)
-	topBarHighLightStyle = lipgloss.NewStyle().
-				Foreground(colorPrimary).
-				Background(lipgloss.Color("#1E1E1E")).
-				Bold(true)
-
 	bottomBarStyle = lipgloss.NewStyle().
 			Foreground(colorBasic)
 
@@ -65,18 +56,15 @@ var (
 				Border(lipgloss.RoundedBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(lipgloss.Color("#555555")).
-				Background(lipgloss.Color("#1b1b1b"))
+				BorderForeground(lipgloss.Color("#555555"))
 	selectedBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.DoubleBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(colorBasic).
-				Background(lipgloss.Color("#1b1b1b"))
+				BorderForeground(colorBasic)
 	popUpBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.ThickBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(colorBasic).
-				Background(lipgloss.Color("#1b1b1b"))
+				BorderForeground(colorBasic)
 )

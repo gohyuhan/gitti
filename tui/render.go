@@ -150,5 +150,4 @@ func renderModifiedFilesDiffViewPort(m *GittiModel) {
 		vpLine += rowNum + diffLine + "\n"
 	}
 	m.CurrentSelectedFileDiffViewport.SetContent(vpLine)
-	m.CurrentSelectedFileDiffViewport.Update(nil)
 }

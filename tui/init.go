@@ -94,8 +94,8 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	CommitMessageTextInput.VirtualCursor = true
 
 	CommitDescriptionTextAreaInput := textarea.New()
-	CommitDescriptionTextAreaInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpCommitDescriptionInputPlaceHolder
 	CommitDescriptionTextAreaInput.ShowLineNumbers = false
+	CommitDescriptionTextAreaInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpCommitDescriptionInputPlaceHolder
 	CommitDescriptionTextAreaInput.SetHeight(5)
 	CommitDescriptionTextAreaInput.Blur()
 
