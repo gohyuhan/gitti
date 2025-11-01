@@ -114,5 +114,6 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		GitCommitOutputViewport:  vp,
 		IsProcessing:             false,
 		HasError:                 false,
+		ProcessSuccess:           false,
 	}
 }

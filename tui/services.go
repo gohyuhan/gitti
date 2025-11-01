@@ -14,6 +14,7 @@ func gitCommitService(m *GittiModel) {
 		var exitStatusCode int
 		if ok {
 			popUp.HasError = false
+			popUp.ProcessSuccess = false
 			popUp.IsProcessing = true
 			popUp.GitCommitOutputViewport.SetContent("")
 			git.GITCOMMIT.ClearGitCommitOutput()
@@ -35,6 +36,7 @@ func gitCommitService(m *GittiModel) {
 			popUp.IsProcessing = false // update the processing status
 			// if sucessful exitcode will be 0
 			if exitStatusCode == 0 && m.PopUpModel.(*GitCommitPopUpModel).IsProcessing == false {
+				popUp.ProcessSuccess = true
 				popUp.MessageTextInput.Reset()
 				popUp.DescriptionTextAreaInput.Reset()
 			} else if exitStatusCode != 0 && m.PopUpModel.(*GitCommitPopUpModel).IsProcessing == false {
@@ -55,6 +57,7 @@ func gitCommitCancelService(m *GittiModel) {
 		if ok {
 			popUp.GitCommitOutputViewport.SetContent("") // set the git commit output viewport to nothing
 			popUp.HasError = false
+			popUp.ProcessSuccess = false
 		}
 	}()
 }

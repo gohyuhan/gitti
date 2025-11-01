@@ -37,6 +37,7 @@ type GitCommitPopUpModel struct {
 	GitCommitOutputViewport  viewport.Model
 	IsProcessing             bool // indicator to prevent multiple thread spawning reacting to the key binding trigger
 	HasError                 bool // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess           bool // has the process sucessfuly executed
 }
 
 // to record the current navigation index position

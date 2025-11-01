@@ -56,17 +56,18 @@ func renderGitCommitPopUp(m *GittiModel) string {
 			descView,
 		)
 		if popUp.GitCommitOutputViewport.GetContent() != "" {
-			logViewPort := panelBorderStyle.
+			logViewPortStyle := panelBorderStyle.
 				Width(popUpWidth - 2).
-				Height(popUpGitCommitOutputViewPortHeight + 2).
-				Render(popUp.GitCommitOutputViewport.View())
+				Height(popUpGitCommitOutputViewPortHeight + 2)
 			if popUp.HasError {
-				logViewPort = panelBorderStyle.
-					BorderForeground(colorError).
-					Width(popUpWidth - 2).
-					Height(popUpGitCommitOutputViewPortHeight + 2).
-					Render(popUp.GitCommitOutputViewport.View())
+				logViewPortStyle = panelBorderStyle.
+					BorderForeground(colorError)
+			} else if popUp.ProcessSuccess {
+				logViewPortStyle = panelBorderStyle.
+					BorderForeground(colorAccent)
 			}
+
+			logViewPort := logViewPortStyle.Render(popUp.GitCommitOutputViewport.View())
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
