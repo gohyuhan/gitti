@@ -25,8 +25,8 @@ var (
 	colorAccent    = lipgloss.Color("#98FB98")
 	colorError     = lipgloss.Color("#FF6B6B")
 	colorBasic     = lipgloss.Color("#FFFFFF")
-	// colorTheme     = lipgloss.Color("#1b1b1b")
-	colorTheme = lipgloss.Color("#00BFFF")
+	colorFade      = lipgloss.Color("#555555")
+
 	// list component style
 	titleStyle = lipgloss.NewStyle().Foreground(colorHighlight).
 			Underline(true).
@@ -35,28 +35,18 @@ var (
 	selectedItemStyle = lipgloss.NewStyle().Foreground(colorPrimary)
 	paginationStyle   = lipgloss.NewStyle()
 
-	lineStyle = lipgloss.NewStyle()
-
 	// Styles
 	bottomBarStyle = lipgloss.NewStyle().
-			Foreground(colorBasic)
-
-	sectionTitleStyle = lipgloss.NewStyle().
-				Foreground(colorHighlight).
-				Underline(true).
-				Bold(true)
-
+			Foreground(colorBasic).Faint(true)
 	diffOldLineStyle = lipgloss.NewStyle().
 				Foreground(colorError)
-
 	diffNewLineStyle = lipgloss.NewStyle().
 				Foreground(colorAccent)
-
 	panelBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(lipgloss.Color("#555555"))
+				BorderForeground(colorFade)
 	selectedBorderStyle = lipgloss.NewStyle().
 				Border(lipgloss.DoubleBorder()).
 				Padding(0).
