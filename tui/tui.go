@@ -105,7 +105,7 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 	fn := itemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Width(m.Width()).Reverse(true).Render("> " + strings.Join(s, " "))
+			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
 
@@ -132,7 +132,7 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	fn := itemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Width(m.Width()).Reverse(true).Render("> " + strings.Join(s, " "))
+			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
 
