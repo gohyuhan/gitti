@@ -197,10 +197,28 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	case "left", "h":
 		if !m.ShowPopUp {
 			m.CurrentSelectedFileDiffViewport.MoveLeft(1)
+		} else {
+			switch m.PopUpType {
+			case CommitPopUp:
+				popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+				if ok {
+					popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+					return m, cmd
+				}
+			}
 		}
 	case "right", "l":
 		if !m.ShowPopUp {
 			m.CurrentSelectedFileDiffViewport.MoveRight(1)
+		} else {
+			switch m.PopUpType {
+			case CommitPopUp:
+				popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+				if ok {
+					popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+					return m, cmd
+				}
+			}
 		}
 	}
 	return m, nil
@@ -221,12 +239,31 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 		if !m.ShowPopUp {
 			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 			return m, cmd
+		} else {
+			switch m.PopUpType {
+			case CommitPopUp:
+				popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+				if ok {
+					popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+					return m, cmd
+				}
+			}
 		}
 	case "wheeldown":
 		if !m.ShowPopUp {
 			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 			return m, cmd
+		} else {
+			switch m.PopUpType {
+			case CommitPopUp:
+				popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+				if ok {
+					popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+					return m, cmd
+				}
+			}
 		}
+
 	}
 	return m, nil
 }

@@ -14,11 +14,6 @@ const (
 	FileDiffComponent      = "C3"
 )
 
-const (
-	None        = "None"
-	CommitPopUp = "CommitPopUp"
-)
-
 func tuiWindowSizing(m *GittiModel) {
 	// Compute panel widths
 	m.HomeTabLeftPanelWidth = min(int(float64(m.Width)*settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio), maxLeftPanelWidth)
