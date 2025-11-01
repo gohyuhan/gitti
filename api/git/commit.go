@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sync"
 )
 
 var GITCOMMIT *GitCommit
 
 type GitCommit struct {
-	RepoPath         string
-	ErrorLog         []error
-	GitCommitProcess *exec.Cmd
-	GitCommitOutput  []string
-	UpdateChannel    chan string
+	RepoPath              string
+	ErrorLog              []error
+	GitCommitProcess      *exec.Cmd
+	GitCommitOutput       []string
+	UpdateChannel         chan string
+	GitCommitProcessMutex sync.Mutex
 }
 
 func InitGitCommit(repoPath string, updateChannel chan string) {
@@ -69,7 +71,9 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 	}
 	cmd.Stderr = cmd.Stdout
 
+	gc.GitCommitProcessMutex.Lock()
 	gc.GitCommitProcess = cmd
+	gc.GitCommitProcessMutex.Unlock()
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
 		gc.GitCommitProcess = nil
@@ -123,6 +127,9 @@ func (gc *GitCommit) ClearGitCommitOutput() {
 }
 
 func (gc *GitCommit) KillCommit() {
+	gc.GitCommitProcessMutex.Lock()
+	defer gc.GitCommitProcessMutex.Unlock()
+
 	if gc.GitCommitProcess != nil && gc.GitCommitProcess.Process != nil {
 		_ = gc.GitCommitProcess.Process.Kill()
 		gc.GitCommitProcess = nil
