@@ -42,6 +42,7 @@ var zH_HANS = LanguageMapping{
 		"[esc] 取消选择组件",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[p] 推送提交",
 		"[esc] 取消选择组件",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -59,6 +60,7 @@ var zH_HANS = LanguageMapping{
 		"[esc] 取消选择组件",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[p] 推送提交",
 		"[esc] 取消选择组件",
 	},
 	KeyBindingFileDiffComponent: []string{

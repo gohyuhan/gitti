@@ -42,6 +42,7 @@ var zH_HANT = LanguageMapping{
 		"[esc] 取消選取元件",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[p] 推送提交",
 		"[esc] 取消選取元件",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -59,6 +60,7 @@ var zH_HANT = LanguageMapping{
 		"[esc] 取消選取元件",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[p] 推送提交",
 		"[esc] 取消選取元件",
 	},
 	KeyBindingFileDiffComponent: []string{

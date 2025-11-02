@@ -42,6 +42,7 @@ var eN = LanguageMapping{
 		"[esc] unselect component",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[p] push changes",
 		"[esc] unselect component",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -59,6 +60,7 @@ var eN = LanguageMapping{
 		"[esc] unselect component",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[p] push changes",
 		"[esc] unselect component",
 	},
 	KeyBindingFileDiffComponent: []string{

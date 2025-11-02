@@ -42,6 +42,7 @@ var jA = LanguageMapping{
 		"[esc] コンポーネント選択を解除",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[p] 変更をプッシュ",
 		"[esc] コンポーネント選択を解除",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -59,6 +60,7 @@ var jA = LanguageMapping{
 		"[esc] コンポーネント選択を解除",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[p] 変更をプッシュ",
 		"[esc] コンポーネント選択を解除",
 	},
 	KeyBindingFileDiffComponent: []string{

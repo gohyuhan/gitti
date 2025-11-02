@@ -229,7 +229,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		return m, nil
 
 	case "enter":
-		if m.CurrentSelectedContainer == ModifiedFilesComponent {
+		if m.CurrentSelectedContainer == ModifiedFilesComponent && len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
 			m.CurrentSelectedContainer = FileDiffComponent
 		}
 		return m, nil
