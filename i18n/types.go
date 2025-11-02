@@ -53,14 +53,16 @@ type LanguageMapping struct {
 	CommitPopUpMessageInputPlaceHolder           string
 	CommitPopUpDescriptionTitle                  string
 	CommitPopUpCommitDescriptionInputPlaceHolder string
+	CommitPopUpProcessing                        string
 	// prompt to add remote origin
-	AddRemotePrompt        string
-	RemoteNameTitle        string
-	RemoteNamePlaceHolder  string
-	RemoteUrlTitle         string
-	RemoteUrlPlaceHolder   string
-	RemoteAddSuccess       string
-	InvalidRemoteUrlFormat string
+	AddRemotePopUpPrompt                 string
+	AddRemotePopUpRemoteNameTitle        string
+	AddRemotePopUpRemoteNamePlaceHolder  string
+	AddRemotePopUpRemoteUrlTitle         string
+	AddRemotePopUpRemoteUrlPlaceHolder   string
+	AddRemotePopUpRemoteAddSuccess       string
+	AddRemotePopUpInvalidRemoteUrlFormat string
 	// git push
-	GitRemotePushTitle string
+	GitRemotePushPopUpTitle      string
+	GitRemotePushPopUpProcessing string
 }

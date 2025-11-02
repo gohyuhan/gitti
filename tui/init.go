@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/v2/list"
+	"github.com/charmbracelet/bubbles/v2/spinner"
 	"github.com/charmbracelet/bubbles/v2/textarea"
 	"github.com/charmbracelet/bubbles/v2/textinput"
 	"github.com/charmbracelet/bubbles/v2/viewport"
@@ -107,12 +108,17 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	vp.SetHeight(popUpGitCommitOutputViewPortHeight)
 	vp.SetWidth(min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = spinnerStyle
+
 	m.PopUpModel = &GitCommitPopUpModel{
 		MessageTextInput:         CommitMessageTextInput,
 		DescriptionTextAreaInput: CommitDescriptionTextAreaInput,
 		TotalInputCount:          2,
 		CurrentActiveInputIndex:  1,
 		GitCommitOutputViewport:  vp,
+		Spinner:                  s,
 		IsProcessing:             false,
 		HasError:                 false,
 		ProcessSuccess:           false,
@@ -124,12 +130,12 @@ func initGitCommitPopUpModel(m *GittiModel) {
 // init the popup model for prompting user to add remote origin
 func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 	RemoteNameTextInput := textinput.New()
-	RemoteNameTextInput.Placeholder = i18n.LANGUAGEMAPPING.RemoteNamePlaceHolder
+	RemoteNameTextInput.Placeholder = i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteNamePlaceHolder
 	RemoteNameTextInput.Focus()
 	RemoteNameTextInput.VirtualCursor = true
 
 	RemoteUrlTextInput := textinput.New()
-	RemoteUrlTextInput.Placeholder = i18n.LANGUAGEMAPPING.RemoteUrlPlaceHolder
+	RemoteUrlTextInput.Placeholder = i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteUrlPlaceHolder
 	RemoteUrlTextInput.Blur()
 	RemoteUrlTextInput.VirtualCursor = true
 
@@ -164,8 +170,13 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 	vp.SetHeight(popUpGitRemotePushOutputViewportHeight)
 	vp.SetWidth(min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = spinnerStyle
+
 	m.PopUpModel = &GitRemotePushPopUpModel{
 		GitRemotePushOutputViewport: vp,
+		Spinner:                     s,
 		IsProcessing:                false,
 		HasError:                    false,
 		ProcessSuccess:              false,

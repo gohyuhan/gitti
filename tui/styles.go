@@ -70,4 +70,6 @@ var (
 				Padding(0).
 				Margin(0).
 				BorderForeground(colorBasic)
+	spinnerStyle = newStyle.
+			Foreground(colorPrimary)
 )

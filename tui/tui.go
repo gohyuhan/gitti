@@ -44,6 +44,8 @@ func (m *GittiModel) Init() tea.Cmd {
 }
 
 func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmds []tea.Cmd
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.Width = msg.Width
@@ -69,11 +71,27 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return GittiMouseInteraction(msg, m)
 	}
 
+	// Update spinners in popups when they are processing
+	if m.ShowPopUp {
+		if commitPopup, ok := m.PopUpModel.(*GitCommitPopUpModel); ok && commitPopup.IsProcessing {
+			var cmd tea.Cmd
+			commitPopup.Spinner, cmd = commitPopup.Spinner.Update(msg)
+			cmds = append(cmds, cmd)
+		}
+		if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok && pushPopup.IsProcessing {
+			var cmd tea.Cmd
+			pushPopup.Spinner, cmd = pushPopup.Spinner.Update(msg)
+			cmds = append(cmds, cmd)
+		}
+	}
+
 	var cmd tea.Cmd
 	m.CurrentRepoBranchesInfoList, cmd = m.CurrentRepoBranchesInfoList.Update(msg)
+	cmds = append(cmds, cmd)
 	m.CurrentRepoModifiedFilesInfoList, cmd = m.CurrentRepoModifiedFilesInfoList.Update(msg)
+	cmds = append(cmds, cmd)
 
-	return m, cmd
+	return m, tea.Batch(cmds...)
 }
 
 func (m *GittiModel) View() tea.View {

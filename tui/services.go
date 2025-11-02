@@ -106,7 +106,7 @@ func gitAddRemoteService(m *GittiModel) {
 				popUp.RemoteNameTextInput.Reset()
 				popUp.RemoteUrlTextInput.Reset()
 				popUp.NoInitialRemote = false
-				gitAddRemoteResult = append(gitAddRemoteResult, fmt.Sprintf(i18n.LANGUAGEMAPPING.RemoteAddSuccess, remoteName, remoteUrl))
+				gitAddRemoteResult = append(gitAddRemoteResult, fmt.Sprintf(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteAddSuccess, remoteName, remoteUrl))
 			} else if exitStatusCode != 0 && popUp.IsProcessing == false {
 				popUp.HasError = true
 			}

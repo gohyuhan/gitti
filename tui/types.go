@@ -2,6 +2,7 @@ package tui
 
 import (
 	"github.com/charmbracelet/bubbles/v2/list"
+	"github.com/charmbracelet/bubbles/v2/spinner"
 	"github.com/charmbracelet/bubbles/v2/textarea"
 	"github.com/charmbracelet/bubbles/v2/textinput"
 	"github.com/charmbracelet/bubbles/v2/viewport"
@@ -35,6 +36,7 @@ type GitCommitPopUpModel struct {
 	TotalInputCount          int             // to tell us how many input were there
 	CurrentActiveInputIndex  int             // to tell us which input should be shown as highlighted/focus and be updated
 	GitCommitOutputViewport  viewport.Model  // to log out the output from git operation
+	Spinner                  spinner.Model   // spinner for showing processing state
 	IsProcessing             bool            // indicator to prevent multiple thread spawning reacting to the key binding trigger
 	HasError                 bool            // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess           bool            // has the process sucessfuly executed
@@ -54,6 +56,7 @@ type AddRemotePromptPopUpModel struct {
 
 type GitRemotePushPopUpModel struct {
 	GitRemotePushOutputViewport viewport.Model // to log out the output from git operation
+	Spinner                     spinner.Model  // spinner for showing processing state
 	IsProcessing                bool           // indicator to prevent multiple thread spawning reacting to the key binding trigger
 	HasError                    bool           // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess              bool           // has the process sucessfuly executed

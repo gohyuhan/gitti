@@ -261,7 +261,7 @@ func (gc *GitCommit) KillGitRemotePushCmd() {
 // ----------------------------------
 func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int) {
 	if !isValidGitRemoteURL(url) {
-		return []string{i18n.LANGUAGEMAPPING.InvalidRemoteUrlFormat}, -1
+		return []string{i18n.LANGUAGEMAPPING.AddRemotePopUpInvalidRemoteUrlFormat}, -1
 	}
 	gitArgs := []string{"remote", "add", originName, url}
 	cmd := exec.Command("git", gitArgs...)

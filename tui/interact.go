@@ -107,6 +107,8 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				// also do not start any git operation is message is no provided
 				if !popUp.IsProcessing {
 					gitCommitService(m)
+					// Start spinner ticking
+					return m, popUp.Spinner.Tick
 				}
 			}
 		case AddRemotePromptPopUp:
@@ -215,6 +217,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					}
 					// then push it after init the git remote push pop up model
 					gitRemotePushService(m, git.GITCOMMIT.Remote[0].Name)
+					// Start spinner ticking
+					if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok {
+						return m, pushPopup.Spinner.Tick
+					}
 				} else if len(git.GITCOMMIT.Remote) > 1 {
 					// if remote is more than 1 let user choose which remote to push to first before pushing
 				}
