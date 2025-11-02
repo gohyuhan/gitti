@@ -221,28 +221,26 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
 		popUpWidth := min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8))
-		if popUp.GitRemotePushOutputViewport.GetContent() != "" {
-			title := titleStyle.Render(i18n.LANGUAGEMAPPING.GitRemotePushTitle)
-			logViewPortStyle := panelBorderStyle.
-				Width(popUpWidth - 2).
-				Height(popUpGitCommitOutputViewPortHeight + 2)
-			if popUp.HasError {
-				logViewPortStyle = panelBorderStyle.
-					BorderForeground(colorError)
-			} else if popUp.ProcessSuccess {
-				logViewPortStyle = panelBorderStyle.
-					BorderForeground(colorAccent)
-			}
-
-			logViewPort := logViewPortStyle.Render(popUp.GitRemotePushOutputViewport.View())
-			content := lipgloss.JoinVertical(
-				lipgloss.Left,
-				title,
-				"",
-				logViewPort,
-			)
-			return popUpBorderStyle.Width(popUpWidth).Render(content)
+		title := titleStyle.Render(i18n.LANGUAGEMAPPING.GitRemotePushTitle)
+		logViewPortStyle := panelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(popUpGitCommitOutputViewPortHeight + 2)
+		if popUp.HasError {
+			logViewPortStyle = panelBorderStyle.
+				BorderForeground(colorError)
+		} else if popUp.ProcessSuccess {
+			logViewPortStyle = panelBorderStyle.
+				BorderForeground(colorAccent)
 		}
+
+		logViewPort := logViewPortStyle.Render(popUp.GitRemotePushOutputViewport.View())
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			logViewPort,
+		)
+		return popUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
 }
