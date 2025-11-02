@@ -43,7 +43,8 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentNone     []string
 	KeyBindingFileDiffComponent              []string
 	KeyBindingForCommitPopUp                 []string
-
+	KeyBindingForAddRemotePromptPopUp        []string
+	KeyBindingForGitRemotePushPopUp          []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -52,4 +53,14 @@ type LanguageMapping struct {
 	CommitPopUpMessageInputPlaceHolder           string
 	CommitPopUpDescriptionTitle                  string
 	CommitPopUpCommitDescriptionInputPlaceHolder string
+	// prompt to add remote origin
+	AddRemotePrompt        string
+	RemoteNameTitle        string
+	RemoteNamePlaceHolder  string
+	RemoteUrlTitle         string
+	RemoteUrlPlaceHolder   string
+	RemoteAddSuccess       string
+	InvalidRemoteUrlFormat string
+	// git push
+	GitRemotePushTitle string
 }

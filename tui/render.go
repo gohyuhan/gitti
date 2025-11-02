@@ -54,6 +54,10 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 		switch m.PopUpType {
 		case CommitPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForCommitPopUp
+		case AddRemotePromptPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForAddRemotePromptPopUp
+		case GitRemotePushPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRemotePushPopUp
 		}
 	} else {
 		switch m.CurrentSelectedContainer {
@@ -88,22 +92,24 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 		}
 	}
 
-	distributedWidth := width / len(keys)
+	distributedWidth := (width / len(keys))
+
 	var keyBindingLine string
 
 	for _, key := range keys {
-		truncatedKey := truncateString(key, distributedWidth)
-		cell := lipgloss.NewStyle().
-			Width(distributedWidth).
+		truncated := truncateString(key, distributedWidth) // truncate manually
+		cell := newStyle.
+			Width(distributedWidth).    // fixed box width
+			MaxWidth(distributedWidth). // disallow overflow expansion
 			Align(lipgloss.Center).
-			Render(truncatedKey)
+			Render(truncated)
 		keyBindingLine += cell
 	}
 
-	keyBindingPanelWidth := lipgloss.Width(keyBindingLine)
-	keyBindingLine = truncateString(keyBindingLine, keyBindingPanelWidth)
-
-	return bottomBarStyle.Width(width).Height(mainPageKeyBindingLayoutPanelHeight).Render(keyBindingLine)
+	return bottomKeyBindingStyle.
+		Width(width).
+		Height(mainPageKeyBindingLayoutPanelHeight).
+		Render(keyBindingLine)
 }
 
 // for the current selected modified file preview viewport
@@ -130,7 +136,7 @@ func renderModifiedFilesDiffViewPort(m *GittiModel) {
 	for _, Line := range fileDiff {
 		var diffLine string
 		var rowNum string
-		style := lipgloss.NewStyle()
+		style := newStyle
 		switch Line.Type {
 		case git.AddLine:
 			style = diffNewLineStyle

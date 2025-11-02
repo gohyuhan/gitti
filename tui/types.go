@@ -34,10 +34,30 @@ type GitCommitPopUpModel struct {
 	DescriptionTextAreaInput textarea.Model  // input index 2
 	TotalInputCount          int             // to tell us how many input were there
 	CurrentActiveInputIndex  int             // to tell us which input should be shown as highlighted/focus and be updated
-	GitCommitOutputViewport  viewport.Model
-	IsProcessing             bool // indicator to prevent multiple thread spawning reacting to the key binding trigger
-	HasError                 bool // indicate if git commit exitcode is not 0 (meaning have error)
-	ProcessSuccess           bool // has the process sucessfuly executed
+	GitCommitOutputViewport  viewport.Model  // to log out the output from git operation
+	IsProcessing             bool            // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                 bool            // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess           bool            // has the process sucessfuly executed
+}
+
+type AddRemotePromptPopUpModel struct {
+	RemoteNameTextInput     textinput.Model // input index 1
+	RemoteUrlTextInput      textinput.Model // input index 2
+	TotalInputCount         int             // to tell us how many input were there
+	CurrentActiveInputIndex int             // to tell us which input should be shown as highlighted/focus and be updated
+	AddRemoteOutputViewport viewport.Model  // to log out the output from git operation
+	IsProcessing            bool            // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                bool            // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess          bool            // has the process sucessfuly executed
+	NoInitialRemote         bool            // indicate if this repo has no remote yet or user just wanted to add more remote
+}
+
+type GitRemotePushPopUpModel struct {
+	GitRemotePushOutputViewport viewport.Model // to log out the output from git operation
+	IsProcessing                bool           // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                    bool           // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess              bool           // has the process sucessfuly executed
+
 }
 
 // to record the current navigation index position

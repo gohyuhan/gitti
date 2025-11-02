@@ -13,8 +13,11 @@ import (
 //
 // -----------------------------------------------------------------------------
 const (
-	None        = "None"
-	CommitPopUp = "CommitPopUp"
+	None                        = "None"
+	CommitPopUp                 = "CommitPopUp"                 // IsTyping will be true
+	AddRemotePromptPopUp        = "AddRemotePromptPopUp"        // IsTyping will be true
+	ChooseRemoteAndGitPushPopUp = "ChooseRemoteAndGitPushPopUp" // IsTyping will be false
+	GitRemotePushPopUp          = "GitRemotePushPopUp"          // IsTyping will be false
 )
 
 // -----------------------------------------------------------------------------
@@ -23,12 +26,22 @@ const (
 //
 // -----------------------------------------------------------------------------
 // render the PopUp and the content within it will be a determine dynamically
+
+// ------------------------------------
+//
+//	For Git Commit
+//
+// ------------------------------------
 func renderPopUpComponent(m *GittiModel) string {
 	var popUp string
 
 	switch m.PopUpType {
 	case CommitPopUp:
 		popUp = renderGitCommitPopUp(m)
+	case AddRemotePromptPopUp:
+		popUp = renderAddRemotePromptPopUp(m)
+	case GitRemotePushPopUp:
+		popUp = renderGitRemotePushPopUp(m)
 	}
 
 	return popUp
@@ -93,10 +106,158 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 		var gitCommitOutputLog string
 		logs := git.GITCOMMIT.GitCommitOutput
 		for _, line := range logs {
-			logLine := lipgloss.NewStyle().Foreground(colorBasic).Render(line)
+			logLine := newStyle.Render(line)
 			gitCommitOutputLog += logLine + "\n"
 		}
 		popUp.GitCommitOutputViewport.SetContent(gitCommitOutputLog)
 		popUp.GitCommitOutputViewport.ViewDown()
+	}
+}
+
+// ------------------------------------
+//
+//	For Adding Git Remote
+//
+// ------------------------------------
+func renderAddRemotePromptPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+	if ok {
+		popUpWidth := min(maxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8))
+		popUp.RemoteNameTextInput.SetWidth(popUpWidth - 4)
+		popUp.RemoteUrlTextInput.SetWidth(popUpWidth - 4)
+
+		noInitialRemote := popUp.NoInitialRemote
+
+		// Rendered content
+		addRemotePrompt := promptTitleStyle.Render(i18n.LANGUAGEMAPPING.AddRemotePrompt)
+		remoteNameTitle := titleStyle.Render(i18n.LANGUAGEMAPPING.RemoteNameTitle)
+		remoteNameInputView := popUp.RemoteNameTextInput.View()
+		remoteUrlTitle := titleStyle.Render(i18n.LANGUAGEMAPPING.RemoteUrlTitle)
+		remoteUrlTitleInputView := popUp.RemoteUrlTextInput.View()
+
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			remoteNameTitle,
+			remoteNameInputView,
+			"", // 1-line padding
+			remoteUrlTitle,
+			remoteUrlTitleInputView,
+		)
+		if noInitialRemote {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				addRemotePrompt,
+				"",
+				remoteNameTitle,
+				remoteNameInputView,
+				"", // 1-line padding
+				remoteUrlTitle,
+				remoteUrlTitleInputView,
+			)
+		}
+		if popUp.AddRemoteOutputViewport.GetContent() != "" {
+			logViewPortStyle := panelBorderStyle.
+				Width(popUpWidth - 2).
+				Height(popUpAddRemoteOutputViewPortHeight + 2)
+			if popUp.HasError {
+				logViewPortStyle = panelBorderStyle.
+					BorderForeground(colorError)
+			} else if popUp.ProcessSuccess {
+				logViewPortStyle = panelBorderStyle.
+					BorderForeground(colorAccent)
+			}
+
+			logViewPort := logViewPortStyle.Render(popUp.AddRemoteOutputViewport.View())
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				remoteNameTitle,
+				remoteNameInputView,
+				"", // 1-line padding
+				remoteUrlTitle,
+				remoteUrlTitleInputView,
+				"",
+				logViewPort,
+			)
+			if noInitialRemote {
+				content = lipgloss.JoinVertical(
+					lipgloss.Left,
+					addRemotePrompt,
+					"",
+					remoteNameTitle,
+					remoteNameInputView,
+					"", // 1-line padding
+					remoteUrlTitle,
+					remoteUrlTitleInputView,
+					"",
+					logViewPort,
+				)
+			}
+		}
+		return popUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
+	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+	if ok {
+		popUp.AddRemoteOutputViewport.SetWidth(min(maxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		var addRemoteLog string
+		for _, line := range outputLog {
+			logLine := newStyle.Render(line)
+			addRemoteLog += logLine + "\n"
+		}
+		popUp.AddRemoteOutputViewport.SetContent(addRemoteLog)
+		popUp.AddRemoteOutputViewport.ViewDown()
+	}
+}
+
+// ------------------------------------
+//
+//	For Git Push
+//
+// ------------------------------------
+func renderGitRemotePushPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
+	if ok {
+		popUpWidth := min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8))
+		if popUp.GitRemotePushOutputViewport.GetContent() != "" {
+			title := titleStyle.Render(i18n.LANGUAGEMAPPING.GitRemotePushTitle)
+			logViewPortStyle := panelBorderStyle.
+				Width(popUpWidth - 2).
+				Height(popUpGitCommitOutputViewPortHeight + 2)
+			if popUp.HasError {
+				logViewPortStyle = panelBorderStyle.
+					BorderForeground(colorError)
+			} else if popUp.ProcessSuccess {
+				logViewPortStyle = panelBorderStyle.
+					BorderForeground(colorAccent)
+			}
+
+			logViewPort := logViewPortStyle.Render(popUp.GitRemotePushOutputViewport.View())
+			content := lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				logViewPort,
+			)
+			return popUpBorderStyle.Width(popUpWidth).Render(content)
+		}
+	}
+	return ""
+}
+
+func updateGitRemotePushOutputViewport(m *GittiModel) {
+	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
+	if ok {
+		popUp.GitRemotePushOutputViewport.SetWidth(min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		logs := git.GITCOMMIT.GitRemotePushOutput
+		var GitPushLog string
+		for _, line := range logs {
+			logLine := newStyle.Render(line)
+			GitPushLog += logLine + "\n"
+		}
+		popUp.GitRemotePushOutputViewport.SetContent(GitPushLog)
+		popUp.GitRemotePushOutputViewport.ViewDown()
 	}
 }

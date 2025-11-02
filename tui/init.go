@@ -20,10 +20,10 @@ func initBranchList(m *GittiModel) {
 	}
 
 	m.CurrentRepoBranchesInfoList = list.New(items, gitBranchItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight)
-	m.CurrentRepoBranchesInfoList.Title = fmt.Sprintf("[b]  %s:", i18n.LANGUAGEMAPPING.Branches)
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
+	m.CurrentRepoBranchesInfoList.Title = truncateString(fmt.Sprintf("[b]  %s:", i18n.LANGUAGEMAPPING.Branches), m.HomeTabLeftPanelWidth-listItemOrTitleWidthPad-2)
 	m.CurrentRepoBranchesInfoList.Styles.Title = titleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = paginationStyle
 
@@ -55,11 +55,11 @@ func initModifiedFilesList(m *GittiModel) {
 	}
 
 	m.CurrentRepoModifiedFilesInfoList = list.New(items, gitModifiedFilesItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight)
-	m.CurrentRepoModifiedFilesInfoList.Title = fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles)
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
+	m.CurrentRepoModifiedFilesInfoList.Title = truncateString(fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth-listItemOrTitleWidthPad-2)
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = titleStyle
 
 	if len(items) < 1 {
@@ -87,6 +87,7 @@ func reinitAndRenderModifiedFileDiffViewPort(m *GittiModel) {
 	renderModifiedFilesDiffViewPort(m)
 }
 
+// init the popup model for git commit
 func initGitCommitPopUpModel(m *GittiModel) {
 	CommitMessageTextInput := textinput.New()
 	CommitMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolder
@@ -115,5 +116,58 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		IsProcessing:             false,
 		HasError:                 false,
 		ProcessSuccess:           false,
+	}
+	m.ShowPopUp = true
+	m.PopUpType = CommitPopUp
+}
+
+// init the popup model for prompting user to add remote origin
+func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
+	RemoteNameTextInput := textinput.New()
+	RemoteNameTextInput.Placeholder = i18n.LANGUAGEMAPPING.RemoteNamePlaceHolder
+	RemoteNameTextInput.Focus()
+	RemoteNameTextInput.VirtualCursor = true
+
+	RemoteUrlTextInput := textinput.New()
+	RemoteUrlTextInput.Placeholder = i18n.LANGUAGEMAPPING.RemoteUrlPlaceHolder
+	RemoteUrlTextInput.Blur()
+	RemoteUrlTextInput.VirtualCursor = true
+
+	// for git add remote output viewport, we will not have any interaction for it as usually it will be a one line for error log or also for our custom success message
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(popUpAddRemoteOutputViewPortHeight)
+	vp.SetWidth(min(maxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	m.PopUpModel = &AddRemotePromptPopUpModel{
+		RemoteNameTextInput:     RemoteNameTextInput,
+		RemoteUrlTextInput:      RemoteUrlTextInput,
+		TotalInputCount:         2,
+		CurrentActiveInputIndex: 1,
+		AddRemoteOutputViewport: vp,
+		IsProcessing:            false,
+		HasError:                false,
+		ProcessSuccess:          false,
+		NoInitialRemote:         noInitialRemote,
+	}
+}
+
+// init the popup model for push output log
+func initGitRemotePushPopUpModel(m *GittiModel) {
+	// for git push output viewport,
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(popUpGitRemotePushOutputViewportHeight)
+	vp.SetWidth(min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	m.PopUpModel = &GitRemotePushPopUpModel{
+		GitRemotePushOutputViewport: vp,
+		IsProcessing:                false,
+		HasError:                    false,
+		ProcessSuccess:              false,
 	}
 }

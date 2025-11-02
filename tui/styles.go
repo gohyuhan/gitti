@@ -11,48 +11,61 @@ const (
 	padding                             = 1
 	mainPageKeyBindingLayoutPanelHeight = 1
 
-	maxLeftPanelWidth   = 80
-	maxCommitPopUpWidth = 100
+	listItemOrTitleWidthPad = 5
 
-	popUpGitCommitOutputViewPortHeight = 8
+	maxLeftPanelWidth            = 80
+	maxCommitPopUpWidth          = 100
+	maxAddRemotePromptPopUpWidth = 100
+	maxGitRemotePushPopUpWidth   = 100
+
+	popUpGitCommitOutputViewPortHeight     = 10
+	popUpAddRemoteOutputViewPortHeight     = 2
+	popUpGitRemotePushOutputViewportHeight = 10
 )
 
 var (
 	// Base colors
-	colorPrimary   = lipgloss.Color("#00BFFF")
-	colorSecondary = lipgloss.Color("#AAAAAA")
-	colorHighlight = lipgloss.Color("#FFD700")
-	colorAccent    = lipgloss.Color("#98FB98")
-	colorError     = lipgloss.Color("#FF6B6B")
-	colorBasic     = lipgloss.Color("#FFFFFF")
-	colorFade      = lipgloss.Color("#555555")
+	colorPrimary    = lipgloss.Color("#00BFFF")
+	colorSecondary  = lipgloss.Color("#AAAAAA")
+	colorHighlight  = lipgloss.Color("#FFD700")
+	colorAccent     = lipgloss.Color("#98FB98")
+	colorError      = lipgloss.Color("#FF6B6B")
+	colorBasic      = lipgloss.Color("#FFFFFF")
+	colorFade       = lipgloss.Color("#555555")
+	colorPrompt     = lipgloss.Color("#DB74ED")
+	colorTitle      = lipgloss.Color("#FF4500")
+	colorKeyBinding = lipgloss.Color("#AAF0F0")
+
+	// lipgloss empty new style
+	newStyle = lipgloss.NewStyle()
 
 	// list component style
-	titleStyle = lipgloss.NewStyle().Foreground(colorHighlight).
-			Underline(true).
-			Bold(true)
-	itemStyle         = lipgloss.NewStyle()
-	selectedItemStyle = lipgloss.NewStyle().Foreground(colorPrimary)
-	paginationStyle   = lipgloss.NewStyle()
+	itemStyle         = newStyle
+	selectedItemStyle = newStyle.Foreground(colorPrimary)
+	paginationStyle   = newStyle
 
 	// Styles
-	bottomBarStyle = lipgloss.NewStyle().
-			Foreground(colorBasic).Faint(true)
-	diffOldLineStyle = lipgloss.NewStyle().
+	titleStyle = newStyle.Foreground(colorTitle).
+			Bold(true)
+	promptTitleStyle = newStyle.Foreground(colorPrompt).
+				Bold(true)
+	bottomKeyBindingStyle = newStyle.
+				Foreground(colorKeyBinding)
+	diffOldLineStyle = newStyle.
 				Foreground(colorError)
-	diffNewLineStyle = lipgloss.NewStyle().
+	diffNewLineStyle = newStyle.
 				Foreground(colorAccent)
-	panelBorderStyle = lipgloss.NewStyle().
+	panelBorderStyle = newStyle.
 				Border(lipgloss.RoundedBorder()).
 				Padding(0).
 				Margin(0).
 				BorderForeground(colorFade)
-	selectedBorderStyle = lipgloss.NewStyle().
+	selectedBorderStyle = newStyle.
 				Border(lipgloss.DoubleBorder()).
 				Padding(0).
 				Margin(0).
 				BorderForeground(colorBasic)
-	popUpBorderStyle = lipgloss.NewStyle().
+	popUpBorderStyle = newStyle.
 				Border(lipgloss.ThickBorder()).
 				Padding(0).
 				Margin(0).

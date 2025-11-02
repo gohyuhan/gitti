@@ -16,23 +16,48 @@ func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	}
 }
 
+// typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
 func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	switch msg.String() {
+	case "ctrl+c":
+		api.GITDAEMON.Stop()
+		return m, tea.Quit
 	case "esc":
-		gitCommitCancelService(m)
+		switch m.PopUpType {
+		case CommitPopUp:
+			gitCommitCancelService(m)
+		case AddRemotePromptPopUp:
+			gitAddRemoteCancelService(m)
+		}
 		return m, nil
 	// in typing mode, tab is move to next input
 	case "tab":
 		switch m.PopUpType {
 		case CommitPopUp:
-			m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex = min(m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex+1, m.PopUpModel.(*GitCommitPopUpModel).TotalInputCount)
-			switch m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex {
-			case 1:
-				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Focus()
-				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Blur()
-			case 2:
-				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Blur()
-				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Focus()
+			popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+			if ok {
+				popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+				switch popUp.CurrentActiveInputIndex {
+				case 1:
+					popUp.MessageTextInput.Focus()
+					popUp.DescriptionTextAreaInput.Blur()
+				case 2:
+					popUp.MessageTextInput.Blur()
+					popUp.DescriptionTextAreaInput.Focus()
+				}
+			}
+		case AddRemotePromptPopUp:
+			popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+			if ok {
+				popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+				switch popUp.CurrentActiveInputIndex {
+				case 1:
+					popUp.RemoteNameTextInput.Focus()
+					popUp.RemoteUrlTextInput.Blur()
+				case 2:
+					popUp.RemoteNameTextInput.Blur()
+					popUp.RemoteUrlTextInput.Focus()
+				}
 			}
 		}
 		return m, nil
@@ -41,46 +66,98 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 	case "shift+tab":
 		switch m.PopUpType {
 		case CommitPopUp:
-			m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex = max(m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex-1, 1)
-			switch m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex {
-			case 1:
-				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Focus()
-				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Blur()
-			case 2:
-				m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Blur()
-				m.PopUpModel.(*GitCommitPopUpModel).DescriptionTextAreaInput.Focus()
+			popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+			if ok {
+				popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+				switch popUp.CurrentActiveInputIndex {
+				case 1:
+					popUp.MessageTextInput.Focus()
+					popUp.DescriptionTextAreaInput.Blur()
+				case 2:
+					popUp.MessageTextInput.Blur()
+					popUp.DescriptionTextAreaInput.Focus()
+				}
 			}
+		case AddRemotePromptPopUp:
+			popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+			if ok {
+				popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+				switch popUp.CurrentActiveInputIndex {
+				case 1:
+					popUp.RemoteNameTextInput.Focus()
+					popUp.RemoteUrlTextInput.Blur()
+				case 2:
+					popUp.RemoteNameTextInput.Blur()
+					popUp.RemoteUrlTextInput.Focus()
+				}
+			}
+
 		}
 
 	case "ctrl+enter":
 		switch m.PopUpType {
 		case CommitPopUp:
-			// once they start for commit process, reinit the input focus
-			m.PopUpModel.(*GitCommitPopUpModel).MessageTextInput.Focus()
-			m.PopUpModel.(*GitCommitPopUpModel).CurrentActiveInputIndex = 1
-			// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
-			// also do not start any git operation is message is no provided
-			if !m.PopUpModel.(*GitCommitPopUpModel).IsProcessing {
-				gitCommitService(m)
+			popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+			if ok {
+				// once they start for commit process, reinit the input focus
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+				popUp.CurrentActiveInputIndex = 1
+				// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
+				// also do not start any git operation is message is no provided
+				if !popUp.IsProcessing {
+					gitCommitService(m)
+				}
 			}
+		case AddRemotePromptPopUp:
+			popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+			if ok {
+				// once they start for commit process, reinit the input focus
+				popUp.RemoteNameTextInput.Focus()
+				popUp.RemoteUrlTextInput.Blur()
+				popUp.CurrentActiveInputIndex = 1
+				// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
+				// also do not start any git operation is message is no provided
+				if !popUp.IsProcessing {
+					gitAddRemoteService(m)
+				}
+			}
+
 		}
 		return m, nil
 	}
 	switch m.PopUpType {
 	case CommitPopUp:
-		commitPopUpModel := m.PopUpModel.(*GitCommitPopUpModel)
+		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
 
-		switch commitPopUpModel.CurrentActiveInputIndex {
-		case 1:
-			var cmd tea.Cmd
-			commitPopUpModel.MessageTextInput, cmd = commitPopUpModel.MessageTextInput.Update(msg)
-			return m, cmd
-
-		case 2:
-			var cmd tea.Cmd
-			commitPopUpModel.DescriptionTextAreaInput, cmd = commitPopUpModel.DescriptionTextAreaInput.Update(msg)
-			return m, cmd
+			case 2:
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
 		}
+	case AddRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.RemoteNameTextInput, cmd = popUp.RemoteNameTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.RemoteUrlTextInput, cmd = popUp.RemoteUrlTextInput.Update(msg)
+				return m, cmd
+			}
+		}
+
 	}
 	return m, nil
 }
@@ -116,6 +193,35 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			m.IsTyping = true
 		}
 		return m, nil
+	case "p", "P":
+		if m.CurrentSelectedContainer == ModifiedFilesComponent || m.CurrentSelectedContainer == None || m.CurrentSelectedContainer == LocalBranchComponent {
+			// first we need to check if there are any push origin for this repo
+			// if not we prompt the user to add a new remote origin
+			if !git.GITCOMMIT.CheckRemoteExist() {
+				m.ShowPopUp = true
+				m.PopUpType = AddRemotePromptPopUp
+				// if the current pop up model is not commit pop up model, then init it
+				if _, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
+					initAddRemotePromptPopUpModel(m, true)
+				}
+				m.IsTyping = true
+			} else {
+				if len(git.GITCOMMIT.Remote) == 1 {
+					m.ShowPopUp = true
+					m.PopUpType = GitRemotePushPopUp
+					// if the current pop up model is not commit pop up model, then init it
+					if _, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
+						initGitRemotePushPopUpModel(m)
+					}
+					// then push it after init the git remote push pop up model
+					gitRemotePushService(m, git.GITCOMMIT.Remote[0].Name)
+				} else if len(git.GITCOMMIT.Remote) > 1 {
+					// if remote is more than 1 let user choose which remote to push to first before pushing
+				}
+			}
+		}
+		return m, nil
+
 	case "enter":
 		if m.CurrentSelectedContainer == ModifiedFilesComponent {
 			m.CurrentSelectedContainer = FileDiffComponent
@@ -123,9 +229,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		return m, nil
 	case "esc":
 		if m.ShowPopUp {
-			m.ShowPopUp = false
-			m.PopUpType = None
-			m.PopUpModel = struct{}{}
+			switch m.PopUpType {
+			case GitRemotePushPopUp:
+				gitRemotePushCancelService(m)
+			}
+			return m, nil
 		} else {
 			switch m.CurrentSelectedContainer {
 			case NoneSelected:

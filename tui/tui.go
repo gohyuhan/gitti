@@ -59,6 +59,8 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			initModifiedFilesList(m)
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
 			updatePopUpCommitOutputViewPort(m)
+		case git.GIT_REMOTE_PUSH_OUTPUT_UPDATE:
+			updateGitRemotePushOutputViewport(m)
 		default:
 			processGitUpdate(m)
 		}
@@ -99,8 +101,7 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 		str = fmt.Sprintf(" [X] %s", i.FileName)
 	}
 
-	componentWidth := m.Width() - 5
-	str = truncateString(str, componentWidth)
+	componentWidth := m.Width() - listItemOrTitleWidthPad
 
 	fn := itemStyle.Render
 	if index == m.Index() {
@@ -108,6 +109,7 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
+	str = truncateString(str, componentWidth)
 
 	fmt.Fprint(w, fn(str))
 }
@@ -126,8 +128,7 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 		str = fmt.Sprintf(" * %s", i.BranchName)
 	}
 
-	componentWidth := m.Width() - 5
-	str = truncateString(str, componentWidth)
+	componentWidth := m.Width() - listItemOrTitleWidthPad
 
 	fn := itemStyle.Render
 	if index == m.Index() {
@@ -135,6 +136,7 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
+	str = truncateString(str, componentWidth)
 
 	fmt.Fprint(w, fn(str))
 }

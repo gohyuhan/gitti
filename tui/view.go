@@ -13,14 +13,14 @@ import (
 // -----------------------------------------------------------------------------
 func gittiMainPageView(m *GittiModel) string {
 	if m.Width < minWidth || m.Height < minHeight {
-		title := lipgloss.NewStyle().
+		title := newStyle.
 			Bold(true).
 			Render(i18n.LANGUAGEMAPPING.TerminalSizeWarning)
 
 		// Styles for the metric labels and values
-		labelStyle := lipgloss.NewStyle()
-		passStyle := lipgloss.NewStyle().Foreground(colorAccent)
-		failStyle := lipgloss.NewStyle().Foreground(colorError)
+		labelStyle := newStyle
+		passStyle := newStyle.Foreground(colorAccent)
+		failStyle := newStyle.Foreground(colorError)
 
 		// Height
 		heightStatus := passStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalHeight, m.Height))
@@ -47,7 +47,7 @@ func gittiMainPageView(m *GittiModel) string {
 			),
 		)
 
-		centered := lipgloss.NewStyle().
+		centered := newStyle.
 			Width(m.Width).
 			Height(m.Height).
 			Align(lipgloss.Center, lipgloss.Center).
