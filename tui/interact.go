@@ -196,7 +196,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 	case "p", "P":
-		if m.CurrentSelectedContainer == ModifiedFilesComponent || m.CurrentSelectedContainer == None || m.CurrentSelectedContainer == LocalBranchComponent {
+		if m.CurrentSelectedContainer == ModifiedFilesComponent || m.CurrentSelectedContainer == NoneSelected || m.CurrentSelectedContainer == LocalBranchComponent {
 			// first we need to check if there are any push origin for this repo
 			// if not we prompt the user to add a new remote origin
 			if !git.GITCOMMIT.CheckRemoteExist() {

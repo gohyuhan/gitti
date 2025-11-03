@@ -13,7 +13,7 @@ import (
 //
 // -----------------------------------------------------------------------------
 const (
-	None                 = "None"
+	NoPopUp              = "NoPopUp"
 	CommitPopUp          = "CommitPopUp"          // IsTyping will be true
 	AddRemotePromptPopUp = "AddRemotePromptPopUp" // IsTyping will be true
 	ChooseRemotePopUp    = "ChooseRemotePopUp"    // IsTyping will be false

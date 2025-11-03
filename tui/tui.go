@@ -29,7 +29,7 @@ func NewGittiModel(repoPath string) GittiModel {
 		CurrentSelectedFileDiffViewportOffset: 0,
 		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
 		ShowPopUp:                             false,
-		PopUpType:                             None,
+		PopUpType:                             NoPopUp,
 		PopUpModel:                            struct{}{},
 		IsTyping:                              false,
 	}
