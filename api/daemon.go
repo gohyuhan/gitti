@@ -61,7 +61,6 @@ func InitGitDaemon(repoPath string, updateChannel chan string) {
 	gd.WatchPath()
 
 	GITDAEMON = gd
-	return
 }
 
 func (gd *GitDaemon) WatchPath() {
@@ -95,12 +94,8 @@ func (gd *GitDaemon) Start() {
 		for {
 			select {
 			case event := <-gd.Watcher.Events:
-				if gd.isRelevantEvent(event) {
-					go func() {
-						if !gd.Paused {
-							gd.resetDebounce()
-						}
-					}()
+				if gd.isRelevantEvent(event) && !gd.Paused {
+					gd.resetDebounce()
 				}
 			case err := <-gd.Watcher.Errors:
 				fmt.Println("Watcher error:", err)
@@ -114,6 +109,8 @@ func (gd *GitDaemon) Start() {
 					}
 				}()
 			case <-gd.GitFilesActiveTimer.C:
+				// reset first to avoid losing ticks, then run work in background
+				gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
 				go func() {
 					if !gd.Paused {
 						gd.GitMU.Lock()
@@ -121,13 +118,13 @@ func (gd *GitDaemon) Start() {
 						gd.UpdateChannel <- git.GENERAL_GIT_UPDATE
 						gd.GitMU.Unlock()
 					}
-					gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
 				}()
 			case <-gd.GitFetchActiveTimer.C:
-				go func() {
-					// for git fetch
-					gd.GitFetchActiveTimer.Reset(gd.GitFetchActiveRefreshDur)
-				}()
+				// reset immediately; git fetch operation TBD
+				gd.GitFetchActiveTimer.Reset(gd.GitFetchActiveRefreshDur)
+				// go func() {
+
+				// }()
 			case <-gd.StopChannel:
 				gd.Watcher.Close()
 				return
