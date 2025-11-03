@@ -160,3 +160,34 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 
 	fmt.Fprint(w, fn(str))
 }
+
+func (d gitRemoteItemDelegate) Height() int                             { return 1 }
+func (d gitRemoteItemDelegate) Spacing() int                            { return 0 }
+func (d gitRemoteItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d gitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(gitRemoteItem)
+	if !ok {
+		return
+	}
+
+	nameStr := fmt.Sprintf("   %s", i.Name)
+	urlStr := fmt.Sprintf("    %s", i.Url)
+
+	componentWidth := m.Width() - listItemOrTitleWidthPad
+
+	nameStr = truncateString(nameStr, componentWidth)
+	urlStr = truncateString(urlStr, componentWidth)
+
+	nameRendered := itemStyle.Render(nameStr)
+	urlRendered := itemStyle.Faint(true).Render(urlStr)
+	fullStr := nameRendered + "\n" + urlRendered
+
+	fn := itemStyle.Render
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(fullStr))
+}

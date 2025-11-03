@@ -45,6 +45,7 @@ type LanguageMapping struct {
 	KeyBindingForCommitPopUp                 []string
 	KeyBindingForAddRemotePromptPopUp        []string
 	KeyBindingForGitRemotePushPopUp          []string
+	KeyBindingForChooseRemotePopUp           []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -65,4 +66,6 @@ type LanguageMapping struct {
 	// git push
 	GitRemotePushPopUpTitle      string
 	GitRemotePushPopUpProcessing string
+	// Choose Remote
+	ChooseRemoteTitle string
 }

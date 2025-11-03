@@ -17,10 +17,12 @@ const (
 	maxCommitPopUpWidth          = 100
 	maxAddRemotePromptPopUpWidth = 100
 	maxGitRemotePushPopUpWidth   = 100
+	maxChooseRemotePopUpWidth    = 100
 
 	popUpGitCommitOutputViewPortHeight     = 10
 	popUpAddRemoteOutputViewPortHeight     = 2
 	popUpGitRemotePushOutputViewportHeight = 10
+	popUpChooseRemoteHeight                = 10
 )
 
 var (

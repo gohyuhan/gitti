@@ -83,6 +83,11 @@ var eN = LanguageMapping{
 	KeyBindingForGitRemotePushPopUp: []string{
 		"[esc] cancel / close",
 	},
+	KeyBindingForChooseRemotePopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select remote and push",
+		"[esc] cancel / close",
+	},
 	CommitPopUpMessageTitle:                      "* Commit Message",
 	CommitPopUpMessageInputPlaceHolder:           "Enter commit message",
 	CommitPopUpDescriptionTitle:                  "Description",
@@ -97,4 +102,5 @@ var eN = LanguageMapping{
 	AddRemotePopUpInvalidRemoteUrlFormat:         "Invalid Remote Url Format",
 	GitRemotePushPopUpTitle:                      "Git Push",
 	GitRemotePushPopUpProcessing:                 "Pushing...",
+	ChooseRemoteTitle:                            "Choose a remote to push to",
 }

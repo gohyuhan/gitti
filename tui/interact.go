@@ -208,29 +208,38 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				}
 				m.IsTyping = true
 			} else {
+				m.ShowPopUp = true
 				if len(git.GITCOMMIT.Remote) == 1 {
-					m.ShowPopUp = true
 					m.PopUpType = GitRemotePushPopUp
-					// if the current pop up model is not commit pop up model, then init it
-					if _, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
-						initGitRemotePushPopUpModel(m)
-					}
-					// then push it after init the git remote push pop up model
-					gitRemotePushService(m, git.GITCOMMIT.Remote[0].Name)
-					// Start spinner ticking
-					if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok {
-						return m, pushPopup.Spinner.Tick
-					}
+					// if the current pop up model is not commit pop up model, then init it and start git push service
+					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, git.GITCOMMIT.Remote[0].Name)
 				} else if len(git.GITCOMMIT.Remote) > 1 {
 					// if remote is more than 1 let user choose which remote to push to first before pushing
+					m.PopUpType = ChooseRemotePopUp
+					if _, ok := m.PopUpModel.(*ChooseRemotePopUpModel); !ok {
+						initGitRemotePushChooseRemotePopUpModel(m, git.GITCOMMIT.Remote)
+					}
 				}
 			}
 		}
 		return m, nil
 
 	case "enter":
-		if m.CurrentSelectedContainer == ModifiedFilesComponent && len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
-			m.CurrentSelectedContainer = FileDiffComponent
+		if !m.ShowPopUp {
+			if m.CurrentSelectedContainer == ModifiedFilesComponent && len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
+				m.CurrentSelectedContainer = FileDiffComponent
+			}
+		} else {
+			switch m.PopUpType {
+			case ChooseRemotePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
+				if ok {
+					remote := popUp.RemoteList.SelectedItem()
+					m.PopUpType = GitRemotePushPopUp
+					m.ShowPopUp = true
+					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, remote.(gitRemoteItem).Name)
+				}
+			}
 		}
 		return m, nil
 	case "esc":
@@ -238,6 +247,9 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			switch m.PopUpType {
 			case GitRemotePushPopUp:
 				gitRemotePushCancelService(m)
+			case ChooseRemotePopUp:
+				m.ShowPopUp = false
+				m.IsTyping = false
 			}
 			return m, nil
 		} else {
@@ -268,12 +280,14 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if !m.ShowPopUp {
 			switch m.CurrentSelectedContainer {
 			case LocalBranchComponent:
+				// we don't use the list native Update() because we track the current selected index
 				if m.CurrentRepoBranchesInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() - 1
 					m.CurrentRepoBranchesInfoList.Select(latestIndex)
 					m.NavigationIndexPosition.LocalBranchComponent = latestIndex
 				}
 			case ModifiedFilesComponent:
+				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
 				if m.CurrentRepoModifiedFilesInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() - 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
@@ -284,18 +298,30 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 				return m, cmd
 			}
+		} else {
+			// for within pop up component
+			switch m.PopUpType {
+			case ChooseRemotePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
+				if ok {
+					popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
+					return m, cmd
+				}
+			}
 		}
 		return m, nil
 	case "down", "j":
 		if !m.ShowPopUp {
 			switch m.CurrentSelectedContainer {
 			case LocalBranchComponent:
+				// we don't use the list native Update() because we track the current selected index
 				if m.CurrentRepoBranchesInfoList.Index() < len(m.CurrentRepoBranchesInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() + 1
 					m.CurrentRepoBranchesInfoList.Select(latestIndex)
 					m.NavigationIndexPosition.LocalBranchComponent = latestIndex
 				}
 			case ModifiedFilesComponent:
+				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
 				if m.CurrentRepoModifiedFilesInfoList.Index() < len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
@@ -305,6 +331,16 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case FileDiffComponent:
 				m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 				return m, cmd
+			}
+		} else {
+			// for within pop up component
+			switch m.PopUpType {
+			case ChooseRemotePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
+				if ok {
+					popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
+					return m, cmd
+				}
 			}
 		}
 		return m, nil

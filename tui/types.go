@@ -75,6 +75,10 @@ type GitRemotePushPopUpModel struct {
 	SessionID uuid.UUID
 }
 
+type ChooseRemotePopUpModel struct {
+	RemoteList list.Model
+}
+
 // to record the current navigation index position
 type GittiComponentsCurrentNavigationIndexPosition struct {
 	LocalBranchComponent   int
@@ -103,6 +107,17 @@ type gitModifiedFilesItem struct {
 
 func (i gitModifiedFilesItem) FilterValue() string {
 	return i.FileName
+}
+
+// for list component of git remote
+type gitRemoteItemDelegate struct{}
+type gitRemoteItem struct {
+	Name string
+	Url  string
+}
+
+func (i gitRemoteItem) FilterValue() string {
+	return i.Name
 }
 
 // tea msg

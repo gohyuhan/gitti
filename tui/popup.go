@@ -13,11 +13,11 @@ import (
 //
 // -----------------------------------------------------------------------------
 const (
-	None                        = "None"
-	CommitPopUp                 = "CommitPopUp"                 // IsTyping will be true
-	AddRemotePromptPopUp        = "AddRemotePromptPopUp"        // IsTyping will be true
-	ChooseRemoteAndGitPushPopUp = "ChooseRemoteAndGitPushPopUp" // IsTyping will be false
-	GitRemotePushPopUp          = "GitRemotePushPopUp"          // IsTyping will be false
+	None                 = "None"
+	CommitPopUp          = "CommitPopUp"          // IsTyping will be true
+	AddRemotePromptPopUp = "AddRemotePromptPopUp" // IsTyping will be true
+	ChooseRemotePopUp    = "ChooseRemotePopUp"    // IsTyping will be false
+	GitRemotePushPopUp   = "GitRemotePushPopUp"   // IsTyping will be false
 )
 
 // -----------------------------------------------------------------------------
@@ -26,12 +26,6 @@ const (
 //
 // -----------------------------------------------------------------------------
 // render the PopUp and the content within it will be a determine dynamically
-
-// ------------------------------------
-//
-//	For Git Commit
-//
-// ------------------------------------
 func renderPopUpComponent(m *GittiModel) string {
 	var popUp string
 
@@ -42,11 +36,17 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderAddRemotePromptPopUp(m)
 	case GitRemotePushPopUp:
 		popUp = renderGitRemotePushPopUp(m)
+	case ChooseRemotePopUp:
+		popUp = renderChooseRemotePopUp(m)
 	}
-
 	return popUp
 }
 
+// ------------------------------------
+//
+//	For Git Commit
+//
+// ------------------------------------
 func renderGitCommitPopUp(m *GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
@@ -227,6 +227,27 @@ func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
 		popUp.AddRemoteOutputViewport.SetContent(addRemoteLog)
 		popUp.AddRemoteOutputViewport.ViewDown()
 	}
+}
+
+// ------------------------------------
+//
+//	For Choosing a Remote for git push if there is more than 1
+//
+// ------------------------------------
+func renderChooseRemotePopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
+	if ok {
+		popUpWidth := min(maxChooseRemotePopUpWidth, int(float64(m.Width)*0.8))
+		title := titleStyle.Render(i18n.LANGUAGEMAPPING.ChooseRemoteTitle)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			popUp.RemoteList.View(),
+		)
+		return popUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
 }
 
 // ------------------------------------

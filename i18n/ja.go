@@ -83,6 +83,11 @@ var jA = LanguageMapping{
 	KeyBindingForGitRemotePushPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForChooseRemotePopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] リモートを選択してプッシュ",
+		"[esc] キャンセル / 閉じる",
+	},
 	CommitPopUpMessageTitle:                      "* コミットメッセージ",
 	CommitPopUpMessageInputPlaceHolder:           "コミットメッセージを入力",
 	CommitPopUpDescriptionTitle:                  "説明",
@@ -97,4 +102,5 @@ var jA = LanguageMapping{
 	AddRemotePopUpInvalidRemoteUrlFormat:         "無効なリモートURL形式",
 	GitRemotePushPopUpTitle:                      "Gitプッシュ",
 	GitRemotePushPopUpProcessing:                 "プッシュ中...",
+	ChooseRemoteTitle:                            "プッシュ先のリモートを選択",
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/bubbles/v2/textarea"
 	"github.com/charmbracelet/bubbles/v2/textinput"
 	"github.com/charmbracelet/bubbles/v2/viewport"
+	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/google/uuid"
 ) // this was for various components part init or reinit function due to update or newly create
 
@@ -131,8 +132,6 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		IsCancelled:              false,
 		SessionID:                newSessionID,
 	}
-	// clear the GitCommitOutput
-	git.GITCOMMIT.ClearGitCommitOutput()
 }
 
 // init the popup model for prompting user to add remote origin
@@ -199,6 +198,34 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 		IsCancelled:                 false,
 		SessionID:                   newSessionID,
 	}
-	// clear the GitRemotePushOutput
-	git.GITCOMMIT.ClearGitRemotePushOutput()
+}
+
+func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string) (*GittiModel, tea.Cmd) {
+	if _, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
+		initGitRemotePushPopUpModel(m)
+	}
+	// then push it after init the git remote push pop up model
+	gitRemotePushService(m, remoteName)
+	// Start spinner ticking
+	if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok {
+		return m, pushPopup.Spinner.Tick
+	}
+	return m, nil
+}
+
+func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.GitRemote) {
+	items := make([]list.Item, 0, len(remoteList))
+	for _, remote := range remoteList {
+		items = append(items, gitRemoteItem(remote))
+	}
+	width := (min(maxChooseRemotePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	rL := list.New(items, gitRemoteItemDelegate{}, width, popUpChooseRemoteHeight)
+	rL.SetShowStatusBar(false)
+	rL.SetFilteringEnabled(false)
+	rL.SetShowHelp(false)
+	rL.SetShowTitle(false)
+
+	m.PopUpModel = &ChooseRemotePopUpModel{
+		RemoteList: rL,
+	}
 }
