@@ -56,6 +56,8 @@ func (gc *GitCommit) GitFetch() {
 	gitArgs := []string{"fetch"}
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gc.RepoPath
+	// Disable interactive prompts for credentials
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 	_, err := cmd.Output()
 	if err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
@@ -219,6 +221,8 @@ func (gc *GitCommit) GitPush(originName string) int {
 	gitArgs := []string{"push", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gc.RepoPath
+	// Disable interactive prompts for credentials
+	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
