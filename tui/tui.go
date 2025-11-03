@@ -2,12 +2,14 @@ package tui
 
 import (
 	"fmt"
+	"io"
+	"strings"
+
+	"gitti/api/git"
+
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/viewport"
 	tea "github.com/charmbracelet/bubbletea/v2"
-	"gitti/api/git"
-	"io"
-	"strings"
 )
 
 func NewGittiModel(repoPath string) GittiModel {

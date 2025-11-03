@@ -2,13 +2,16 @@ package tui
 
 import (
 	"fmt"
+
+	"gitti/api/git"
+	"gitti/i18n"
+
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/spinner"
 	"github.com/charmbracelet/bubbles/v2/textarea"
 	"github.com/charmbracelet/bubbles/v2/textinput"
 	"github.com/charmbracelet/bubbles/v2/viewport"
-	"gitti/api/git"
-	"gitti/i18n"
+	"github.com/google/uuid"
 ) // this was for various components part init or reinit function due to update or newly create
 
 func initBranchList(m *GittiModel) {
@@ -112,6 +115,9 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	s.Spinner = spinner.Dot
 	s.Style = spinnerStyle
 
+	// Generate a unique UUID for this popup session
+	newSessionID := uuid.New()
+
 	m.PopUpModel = &GitCommitPopUpModel{
 		MessageTextInput:         CommitMessageTextInput,
 		DescriptionTextAreaInput: CommitDescriptionTextAreaInput,
@@ -122,9 +128,11 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		IsProcessing:             false,
 		HasError:                 false,
 		ProcessSuccess:           false,
+		IsCancelled:              false,
+		SessionID:                newSessionID,
 	}
-	m.ShowPopUp = true
-	m.PopUpType = CommitPopUp
+	// clear the GitCommitOutput
+	git.GITCOMMIT.ClearGitCommitOutput()
 }
 
 // init the popup model for prompting user to add remote origin
@@ -147,6 +155,9 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 	vp.SetHeight(popUpAddRemoteOutputViewPortHeight)
 	vp.SetWidth(min(maxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
+	// Generate a unique UUID for this popup session
+	newSessionID := uuid.New()
+
 	m.PopUpModel = &AddRemotePromptPopUpModel{
 		RemoteNameTextInput:     RemoteNameTextInput,
 		RemoteUrlTextInput:      RemoteUrlTextInput,
@@ -157,6 +168,8 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 		HasError:                false,
 		ProcessSuccess:          false,
 		NoInitialRemote:         noInitialRemote,
+		IsCancelled:             false,
+		SessionID:               newSessionID,
 	}
 }
 
@@ -174,11 +187,18 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 	s.Spinner = spinner.Dot
 	s.Style = spinnerStyle
 
+	// Generate a unique UUID for this popup session
+	newSessionID := uuid.New()
+
 	m.PopUpModel = &GitRemotePushPopUpModel{
 		GitRemotePushOutputViewport: vp,
 		Spinner:                     s,
 		IsProcessing:                false,
 		HasError:                    false,
 		ProcessSuccess:              false,
+		IsCancelled:                 false,
+		SessionID:                   newSessionID,
 	}
+	// clear the GitRemotePushOutput
+	git.GITCOMMIT.ClearGitRemotePushOutput()
 }

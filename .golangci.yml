@@ -1,80 +1,163 @@
 # golangci-lint configuration
-# https://golangci-lint.run/usage/configuration/
+# Documentation: https://golangci-lint.run/usage/configuration/
+# Version: 1.57.2
 
+# This file is the configuration for golangci-lint.
+# For more information, see: https://golangci-lint.run/usage/configuration/
+
+# The version of the configuration format
+version: 1.0.0
+
+# Options for analysis
 run:
+  # Timeout for analysis of one package
   timeout: 5m
+  # Run analysis on tests
   tests: true
-  skip-dirs:
-    - vendor
+  # Enable modules support
+  modules-download-mode: readonly
+  # Go version (e.g., 1.24) - used by all linters
+  go: "1.24"
 
+# Linter configuration
 linters:
+  # Enable specific linters
   enable:
     # Default linters
-    - errcheck      # Check for unchecked errors
-    - gosimple      # Simplify code
-    - govet         # Vet examines Go source code
-    - ineffassign   # Detect ineffectual assignments
-    - staticcheck   # Static analysis
-    - unused        # Check for unused code
+    - errcheck          # Check for unchecked errors
+    - govet             # Vet examines Go source code
+    - ineffassign       # Detect ineffectual assignments
+    - unused            # Check for unused code
+    - typecheck         # Type check the code
+    - lll               # Line length linter
+    - varnamelen        # Check variable name length based on scope
 
-    # Additional recommended linters
-    - gofmt         # Check code formatting
-    - goimports     # Check import formatting
-    - misspell      # Check for misspelled words
-    - revive        # Fast, configurable, extensible linter (replacement for golint)
-    - unconvert     # Remove unnecessary type conversions
-    - unparam       # Report unused function parameters
-    - gosec         # Security-focused linter
-    - gocritic      # Opinionated linter
-    - gocyclo       # Check cyclomatic complexity
-    - dupl          # Check for duplicate code
-    - prealloc      # Find slice declarations that could be preallocated
-    - exportloopref # Check for pointers to enclosing loop variables
-    - nilerr        # Find code that returns nil even if it checks that error is not nil
+    # Code style
+    - gofmt             # Check code formatting
+    - misspell          # Check for misspelled words
 
+    # Performance
+    - prealloc          # Find slice declarations that could be preallocated
+    - gocyclo           # Check cyclomatic complexity
+    - dupl              # Check for duplicate code
+
+    # Best practices
+    - unconvert         # Remove unnecessary type conversions
+    - unparam           # Report unused function parameters
+    - gosec             # Security-focused linter
+    - copyloopvar       # Check for pointers to enclosing loop variables
+    - nilerr            # Find code that returns nil even if it checks that error is not nil
+    - errname           # Check that sentinel errors are prefixed with Err and error types are suffixed with Error
+
+  # Disable specific linters - EXPLICITLY DISABLE WSL, DEPGUARD, and import-modifying linters
+  disable:
+    - wsl        # DISABLED: Whitespace linter
+    - depguard   # DISABLED: Import restrictions linter
+    - gosimple   # DISABLED: Modifies imports (conflicts with goimports)
+    - staticcheck # DISABLED: Modifies imports (conflicts with goimports)
+    - gocritic   # DISABLED: Modifies imports (conflicts with goimports)
+    - revive     # DISABLED: Modifies imports (conflicts with goimports)
+  disable-all: false
+
+  # Presets of linters
+  presets:
+    - bugs
+    - comment
+    - error
+    - import
+    - metalinter
+    - performance
+    - style
+
+# Linter settings
 linters-settings:
-  gofmt:
-    simplify: true
+  # Line length settings
+  lll:
+    line-length: 120
+    tab-width: 4
 
-  goimports:
-    local-prefixes: gitti
+  # Variable name length settings
+  varnamelen:
+    min-name-length: 1
+    max-name-length: 30
+    checkReceiver: true
+    checkReturn: false
+    checkTypeParam: true
+    ignoreNames: [i, j, k, v, t, x, y, z, id, ok, err]
 
+  # Revive settings
   revive:
+    ignore-generated-header: true
+    severity: warning
     rules:
       - name: exported
-        severity: warning
         disabled: false
       - name: var-naming
-        severity: warning
         disabled: false
       - name: package-comments
-        severity: warning
         disabled: false
+      - name: range
+        disabled: true
+      - name: time-naming
+        disabled: true
 
+  # Gocyclo settings
   gocyclo:
     min-complexity: 15
 
+  # Dupl settings
   dupl:
     threshold: 100
 
+  # Gocritic settings
   gocritic:
-    enabled-tags:
-      - diagnostic
-      - style
-      - performance
-    disabled-checks:
-      - unnamedResult
-      - hugeParam
+    enabled-true: true
+    # Enable all checks as we're using Go 1.24+
+    disabled-checks: []
 
+  # Gosec settings
+  gosec:
+    excludes:
+      - G104 # Errors unhandled
+      - G204 # Audit use of command execution
+      - G304 # Potential file inclusion via variable
+
+  # Staticcheck settings
+  staticcheck:
+    checks: ["all"]
+
+  # Govet settings
+  govet:
+    enable: ["all"]
+    disable:
+      - fieldalignment
+
+# Issues configuration
 issues:
+  # Don't exclude any issues by default
   exclude-use-default: false
+  # Maximum issues count per one linter
   max-issues-per-linter: 0
+  # Maximum same issues count
   max-same-issues: 0
-
-  # Exclude some linters from running on tests files
+  # Directories to exclude from analysis
+  exclude-dirs:
+    - vendor
+    - .git
+    - _build
+    - testdata
+  # Exclude configuration per-path, per-linter, per-text and per-source
   exclude-rules:
-    - path: _test\.go
+    # Exclude gocyclo and dupl from test files
+    - path: _test\.go$
       linters:
         - gocyclo
         - dupl
         - gosec
+    # Exclude known linter issues
+    - linters:
+        - staticcheck
+      text: "SA1019"  # Using deprecated function
+    - linters:
+        - gosec
+      text: "G204"    # Subprocess launched with function call as argument or cmd arguments

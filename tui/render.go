@@ -2,10 +2,11 @@ package tui
 
 import (
 	"fmt"
-	"gitti/api/git"
-	"gitti/i18n"
 
 	"github.com/charmbracelet/lipgloss/v2"
+
+	"gitti/api/git"
+	"gitti/i18n"
 )
 
 // -----------------------------------------------------------------------------

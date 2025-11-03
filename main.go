@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gitti/api"
-	"gitti/i18n"
-	"gitti/tui"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea/v2"
+
+	"gitti/api"
+	"gitti/i18n"
+	"gitti/tui"
 )
 
 func main() {

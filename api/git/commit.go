@@ -3,13 +3,14 @@ package git
 import (
 	"bufio"
 	"fmt"
-	"gitti/i18n"
 	"net/url"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
 	"sync"
+
+	"gitti/i18n"
 )
 
 var GITCOMMIT *GitCommit
@@ -19,11 +20,15 @@ type GitCommit struct {
 	ErrorLog                  []error
 	GitCommitProcess          *exec.Cmd
 	GitRemotePushProcess      *exec.Cmd
+	GitAddRemoteProcess       *exec.Cmd
+	GitStageProcess           *exec.Cmd
 	GitCommitOutput           []string
 	GitRemotePushOutput       []string
 	UpdateChannel             chan string
 	GitCommitProcessMutex     sync.Mutex
 	GitRemotePushProcessMutex sync.Mutex
+	GitAddRemoteProcessMutex  sync.Mutex
+	GitStageProcessMutex      sync.Mutex
 	Remote                    []GitRemote
 }
 
@@ -37,6 +42,8 @@ func InitGitCommit(repoPath string, updateChannel chan string) {
 		RepoPath:             repoPath,
 		GitCommitProcess:     nil,
 		GitRemotePushProcess: nil,
+		GitAddRemoteProcess:  nil,
+		GitStageProcess:      nil,
 		GitCommitOutput:      []string{},
 		GitRemotePushOutput:  []string{},
 		UpdateChannel:        updateChannel,
@@ -85,8 +92,31 @@ func (gc *GitCommit) GitStage() {
 
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gc.RepoPath
+
+	gc.GitStageProcessMutex.Lock()
+	gc.GitStageProcess = cmd
+	gc.GitStageProcessMutex.Unlock()
+	defer func() {
+		gc.GitStageProcessMutex.Lock()
+		gc.GitStageProcess = nil
+		gc.GitStageProcessMutex.Unlock()
+	}()
+
 	if _, err := cmd.Output(); err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT STAGE ERROR]: %w", err))
+	}
+}
+
+// KillGitStageCmd forcefully terminates any running git stage process.
+// It is safe to call this method even if no process is running.
+// This method is thread-safe and can be called from multiple goroutines.
+func (gc *GitCommit) KillGitStageCmd() {
+	gc.GitStageProcessMutex.Lock()
+	defer gc.GitStageProcessMutex.Unlock()
+
+	if gc.GitStageProcess != nil && gc.GitStageProcess.Process != nil {
+		_ = gc.GitStageProcess.Process.Kill()
+		gc.GitStageProcess = nil
 	}
 }
 
@@ -118,7 +148,9 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 	gc.GitCommitProcessMutex.Unlock()
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
+		gc.GitCommitProcessMutex.Lock()
 		gc.GitCommitProcess = nil
+		gc.GitCommitProcessMutex.Unlock()
 	}()
 
 	if err := cmd.Start(); err != nil {
@@ -200,7 +232,9 @@ func (gc *GitCommit) GitPush(originName string) int {
 	gc.GitRemotePushProcessMutex.Unlock()
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
+		gc.GitRemotePushProcessMutex.Lock()
 		gc.GitRemotePushProcess = nil
+		gc.GitRemotePushProcessMutex.Unlock()
 	}()
 
 	if err := cmd.Start(); err != nil {
@@ -266,6 +300,16 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 	gitArgs := []string{"remote", "add", originName, url}
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gc.RepoPath
+
+	gc.GitAddRemoteProcessMutex.Lock()
+	gc.GitAddRemoteProcess = cmd
+	gc.GitAddRemoteProcessMutex.Unlock()
+	defer func() {
+		gc.GitAddRemoteProcessMutex.Lock()
+		gc.GitAddRemoteProcess = nil
+		gc.GitAddRemoteProcessMutex.Unlock()
+	}()
+
 	gitOutput, err := cmd.CombinedOutput()
 
 	gitAddRemoteOutput := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
@@ -280,6 +324,19 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 
 	}
 	return gitAddRemoteOutput, 0
+}
+
+// KillGitAddRemoteCmd forcefully terminates any running git remote add process.
+// It is safe to call this method even if no process is running.
+// This method is thread-safe and can be called from multiple goroutines.
+func (gc *GitCommit) KillGitAddRemoteCmd() {
+	gc.GitAddRemoteProcessMutex.Lock()
+	defer gc.GitAddRemoteProcessMutex.Unlock()
+
+	if gc.GitAddRemoteProcess != nil && gc.GitAddRemoteProcess.Process != nil {
+		_ = gc.GitAddRemoteProcess.Process.Kill()
+		gc.GitAddRemoteProcess = nil
+	}
 }
 
 func (gc *GitCommit) CheckRemoteExist() bool {
@@ -306,10 +363,7 @@ func (gc *GitCommit) CheckRemoteExist() bool {
 		})
 	}
 	gc.Remote = remoteStruct
-	if len(gc.Remote) > 0 {
-		return true
-	}
-	return false
+	return len(gc.Remote) > 0
 }
 
 // ----------------------------------

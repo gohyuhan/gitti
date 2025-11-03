@@ -1,8 +1,9 @@
 package i18n
 
 import (
-	"gitti/utils"
 	"strings"
+
+	"gitti/utils"
 )
 
 // we are using ISO 639-1 as our default for the language,

@@ -2,11 +2,12 @@ package settings
 
 import (
 	"encoding/json"
-	"gitti/api/git"
 	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
+
+	"gitti/api/git"
 )
 
 var GITTICONFIGSETTINGS *GittiConfigSettings

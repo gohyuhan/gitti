@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"gitti/api"
 	"gitti/api/git"
 	"gitti/i18n"
 	"gitti/settings"
-	"os"
 )
 
 func setLanguage(langCode string) {

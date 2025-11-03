@@ -3,12 +3,13 @@ package api
 import (
 	"bufio"
 	"fmt"
-	"gitti/api/git"
-	"gitti/i18n"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"gitti/api/git"
+	"gitti/i18n"
 )
 
 func GetUpdatedGitInfo(updateChannel chan string) {

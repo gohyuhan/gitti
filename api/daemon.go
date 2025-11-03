@@ -2,15 +2,17 @@ package api
 
 import (
 	"fmt"
-	"github.com/fsnotify/fsnotify"
-	"gitti/api/git"
-	"gitti/settings"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
+
+	"gitti/api/git"
+	"gitti/settings"
 )
 
 type GitDaemon struct {

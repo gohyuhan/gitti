@@ -2,10 +2,11 @@ package tui
 
 import (
 	"fmt"
-	"gitti/i18n"
-	"gitti/settings"
 
 	"github.com/charmbracelet/lipgloss/v2"
+
+	"gitti/i18n"
+	"gitti/settings"
 )
 
 // -----------------------------------------------------------------------------

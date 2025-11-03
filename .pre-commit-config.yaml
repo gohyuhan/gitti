@@ -45,14 +45,6 @@
         pass_filenames: false
         files: 'go\.(mod|sum)$'
 
-      # Run golangci-lint for comprehensive linting
-      - id: golangci-lint
-        name: golangci-lint
-        entry: golangci-lint run --fix
-        language: system
-        pass_filenames: false
-        types: [go]
-
   # Security scanning
   - repo: https://github.com/zricethezav/gitleaks
     rev: v8.18.1

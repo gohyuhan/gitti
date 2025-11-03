@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/v2/textarea"
 	"github.com/charmbracelet/bubbles/v2/textinput"
 	"github.com/charmbracelet/bubbles/v2/viewport"
+	"github.com/google/uuid"
 )
 
 type GittiModel struct {
@@ -40,6 +41,10 @@ type GitCommitPopUpModel struct {
 	IsProcessing             bool            // indicator to prevent multiple thread spawning reacting to the key binding trigger
 	HasError                 bool            // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess           bool            // has the process sucessfuly executed
+	IsCancelled              bool            // flag to indicate if the operation was cancelled by user
+	// SessionID is a unique UUID for each popup instance to prevent
+	// stale goroutines from affecting new popups
+	SessionID uuid.UUID
 }
 
 type AddRemotePromptPopUpModel struct {
@@ -52,6 +57,10 @@ type AddRemotePromptPopUpModel struct {
 	HasError                bool            // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess          bool            // has the process sucessfuly executed
 	NoInitialRemote         bool            // indicate if this repo has no remote yet or user just wanted to add more remote
+	IsCancelled             bool            // flag to indicate if the operation was cancelled by user
+	// SessionID is a unique UUID for each popup instance to prevent
+	// stale goroutines from affecting new popups
+	SessionID uuid.UUID
 }
 
 type GitRemotePushPopUpModel struct {
@@ -60,7 +69,10 @@ type GitRemotePushPopUpModel struct {
 	IsProcessing                bool           // indicator to prevent multiple thread spawning reacting to the key binding trigger
 	HasError                    bool           // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess              bool           // has the process sucessfuly executed
-
+	IsCancelled                 bool           // flag to indicate if the operation was cancelled by user
+	// SessionID is a unique UUID for each popup instance to prevent
+	// stale goroutines from affecting new popups
+	SessionID uuid.UUID
 }
 
 // to record the current navigation index position
