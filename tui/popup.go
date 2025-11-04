@@ -21,6 +21,8 @@ const (
 	GitRemotePushPopUp   = "GitRemotePushPopUp"   // IsTyping will be false
 )
 
+const AUTOCLOSEINTERVAL = 500
+
 // -----------------------------------------------------------------------------
 //
 //	Functions that related to the rendering of pop up

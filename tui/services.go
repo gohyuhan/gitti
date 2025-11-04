@@ -52,7 +52,7 @@ func gitCommitService(m *GittiModel) {
 				popUp.ProcessSuccess = true
 				popUp.MessageTextInput.Reset()
 				popUp.DescriptionTextAreaInput.Reset()
-				time.Sleep(1 * time.Second)
+				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
 				if ok && !popUp.IsCancelled && popUp.SessionID == sessionID {
@@ -134,7 +134,7 @@ func gitAddRemoteService(m *GittiModel) {
 				popUp.NoInitialRemote = false
 				gitAddRemoteResult = append(gitAddRemoteResult, fmt.Sprintf(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteAddSuccess, remoteName, remoteUrl))
 				updateAddRemoteOutputViewport(m, gitAddRemoteResult)
-				time.Sleep(1 * time.Second)
+				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*AddRemotePromptPopUpModel)
 				if ok && !popUp.IsCancelled && popUp.SessionID == sessionID {
@@ -201,7 +201,7 @@ func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 			// if sucessful exitcode will be 0
 			if exitStatusCode == 0 && !popUp.IsProcessing {
 				popUp.ProcessSuccess = true
-				time.Sleep(1 * time.Second)
+				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
 				if ok && !popUp.IsCancelled && popUp.SessionID == sessionID {
