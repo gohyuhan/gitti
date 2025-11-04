@@ -209,10 +209,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.IsTyping = true
 			} else {
 				m.ShowPopUp = true
+				m.IsTyping = false
 				if len(git.GITCOMMIT.Remote) == 1 {
-					m.PopUpType = GitRemotePushPopUp
+					m.PopUpType = ChoosePushTypePopUp
 					// if the current pop up model is not commit pop up model, then init it and start git push service
-					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, git.GITCOMMIT.Remote[0].Name)
+					initChoosePushTypePopUpModel(m, git.GITCOMMIT.Remote[0].Name)
 				} else if len(git.GITCOMMIT.Remote) > 1 {
 					// if remote is more than 1 let user choose which remote to push to first before pushing
 					m.PopUpType = ChooseRemotePopUp
@@ -235,9 +236,19 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
 				if ok {
 					remote := popUp.RemoteList.SelectedItem()
+					m.PopUpType = ChoosePushTypePopUp
+					m.ShowPopUp = true
+					m.IsTyping = false
+					initChoosePushTypePopUpModel(m, remote.(gitRemoteItem).Name)
+				}
+			case ChoosePushTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
+				if ok {
 					m.PopUpType = GitRemotePushPopUp
 					m.ShowPopUp = true
-					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, remote.(gitRemoteItem).Name)
+					m.IsTyping = false
+					selectedOption := popUp.PushOptionList.SelectedItem()
+					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(gitPushOptionItem).pushType)
 				}
 			}
 		}
@@ -250,6 +261,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case ChooseRemotePopUp:
 				m.ShowPopUp = false
 				m.IsTyping = false
+
+			case ChoosePushTypePopUp:
+				m.ShowPopUp = false
+				m.IsTyping = false
+				m.PopUpModel = nil
 			}
 			return m, nil
 		} else {
@@ -307,6 +323,12 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
 					return m, cmd
 				}
+			case ChoosePushTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
+				if ok {
+					popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
+					return m, cmd
+				}
 			}
 		}
 		return m, nil
@@ -339,6 +361,12 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
 				if ok {
 					popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
+					return m, cmd
+				}
+			case ChoosePushTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
+				if ok {
+					popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
 					return m, cmd
 				}
 			}

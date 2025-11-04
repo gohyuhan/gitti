@@ -61,6 +61,8 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRemotePushPopUp
 		case ChooseRemotePopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseRemotePopUp
+		case ChoosePushTypePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChoosePushTypePopUp
 		}
 	} else {
 		switch m.CurrentSelectedContainer {

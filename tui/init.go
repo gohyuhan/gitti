@@ -200,12 +200,12 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 	}
 }
 
-func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string) (*GittiModel, tea.Cmd) {
+func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string, pushType string) (*GittiModel, tea.Cmd) {
 	if _, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
 		initGitRemotePushPopUpModel(m)
 	}
 	// then push it after init the git remote push pop up model
-	gitRemotePushService(m, remoteName)
+	gitRemotePushService(m, remoteName, pushType)
 	// Start spinner ticking
 	if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok {
 		return m, pushPopup.Spinner.Tick
@@ -227,5 +227,41 @@ func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.Git
 
 	m.PopUpModel = &ChooseRemotePopUpModel{
 		RemoteList: rL,
+	}
+}
+
+func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
+	pushTypeOption := []gitPushOptionItem{
+		gitPushOptionItem{
+			Name:     "Push",
+			Info:     "git push",
+			pushType: git.PUSH,
+		},
+		gitPushOptionItem{
+			Name:     "Force Push (Safe)",
+			Info:     "git push --force",
+			pushType: git.FORCEPUSHSAFE,
+		},
+		gitPushOptionItem{
+			Name:     "Force Push (Dangerous)",
+			Info:     "git push --force-with-lease",
+			pushType: git.FORCEPUSHDANGEROUS,
+		},
+	}
+
+	items := make([]list.Item, 0, len(pushTypeOption))
+	for _, pushOption := range pushTypeOption {
+		items = append(items, gitPushOptionItem(pushOption))
+	}
+	width := (min(maxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	pOL := list.New(items, gitPushOptionDelegate{}, width, popUpChoosePushTypeHeight)
+	pOL.SetShowStatusBar(false)
+	pOL.SetFilteringEnabled(false)
+	pOL.SetShowHelp(false)
+	pOL.SetShowTitle(false)
+
+	m.PopUpModel = &ChoosePushTypePopUpModel{
+		PushOptionList: pOL,
+		RemoteName:     remoteName,
 	}
 }

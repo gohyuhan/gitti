@@ -85,7 +85,12 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingForChooseRemotePopUp: []string{
 		"[↑/↓] 上下移动",
-		"[enter] 选择远程并推送",
+		"[enter] 选择远程仓库",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForChoosePushTypePopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择推送选项并推送",
 		"[esc] 取消 / 关闭",
 	},
 	CommitPopUpMessageTitle:                      "* 提交信息",
@@ -102,5 +107,6 @@ var zH_HANS = LanguageMapping{
 	AddRemotePopUpInvalidRemoteUrlFormat:         "远程地址格式无效",
 	GitRemotePushPopUpTitle:                      "Git 推送",
 	GitRemotePushPopUpProcessing:                 "推送中...",
+	GitRemotePushOptionTitle:                     "推送选项",
 	ChooseRemoteTitle:                            "选择要推送到的远程",
 }

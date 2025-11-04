@@ -16,6 +16,7 @@ const (
 	NoPopUp              = "NoPopUp"
 	CommitPopUp          = "CommitPopUp"          // IsTyping will be true
 	AddRemotePromptPopUp = "AddRemotePromptPopUp" // IsTyping will be true
+	ChoosePushTypePopUp  = "ChoosePushTypePopUp"  // IsTyping will be false
 	ChooseRemotePopUp    = "ChooseRemotePopUp"    // IsTyping will be false
 	GitRemotePushPopUp   = "GitRemotePushPopUp"   // IsTyping will be false
 )
@@ -38,6 +39,8 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderGitRemotePushPopUp(m)
 	case ChooseRemotePopUp:
 		popUp = renderChooseRemotePopUp(m)
+	case ChoosePushTypePopUp:
+		popUp = renderChoosePushTypePopUp(m)
 	}
 	return popUp
 }
@@ -244,6 +247,27 @@ func renderChooseRemotePopUp(m *GittiModel) string {
 			title,
 			"",
 			popUp.RemoteList.View(),
+		)
+		return popUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Choosing a push option
+//
+// ------------------------------------
+func renderChoosePushTypePopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
+	if ok {
+		popUpWidth := min(maxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8))
+		title := titleStyle.Width(popUpWidth).Render(i18n.LANGUAGEMAPPING.GitRemotePushOptionTitle)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			popUp.PushOptionList.View(),
 		)
 		return popUpBorderStyle.Width(popUpWidth).Render(content)
 	}

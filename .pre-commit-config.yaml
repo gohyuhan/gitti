@@ -1,7 +1,7 @@
 # .pre-commit-config.yaml
  repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
@@ -47,6 +47,6 @@
 
   # Security scanning
   - repo: https://github.com/zricethezav/gitleaks
-    rev: v8.18.1
+    rev: v8.19.1
     hooks:
       - id: gitleaks

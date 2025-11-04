@@ -180,7 +180,7 @@ func gitAddRemoteCancelService(m *GittiModel) {
 //	For Git Push
 //
 // ------------------------------------
-func gitRemotePushService(m *GittiModel, originName string) {
+func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 	go func() {
 		// git push
 		popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
@@ -198,7 +198,7 @@ func gitRemotePushService(m *GittiModel, originName string) {
 			return
 		}
 
-		exitStatusCode := git.GITCOMMIT.GitPush(originName)
+		exitStatusCode := git.GITCOMMIT.GitPush(originName, pushType)
 		popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
 		if ok && !popUp.IsCancelled {
 			popUp.IsProcessing = false // update the processing status

@@ -15,6 +15,12 @@ import (
 
 var GITCOMMIT *GitCommit
 
+const (
+	PUSH               = "PUSH"
+	FORCEPUSHSAFE      = "FORCEPUSHSAFE"
+	FORCEPUSHDANGEROUS = "FORCEPUSHDANGEROUS"
+)
+
 type GitCommit struct {
 	RepoPath                  string
 	ErrorLog                  []error
@@ -216,9 +222,18 @@ func (gc *GitCommit) KillGitCommitCmd() {
 //	Related to Git Push
 //
 // ----------------------------------
-func (gc *GitCommit) GitPush(originName string) int {
+func (gc *GitCommit) GitPush(originName string, pushType string) int {
 	gc.ClearGitRemotePushOutput()
+
 	gitArgs := []string{"push", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+	switch pushType {
+	case FORCEPUSHSAFE:
+		gitArgs = []string{"push", "--force-with-lease", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+	case FORCEPUSHDANGEROUS:
+		gitArgs = []string{"push", "--force", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+	default:
+		gitArgs = []string{"push", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+	}
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = gc.RepoPath
 	// Disable interactive prompts for credentials

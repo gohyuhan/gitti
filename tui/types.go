@@ -75,6 +75,12 @@ type GitRemotePushPopUpModel struct {
 	SessionID uuid.UUID
 }
 
+// user choose how do they want to push the commit, push /  push --force / push --force-with-lease
+type ChoosePushTypePopUpModel struct {
+	PushOptionList list.Model
+	RemoteName     string
+}
+
 type ChooseRemotePopUpModel struct {
 	RemoteList list.Model
 }
@@ -117,6 +123,18 @@ type gitRemoteItem struct {
 }
 
 func (i gitRemoteItem) FilterValue() string {
+	return i.Name
+}
+
+// for push selection option
+type gitPushOptionDelegate struct{}
+type gitPushOptionItem struct {
+	Name     string
+	Info     string
+	pushType string
+}
+
+func (i gitPushOptionItem) FilterValue() string {
 	return i.Name
 }
 
