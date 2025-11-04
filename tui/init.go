@@ -201,8 +201,11 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 }
 
 func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string, pushType string) (*GittiModel, tea.Cmd) {
-	if _, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
+	git.GITCOMMIT.ClearGitRemotePushOutput()
+	if popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
 		initGitRemotePushPopUpModel(m)
+	} else {
+		popUp.GitRemotePushOutputViewport.SetContent("")
 	}
 	// then push it after init the git remote push pop up model
 	gitRemotePushService(m, remoteName, pushType)

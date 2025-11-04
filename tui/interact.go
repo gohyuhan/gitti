@@ -188,9 +188,13 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if m.CurrentSelectedContainer == ModifiedFilesComponent {
 			m.ShowPopUp = true
 			m.PopUpType = CommitPopUp
+			git.GITCOMMIT.ClearGitCommitOutput()
+
 			// if the current pop up model is not commit pop up model, then init it
-			if _, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
+			if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
 				initGitCommitPopUpModel(m)
+			} else {
+				popUp.GitCommitOutputViewport.SetContent("")
 			}
 			m.IsTyping = true
 		}
@@ -203,8 +207,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.ShowPopUp = true
 				m.PopUpType = AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it
-				if _, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
+				if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
 					initAddRemotePromptPopUpModel(m, true)
+				} else {
+					popUp.AddRemoteOutputViewport.SetContent("")
 				}
 				m.IsTyping = true
 			} else {

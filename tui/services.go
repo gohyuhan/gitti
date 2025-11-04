@@ -31,8 +31,6 @@ func gitCommitService(m *GittiModel) {
 			popUp.ProcessSuccess = false
 			popUp.IsProcessing = true
 			popUp.IsCancelled = false
-			popUp.GitCommitOutputViewport.SetContent("")
-			git.GITCOMMIT.ClearGitCommitOutput()
 			// retrieve the value of commit message and desc
 			message = popUp.MessageTextInput.Value()
 			description = popUp.DescriptionTextAreaInput.Value()
@@ -114,7 +112,7 @@ func gitAddRemoteService(m *GittiModel) {
 			popUp.ProcessSuccess = false
 			popUp.IsProcessing = true
 			popUp.IsCancelled = false
-			popUp.AddRemoteOutputViewport.SetContent("")
+
 			// retrieve the value of remote name and remote url
 			remoteName = popUp.RemoteNameTextInput.Value()
 			remoteUrl = popUp.RemoteUrlTextInput.Value()
@@ -192,8 +190,6 @@ func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 			popUp.ProcessSuccess = false
 			popUp.IsProcessing = true
 			popUp.IsCancelled = false
-			popUp.GitRemotePushOutputViewport.SetContent("")
-			git.GITCOMMIT.ClearGitRemotePushOutput()
 		} else {
 			return
 		}
