@@ -44,6 +44,9 @@ func gitCommitService(m *GittiModel) {
 		git.GITCOMMIT.GitStage()
 		// and commit it
 		exitStatusCode = git.GITCOMMIT.GitCommit(message, description)
+
+		// after the commit, we set back the Is Selected for Stage state.
+		defer git.GITFILES.UpdateFilesStageStatusAfterCommit()
 		popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
 		if ok && !popUp.IsCancelled {
 			popUp.IsProcessing = false // update the processing status

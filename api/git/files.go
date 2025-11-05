@@ -28,18 +28,20 @@ type FileDiffLine struct {
 }
 
 type GitFiles struct {
-	RepoPath      string
-	FilesStatus   []FileStatus
-	FilesPosition map[string]int
-	UpdateChannel chan string
-	ErrorLog      []error
+	RepoPath                     string
+	FilesStatus                  []FileStatus
+	FilesPosition                map[string]int
+	UpdateChannel                chan string
+	FilesStatusAfterLatestCommit map[string]bool
+	ErrorLog                     []error
 }
 
 func InitGitFile(repoPath string, updateChannel chan string) {
 	gitFiles := GitFiles{
-		RepoPath:      repoPath,
-		FilesStatus:   make([]FileStatus, 0),
-		UpdateChannel: updateChannel,
+		RepoPath:                     repoPath,
+		FilesStatus:                  make([]FileStatus, 0),
+		UpdateChannel:                updateChannel,
+		FilesStatusAfterLatestCommit: make(map[string]bool),
 	}
 	GITFILES = &gitFiles
 }
@@ -144,11 +146,18 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 func (gf *GitFiles) ToggleFilesStageStatus(fileName string) {
 	fileIndex, exist := gf.FilesPosition[fileName]
 	if exist {
-		if gf.FilesStatus[fileIndex].SelectedForStage {
-			gf.FilesStatus[fileIndex].SelectedForStage = false
-		} else {
-			gf.FilesStatus[fileIndex].SelectedForStage = true
-		}
+		gf.FilesStatus[fileIndex].SelectedForStage = !gf.FilesStatus[fileIndex].SelectedForStage
 		gf.UpdateChannel <- GIT_FILES_STATUS_UPDATE
 	}
+}
+
+func (gf *GitFiles) UpdateFilesStageStatusAfterCommit() {
+	for fileName, IsSelectedForStage := range gf.FilesStatusAfterLatestCommit {
+		fileIndex, exist := gf.FilesPosition[fileName]
+		if exist {
+			gf.FilesStatus[fileIndex].SelectedForStage = IsSelectedForStage
+		}
+	}
+	gf.FilesStatusAfterLatestCommit = make(map[string]bool)
+	gf.UpdateChannel <- GIT_FILES_STATUS_UPDATE
 }

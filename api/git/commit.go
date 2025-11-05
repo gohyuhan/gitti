@@ -88,6 +88,7 @@ func (gc *GitCommit) GitStage() {
 	// Now, stage selected files.
 	gitArgs := []string{"add"}
 	for _, files := range GITFILES.FilesStatus {
+		GITFILES.FilesStatusAfterLatestCommit[files.FileName] = files.SelectedForStage
 		if files.SelectedForStage {
 			gitArgs = append(gitArgs, files.FileName)
 		}

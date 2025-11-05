@@ -22,10 +22,10 @@ type GitDaemon struct {
 	GitFilesActiveRefreshDur       time.Duration
 	GitFetchActiveRefreshDur       time.Duration
 	Paused                         bool
-	WatcherTimer                   *time.Timer
 	isGitGeneralInfoPassiveRunning atomic.Bool
 	isGitFilesActiveRunning        atomic.Bool
 	isGitFetchActiveRunning        atomic.Bool
+	WatcherTimer                   *time.Timer
 	GitFilesActiveTimer            *time.Timer
 	GitFetchActiveTimer            *time.Timer
 	StopChannel                    chan struct{}
