@@ -13,15 +13,13 @@ brew install pre-commit
 pip install pre-commit
 ```
 
-### 2. Install Go tools
+### 2. Ensure Go is installed
 ```bash
-# Install goimports (for import formatting and cleanup)
-go install golang.org/x/tools/cmd/goimports@latest
+# Verify Go installation
+go version
 
-# Install golangci-lint (comprehensive linter)
-brew install golangci-lint
-# or
-curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+# The pre-commit hooks will automatically download goimports when needed
+# No manual installation of Go tools is required
 ```
 
 ## Setup
@@ -30,6 +28,13 @@ Install the pre-commit hooks:
 ```bash
 pre-commit install
 ```
+
+On first commit, pre-commit will:
+1. Download and cache the hook repositories
+2. Download `goimports` tool (if not already cached)
+3. Run all configured hooks
+
+This initial setup may take a minute, but subsequent commits will be much faster.
 
 ## What the hooks do
 
@@ -44,20 +49,14 @@ pre-commit install
 ### Go-specific Hooks
 - **go fmt**: Formats Go code according to standard conventions
 - **goimports**:
+  - Automatically downloads and runs `goimports` tool
   - Formats import statements
   - Removes unused imports
-  - Groups imports (stdlib, external, local)
+  - Groups imports (stdlib, external, local packages)
   - Sorts imports alphabetically
+  - Uses `-local gitti` flag to properly group local imports
 - **go vet**: Runs Go's built-in static analyzer to find suspicious code
-- **go mod tidy**: Cleans up `go.mod` and `go.sum` files
-- **golangci-lint**: Runs comprehensive linting with multiple linters:
-  - Code style and formatting
-  - Error checking
-  - Security issues (gosec)
-  - Code complexity (gocyclo)
-  - Duplicate code detection
-  - Performance issues
-  - And many more...
+- **go mod tidy**: Cleans up `go.mod` and `go.sum` files (runs only when these files change)
 
 ### Security
 - **gitleaks**: Scans for secrets and credentials in code
@@ -71,8 +70,9 @@ pre-commit run --all-files
 
 Run specific hook:
 ```bash
-pre-commit run golangci-lint --all-files
 pre-commit run goimports --all-files
+pre-commit run go-vet --all-files
+pre-commit run gitleaks --all-files
 ```
 
 Skip hooks for a commit (not recommended):
@@ -82,8 +82,13 @@ git commit --no-verify
 
 ## Configuration Files
 
-- `.pre-commit-config.yaml`: Pre-commit hook configuration
-- `.golangci.yml`: golangci-lint configuration with enabled linters and rules
+- `.pre-commit-config.yaml`: Pre-commit hook configuration with all enabled hooks and their settings
+
+## Current Hook Versions
+
+- **pre-commit-hooks**: v4.6.0
+- **gitleaks**: v8.19.1
+- **goimports**: Latest version (auto-downloaded on first run)
 
 ## Troubleshooting
 
