@@ -51,7 +51,7 @@ func renderFileDiffPanel(width int, height int, m *GittiModel) string {
 
 func renderKeyBindingPanel(width int, m *GittiModel) string {
 	var keys []string
-	if m.ShowPopUp {
+	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case CommitPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForCommitPopUp

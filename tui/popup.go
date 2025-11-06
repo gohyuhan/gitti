@@ -77,10 +77,10 @@ func renderGitCommitPopUp(m *GittiModel) string {
 			logViewPortStyle := panelBorderStyle.
 				Width(popUpWidth - 2).
 				Height(popUpGitCommitOutputViewPortHeight + 2)
-			if popUp.HasError {
+			if popUp.HasError.Load() {
 				logViewPortStyle = panelBorderStyle.
 					BorderForeground(colorError)
-			} else if popUp.ProcessSuccess {
+			} else if popUp.ProcessSuccess.Load() {
 				logViewPortStyle = panelBorderStyle.
 					BorderForeground(colorAccent)
 			}
@@ -88,7 +88,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 			logViewPort := logViewPortStyle.Render(popUp.GitCommitOutputViewport.View())
 
 			// Show spinner above viewport when processing
-			if popUp.IsProcessing {
+			if popUp.IsProcessing.Load() {
 				processingText := spinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.CommitPopUpProcessing)
 				content = lipgloss.JoinVertical(
 					lipgloss.Left,
@@ -181,10 +181,10 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 			logViewPortStyle := panelBorderStyle.
 				Width(popUpWidth - 2).
 				Height(popUpAddRemoteOutputViewPortHeight + 2)
-			if popUp.HasError {
+			if popUp.HasError.Load() {
 				logViewPortStyle = panelBorderStyle.
 					BorderForeground(colorError)
-			} else if popUp.ProcessSuccess {
+			} else if popUp.ProcessSuccess.Load() {
 				logViewPortStyle = panelBorderStyle.
 					BorderForeground(colorAccent)
 			}
@@ -289,10 +289,10 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 		logViewPortStyle := panelBorderStyle.
 			Width(popUpWidth - 2).
 			Height(popUpGitCommitOutputViewPortHeight + 2)
-		if popUp.HasError {
+		if popUp.HasError.Load() {
 			logViewPortStyle = panelBorderStyle.
 				BorderForeground(colorError)
-		} else if popUp.ProcessSuccess {
+		} else if popUp.ProcessSuccess.Load() {
 			logViewPortStyle = panelBorderStyle.
 				BorderForeground(colorAccent)
 		}
@@ -301,7 +301,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 
 		var content string
 		// Show spinner above viewport when processing
-		if popUp.IsProcessing {
+		if popUp.IsProcessing.Load() {
 			processingText := spinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitRemotePushPopUpProcessing)
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,

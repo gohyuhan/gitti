@@ -12,13 +12,13 @@ import (
 	tea "github.com/charmbracelet/bubbletea/v2"
 )
 
-func NewGittiModel(repoPath string) GittiModel {
+func NewGittiModel(repoPath string) *GittiModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
 	vp.SetHorizontalStep(1)
 	vp.MouseWheelDelta = 1
-	gitti := GittiModel{
+	gitti := &GittiModel{
 		CurrentSelectedContainer:              ModifiedFilesComponent,
 		RepoPath:                              repoPath,
 		Width:                                 0,
@@ -28,11 +28,11 @@ func NewGittiModel(repoPath string) GittiModel {
 		CurrentSelectedFileDiffViewport:       vp,
 		CurrentSelectedFileDiffViewportOffset: 0,
 		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
-		ShowPopUp:                             false,
 		PopUpType:                             NoPopUp,
 		PopUpModel:                            struct{}{},
-		IsTyping:                              false,
 	}
+	gitti.ShowPopUp.Store(false)
+	gitti.IsTyping.Store(false)
 
 	return gitti
 }
@@ -75,13 +75,13 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	// Update spinners in popups when they are processing
-	if m.ShowPopUp {
-		if commitPopup, ok := m.PopUpModel.(*GitCommitPopUpModel); ok && commitPopup.IsProcessing {
+	if m.ShowPopUp.Load() {
+		if commitPopup, ok := m.PopUpModel.(*GitCommitPopUpModel); ok && commitPopup.IsProcessing.Load() {
 			var cmd tea.Cmd
 			commitPopup.Spinner, cmd = commitPopup.Spinner.Update(msg)
 			cmds = append(cmds, cmd)
 		}
-		if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok && pushPopup.IsProcessing {
+		if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok && pushPopup.IsProcessing.Load() {
 			var cmd tea.Cmd
 			pushPopup.Spinner, cmd = pushPopup.Spinner.Update(msg)
 			cmds = append(cmds, cmd)

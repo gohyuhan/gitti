@@ -72,7 +72,7 @@ func gittiMainPageView(m *GittiModel) string {
 	// Stack vertically with explicit left alignment
 	mainView := lipgloss.JoinVertical(lipgloss.Left, content, bottomBar)
 
-	if m.ShowPopUp {
+	if m.ShowPopUp.Load() {
 		// --- SETUP THE CANVAS ---
 		// Create a new canvas that will hold all our layers.
 		canvas := lipgloss.NewCanvas()

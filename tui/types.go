@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"sync/atomic"
+
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/spinner"
 	"github.com/charmbracelet/bubbles/v2/textarea"
@@ -25,10 +27,10 @@ type GittiModel struct {
 	CurrentSelectedFileDiffViewport       viewport.Model
 	CurrentSelectedFileDiffViewportOffset int
 	NavigationIndexPosition               GittiComponentsCurrentNavigationIndexPosition
-	ShowPopUp                             bool
+	ShowPopUp                             atomic.Bool
 	PopUpType                             string
 	PopUpModel                            interface{}
-	IsTyping                              bool
+	IsTyping                              atomic.Bool
 }
 
 type GitCommitPopUpModel struct {
@@ -38,10 +40,10 @@ type GitCommitPopUpModel struct {
 	CurrentActiveInputIndex  int             // to tell us which input should be shown as highlighted/focus and be updated
 	GitCommitOutputViewport  viewport.Model  // to log out the output from git operation
 	Spinner                  spinner.Model   // spinner for showing processing state
-	IsProcessing             bool            // indicator to prevent multiple thread spawning reacting to the key binding trigger
-	HasError                 bool            // indicate if git commit exitcode is not 0 (meaning have error)
-	ProcessSuccess           bool            // has the process sucessfuly executed
-	IsCancelled              bool            // flag to indicate if the operation was cancelled by user
+	IsProcessing             atomic.Bool     // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                 atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess           atomic.Bool     // has the process sucessfuly executed
+	IsCancelled              atomic.Bool     // flag to indicate if the operation was cancelled by user
 	// SessionID is a unique UUID for each popup instance to prevent
 	// stale goroutines from affecting new popups
 	SessionID uuid.UUID
@@ -53,11 +55,11 @@ type AddRemotePromptPopUpModel struct {
 	TotalInputCount         int             // to tell us how many input were there
 	CurrentActiveInputIndex int             // to tell us which input should be shown as highlighted/focus and be updated
 	AddRemoteOutputViewport viewport.Model  // to log out the output from git operation
-	IsProcessing            bool            // indicator to prevent multiple thread spawning reacting to the key binding trigger
-	HasError                bool            // indicate if git commit exitcode is not 0 (meaning have error)
-	ProcessSuccess          bool            // has the process sucessfuly executed
+	IsProcessing            atomic.Bool     // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess          atomic.Bool     // has the process sucessfuly executed
 	NoInitialRemote         bool            // indicate if this repo has no remote yet or user just wanted to add more remote
-	IsCancelled             bool            // flag to indicate if the operation was cancelled by user
+	IsCancelled             atomic.Bool     // flag to indicate if the operation was cancelled by user
 	// SessionID is a unique UUID for each popup instance to prevent
 	// stale goroutines from affecting new popups
 	SessionID uuid.UUID
@@ -66,10 +68,10 @@ type AddRemotePromptPopUpModel struct {
 type GitRemotePushPopUpModel struct {
 	GitRemotePushOutputViewport viewport.Model // to log out the output from git operation
 	Spinner                     spinner.Model  // spinner for showing processing state
-	IsProcessing                bool           // indicator to prevent multiple thread spawning reacting to the key binding trigger
-	HasError                    bool           // indicate if git commit exitcode is not 0 (meaning have error)
-	ProcessSuccess              bool           // has the process sucessfuly executed
-	IsCancelled                 bool           // flag to indicate if the operation was cancelled by user
+	IsProcessing                atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                    atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess              atomic.Bool    // has the process sucessfuly executed
+	IsCancelled                 atomic.Bool    // flag to indicate if the operation was cancelled by user
 	// SessionID is a unique UUID for each popup instance to prevent
 	// stale goroutines from affecting new popups
 	SessionID uuid.UUID

@@ -9,7 +9,7 @@ import (
 
 // the function to handle bubbletea key interactions
 func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
-	if m.IsTyping {
+	if m.IsTyping.Load() {
 		return handleTypingKeyBindingInteraction(msg, m)
 	} else {
 		return handleNonTypingGlobalKeyBindingInteraction(msg, m)
@@ -105,7 +105,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				popUp.CurrentActiveInputIndex = 1
 				// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
 				// also do not start any git operation is message is no provided
-				if !popUp.IsProcessing {
+				if !popUp.IsProcessing.Load() {
 					gitCommitService(m)
 					// Start spinner ticking
 					return m, popUp.Spinner.Tick
@@ -120,7 +120,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				popUp.CurrentActiveInputIndex = 1
 				// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
 				// also do not start any git operation is message is no provided
-				if !popUp.IsProcessing {
+				if !popUp.IsProcessing.Load() {
 					gitAddRemoteService(m)
 				}
 			}
@@ -186,7 +186,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		return m, nil
 	case "c", "C":
 		if m.CurrentSelectedContainer == ModifiedFilesComponent {
-			m.ShowPopUp = true
+			m.ShowPopUp.Store(true)
 			m.PopUpType = CommitPopUp
 			git.GITCOMMIT.ClearGitCommitOutput()
 
@@ -196,7 +196,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			} else {
 				popUp.GitCommitOutputViewport.SetContent("")
 			}
-			m.IsTyping = true
+			m.IsTyping.Store(true)
 		}
 		return m, nil
 	case "p", "P":
@@ -204,7 +204,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			// first we need to check if there are any push origin for this repo
 			// if not we prompt the user to add a new remote origin
 			if !git.GITCOMMIT.CheckRemoteExist() {
-				m.ShowPopUp = true
+				m.ShowPopUp.Store(true)
 				m.PopUpType = AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it
 				if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
@@ -212,10 +212,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				} else {
 					popUp.AddRemoteOutputViewport.SetContent("")
 				}
-				m.IsTyping = true
+				m.IsTyping.Store(true)
 			} else {
-				m.ShowPopUp = true
-				m.IsTyping = false
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
 				if len(git.GITCOMMIT.Remote) == 1 {
 					m.PopUpType = ChoosePushTypePopUp
 					// if the current pop up model is not commit pop up model, then init it and start git push service
@@ -232,7 +232,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		return m, nil
 
 	case "enter":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedContainer == ModifiedFilesComponent && len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
 				m.CurrentSelectedContainer = FileDiffComponent
 			}
@@ -243,16 +243,16 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				if ok {
 					remote := popUp.RemoteList.SelectedItem()
 					m.PopUpType = ChoosePushTypePopUp
-					m.ShowPopUp = true
-					m.IsTyping = false
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
 					initChoosePushTypePopUpModel(m, remote.(gitRemoteItem).Name)
 				}
 			case ChoosePushTypePopUp:
 				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
 				if ok {
 					m.PopUpType = GitRemotePushPopUp
-					m.ShowPopUp = true
-					m.IsTyping = false
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
 					selectedOption := popUp.PushOptionList.SelectedItem()
 					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(gitPushOptionItem).pushType)
 				}
@@ -260,17 +260,17 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 	case "esc":
-		if m.ShowPopUp {
+		if m.ShowPopUp.Load() {
 			switch m.PopUpType {
 			case GitRemotePushPopUp:
 				gitRemotePushCancelService(m)
 			case ChooseRemotePopUp:
-				m.ShowPopUp = false
-				m.IsTyping = false
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
 
 			case ChoosePushTypePopUp:
-				m.ShowPopUp = false
-				m.IsTyping = false
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
 				m.PopUpModel = nil
 			}
 			return m, nil
@@ -299,7 +299,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 	case "up", "k":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			switch m.CurrentSelectedContainer {
 			case LocalBranchComponent:
 				// we don't use the list native Update() because we track the current selected index
@@ -339,7 +339,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 	case "down", "j":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			switch m.CurrentSelectedContainer {
 			case LocalBranchComponent:
 				// we don't use the list native Update() because we track the current selected index
@@ -379,7 +379,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 	case "left", "h":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			m.CurrentSelectedFileDiffViewport.MoveLeft(1)
 		} else {
 			switch m.PopUpType {
@@ -392,7 +392,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			}
 		}
 	case "right", "l":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			m.CurrentSelectedFileDiffViewport.MoveRight(1)
 		} else {
 			switch m.PopUpType {
@@ -412,15 +412,15 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "wheelleft":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			m.CurrentSelectedFileDiffViewport.MoveLeft(1)
 		}
 	case "wheelright":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			m.CurrentSelectedFileDiffViewport.MoveRight(1)
 		}
 	case "wheelup":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 			return m, cmd
 		} else {
@@ -434,7 +434,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 			}
 		}
 	case "wheeldown":
-		if !m.ShowPopUp {
+		if !m.ShowPopUp.Load() {
 			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
 			return m, cmd
 		} else {

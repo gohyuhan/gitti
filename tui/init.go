@@ -119,19 +119,20 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	// Generate a unique UUID for this popup session
 	newSessionID := uuid.New()
 
-	m.PopUpModel = &GitCommitPopUpModel{
+	popUpModel := &GitCommitPopUpModel{
 		MessageTextInput:         CommitMessageTextInput,
 		DescriptionTextAreaInput: CommitDescriptionTextAreaInput,
 		TotalInputCount:          2,
 		CurrentActiveInputIndex:  1,
 		GitCommitOutputViewport:  vp,
 		Spinner:                  s,
-		IsProcessing:             false,
-		HasError:                 false,
-		ProcessSuccess:           false,
-		IsCancelled:              false,
 		SessionID:                newSessionID,
 	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+	m.PopUpModel = popUpModel
 }
 
 // init the popup model for prompting user to add remote origin
@@ -157,19 +158,20 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 	// Generate a unique UUID for this popup session
 	newSessionID := uuid.New()
 
-	m.PopUpModel = &AddRemotePromptPopUpModel{
+	popUpModel := &AddRemotePromptPopUpModel{
 		RemoteNameTextInput:     RemoteNameTextInput,
 		RemoteUrlTextInput:      RemoteUrlTextInput,
 		TotalInputCount:         2,
 		CurrentActiveInputIndex: 1,
 		AddRemoteOutputViewport: vp,
-		IsProcessing:            false,
-		HasError:                false,
-		ProcessSuccess:          false,
 		NoInitialRemote:         noInitialRemote,
-		IsCancelled:             false,
 		SessionID:               newSessionID,
 	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+	m.PopUpModel = popUpModel
 }
 
 // init the popup model for push output log
@@ -189,15 +191,16 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 	// Generate a unique UUID for this popup session
 	newSessionID := uuid.New()
 
-	m.PopUpModel = &GitRemotePushPopUpModel{
+	popUpModel := &GitRemotePushPopUpModel{
 		GitRemotePushOutputViewport: vp,
 		Spinner:                     s,
-		IsProcessing:                false,
-		HasError:                    false,
-		ProcessSuccess:              false,
-		IsCancelled:                 false,
 		SessionID:                   newSessionID,
 	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+	m.PopUpModel = popUpModel
 }
 
 func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string, pushType string) (*GittiModel, tea.Cmd) {
@@ -235,17 +238,17 @@ func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.Git
 
 func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
 	pushTypeOption := []gitPushOptionItem{
-		gitPushOptionItem{
+		{
 			Name:     "Push",
 			Info:     "git push",
 			pushType: git.PUSH,
 		},
-		gitPushOptionItem{
+		{
 			Name:     "Force Push (Safe)",
 			Info:     "git push --force",
 			pushType: git.FORCEPUSHSAFE,
 		},
-		gitPushOptionItem{
+		{
 			Name:     "Force Push (Dangerous)",
 			Info:     "git push --force-with-lease",
 			pushType: git.FORCEPUSHDANGEROUS,

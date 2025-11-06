@@ -48,7 +48,7 @@ func main() {
 
 		gittiUiModel := tui.NewGittiModel(repoPath)
 		gitti := tea.NewProgram(
-			&gittiUiModel,
+			gittiUiModel,
 		)
 
 		tui.StartGitUpdateListener(gitti, updateChannel)

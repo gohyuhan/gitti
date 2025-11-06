@@ -27,10 +27,10 @@ func gitCommitService(m *GittiModel) {
 		var sessionID uuid.UUID
 		if ok {
 			sessionID = popUp.SessionID // Capture the session ID at start
-			popUp.HasError = false
-			popUp.ProcessSuccess = false
-			popUp.IsProcessing = true
-			popUp.IsCancelled = false
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+			popUp.IsCancelled.Store(false)
 			// retrieve the value of commit message and desc
 			message = popUp.MessageTextInput.Value()
 			description = popUp.DescriptionTextAreaInput.Value()
@@ -46,27 +46,27 @@ func gitCommitService(m *GittiModel) {
 		exitStatusCode = git.GITCOMMIT.GitCommit(message, description)
 
 		popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
-		if ok && !popUp.IsCancelled {
-			popUp.IsProcessing = false // update the processing status
+		if ok && !popUp.IsCancelled.Load() {
+			popUp.IsProcessing.Store(false) // update the processing status
 			// if sucessful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing {
-				popUp.ProcessSuccess = true
+			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(true)
 				popUp.MessageTextInput.Reset()
 				popUp.DescriptionTextAreaInput.Reset()
 				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
-				if ok && !popUp.IsCancelled && popUp.SessionID == sessionID {
+				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
 					git.GITCOMMIT.ClearGitCommitOutput() // clear the git commit output log
-					m.ShowPopUp = false                  // close the pop up
-					m.IsTyping = false
+					m.ShowPopUp.Store(false)             // close the pop up
+					m.IsTyping.Store(false)
 					popUp.GitCommitOutputViewport.SetContent("") // set the git commit output viewport to nothing
-					popUp.IsProcessing = false
-					popUp.HasError = false
-					popUp.ProcessSuccess = false
+					popUp.IsProcessing.Store(false)
+					popUp.HasError.Store(false)
+					popUp.ProcessSuccess.Store(false)
 				}
-			} else if exitStatusCode != 0 && !popUp.IsProcessing {
-				popUp.HasError = true
+			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
+				popUp.HasError.Store(true)
 			}
 		}
 	}()
@@ -76,20 +76,20 @@ func gitCommitCancelService(m *GittiModel) {
 	go func() {
 		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 		if ok {
-			popUp.IsCancelled = true // set cancellation flag first to prevent race condition
+			popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 		}
 		// Clean up git processes and state
 		git.GITCOMMIT.KillGitCommitCmd()     // kill the git commit cmd process if exist
 		git.GITCOMMIT.KillGitStageCmd()      // kill the git stage cmd process if exist
 		git.GITCOMMIT.ClearGitCommitOutput() // clear the git commit output log
 
-		m.ShowPopUp = false // close the pop up
-		m.IsTyping = false  // reset typing mode
+		m.ShowPopUp.Store(false) // close the pop up
+		m.IsTyping.Store(false)  // reset typing mode
 		if ok {
 			popUp.GitCommitOutputViewport.SetContent("") // set the git commit output viewport to nothing
-			popUp.IsProcessing = false
-			popUp.HasError = false
-			popUp.ProcessSuccess = false
+			popUp.IsProcessing.Store(false)
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
 		}
 	}()
 }
@@ -109,10 +109,10 @@ func gitAddRemoteService(m *GittiModel) {
 		var sessionID uuid.UUID
 		if ok {
 			sessionID = popUp.SessionID // Capture the session ID at start
-			popUp.HasError = false
-			popUp.ProcessSuccess = false
-			popUp.IsProcessing = true
-			popUp.IsCancelled = false
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+			popUp.IsCancelled.Store(false)
 
 			// retrieve the value of remote name and remote url
 			remoteName = popUp.RemoteNameTextInput.Value()
@@ -125,11 +125,11 @@ func gitAddRemoteService(m *GittiModel) {
 		}
 		gitAddRemoteResult, exitStatusCode := git.GITCOMMIT.GitAddRemote(remoteName, remoteUrl)
 		popUp, ok = m.PopUpModel.(*AddRemotePromptPopUpModel)
-		if ok && !popUp.IsCancelled {
-			popUp.IsProcessing = false // update the processing status
+		if ok && !popUp.IsCancelled.Load() {
+			popUp.IsProcessing.Store(false) // update the processing status
 			// if sucessful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing {
-				popUp.ProcessSuccess = true
+			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(true)
 				popUp.RemoteNameTextInput.Reset()
 				popUp.RemoteUrlTextInput.Reset()
 				popUp.NoInitialRemote = false
@@ -138,16 +138,16 @@ func gitAddRemoteService(m *GittiModel) {
 				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*AddRemotePromptPopUpModel)
-				if ok && !popUp.IsCancelled && popUp.SessionID == sessionID {
-					m.ShowPopUp = false // close the pop up
-					m.IsTyping = false
+				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
+					m.ShowPopUp.Store(false) // close the pop up
+					m.IsTyping.Store(false)
 					popUp.AddRemoteOutputViewport.SetContent("") // set the git commit output viewport to nothing
-					popUp.IsProcessing = false
-					popUp.HasError = false
-					popUp.ProcessSuccess = false
+					popUp.IsProcessing.Store(false)
+					popUp.HasError.Store(false)
+					popUp.ProcessSuccess.Store(false)
 				}
-			} else if exitStatusCode != 0 && !popUp.IsProcessing {
-				popUp.HasError = true
+			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
+				popUp.HasError.Store(true)
 				updateAddRemoteOutputViewport(m, gitAddRemoteResult)
 			}
 		}
@@ -158,18 +158,18 @@ func gitAddRemoteCancelService(m *GittiModel) {
 	go func() {
 		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 		if ok {
-			popUp.IsCancelled = true // set cancellation flag first to prevent race condition
+			popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 		}
 		// Clean up git remote add process
 		git.GITCOMMIT.KillGitAddRemoteCmd() // kill the cmd process if exist
 
-		m.ShowPopUp = false // close the pop up
-		m.IsTyping = false  // reset typing mode
+		m.ShowPopUp.Store(false) // close the pop up
+		m.IsTyping.Store(false)  // reset typing mode
 		if ok {
 			popUp.AddRemoteOutputViewport.SetContent("") // set the git commit output viewport to nothing
-			popUp.IsProcessing = false
-			popUp.HasError = false
-			popUp.ProcessSuccess = false
+			popUp.IsProcessing.Store(false)
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
 		}
 	}()
 }
@@ -187,35 +187,35 @@ func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 
 		if ok {
 			sessionID = popUp.SessionID // Capture the session ID at start
-			popUp.HasError = false
-			popUp.ProcessSuccess = false
-			popUp.IsProcessing = true
-			popUp.IsCancelled = false
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+			popUp.IsCancelled.Store(false)
 		} else {
 			return
 		}
 
 		exitStatusCode := git.GITCOMMIT.GitPush(originName, pushType)
 		popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
-		if ok && !popUp.IsCancelled {
-			popUp.IsProcessing = false // update the processing status
+		if ok && !popUp.IsCancelled.Load() {
+			popUp.IsProcessing.Store(false) // update the processing status
 			// if sucessful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing {
-				popUp.ProcessSuccess = true
+			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(true)
 				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
-				if ok && !popUp.IsCancelled && popUp.SessionID == sessionID {
+				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
 					git.GITCOMMIT.ClearGitRemotePushOutput() // clear the git commit output log
-					m.ShowPopUp = false                      // close the pop up
-					m.IsTyping = false
+					m.ShowPopUp.Store(false)                 // close the pop up
+					m.IsTyping.Store(false)
 					popUp.GitRemotePushOutputViewport.SetContent("") // set the git commit output viewport to nothing
-					popUp.IsProcessing = false
-					popUp.HasError = false
-					popUp.ProcessSuccess = false
+					popUp.IsProcessing.Store(false)
+					popUp.HasError.Store(false)
+					popUp.ProcessSuccess.Store(false)
 				}
-			} else if exitStatusCode != 0 && !popUp.IsProcessing {
-				popUp.HasError = true
+			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
+				popUp.HasError.Store(true)
 			}
 		}
 	}()
@@ -225,17 +225,17 @@ func gitRemotePushCancelService(m *GittiModel) {
 	go func() {
 		popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 		if ok {
-			popUp.IsCancelled = true // set cancellation flag first to prevent race condition
+			popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 		}
 		git.GITCOMMIT.KillGitRemotePushCmd()     // kill the cmd process if exist
 		git.GITCOMMIT.ClearGitRemotePushOutput() // clear the git commit output log
-		m.ShowPopUp = false                      // close the pop up
-		m.IsTyping = false                       // and reset typing mode
+		m.ShowPopUp.Store(false)                 // close the pop up
+		m.IsTyping.Store(false)                  // and reset typing mode
 		if ok {
 			popUp.GitRemotePushOutputViewport.SetContent("") // set the git commit output viewport to nothing
-			popUp.IsProcessing = false
-			popUp.HasError = false
-			popUp.ProcessSuccess = false
+			popUp.IsProcessing.Store(false)
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
 		}
 	}()
 }
