@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 var GITFILES *GitFiles
@@ -28,20 +29,21 @@ type FileDiffLine struct {
 }
 
 type GitFiles struct {
-	RepoPath                     string
-	FilesStatus                  []FileStatus
-	FilesPosition                map[string]int
-	UpdateChannel                chan string
-	FilesStatusAfterLatestCommit map[string]bool
-	ErrorLog                     []error
+	RepoPath                    string
+	FilesStatus                 []FileStatus
+	FilesPosition               map[string]int
+	UpdateChannel               chan string
+	FilesSelectedForStageStatus map[string]bool // centralized recording the user selection if they want to stage a file
+	ErrorLog                    []error
+	GitFilesMutex               sync.Mutex
 }
 
 func InitGitFile(repoPath string, updateChannel chan string) {
 	gitFiles := GitFiles{
-		RepoPath:                     repoPath,
-		FilesStatus:                  make([]FileStatus, 0),
-		UpdateChannel:                updateChannel,
-		FilesStatusAfterLatestCommit: make(map[string]bool),
+		RepoPath:                    repoPath,
+		FilesStatus:                 make([]FileStatus, 0),
+		UpdateChannel:               updateChannel,
+		FilesSelectedForStageStatus: make(map[string]bool),
 	}
 	GITFILES = &gitFiles
 }
@@ -61,6 +63,7 @@ func (gf *GitFiles) GetGitFilesStatus() {
 	modifiedFilesStatus := []FileStatus{}
 	modifiedFilesPositionHashmap := make(map[string]int)
 
+	gf.GitFilesMutex.Lock()
 	for index, file := range files {
 		if len(file) < 3 {
 			continue
@@ -71,22 +74,23 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		fileName := strings.TrimSpace(file[3:])
 
 		// check if this was also in the previsou list before any update to the list and retrieve back the SelectedForStage info
-		fileIndex, exist := gf.FilesPosition[fileName]
-		selectedForStage := true
-		if exist {
-			selectedForStage = gf.FilesStatus[fileIndex].SelectedForStage
+		_, exist := gf.FilesSelectedForStageStatus[fileName]
+		if !exist {
+			gf.FilesSelectedForStageStatus[fileName] = true
 		}
 
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
 			FileName:         fileName,
 			IndexState:       indexState,
 			WorkTree:         worktree,
-			SelectedForStage: selectedForStage,
+			SelectedForStage: gf.FilesSelectedForStageStatus[fileName],
 		})
 		modifiedFilesPositionHashmap[fileName] = index
 	}
+
 	gf.FilesPosition = modifiedFilesPositionHashmap
 	gf.FilesStatus = modifiedFilesStatus
+	gf.GitFilesMutex.Unlock()
 }
 
 // get the file diff content
@@ -144,20 +148,13 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 }
 
 func (gf *GitFiles) ToggleFilesStageStatus(fileName string) {
-	fileIndex, exist := gf.FilesPosition[fileName]
-	if exist {
-		gf.FilesStatus[fileIndex].SelectedForStage = !gf.FilesStatus[fileIndex].SelectedForStage
+	gf.GitFilesMutex.Lock()
+	_, fileStatusExist := gf.FilesSelectedForStageStatus[fileName]
+	fileIndex, fileIndexExist := gf.FilesPosition[fileName]
+	if fileIndexExist && fileStatusExist {
+		gf.FilesSelectedForStageStatus[fileName] = !gf.FilesSelectedForStageStatus[fileName]
+		gf.FilesStatus[fileIndex].SelectedForStage = gf.FilesSelectedForStageStatus[fileName]
 		gf.UpdateChannel <- GIT_FILES_STATUS_UPDATE
 	}
-}
-
-func (gf *GitFiles) UpdateFilesStageStatusAfterCommit() {
-	for fileName, IsSelectedForStage := range gf.FilesStatusAfterLatestCommit {
-		fileIndex, exist := gf.FilesPosition[fileName]
-		if exist {
-			gf.FilesStatus[fileIndex].SelectedForStage = IsSelectedForStage
-		}
-	}
-	gf.FilesStatusAfterLatestCommit = make(map[string]bool)
-	gf.UpdateChannel <- GIT_FILES_STATUS_UPDATE
+	gf.GitFilesMutex.Unlock()
 }
