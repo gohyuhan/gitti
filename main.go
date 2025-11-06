@@ -8,6 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea/v2"
 
 	"gitti/api"
+	"gitti/cmd"
 	"gitti/i18n"
 	"gitti/tui"
 )
@@ -25,6 +26,8 @@ func main() {
 	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
 
 	flag.Parse()
+
+	cmd.InitCmd(repoPath)
 
 	switch {
 	case *langCode != "":

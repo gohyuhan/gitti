@@ -6,6 +6,8 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+
+	"gitti/cmd"
 )
 
 var GITFILES *GitFiles
@@ -29,7 +31,6 @@ type FileDiffLine struct {
 }
 
 type GitFiles struct {
-	RepoPath                    string
 	FilesStatus                 []FileStatus
 	FilesPosition               map[string]int
 	UpdateChannel               chan string
@@ -38,9 +39,8 @@ type GitFiles struct {
 	GitFilesMutex               sync.Mutex
 }
 
-func InitGitFile(repoPath string, updateChannel chan string) {
+func InitGitFile(updateChannel chan string) {
 	gitFiles := GitFiles{
-		RepoPath:                    repoPath,
 		FilesStatus:                 make([]FileStatus, 0),
 		UpdateChannel:               updateChannel,
 		FilesSelectedForStageStatus: make(map[string]bool),
@@ -51,8 +51,7 @@ func InitGitFile(repoPath string, updateChannel chan string) {
 func (gf *GitFiles) GetGitFilesStatus() {
 	gitArgs := []string{"status", "--porcelain", "-uall"}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gf.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitOutput, err := cmd.Output()
 	if err != nil {
 		gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES ERROR]: %w", err))
@@ -106,8 +105,7 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 		gitArgs = []string{"diff", "--no-index", "-U99999", nullFile, "--", fileStatus.FileName}
 	}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gf.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitOutput, err := cmd.Output()
 	if err != nil {
 		exitError, ok := err.(*exec.ExitError)

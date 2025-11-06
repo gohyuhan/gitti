@@ -3,9 +3,10 @@ package git
 import (
 	"bufio"
 	"fmt"
-	"os/exec"
 	"strings"
 	"sync"
+
+	"gitti/cmd"
 
 	"github.com/google/uuid"
 )
@@ -34,7 +35,6 @@ type CommitLogInfo struct {
 
 type GitCommitLog struct {
 	ID                          uuid.UUID // because this is a slow operation and to prevent race override, we use ID to detect and only allow override whe the ID matches
-	RepoPath                    string
 	GitCommitLogs               []CommitLogInfo
 	GitCommitLogsDAG            [][]string
 	ErrorLog                    []error
@@ -54,14 +54,13 @@ const (
 	DONE         = "DONE"
 )
 
-func InitGitCommitLog(repoPath string, allBranch bool) {
+func InitGitCommitLog(allBranch bool) {
 	branch := CURRENTBRANCH
 	if allBranch {
 		branch = ALLBRANCH
 	}
 	gitCommitLog := GitCommitLog{
 		ID:                          uuid.New(),
-		RepoPath:                    repoPath,
 		GitCommitLogs:               make([]CommitLogInfo, 0, 1),
 		GitCommitLogsDAG:            make([][]string, 0, 1),
 		ErrorLog:                    []error{},
@@ -106,8 +105,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 		gitArgs = append(gitArgs, "HEAD")
 	}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gc.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitStreamOutput, err := cmd.StdoutPipe()
 	if err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))

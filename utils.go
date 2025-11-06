@@ -23,14 +23,14 @@ func setLanguage(langCode string) {
 
 // set the default git init branch name only for gitti
 func setInitBranch(branchName string) {
-	settings.UpdatedDefaultBranch(branchName, false, "")
+	settings.UpdateDefaultBranch(branchName, false, "")
 	fmt.Printf(i18n.LANGUAGEMAPPING.GittiDefaultBranchSet+"\n", branchName)
 	os.Exit(0)
 }
 
 // set the default git init branch name for both gitti and git
 func setGlobalInitBranch(branchName string, cwd string) {
-	settings.UpdatedDefaultBranch(branchName, true, cwd)
+	settings.UpdateDefaultBranch(branchName, true, cwd)
 	fmt.Printf(i18n.LANGUAGEMAPPING.GittiDefaultAndGitDefaultBranchSet+"\n", branchName)
 	os.Exit(0)
 }
@@ -41,11 +41,12 @@ func initGitAndAPI(repoPath string, updateChannel chan string) {
 	// check if the user repo is git inited, is not prompt user to init it
 	api.IsRepoGitInitialized(repoPath)
 	// various initialization
-	git.InitGitBranch(repoPath)
-	git.InitGitFile(repoPath, updateChannel)
-	git.InitGitCommit(repoPath, updateChannel)
-	// git.InitGitCommitLog(repoPath, false) // not included in v0.1.0
+	git.InitGitBranch()
+	git.InitGitFile(updateChannel)
+	git.InitGitCommit(updateChannel)
+	// git.InitGitCommitLog(false) // not included in v0.1.0
 	api.InitGitDaemon(repoPath, updateChannel)
+
 }
 
 func initGlobalSettingAndLanguage() {

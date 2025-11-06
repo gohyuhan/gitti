@@ -153,7 +153,7 @@ func UpdateLanguageCode(languageCode string) {
 	}
 }
 
-func UpdatedDefaultBranch(branchName string, applyToGit bool, cwd string) {
+func UpdateDefaultBranch(branchName string, applyToGit bool, cwd string) {
 	GITTICONFIGSETTINGS.GitInitDefaultBranch = branchName
 	cfgPath, err := getConfigPath()
 	if err == nil {

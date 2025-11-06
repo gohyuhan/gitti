@@ -11,6 +11,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"gitti/cmd"
 	"gitti/i18n"
 )
 
@@ -23,7 +24,6 @@ const (
 )
 
 type GitCommit struct {
-	RepoPath                      string
 	ErrorLog                      []error
 	GitCommitProcess              *exec.Cmd
 	GitRemotePushProcess          *exec.Cmd
@@ -48,9 +48,8 @@ type GitRemote struct {
 	Url  string
 }
 
-func InitGitCommit(repoPath string, updateChannel chan string) {
+func InitGitCommit(updateChannel chan string) {
 	gitCommit := GitCommit{
-		RepoPath:             repoPath,
 		GitCommitProcess:     nil,
 		GitRemotePushProcess: nil,
 		GitAddRemoteProcess:  nil,
@@ -71,8 +70,7 @@ func InitGitCommit(repoPath string, updateChannel chan string) {
 
 func (gc *GitCommit) GitFetch() {
 	gitArgs := []string{"fetch"}
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gc.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 	_, err := cmd.Output()
@@ -94,8 +92,7 @@ func (gc *GitCommit) GitStage() {
 		return
 	}
 	gc.GitStageProcessMutex.Lock()
-	resetCmd := exec.Command("git", "reset")
-	resetCmd.Dir = gc.RepoPath
+	resetCmd := cmd.GittiCmd.RunGitCmd([]string{"reset"})
 	if _, err := resetCmd.Output(); err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT RESET ERROR]: %w", err))
 	}
@@ -111,9 +108,7 @@ func (gc *GitCommit) GitStage() {
 	}
 	GITFILES.GitFilesMutex.Unlock()
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gc.RepoPath
-
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gc.GitStageProcess = cmd
 	gc.GitStageProcessMutex.Unlock()
 
@@ -166,8 +161,7 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 		gitArgs = append(gitArgs, "-m", description)
 	}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gc.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 
 	gc.GitCommitProcessMutex.Lock()
 	gc.GitCommitProcess = cmd
@@ -268,8 +262,7 @@ func (gc *GitCommit) GitPush(originName string, pushType string) int {
 	default:
 		gitArgs = []string{"push", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
 	}
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gc.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
@@ -357,8 +350,7 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 		return []string{}, -1
 	}
 	gitArgs := []string{"remote", "add", originName, url}
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gc.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 
 	gc.GitAddRemoteProcessMutex.Lock()
 	gc.GitAddRemoteProcess = cmd
@@ -408,8 +400,7 @@ func (gc *GitCommit) gitAddRemoteProcessReset() {
 
 func (gc *GitCommit) CheckRemoteExist() bool {
 	gitArgs := []string{"remote", "-v"}
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gc.RepoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitOutput, err := cmd.Output()
 	if err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
@@ -441,8 +432,7 @@ func (gc *GitCommit) CheckRemoteExist() bool {
 func GitInit(repoPath string) {
 	gitArgs := []string{"init"}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = repoPath
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	_, err := cmd.Output()
 	if err != nil {
 		fmt.Printf("[GIT INIT ERROR]: %v", err)

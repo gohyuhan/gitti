@@ -2,8 +2,9 @@ package git
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
+
+	"gitti/cmd"
 )
 
 var GITBRANCH *GitBranch
@@ -14,26 +15,27 @@ type BranchInfo struct {
 }
 
 type GitBranch struct {
-	RepoPath        string
 	CurrentCheckOut BranchInfo
 	AllBranches     []BranchInfo
 	ErrorLog        []error
 }
 
-func InitGitBranch(repoPath string) {
-	gitBranch := GitBranch{
-		RepoPath: repoPath,
-	}
+func InitGitBranch() {
+	gitBranch := GitBranch{}
 	GITBRANCH = &gitBranch
 }
 
+// ----------------------------------
+//
+//	Related to Branches Info
+//
+// ----------------------------------
 func (gb *GitBranch) GetLatestBranchesinfo() {
 	gitArgs := []string{"branch"}
 	allBranches := []BranchInfo{}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = gb.RepoPath
-	gitOutput, err := cmd.Output()
+	bCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	gitOutput, err := bCmd.Output()
 	if err != nil {
 		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
 	}
@@ -43,9 +45,8 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	// meaning this was a newly init repo with a uncommited branch
 	if len(gitBranches) < 1 {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
-		cmd := exec.Command("git", gitArgs...)
-		cmd.Dir = gb.RepoPath
-		gitOutput, err := cmd.Output()
+		bCmd = cmd.GittiCmd.RunGitCmd(gitArgs)
+		gitOutput, err := bCmd.Output()
 		if err != nil {
 			gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
 		}
@@ -76,10 +77,44 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	gb.AllBranches = allBranches
 }
 
+// ----------------------------------
+//
+//	Set The Global Default Branch Name when git init
+//
+// ----------------------------------
 func SetGitInitDefaultBranch(branchName string, cwd string) {
 	gitArgs := []string{"config", "--global", "init.defaultBranch", branchName}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = cwd
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	_ = cmd.Run()
+}
+
+// ----------------------------------
+//
+//	Related to Git Stash
+//
+// ----------------------------------
+func (gb *GitBranch) GitStash() {
+	gitArgs := []string{"stash", "--all"}
+
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	_, err := cmd.Output()
+	if err != nil {
+		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT STASH ERROR]: %w", err))
+	}
+}
+
+// ----------------------------------
+//
+//	Related to Git UnStash
+//
+// ----------------------------------
+func (gb *GitBranch) GitUnstash() {
+	gitArgs := []string{"stash", "pop"}
+
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	_, err := cmd.Output()
+	if err != nil {
+		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT UNSTASH ERROR]: %w", err))
+	}
 }
