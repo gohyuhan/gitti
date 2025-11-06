@@ -45,6 +45,35 @@ func tuiWindowSizing(m *GittiModel) {
 	m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
 	m.CurrentSelectedFileDiffViewport.SetYOffset(m.CurrentSelectedFileDiffViewport.YOffset)
 
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case CommitPopUp:
+			popUp, exist := m.PopUpModel.(*GitCommitPopUpModel)
+			if exist {
+				width := (min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.GitCommitOutputViewport.SetWidth(width)
+			}
+		case GitRemotePushPopUp:
+			popUp, exist := m.PopUpModel.(*GitRemotePushPopUpModel)
+			if exist {
+				width := (min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.GitRemotePushOutputViewport.SetWidth(width)
+			}
+		case ChoosePushTypePopUp:
+			popUp, exist := m.PopUpModel.(*ChoosePushTypePopUpModel)
+			if exist {
+				width := (min(maxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.PushOptionList.SetWidth(width)
+			}
+		case ChooseRemotePopUp:
+			popUp, exist := m.PopUpModel.(*ChooseRemotePopUpModel)
+			if exist {
+				width := (min(maxChooseRemotePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.RemoteList.SetWidth(width)
+			}
+		}
+	}
+
 }
 
 // truncateString trims string s to fit within given display width,

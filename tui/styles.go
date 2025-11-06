@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	minWidth  = 90
-	minHeight = 28
+	minWidth  = 80
+	minHeight = 24
 
 	padding                             = 1
 	mainPageKeyBindingLayoutPanelHeight = 1
