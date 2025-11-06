@@ -24,23 +24,20 @@ const (
 )
 
 type GitCommit struct {
-	ErrorLog                      []error
-	GitCommitProcess              *exec.Cmd
-	GitRemotePushProcess          *exec.Cmd
-	GitAddRemoteProcess           *exec.Cmd
-	GitStageProcess               *exec.Cmd
-	GitCommitOutput               []string
-	GitRemotePushOutput           []string
-	UpdateChannel                 chan string
-	GitCommitProcessMutex         sync.Mutex
-	GitRemotePushProcessMutex     sync.Mutex
-	GitAddRemoteProcessMutex      sync.Mutex
-	GitStageProcessMutex          sync.Mutex
-	isGitCommitProcessRunning     atomic.Bool
-	isGitRemotePushProcessRunning atomic.Bool
-	isGitAddRemoteProcessRunning  atomic.Bool
-	isGitStageProcessRunning      atomic.Bool
-	Remote                        []GitRemote
+	ErrorLog                          []error
+	GitStashAndCommitProcess          *exec.Cmd
+	GitRemotePushProcess              *exec.Cmd
+	GitAddRemoteProcess               *exec.Cmd
+	GitCommitOutput                   []string
+	GitRemotePushOutput               []string
+	UpdateChannel                     chan string
+	GitStashAndCommitProcessMutex     sync.Mutex
+	GitRemotePushProcessMutex         sync.Mutex
+	GitAddRemoteProcessMutex          sync.Mutex
+	isGitStashAndCommitProcessRunning atomic.Bool
+	isGitRemotePushProcessRunning     atomic.Bool
+	isGitAddRemoteProcessRunning      atomic.Bool
+	Remote                            []GitRemote
 }
 
 type GitRemote struct {
@@ -50,20 +47,18 @@ type GitRemote struct {
 
 func InitGitCommit(updateChannel chan string) {
 	gitCommit := GitCommit{
-		GitCommitProcess:     nil,
-		GitRemotePushProcess: nil,
-		GitAddRemoteProcess:  nil,
-		GitStageProcess:      nil,
-		GitCommitOutput:      []string{},
-		GitRemotePushOutput:  []string{},
-		UpdateChannel:        updateChannel,
-		Remote:               []GitRemote{},
+		GitStashAndCommitProcess: nil,
+		GitRemotePushProcess:     nil,
+		GitAddRemoteProcess:      nil,
+		GitCommitOutput:          []string{},
+		GitRemotePushOutput:      []string{},
+		UpdateChannel:            updateChannel,
+		Remote:                   []GitRemote{},
 	}
 
-	gitCommit.isGitCommitProcessRunning.Store(false)
+	gitCommit.isGitStashAndCommitProcessRunning.Store(false)
 	gitCommit.isGitRemotePushProcessRunning.Store(false)
 	gitCommit.isGitAddRemoteProcessRunning.Store(false)
-	gitCommit.isGitStageProcessRunning.Store(false)
 
 	GITCOMMIT = &gitCommit
 }
@@ -81,107 +76,67 @@ func (gc *GitCommit) GitFetch() {
 
 // ----------------------------------
 //
-//	Related to Git Stage
+//	Related to Git Stash & Commit
 //
 // ----------------------------------
-func (gc *GitCommit) GitStage() {
-	// First, reset the staging area to avoid conflicts with previously staged files.
-	// Also prevent to stage file that was stage else where like on git cli or other git related program
-	// but decided to not include that file for commit when using gitti
-	if !gc.isGitStageProcessRunning.CompareAndSwap(false, true) {
-		return
+func (gc *GitCommit) GitStashAndCommit(message, description string) int {
+	if !gc.isGitStashAndCommitProcessRunning.CompareAndSwap(false, true) {
+		return -1
 	}
-	gc.GitStageProcessMutex.Lock()
-	resetCmd := cmd.GittiCmd.RunGitCmd([]string{"reset"})
-	if _, err := resetCmd.Output(); err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT RESET ERROR]: %w", err))
-	}
+	gc.ClearGitCommitOutput()
+	gc.GitStashAndCommitProcessMutex.Lock()
 
-	gitArgs := []string{"add"}
+	defer func() {
+		// ensure cleanup even if Start or Wait fails
+		gc.GitStashAndCommitProcessMutex.Lock()
+		gc.gitStashAndCommitProcessReset()
+		gc.gitReset()
+		gc.GitStashAndCommitProcessMutex.Unlock()
+	}()
+
+	stashGitArgs := []string{"add"}
 
 	// stage selected files.
 	GITFILES.GitFilesMutex.Lock()
 	for _, files := range GITFILES.FilesStatus {
 		if files.SelectedForStage {
-			gitArgs = append(gitArgs, files.FileName)
+			stashGitArgs = append(stashGitArgs, files.FileName)
 		}
 	}
 	GITFILES.GitFilesMutex.Unlock()
+	stashCmd := cmd.GittiCmd.RunGitCmd(stashGitArgs)
+	gc.GitStashAndCommitProcess = stashCmd
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
-	gc.GitStageProcess = cmd
-	gc.GitStageProcessMutex.Unlock()
-
-	defer func() {
-		gc.GitStageProcessMutex.Lock()
-		gc.gitStageProcessReset()
-		gc.GitStageProcessMutex.Unlock()
-	}()
-
-	if len(gitArgs) == 1 {
+	if len(stashGitArgs) == 1 {
 		// No files selected, nothing to stage
-		return
-	}
-
-	if _, err := cmd.Output(); err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT STAGE ERROR]: %w", err))
-	}
-}
-
-// KillGitStageCmd forcefully terminates any running git stage process.
-// It is safe to call this method even if no process is running.
-// This method is thread-safe and can be called from multiple goroutines.
-// This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
-func (gc *GitCommit) KillGitStageCmd() {
-	gc.GitStageProcessMutex.Lock()
-	defer gc.GitStageProcessMutex.Unlock()
-
-	if gc.GitStageProcess != nil && gc.GitStageProcess.Process != nil {
-		_ = gc.GitStageProcess.Process.Kill()
-	}
-}
-
-func (gc *GitCommit) gitStageProcessReset() {
-	gc.GitStageProcess = nil
-	gc.isGitStageProcessRunning.Store(false)
-}
-
-// ----------------------------------
-//
-//	Related to Git Commit
-//
-// ----------------------------------
-func (gc *GitCommit) GitCommit(message, description string) int {
-	if !gc.isGitCommitProcessRunning.CompareAndSwap(false, true) {
+		gc.GitStashAndCommitProcessMutex.Unlock()
 		return -1
 	}
-	gc.ClearGitCommitOutput()
+
+	if _, err := stashCmd.Output(); err != nil {
+		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT STAGE ERROR]: %w", err))
+		gc.GitStashAndCommitProcessMutex.Unlock()
+		return -1
+	}
+
 	gitArgs := []string{"commit", "-m", message}
 	if len(description) > 0 {
 		gitArgs = append(gitArgs, "-m", description)
 	}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
-
-	gc.GitCommitProcessMutex.Lock()
-	gc.GitCommitProcess = cmd
-	gc.GitCommitProcessMutex.Unlock()
-	defer func() {
-		// ensure cleanup even if Start or Wait fails
-		gc.GitCommitProcessMutex.Lock()
-		gc.gitCommitProcessReset()
-		gc.GitCommitProcessMutex.Unlock()
-	}()
+	commitCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	gc.GitStashAndCommitProcess = commitCmd
+	gc.GitStashAndCommitProcessMutex.Unlock()
 
 	// Combine stderr into stdout
-	stdout, err := cmd.StdoutPipe()
+	stdout, err := commitCmd.StdoutPipe()
 	if err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
-	cmd.Stderr = cmd.Stdout
+	commitCmd.Stderr = commitCmd.Stdout
 
-	if err := cmd.Start(); err != nil {
+	if err := commitCmd.Start(); err != nil {
 		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
@@ -203,7 +158,7 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 		}
 	}()
 
-	waitErr := cmd.Wait()
+	waitErr := commitCmd.Wait()
 	wg.Wait()
 
 	if waitErr != nil {
@@ -224,18 +179,30 @@ func (gc *GitCommit) ClearGitCommitOutput() {
 }
 
 // This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
-func (gc *GitCommit) KillGitCommitCmd() {
-	gc.GitCommitProcessMutex.Lock()
-	defer gc.GitCommitProcessMutex.Unlock()
+func (gc *GitCommit) KillGitStashAndCommitCmd() {
+	gc.GitStashAndCommitProcessMutex.Lock()
+	defer gc.GitStashAndCommitProcessMutex.Unlock()
 
-	if gc.GitCommitProcess != nil && gc.GitCommitProcess.Process != nil {
-		_ = gc.GitCommitProcess.Process.Kill()
+	if gc.GitStashAndCommitProcess != nil && gc.GitStashAndCommitProcess.Process != nil {
+		_ = gc.GitStashAndCommitProcess.Process.Kill()
 	}
 }
 
-func (gc *GitCommit) gitCommitProcessReset() {
-	gc.GitCommitProcess = nil
-	gc.isGitCommitProcessRunning.Store(false)
+func (gc *GitCommit) gitStashAndCommitProcessReset() {
+	gc.GitStashAndCommitProcess = nil
+	gc.isGitStashAndCommitProcessRunning.Store(false)
+}
+
+// ----------------------------------
+//
+//	Related to Git Reset
+//
+// ----------------------------------
+func (gc *GitCommit) gitReset() {
+	resetCmd := cmd.GittiCmd.RunGitCmd([]string{"reset"})
+	if _, err := resetCmd.Output(); err != nil {
+		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT RESET ERROR]: %w", err))
+	}
 }
 
 // func (gc *GitCommit) GitPull() {
@@ -252,7 +219,7 @@ func (gc *GitCommit) GitPush(originName string, pushType string) int {
 		return -1
 	}
 	gc.ClearGitRemotePushOutput()
-
+	gc.GitRemotePushProcessMutex.Lock()
 	gitArgs := []string{"push", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
 	switch pushType {
 	case FORCEPUSHSAFE:
@@ -266,7 +233,6 @@ func (gc *GitCommit) GitPush(originName string, pushType string) int {
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
-	gc.GitRemotePushProcessMutex.Lock()
 	gc.GitRemotePushProcess = cmd
 	gc.GitRemotePushProcessMutex.Unlock()
 	defer func() {
@@ -349,10 +315,10 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 	if !gc.isGitAddRemoteProcessRunning.CompareAndSwap(false, true) {
 		return []string{}, -1
 	}
+	gc.GitAddRemoteProcessMutex.Lock()
 	gitArgs := []string{"remote", "add", originName, url}
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 
-	gc.GitAddRemoteProcessMutex.Lock()
 	gc.GitAddRemoteProcess = cmd
 	gc.GitAddRemoteProcessMutex.Unlock()
 	defer func() {
