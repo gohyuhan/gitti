@@ -89,6 +89,11 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	const fieldSeparator = "<<COMMITLOGINFOSEPERATOR>>"
 	const recordSeparator = "<<COMMITLOGENDOFLINE>>"
 
+	// early return is Id is not the same when the process starts
+	if gc.ID != currentID {
+		return
+	}
+
 	// A custom format with unique separators to handle multi-line commit messages reliably.
 	// Format: <hash>|||<parents>|||<refs>|||<author>|||<subject>|||<body>|||<datetime><<RECORD_END>>
 	const gitLogFormat = "--pretty=format:" + fieldSeparator + "%h" + fieldSeparator + "%H" + fieldSeparator + "%P" + fieldSeparator + "%d" + fieldSeparator + "%an" + fieldSeparator + "%s" + fieldSeparator + "%ci" + recordSeparator
