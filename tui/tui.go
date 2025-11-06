@@ -59,14 +59,15 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case GitUpdateMsg:
 		updateEvent := string(msg)
 		switch updateEvent {
+		case git.GIT_BRANCH_UPDATE:
+			initBranchList(m)
 		case git.GIT_FILES_STATUS_UPDATE:
 			initModifiedFilesList(m)
+			renderModifiedFilesDiffViewPort(m)
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
 			updatePopUpCommitOutputViewPort(m)
 		case git.GIT_REMOTE_PUSH_OUTPUT_UPDATE:
 			updateGitRemotePushOutputViewport(m)
-		default:
-			processGitUpdate(m)
 		}
 		return m, nil
 	case tea.MouseMsg:

@@ -13,15 +13,21 @@ import (
 )
 
 func GetUpdatedGitInfo(updateChannel chan string) {
-	git.GITFILES.GetGitFilesStatus()
-	git.GITBRANCH.GetLatestBranchesinfo()
+	go func() {
+		git.GITFILES.GetGitFilesStatus()
+		updateChannel <- git.GIT_FILES_STATUS_UPDATE
+	}()
+
+	go func() {
+		git.GITBRANCH.GetLatestBranchesinfo()
+		updateChannel <- git.GIT_BRANCH_UPDATE
+	}()
 
 	// not included in v0.1.0
 	// go func() {
 	// 	GITCOMMIT.GetLatestGitCommitLogInfoAndDAG(updateChannel)
 	// }()
 
-	updateChannel <- git.GENERAL_GIT_UPDATE
 }
 
 func IsGitInstalled(repoPath string) {

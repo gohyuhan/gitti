@@ -21,7 +21,6 @@ type GitDaemon struct {
 	DebounceDur                    time.Duration
 	GitFilesActiveRefreshDur       time.Duration
 	GitFetchActiveRefreshDur       time.Duration
-	Paused                         bool
 	isGitGeneralInfoPassiveRunning atomic.Bool
 	isGitFilesActiveRunning        atomic.Bool
 	isGitFetchActiveRunning        atomic.Bool
@@ -88,7 +87,7 @@ func (gd *GitDaemon) WatchPath() {
 func (gd *GitDaemon) Start() {
 	go func() {
 		// Initial call to get info of git
-		if !gd.Paused && gd.UpdateChannel != nil {
+		if gd.UpdateChannel != nil {
 			GetUpdatedGitInfo(gd.UpdateChannel)
 		}
 		gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
@@ -97,7 +96,7 @@ func (gd *GitDaemon) Start() {
 		for {
 			select {
 			case event := <-gd.Watcher.Events:
-				if gd.isRelevantEvent(event) && !gd.Paused {
+				if gd.isRelevantEvent(event) {
 					gd.resetDebounce()
 				}
 			case err := <-gd.Watcher.Errors:
@@ -105,7 +104,7 @@ func (gd *GitDaemon) Start() {
 
 			case <-gd.WatcherTimer.C:
 				go func() {
-					if !gd.Paused && gd.isGitGeneralInfoPassiveRunning.CompareAndSwap(false, true) {
+					if gd.isGitGeneralInfoPassiveRunning.CompareAndSwap(false, true) {
 						defer gd.isGitGeneralInfoPassiveRunning.Store(false)
 						GetUpdatedGitInfo(gd.UpdateChannel)
 					}
@@ -114,7 +113,7 @@ func (gd *GitDaemon) Start() {
 				// reset first to avoid losing ticks, then run work in background
 				gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
 				go func() {
-					if !gd.Paused && gd.isGitFilesActiveRunning.CompareAndSwap(false, true) {
+					if gd.isGitFilesActiveRunning.CompareAndSwap(false, true) {
 						// Mark as running
 						defer gd.isGitFilesActiveRunning.Store(false)
 
@@ -178,14 +177,6 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 	}
 
 	return false
-}
-
-func (gd *GitDaemon) Pause() {
-	gd.Paused = true
-}
-
-func (gd *GitDaemon) Resume() {
-	gd.Paused = false
 }
 
 func (gd *GitDaemon) Stop() {

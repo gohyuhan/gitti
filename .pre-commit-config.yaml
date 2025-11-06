@@ -24,7 +24,7 @@
       # Format imports and remove unused ones
       - id: goimports
         name: goimports
-        entry: bash -c 'goimports -w -local gitti $(find . -type f -name "*.go" | grep -v vendor/)'
+        entry: bash -c 'go run golang.org/x/tools/cmd/goimports@latest -w -local gitti $(find . -type f -name "*.go" | grep -v vendor/)'
         language: system
         pass_filenames: false
         types: [go]

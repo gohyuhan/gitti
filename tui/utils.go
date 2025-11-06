@@ -47,13 +47,6 @@ func tuiWindowSizing(m *GittiModel) {
 
 }
 
-func processGitUpdate(m *GittiModel) {
-	initBranchList(m)
-	initModifiedFilesList(m)
-	renderModifiedFilesDiffViewPort(m)
-	return
-}
-
 // truncateString trims string s to fit within given display width,
 // accounting for wide CJK characters, and appends "…" if truncated.
 func truncateString(s string, maxWidth int) string {
