@@ -101,7 +101,7 @@ func (gc *GitCommit) GitFetch() {
 
 // ----------------------------------
 //
-//	Related to Git Stash & Commit
+//	Related to Git Stage & Commit
 //
 // ----------------------------------
 func (gc *GitCommit) GitStageAndCommit(message, description string, stagedFiles []string) int {
@@ -109,7 +109,6 @@ func (gc *GitCommit) GitStageAndCommit(message, description string, stagedFiles 
 		return -1
 	}
 	gc.ClearGitCommitOutput()
-	gc.gitStashAndCommitProcessMutex.Lock()
 
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
@@ -118,6 +117,8 @@ func (gc *GitCommit) GitStageAndCommit(message, description string, stagedFiles 
 		gc.gitReset()
 		gc.gitStashAndCommitProcessMutex.Unlock()
 	}()
+
+	gc.gitStashAndCommitProcessMutex.Lock()
 
 	stageGitArgs := []string{"add"}
 	if len(stagedFiles) > 0 {
@@ -146,20 +147,25 @@ func (gc *GitCommit) GitStageAndCommit(message, description string, stagedFiles 
 
 	commitCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gc.gitStashAndCommitProcess = commitCmd
-	gc.gitStashAndCommitProcessMutex.Unlock()
 
 	// Combine stderr into stdout
 	stdout, err := commitCmd.StdoutPipe()
 	if err != nil {
+		gc.gitStashAndCommitProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
 	commitCmd.Stderr = commitCmd.Stdout
 
+	// Start the process while still holding the mutex
 	if err := commitCmd.Start(); err != nil {
+		gc.gitStashAndCommitProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
+
+	// Process is now started and can be killed safely
+	gc.gitStashAndCommitProcessMutex.Unlock()
 
 	// Stream combined output
 	var wg sync.WaitGroup
@@ -239,6 +245,14 @@ func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pu
 		return -1
 	}
 	gc.ClearGitRemotePushOutput()
+
+	defer func() {
+		// ensure cleanup even if Start or Wait fails
+		gc.gitRemotePushProcessMutex.Lock()
+		gc.resetGitRemotePushProcesstatus()
+		gc.gitRemotePushProcessMutex.Unlock()
+	}()
+
 	gc.gitRemotePushProcessMutex.Lock()
 	gitArgs := []string{"push", "-u", originName, currentCheckOutBranch}
 	switch pushType {
@@ -254,26 +268,25 @@ func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pu
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
 	gc.gitRemotePushProcess = cmd
-	gc.gitRemotePushProcessMutex.Unlock()
-	defer func() {
-		// ensure cleanup even if Start or Wait fails
-		gc.gitRemotePushProcessMutex.Lock()
-		gc.resetGitRemotePushProcesstatus()
-		gc.gitRemotePushProcessMutex.Unlock()
-	}()
 
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
+		gc.gitRemotePushProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
 	cmd.Stderr = cmd.Stdout
 
+	// Start the process while still holding the mutex
 	if err := cmd.Start(); err != nil {
+		gc.gitRemotePushProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
+
+	// Process is now started and can be killed safely
+	gc.gitRemotePushProcessMutex.Unlock()
 
 	// Stream combined output
 	var wg sync.WaitGroup
@@ -335,22 +348,28 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 	if !gc.isGitAddRemoteProcessRunning.CompareAndSwap(false, true) {
 		return []string{}, -1
 	}
-	gc.gitAddRemoteProcessMutex.Lock()
-	gitArgs := []string{"remote", "add", originName, url}
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
-
-	gc.gitAddRemoteProcess = cmd
-	gc.gitAddRemoteProcessMutex.Unlock()
 	defer func() {
 		gc.gitAddRemoteProcessMutex.Lock()
 		gc.gitAddRemoteProcessReset()
 		gc.gitAddRemoteProcessMutex.Unlock()
 	}()
+
 	if !isValidGitRemoteURL(url) {
-		return []string{i18n.LANGUAGEMAPPING.AddRemotePopUpInvalidRemoteUrlFormat}, -1
+		errMsg := "Invalid remote URL format"
+		if i18n.LANGUAGEMAPPING != nil {
+			errMsg = i18n.LANGUAGEMAPPING.AddRemotePopUpInvalidRemoteUrlFormat
+		}
+		return []string{errMsg}, -1
 	}
 
+	gc.gitAddRemoteProcessMutex.Lock()
+	gitArgs := []string{"remote", "add", originName, url}
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	gc.gitAddRemoteProcess = cmd
+
+	// CombinedOutput starts and waits for the command
 	gitOutput, err := cmd.CombinedOutput()
+	gc.gitAddRemoteProcessMutex.Unlock()
 
 	gitAddRemoteOutput := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
 	if err != nil {
