@@ -170,61 +170,69 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		api.GITDAEMON.Stop()
 		return m, tea.Quit
 	case "b", "B":
-		if m.CurrentSelectedContainer != LocalBranchComponent {
-			m.CurrentSelectedContainer = LocalBranchComponent
-		} else {
-			m.CurrentSelectedContainer = NoneSelected
+		if !m.ShowPopUp.Load() {
+			if m.CurrentSelectedContainer != LocalBranchComponent {
+				m.CurrentSelectedContainer = LocalBranchComponent
+			} else {
+				m.CurrentSelectedContainer = NoneSelected
+			}
 		}
 		return m, nil
 	case "f", "F":
-		if m.CurrentSelectedContainer != ModifiedFilesComponent {
-			m.CurrentSelectedContainer = ModifiedFilesComponent
-		} else {
-			m.CurrentSelectedContainer = NoneSelected
+		if !m.ShowPopUp.Load() {
+			if m.CurrentSelectedContainer != ModifiedFilesComponent {
+				m.CurrentSelectedContainer = ModifiedFilesComponent
+			} else {
+				m.CurrentSelectedContainer = NoneSelected
+			}
 		}
 		return m, nil
 	case "c", "C":
-		if m.CurrentSelectedContainer == ModifiedFilesComponent {
-			m.ShowPopUp.Store(true)
-			m.PopUpType = CommitPopUp
-			m.GitState.GitCommit.ClearGitCommitOutput()
+		if !m.ShowPopUp.Load() {
+			if m.CurrentSelectedContainer == ModifiedFilesComponent {
+				m.ShowPopUp.Store(true)
+				m.PopUpType = CommitPopUp
+				m.GitState.GitCommit.ClearGitCommitOutput()
 
-			// if the current pop up model is not commit pop up model, then init it
-			if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
-				initGitCommitPopUpModel(m)
-			} else {
-				popUp.GitCommitOutputViewport.SetContent("")
+				// if the current pop up model is not commit pop up model, then init it
+				if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
+					initGitCommitPopUpModel(m)
+				} else {
+					popUp.GitCommitOutputViewport.SetContent("")
+				}
+				m.IsTyping.Store(true)
 			}
-			m.IsTyping.Store(true)
 		}
 		return m, nil
 	case "p", "P":
-		if m.CurrentSelectedContainer == ModifiedFilesComponent || m.CurrentSelectedContainer == NoneSelected || m.CurrentSelectedContainer == LocalBranchComponent {
-			// first we need to check if there are any push origin for this repo
-			// if not we prompt the user to add a new remote origin
-			if !m.GitState.GitCommit.CheckRemoteExist() {
-				m.ShowPopUp.Store(true)
-				m.PopUpType = AddRemotePromptPopUp
-				// if the current pop up model is not commit pop up model, then init it
-				if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
-					initAddRemotePromptPopUpModel(m, true)
+		if !m.ShowPopUp.Load() {
+			if m.CurrentSelectedContainer == ModifiedFilesComponent || m.CurrentSelectedContainer == NoneSelected || m.CurrentSelectedContainer == LocalBranchComponent {
+				// first we need to check if there are any push origin for this repo
+				// if not we prompt the user to add a new remote origin
+				if !m.GitState.GitCommit.CheckRemoteExist() {
+					m.ShowPopUp.Store(true)
+					m.PopUpType = AddRemotePromptPopUp
+					// if the current pop up model is not commit pop up model, then init it
+					if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
+						initAddRemotePromptPopUpModel(m, true)
+					} else {
+						popUp.AddRemoteOutputViewport.SetContent("")
+					}
+					m.IsTyping.Store(true)
 				} else {
-					popUp.AddRemoteOutputViewport.SetContent("")
-				}
-				m.IsTyping.Store(true)
-			} else {
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(false)
-				remotes := m.GitState.GitCommit.Remote()
-				if len(remotes) == 1 {
-					m.PopUpType = ChoosePushTypePopUp
-					// if the current pop up model is not commit pop up model, then init it and start git push service
-					initChoosePushTypePopUpModel(m, remotes[0].Name)
-				} else if len(remotes) > 1 {
-					// if remote is more than 1 let user choose which remote to push to first before pushing
-					m.PopUpType = ChooseRemotePopUp
-					if _, ok := m.PopUpModel.(*ChooseRemotePopUpModel); !ok {
-						initGitRemotePushChooseRemotePopUpModel(m, remotes)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					remotes := m.GitState.GitCommit.Remote()
+					if len(remotes) == 1 {
+						m.PopUpType = ChoosePushTypePopUp
+						// if the current pop up model is not commit pop up model, then init it and start git push service
+						initChoosePushTypePopUpModel(m, remotes[0].Name)
+					} else if len(remotes) > 1 {
+						// if remote is more than 1 let user choose which remote to push to first before pushing
+						m.PopUpType = ChooseRemotePopUp
+						if _, ok := m.PopUpModel.(*ChooseRemotePopUpModel); !ok {
+							initGitRemotePushChooseRemotePopUpModel(m, remotes)
+						}
 					}
 				}
 			}
