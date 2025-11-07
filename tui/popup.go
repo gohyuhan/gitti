@@ -2,25 +2,11 @@ package tui
 
 import (
 	"gitti/i18n"
+	"gitti/tui/constant"
+	"gitti/tui/style"
 
 	"github.com/charmbracelet/lipgloss/v2"
 )
-
-// -----------------------------------------------------------------------------
-//
-//	Pop Up Type
-//
-// -----------------------------------------------------------------------------
-const (
-	NoPopUp              = "NoPopUp"
-	CommitPopUp          = "CommitPopUp"          // IsTyping will be true
-	AddRemotePromptPopUp = "AddRemotePromptPopUp" // IsTyping will be true
-	ChoosePushTypePopUp  = "ChoosePushTypePopUp"  // IsTyping will be false
-	ChooseRemotePopUp    = "ChooseRemotePopUp"    // IsTyping will be false
-	GitRemotePushPopUp   = "GitRemotePushPopUp"   // IsTyping will be false
-)
-
-const AUTOCLOSEINTERVAL = 500
 
 // -----------------------------------------------------------------------------
 //
@@ -32,15 +18,15 @@ func renderPopUpComponent(m *GittiModel) string {
 	var popUp string
 
 	switch m.PopUpType {
-	case CommitPopUp:
+	case constant.CommitPopUp:
 		popUp = renderGitCommitPopUp(m)
-	case AddRemotePromptPopUp:
+	case constant.AddRemotePromptPopUp:
 		popUp = renderAddRemotePromptPopUp(m)
-	case GitRemotePushPopUp:
+	case constant.GitRemotePushPopUp:
 		popUp = renderGitRemotePushPopUp(m)
-	case ChooseRemotePopUp:
+	case constant.ChooseRemotePopUp:
 		popUp = renderChooseRemotePopUp(m)
-	case ChoosePushTypePopUp:
+	case constant.ChoosePushTypePopUp:
 		popUp = renderChoosePushTypePopUp(m)
 	}
 	return popUp
@@ -54,14 +40,14 @@ func renderPopUpComponent(m *GittiModel) string {
 func renderGitCommitPopUp(m *GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
-		popUpWidth := min(maxCommitPopUpWidth, int(float64(m.Width)*0.8))
+		popUpWidth := min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8))
 		popUp.MessageTextInput.SetWidth(popUpWidth - 4)
 		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
 
 		// Rendered content
-		title := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitle)
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitle)
 		inputView := popUp.MessageTextInput.View()
-		descLabel := titleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpDescriptionTitle)
+		descLabel := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpDescriptionTitle)
 		descView := popUp.DescriptionTextAreaInput.View()
 
 		content := lipgloss.JoinVertical(
@@ -73,22 +59,22 @@ func renderGitCommitPopUp(m *GittiModel) string {
 			descView,
 		)
 		if popUp.GitCommitOutputViewport.GetContent() != "" {
-			logViewPortStyle := panelBorderStyle.
+			logViewPortStyle := style.PanelBorderStyle.
 				Width(popUpWidth - 2).
-				Height(popUpGitCommitOutputViewPortHeight + 2)
+				Height(constant.PopUpGitCommitOutputViewPortHeight + 2)
 			if popUp.HasError.Load() {
-				logViewPortStyle = panelBorderStyle.
-					BorderForeground(colorError)
+				logViewPortStyle = style.PanelBorderStyle.
+					BorderForeground(style.ColorError)
 			} else if popUp.ProcessSuccess.Load() {
-				logViewPortStyle = panelBorderStyle.
-					BorderForeground(colorAccent)
+				logViewPortStyle = style.PanelBorderStyle.
+					BorderForeground(style.ColorAccent)
 			}
 
 			logViewPort := logViewPortStyle.Render(popUp.GitCommitOutputViewport.View())
 
 			// Show spinner above viewport when processing
 			if popUp.IsProcessing.Load() {
-				processingText := spinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.CommitPopUpProcessing)
+				processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.CommitPopUpProcessing)
 				content = lipgloss.JoinVertical(
 					lipgloss.Left,
 					title,
@@ -113,7 +99,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 				)
 			}
 		}
-		return popUpBorderStyle.Width(popUpWidth).Render(content)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
 }
@@ -123,11 +109,11 @@ func renderGitCommitPopUp(m *GittiModel) string {
 func updatePopUpCommitOutputViewPort(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
-		popUp.GitCommitOutputViewport.SetWidth(min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.GitCommitOutputViewport.SetWidth(min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		var gitCommitOutputLog string
 		logs := m.GitState.GitCommit.GitCommitOutput()
 		for _, line := range logs {
-			logLine := newStyle.Render(line)
+			logLine := style.NewStyle.Render(line)
 			gitCommitOutputLog += logLine + "\n"
 		}
 		popUp.GitCommitOutputViewport.SetContent(gitCommitOutputLog)
@@ -143,17 +129,17 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 func renderAddRemotePromptPopUp(m *GittiModel) string {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if ok {
-		popUpWidth := min(maxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8))
+		popUpWidth := min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8))
 		popUp.RemoteNameTextInput.SetWidth(popUpWidth - 4)
 		popUp.RemoteUrlTextInput.SetWidth(popUpWidth - 4)
 
 		noInitialRemote := popUp.NoInitialRemote
 
 		// Rendered content
-		addRemotePrompt := promptTitleStyle.Render(i18n.LANGUAGEMAPPING.AddRemotePopUpPrompt)
-		remoteNameTitle := titleStyle.Render(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteNameTitle)
+		addRemotePrompt := style.PromptTitleStyle.Render(i18n.LANGUAGEMAPPING.AddRemotePopUpPrompt)
+		remoteNameTitle := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteNameTitle)
 		remoteNameInputView := popUp.RemoteNameTextInput.View()
-		remoteUrlTitle := titleStyle.Render(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteUrlTitle)
+		remoteUrlTitle := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteUrlTitle)
 		remoteUrlTitleInputView := popUp.RemoteUrlTextInput.View()
 
 		content := lipgloss.JoinVertical(
@@ -177,15 +163,15 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 			)
 		}
 		if popUp.AddRemoteOutputViewport.GetContent() != "" {
-			logViewPortStyle := panelBorderStyle.
+			logViewPortStyle := style.PanelBorderStyle.
 				Width(popUpWidth - 2).
-				Height(popUpAddRemoteOutputViewPortHeight + 2)
+				Height(constant.PopUpAddRemoteOutputViewPortHeight + 2)
 			if popUp.HasError.Load() {
-				logViewPortStyle = panelBorderStyle.
-					BorderForeground(colorError)
+				logViewPortStyle = style.PanelBorderStyle.
+					BorderForeground(style.ColorError)
 			} else if popUp.ProcessSuccess.Load() {
-				logViewPortStyle = panelBorderStyle.
-					BorderForeground(colorAccent)
+				logViewPortStyle = style.PanelBorderStyle.
+					BorderForeground(style.ColorAccent)
 			}
 
 			logViewPort := logViewPortStyle.Render(popUp.AddRemoteOutputViewport.View())
@@ -214,7 +200,7 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 				)
 			}
 		}
-		return popUpBorderStyle.Width(popUpWidth).Render(content)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
 }
@@ -222,10 +208,10 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if ok {
-		popUp.AddRemoteOutputViewport.SetWidth(min(maxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.AddRemoteOutputViewport.SetWidth(min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		var addRemoteLog string
 		for _, line := range outputLog {
-			logLine := newStyle.Render(line)
+			logLine := style.NewStyle.Render(line)
 			addRemoteLog += logLine + "\n"
 		}
 		popUp.AddRemoteOutputViewport.SetContent(addRemoteLog)
@@ -241,15 +227,15 @@ func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
 func renderChooseRemotePopUp(m *GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
 	if ok {
-		popUpWidth := min(maxChooseRemotePopUpWidth, int(float64(m.Width)*0.8))
-		title := titleStyle.Render(i18n.LANGUAGEMAPPING.ChooseRemoteTitle)
+		popUpWidth := min(constant.MaxChooseRemotePopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChooseRemoteTitle)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			"",
 			popUp.RemoteList.View(),
 		)
-		return popUpBorderStyle.Width(popUpWidth).Render(content)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
 }
@@ -262,15 +248,15 @@ func renderChooseRemotePopUp(m *GittiModel) string {
 func renderChoosePushTypePopUp(m *GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
 	if ok {
-		popUpWidth := min(maxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8))
-		title := titleStyle.Width(popUpWidth).Render(i18n.LANGUAGEMAPPING.GitRemotePushOptionTitle)
+		popUpWidth := min(constant.MaxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Width(popUpWidth).Render(i18n.LANGUAGEMAPPING.GitRemotePushOptionTitle)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			"",
 			popUp.PushOptionList.View(),
 		)
-		return popUpBorderStyle.Width(popUpWidth).Render(content)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
 }
@@ -283,17 +269,17 @@ func renderChoosePushTypePopUp(m *GittiModel) string {
 func renderGitRemotePushPopUp(m *GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
-		popUpWidth := min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8))
-		title := titleStyle.Render(i18n.LANGUAGEMAPPING.GitRemotePushPopUpTitle)
-		logViewPortStyle := panelBorderStyle.
+		popUpWidth := min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitRemotePushPopUpTitle)
+		logViewPortStyle := style.PanelBorderStyle.
 			Width(popUpWidth - 2).
-			Height(popUpGitCommitOutputViewPortHeight + 2)
+			Height(constant.PopUpGitCommitOutputViewPortHeight + 2)
 		if popUp.HasError.Load() {
-			logViewPortStyle = panelBorderStyle.
-				BorderForeground(colorError)
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
 		} else if popUp.ProcessSuccess.Load() {
-			logViewPortStyle = panelBorderStyle.
-				BorderForeground(colorAccent)
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorAccent)
 		}
 
 		logViewPort := logViewPortStyle.Render(popUp.GitRemotePushOutputViewport.View())
@@ -301,7 +287,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 		var content string
 		// Show spinner above viewport when processing
 		if popUp.IsProcessing.Load() {
-			processingText := spinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitRemotePushPopUpProcessing)
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitRemotePushPopUpProcessing)
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
@@ -317,7 +303,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 				logViewPort,
 			)
 		}
-		return popUpBorderStyle.Width(popUpWidth).Render(content)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
 }
@@ -325,11 +311,11 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 func updateGitRemotePushOutputViewport(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
-		popUp.GitRemotePushOutputViewport.SetWidth(min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.GitRemotePushOutputViewport.SetWidth(min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		logs := m.GitState.GitCommit.GitRemotePushOutput()
 		var GitPushLog string
 		for _, line := range logs {
-			logLine := newStyle.Render(line)
+			logLine := style.NewStyle.Render(line)
 			GitPushLog += logLine + "\n"
 		}
 		popUp.GitRemotePushOutputViewport.SetContent(GitPushLog)

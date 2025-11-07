@@ -5,6 +5,9 @@ import (
 
 	"gitti/api/git"
 	"gitti/i18n"
+	"gitti/tui/constant"
+	"gitti/tui/style"
+	"gitti/tui/utils"
 
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/spinner"
@@ -28,9 +31,9 @@ func initBranchList(m *GittiModel) {
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
-	m.CurrentRepoBranchesInfoList.Title = truncateString(fmt.Sprintf("[b]  %s:", i18n.LANGUAGEMAPPING.Branches), m.HomeTabLeftPanelWidth-listItemOrTitleWidthPad-2)
-	m.CurrentRepoBranchesInfoList.Styles.Title = titleStyle
-	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = paginationStyle
+	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[b]  %s:", i18n.LANGUAGEMAPPING.Branches), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
+	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
 
 	if m.NavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
 		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)
@@ -64,8 +67,8 @@ func initModifiedFilesList(m *GittiModel) {
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
-	m.CurrentRepoModifiedFilesInfoList.Title = truncateString(fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth-listItemOrTitleWidthPad-2)
-	m.CurrentRepoModifiedFilesInfoList.Styles.Title = titleStyle
+	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
 
 	if len(items) < 1 {
 		return
@@ -109,12 +112,12 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
 	vp.MouseWheelDelta = 1
-	vp.SetHeight(popUpGitCommitOutputViewPortHeight)
-	vp.SetWidth(min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	vp.SetHeight(constant.PopUpGitCommitOutputViewPortHeight)
+	vp.SetWidth(min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
 	s := spinner.New()
 	s.Spinner = spinner.Dot
-	s.Style = spinnerStyle
+	s.Style = style.SpinnerStyle
 
 	// Generate a unique UUID for this popup session
 	newSessionID := uuid.New()
@@ -152,8 +155,8 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
 	vp.MouseWheelDelta = 1
-	vp.SetHeight(popUpAddRemoteOutputViewPortHeight)
-	vp.SetWidth(min(maxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	vp.SetHeight(constant.PopUpAddRemoteOutputViewPortHeight)
+	vp.SetWidth(min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
 	// Generate a unique UUID for this popup session
 	newSessionID := uuid.New()
@@ -181,12 +184,12 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
 	vp.MouseWheelDelta = 1
-	vp.SetHeight(popUpGitRemotePushOutputViewportHeight)
-	vp.SetWidth(min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	vp.SetHeight(constant.PopUpGitRemotePushOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
 	s := spinner.New()
 	s.Spinner = spinner.Dot
-	s.Style = spinnerStyle
+	s.Style = style.SpinnerStyle
 
 	// Generate a unique UUID for this popup session
 	newSessionID := uuid.New()
@@ -224,8 +227,8 @@ func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.Git
 	for _, remote := range remoteList {
 		items = append(items, gitRemoteItem(remote))
 	}
-	width := (min(maxChooseRemotePopUpWidth, int(float64(m.Width)*0.8)) - 4)
-	rL := list.New(items, gitRemoteItemDelegate{}, width, popUpChooseRemoteHeight)
+	width := (min(constant.MaxChooseRemotePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	rL := list.New(items, gitRemoteItemDelegate{}, width, constant.PopUpChooseRemoteHeight)
 	rL.SetShowStatusBar(false)
 	rL.SetFilteringEnabled(false)
 	rL.SetShowHelp(false)
@@ -259,8 +262,8 @@ func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
 	for _, pushOption := range pushTypeOption {
 		items = append(items, gitPushOptionItem(pushOption))
 	}
-	width := (min(maxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
-	pOL := list.New(items, gitPushOptionDelegate{}, width, popUpChoosePushTypeHeight)
+	width := (min(constant.MaxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	pOL := list.New(items, gitPushOptionDelegate{}, width, constant.PopUpChoosePushTypeHeight)
 	pOL.SetShowStatusBar(false)
 	pOL.SetFilteringEnabled(false)
 	pOL.SetShowHelp(false)

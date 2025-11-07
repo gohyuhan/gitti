@@ -7,6 +7,9 @@ import (
 
 	"gitti/api"
 	"gitti/api/git"
+	"gitti/tui/constant"
+	"gitti/tui/style"
+	"gitti/tui/utils"
 
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/viewport"
@@ -20,7 +23,7 @@ func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
 	vp.SetHorizontalStep(1)
 	vp.MouseWheelDelta = 1
 	gitti := &GittiModel{
-		CurrentSelectedContainer:              ModifiedFilesComponent,
+		CurrentSelectedContainer:              constant.ModifiedFilesComponent,
 		RepoPath:                              repoPath,
 		Width:                                 0,
 		Height:                                0,
@@ -29,7 +32,7 @@ func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
 		CurrentSelectedFileDiffViewport:       vp,
 		CurrentSelectedFileDiffViewportOffset: 0,
 		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
-		PopUpType:                             NoPopUp,
+		PopUpType:                             constant.NoPopUp,
 		PopUpModel:                            struct{}{},
 		GitState:                              gitState,
 	}
@@ -125,15 +128,15 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 		str = fmt.Sprintf(" [X] %s", i.FileName)
 	}
 
-	componentWidth := m.Width() - listItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	fn := itemStyle.Render
+	fn := style.ItemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
-	str = truncateString(str, componentWidth)
+	str = utils.TruncateString(str, componentWidth)
 
 	fmt.Fprint(w, fn(str))
 }
@@ -153,15 +156,15 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 		str = fmt.Sprintf(" * %s", i.BranchName)
 	}
 
-	componentWidth := m.Width() - listItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	fn := itemStyle.Render
+	fn := style.ItemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
 		}
 	}
-	str = truncateString(str, componentWidth)
+	str = utils.TruncateString(str, componentWidth)
 
 	fmt.Fprint(w, fn(str))
 }
@@ -179,19 +182,19 @@ func (d gitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	nameStr := fmt.Sprintf("   %s", i.Name)
 	urlStr := fmt.Sprintf("    %s", i.Url)
 
-	componentWidth := m.Width() - listItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	nameStr = truncateString(nameStr, componentWidth)
-	urlStr = truncateString(urlStr, componentWidth)
+	nameStr = utils.TruncateString(nameStr, componentWidth)
+	urlStr = utils.TruncateString(urlStr, componentWidth)
 
-	nameRendered := itemStyle.Render(nameStr)
-	urlRendered := itemStyle.Faint(true).Render(urlStr)
+	nameRendered := style.ItemStyle.Render(nameStr)
+	urlRendered := style.ItemStyle.Faint(true).Render(urlStr)
 	fullStr := nameRendered + "\n" + urlRendered
 
-	fn := itemStyle.Render
+	fn := style.ItemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
 		}
 	}
 
@@ -211,19 +214,19 @@ func (d gitPushOptionDelegate) Render(w io.Writer, m list.Model, index int, list
 	nameStr := fmt.Sprintf("   %s", i.Name)
 	urlStr := fmt.Sprintf("    %s", i.Info)
 
-	componentWidth := m.Width() - listItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	nameStr = truncateString(nameStr, componentWidth)
-	urlStr = truncateString(urlStr, componentWidth)
+	nameStr = utils.TruncateString(nameStr, componentWidth)
+	urlStr = utils.TruncateString(urlStr, componentWidth)
 
-	nameRendered := itemStyle.Render(nameStr)
-	urlRendered := itemStyle.Faint(true).Render(urlStr)
+	nameRendered := style.ItemStyle.Render(nameStr)
+	urlRendered := style.ItemStyle.Faint(true).Render(urlStr)
 	fullStr := nameRendered + "\n" + urlRendered
 
-	fn := itemStyle.Render
+	fn := style.ItemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return selectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
 		}
 	}
 

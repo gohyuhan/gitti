@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 
 	"gitti/i18n"
+	"gitti/tui/constant"
 )
 
 // service.go was to bridge api and the needs of the terminal interface logic so that it can be compatible and feels smooth and not cluncy
@@ -50,7 +51,7 @@ func gitCommitService(m *GittiModel) {
 				popUp.ProcessSuccess.Store(true)
 				popUp.MessageTextInput.Reset()
 				popUp.DescriptionTextAreaInput.Reset()
-				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
+				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
@@ -131,7 +132,7 @@ func gitAddRemoteService(m *GittiModel) {
 				popUp.NoInitialRemote = false
 				gitAddRemoteResult = append(gitAddRemoteResult, fmt.Sprintf(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteAddSuccess, remoteName, remoteUrl))
 				updateAddRemoteOutputViewport(m, gitAddRemoteResult)
-				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
+				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*AddRemotePromptPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
@@ -198,7 +199,7 @@ func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 			// if sucessful exitcode will be 0
 			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
 				popUp.ProcessSuccess.Store(true)
-				time.Sleep(AUTOCLOSEINTERVAL * time.Millisecond)
+				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {

@@ -7,31 +7,33 @@ import (
 
 	"gitti/i18n"
 	"gitti/settings"
+	"gitti/tui/constant"
+	"gitti/tui/style"
 )
 
 // -----------------------------------------------------------------------------
 // Gitti Main Page View
 // -----------------------------------------------------------------------------
 func gittiMainPageView(m *GittiModel) string {
-	if m.Width < minWidth || m.Height < minHeight {
-		title := newStyle.
+	if m.Width < constant.MinWidth || m.Height < constant.MinHeight {
+		title := style.NewStyle.
 			Bold(true).
 			Render(i18n.LANGUAGEMAPPING.TerminalSizeWarning)
 
 		// Styles for the metric labels and values
-		labelStyle := newStyle
-		passStyle := newStyle.Foreground(colorAccent)
-		failStyle := newStyle.Foreground(colorError)
+		labelStyle := style.NewStyle
+		passStyle := style.NewStyle.Foreground(style.ColorAccent)
+		failStyle := style.NewStyle.Foreground(style.ColorError)
 
 		// Height
 		heightStatus := passStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalHeight, m.Height))
-		if m.Height < minHeight {
+		if m.Height < constant.MinHeight {
 			heightStatus = failStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Height))
 		}
 
 		// Width
 		widthStatus := passStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Width))
-		if m.Width < minWidth {
+		if m.Width < constant.MinWidth {
 			widthStatus = failStyle.Render(fmt.Sprintf("%s: %v", i18n.LANGUAGEMAPPING.CurrentTerminalWidth, m.Width))
 		}
 
@@ -41,14 +43,14 @@ func gittiMainPageView(m *GittiModel) string {
 			title,
 			fmt.Sprintf(
 				"\n%s %d\n%s %d\n%s\n%s",
-				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalHeight)), minHeight,
-				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalWidth)), minWidth,
+				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalHeight)), constant.MinHeight,
+				labelStyle.Render(fmt.Sprintf("%s: ", i18n.LANGUAGEMAPPING.MinimumTerminalWidth)), constant.MinWidth,
 				heightStatus,
 				widthStatus,
 			),
 		)
 
-		centered := newStyle.
+		centered := style.NewStyle.
 			Width(m.Width).
 			Height(m.Height).
 			Align(lipgloss.Center, lipgloss.Center).
@@ -58,7 +60,7 @@ func gittiMainPageView(m *GittiModel) string {
 	}
 
 	// --- Components ---
-	gittiVersionPanel := panelBorderStyle.Width(m.HomeTabLeftPanelWidth).Height(1).Render(fmt.Sprintf("%s %s", settings.AppName, settings.AppVersion))
+	gittiVersionPanel := style.PanelBorderStyle.Width(m.HomeTabLeftPanelWidth).Height(1).Render(fmt.Sprintf("%s %s", settings.AppName, settings.AppVersion))
 	localBranchesPanel := renderLocalBranchesPanel(m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight, m)
 	changedFilesPanel := renderChangedFilesPanel(m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight, m)
 	fileDiffPanel := renderFileDiffPanel(m.HomeTabFileDiffPanelWidth, m.HomeTabFileDiffPanelHeight, m)
