@@ -3,6 +3,8 @@ package tui
 import (
 	"sync/atomic"
 
+	"gitti/api"
+
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/spinner"
 	"github.com/charmbracelet/bubbles/v2/textarea"
@@ -31,6 +33,7 @@ type GittiModel struct {
 	PopUpType                             string
 	PopUpModel                            interface{}
 	IsTyping                              atomic.Bool
+	GitState                              *api.GitState
 }
 
 type GitCommitPopUpModel struct {

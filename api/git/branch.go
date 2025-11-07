@@ -7,25 +7,50 @@ import (
 	"gitti/cmd"
 )
 
-var GITBRANCH *GitBranch
-
 type BranchInfo struct {
 	BranchName   string
 	IsCheckedOut bool
 }
 
 type GitBranch struct {
-	IsRepoUnborn    bool // meaning this is a newly init repo, no commit on any branch yet
-	CurrentCheckOut BranchInfo
-	AllBranches     []BranchInfo
-	ErrorLog        []error
+	isRepoUnborn    bool // meaning this is a newly init repo, no commit on any branch yet
+	currentCheckOut BranchInfo
+	allBranches     []BranchInfo
+	errorLog        []error
 }
 
-func InitGitBranch() {
+func InitGitBranch() *GitBranch {
 	gitBranch := GitBranch{
-		IsRepoUnborn: false,
+		isRepoUnborn: false,
 	}
-	GITBRANCH = &gitBranch
+	return &gitBranch
+}
+
+// ----------------------------------
+//
+//	Return current branch
+//
+// ----------------------------------
+func (gb *GitBranch) CurrentCheckOut() BranchInfo {
+	return gb.currentCheckOut
+}
+
+// ----------------------------------
+//
+//	Return  allbranch
+//
+// ----------------------------------
+func (gb *GitBranch) AllBranches() []BranchInfo {
+	return gb.allBranches
+}
+
+// ----------------------------------
+//
+//	Return is repo unborn
+//
+// ----------------------------------
+func (gb *GitBranch) IsRepoUnborn() bool {
+	return gb.isRepoUnborn
 }
 
 // ----------------------------------
@@ -40,25 +65,25 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	bCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitOutput, err := bCmd.Output()
 	if err != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
 	}
 
 	gitBranches := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
-	gb.AllBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
+	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommited branch
 	if len(gitBranches) < 1 {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
 		bCmd = cmd.GittiCmd.RunGitCmd(gitArgs)
 		gitOutput, err := bCmd.Output()
 		if err != nil {
-			gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
+			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
 		}
 		gitBranches = strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
-		gb.CurrentCheckOut = BranchInfo{
+		gb.currentCheckOut = BranchInfo{
 			BranchName:   gitBranches[0],
 			IsCheckedOut: true,
 		}
-		gb.IsRepoUnborn = true
+		gb.isRepoUnborn = true
 	}
 
 	for _, branch := range gitBranches {
@@ -66,7 +91,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 
 		if strings.HasPrefix(branch, "*") {
 			branch = strings.TrimSpace(strings.TrimPrefix(branch, "*"))
-			gb.CurrentCheckOut = BranchInfo{
+			gb.currentCheckOut = BranchInfo{
 				BranchName:   branch,
 				IsCheckedOut: true,
 			}
@@ -78,7 +103,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 		}
 	}
 
-	gb.AllBranches = allBranches
+	gb.allBranches = allBranches
 }
 
 // ----------------------------------
@@ -104,7 +129,7 @@ func (gb *GitBranch) GitStash() {
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT STASH ERROR]: %w", err))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH ERROR]: %w", err))
 	}
 }
 
@@ -119,7 +144,7 @@ func (gb *GitBranch) GitUnstash() {
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT UNSTASH ERROR]: %w", err))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH ERROR]: %w", err))
 	}
 }
 
@@ -134,7 +159,7 @@ func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT CREATE BRANCH ERROR]: %w", err))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE BRANCH ERROR]: %w", err))
 	}
 }
 
@@ -148,7 +173,7 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs)
 	_, stashChangesErr := stashChangesCmd.CombinedOutput()
 	if stashChangesErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
 		return
 	}
 
@@ -156,7 +181,7 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	createBranchCmd := cmd.GittiCmd.RunGitCmd(createBranchGitArgs)
 	_, createBranchErr := createBranchCmd.CombinedOutput()
 	if createBranchErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT CREATE AND SWITCH BRANCH ERROR]: %w", createBranchErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE AND SWITCH BRANCH ERROR]: %w", createBranchErr))
 		return
 	}
 
@@ -164,7 +189,7 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	unstashChangesCmd := cmd.GittiCmd.RunGitCmd(unstashChangesGitArgs)
 	_, unstashChangesErr := unstashChangesCmd.CombinedOutput()
 	if unstashChangesErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT UNSTASH CHANGE ERROR]: %w", unstashChangesErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH CHANGE ERROR]: %w", unstashChangesErr))
 		return
 	}
 }
@@ -179,7 +204,7 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) {
 	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs)
 	_, stashChangesErr := stashChangesCmd.CombinedOutput()
 	if stashChangesErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
 		return
 	}
 
@@ -187,7 +212,7 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) {
 	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs)
 	_, switchBranchErr := switchBranchCmd.CombinedOutput()
 	if switchBranchErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT SWITCH BRANCH ERROR]: %w", switchBranchErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT SWITCH BRANCH ERROR]: %w", switchBranchErr))
 		return
 	}
 }
@@ -202,7 +227,7 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) {
 	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs)
 	_, stashChangesErr := stashChangesCmd.CombinedOutput()
 	if stashChangesErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
 		return
 	}
 
@@ -210,7 +235,7 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) {
 	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs)
 	_, switchBranchErr := switchBranchCmd.CombinedOutput()
 	if switchBranchErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT SWITCH BRANCH ERROR]: %w", switchBranchErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT SWITCH BRANCH ERROR]: %w", switchBranchErr))
 		return
 	}
 
@@ -218,7 +243,7 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) {
 	unstashChangesCmd := cmd.GittiCmd.RunGitCmd(unstashChangesGitArgs)
 	_, unstashChangesErr := unstashChangesCmd.CombinedOutput()
 	if unstashChangesErr != nil {
-		gb.ErrorLog = append(gb.ErrorLog, fmt.Errorf("[GIT UNSTASH CHANGE ERROR]: %w", unstashChangesErr))
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH CHANGE ERROR]: %w", unstashChangesErr))
 		return
 	}
 }

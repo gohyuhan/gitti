@@ -16,25 +16,26 @@ import (
 )
 
 type GitDaemon struct {
-	RepoPath                       string
-	Watcher                        *fsnotify.Watcher
-	DebounceDur                    time.Duration
-	GitFilesActiveRefreshDur       time.Duration
-	GitFetchActiveRefreshDur       time.Duration
+	repoPath                       string
+	watcher                        *fsnotify.Watcher
+	debounceDur                    time.Duration
+	gitFilesActiveRefreshDur       time.Duration
+	gitFetchActiveRefreshDur       time.Duration
 	isGitGeneralInfoPassiveRunning atomic.Bool
 	isGitFilesActiveRunning        atomic.Bool
 	isGitFetchActiveRunning        atomic.Bool
-	WatcherTimer                   *time.Timer
-	GitFilesActiveTimer            *time.Timer
-	GitFetchActiveTimer            *time.Timer
-	StopChannel                    chan struct{}
-	ErrorLog                       []error
-	UpdateChannel                  chan string // to communicate back to main thread for an update event
+	watcherTimer                   *time.Timer
+	gitFilesActiveTimer            *time.Timer
+	gitFetchActiveTimer            *time.Timer
+	stopChannel                    chan struct{}
+	errorLog                       []error
+	updateChannel                  chan string // to communicate back to main thread for an update event
+	gitState                       *GitState
 }
 
 var GITDAEMON *GitDaemon
 
-func InitGitDaemon(repoPath string, updateChannel chan string) {
+func InitGitDaemon(repoPath string, updateChannel chan string, gitState *GitState) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		return
@@ -44,42 +45,43 @@ func InitGitDaemon(repoPath string, updateChannel chan string) {
 	gitFilesActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFilesActiveRefreshDurationMS) * time.Millisecond
 	gitFetchActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFetchDurationMS) * time.Millisecond
 	gd := &GitDaemon{
-		RepoPath:                 filepath.Join(repoPath, ".git"),
-		Watcher:                  w,
-		DebounceDur:              debounce,
-		GitFilesActiveRefreshDur: gitFilesActiveRefreshDur,
-		GitFetchActiveRefreshDur: gitFetchActiveRefreshDur,
-		WatcherTimer:             time.NewTimer(debounce), // milliseconds
-		GitFilesActiveTimer:      time.NewTimer(gitFilesActiveRefreshDur),
-		GitFetchActiveTimer:      time.NewTimer(gitFetchActiveRefreshDur),
-		StopChannel:              make(chan struct{}),
-		ErrorLog:                 make([]error, 0),
-		UpdateChannel:            updateChannel,
+		repoPath:                 filepath.Join(repoPath, ".git"),
+		watcher:                  w,
+		debounceDur:              debounce,
+		gitFilesActiveRefreshDur: gitFilesActiveRefreshDur,
+		gitFetchActiveRefreshDur: gitFetchActiveRefreshDur,
+		watcherTimer:             time.NewTimer(debounce), // milliseconds
+		gitFilesActiveTimer:      time.NewTimer(gitFilesActiveRefreshDur),
+		gitFetchActiveTimer:      time.NewTimer(gitFetchActiveRefreshDur),
+		stopChannel:              make(chan struct{}),
+		errorLog:                 make([]error, 0),
+		updateChannel:            updateChannel,
+		gitState:                 gitState,
 	}
 	gd.isGitFilesActiveRunning.Store(false)
 	gd.isGitFetchActiveRunning.Store(false)
 	gd.isGitGeneralInfoPassiveRunning.Store(false)
-	gd.WatcherTimer.Stop()
-	gd.GitFilesActiveTimer.Stop()
-	gd.GitFetchActiveTimer.Stop()
-	gd.WatchPath()
+	gd.watcherTimer.Stop()
+	gd.gitFilesActiveTimer.Stop()
+	gd.gitFetchActiveTimer.Stop()
+	gd.watchPath()
 
 	GITDAEMON = gd
 }
 
-func (gd *GitDaemon) WatchPath() {
-	err := gd.Watcher.Add(gd.RepoPath)
+func (gd *GitDaemon) watchPath() {
+	err := gd.watcher.Add(gd.repoPath)
 	if err != nil {
-		gd.ErrorLog = append(gd.ErrorLog, err)
+		gd.errorLog = append(gd.errorLog, err)
 	}
-	err = filepath.WalkDir(gd.RepoPath, func(path string, d fs.DirEntry, err error) error {
+	err = filepath.WalkDir(gd.repoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
-			gd.Watcher.Add(path)
+			gd.watcher.Add(path)
 		}
 		return nil
 	})
 	if err != nil {
-		gd.ErrorLog = append(gd.ErrorLog, err)
+		gd.errorLog = append(gd.errorLog, err)
 	}
 
 }
@@ -87,48 +89,48 @@ func (gd *GitDaemon) WatchPath() {
 func (gd *GitDaemon) Start() {
 	go func() {
 		// Initial call to get info of git
-		if gd.UpdateChannel != nil {
-			GetUpdatedGitInfo(gd.UpdateChannel)
+		if gd.updateChannel != nil {
+			GetUpdatedGitInfo(gd.gitState, gd.updateChannel)
 		}
-		gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
-		gd.GitFetchActiveTimer.Reset(gd.GitFetchActiveRefreshDur)
+		gd.gitFilesActiveTimer.Reset(gd.gitFilesActiveRefreshDur)
+		gd.gitFetchActiveTimer.Reset(gd.gitFetchActiveRefreshDur)
 		// loop to stay active
 		for {
 			select {
-			case event := <-gd.Watcher.Events:
+			case event := <-gd.watcher.Events:
 				if gd.isRelevantEvent(event) {
 					gd.resetDebounce()
 				}
-			case err := <-gd.Watcher.Errors:
+			case err := <-gd.watcher.Errors:
 				fmt.Println("Watcher error:", err)
 
-			case <-gd.WatcherTimer.C:
+			case <-gd.watcherTimer.C:
 				go func() {
 					if gd.isGitGeneralInfoPassiveRunning.CompareAndSwap(false, true) {
 						defer gd.isGitGeneralInfoPassiveRunning.Store(false)
-						GetUpdatedGitInfo(gd.UpdateChannel)
+						GetUpdatedGitInfo(gd.gitState, gd.updateChannel)
 					}
 				}()
-			case <-gd.GitFilesActiveTimer.C:
+			case <-gd.gitFilesActiveTimer.C:
 				// reset first to avoid losing ticks, then run work in background
-				gd.GitFilesActiveTimer.Reset(gd.GitFilesActiveRefreshDur)
+				gd.gitFilesActiveTimer.Reset(gd.gitFilesActiveRefreshDur)
 				go func() {
 					if gd.isGitFilesActiveRunning.CompareAndSwap(false, true) {
 						// Mark as running
 						defer gd.isGitFilesActiveRunning.Store(false)
 
-						git.GITFILES.GetGitFilesStatus()
-						gd.UpdateChannel <- git.GIT_FILES_STATUS_UPDATE
+						gd.gitState.GitFiles.GetGitFilesStatus()
+						gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
 					}
 				}()
-			case <-gd.GitFetchActiveTimer.C:
+			case <-gd.gitFetchActiveTimer.C:
 				// reset immediately; git fetch operation TBD
-				gd.GitFetchActiveTimer.Reset(gd.GitFetchActiveRefreshDur)
+				gd.gitFetchActiveTimer.Reset(gd.gitFetchActiveRefreshDur)
 				// go func() {
 
 				// }()
-			case <-gd.StopChannel:
-				gd.Watcher.Close()
+			case <-gd.stopChannel:
+				gd.watcher.Close()
 				return
 			}
 		}
@@ -136,18 +138,18 @@ func (gd *GitDaemon) Start() {
 }
 
 func (gd *GitDaemon) resetDebounce() {
-	if !gd.WatcherTimer.Stop() {
+	if !gd.watcherTimer.Stop() {
 		select {
-		case <-gd.WatcherTimer.C:
+		case <-gd.watcherTimer.C:
 		default:
 		}
 	}
-	gd.WatcherTimer.Reset(gd.DebounceDur)
+	gd.watcherTimer.Reset(gd.debounceDur)
 }
 
 func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 	// Only watch .git subpaths
-	if !strings.Contains(event.Name, filepath.Join(gd.RepoPath)) {
+	if !strings.Contains(event.Name, filepath.Join(gd.repoPath)) {
 		return false
 	}
 
@@ -163,7 +165,7 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 		if err == nil && fi.IsDir() {
 			filepath.WalkDir(event.Name, func(path string, d fs.DirEntry, err error) error {
 				if err == nil && d.IsDir() {
-					_ = gd.Watcher.Add(path)
+					_ = gd.watcher.Add(path)
 				}
 				return nil
 			})
@@ -180,5 +182,5 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 }
 
 func (gd *GitDaemon) Stop() {
-	close(gd.StopChannel)
+	close(gd.stopChannel)
 }

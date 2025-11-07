@@ -15,8 +15,6 @@ import (
 	"gitti/i18n"
 )
 
-var GITCOMMIT *GitCommit
-
 const (
 	PUSH               = "PUSH"
 	FORCEPUSHSAFE      = "FORCEPUSHSAFE"
@@ -24,20 +22,20 @@ const (
 )
 
 type GitCommit struct {
-	ErrorLog                          []error
-	GitStashAndCommitProcess          *exec.Cmd
-	GitRemotePushProcess              *exec.Cmd
-	GitAddRemoteProcess               *exec.Cmd
-	GitCommitOutput                   []string
-	GitRemotePushOutput               []string
-	UpdateChannel                     chan string
-	GitStashAndCommitProcessMutex     sync.Mutex
-	GitRemotePushProcessMutex         sync.Mutex
-	GitAddRemoteProcessMutex          sync.Mutex
+	errorLog                          []error
+	gitStashAndCommitProcess          *exec.Cmd
+	gitRemotePushProcess              *exec.Cmd
+	gitAddRemoteProcess               *exec.Cmd
+	gitCommitOutput                   []string
+	gitRemotePushOutput               []string
+	updateChannel                     chan string
+	gitStashAndCommitProcessMutex     sync.Mutex
+	gitRemotePushProcessMutex         sync.Mutex
+	gitAddRemoteProcessMutex          sync.Mutex
 	isGitStashAndCommitProcessRunning atomic.Bool
 	isGitRemotePushProcessRunning     atomic.Bool
 	isGitAddRemoteProcessRunning      atomic.Bool
-	Remote                            []GitRemote
+	remote                            []GitRemote
 }
 
 type GitRemote struct {
@@ -45,22 +43,49 @@ type GitRemote struct {
 	Url  string
 }
 
-func InitGitCommit(updateChannel chan string) {
+func InitGitCommit(updateChannel chan string) *GitCommit {
 	gitCommit := GitCommit{
-		GitStashAndCommitProcess: nil,
-		GitRemotePushProcess:     nil,
-		GitAddRemoteProcess:      nil,
-		GitCommitOutput:          []string{},
-		GitRemotePushOutput:      []string{},
-		UpdateChannel:            updateChannel,
-		Remote:                   []GitRemote{},
+		gitStashAndCommitProcess: nil,
+		gitRemotePushProcess:     nil,
+		gitAddRemoteProcess:      nil,
+		gitCommitOutput:          []string{},
+		gitRemotePushOutput:      []string{},
+		updateChannel:            updateChannel,
+		remote:                   []GitRemote{},
 	}
 
 	gitCommit.isGitStashAndCommitProcessRunning.Store(false)
 	gitCommit.isGitRemotePushProcessRunning.Store(false)
 	gitCommit.isGitAddRemoteProcessRunning.Store(false)
 
-	GITCOMMIT = &gitCommit
+	return &gitCommit
+}
+
+// ----------------------------------
+//
+//	Return git commit output
+//
+// ----------------------------------
+func (gc *GitCommit) GitCommitOutput() []string {
+	return gc.gitCommitOutput
+}
+
+// ----------------------------------
+//
+//	Return remote
+//
+// ----------------------------------
+func (gc *GitCommit) Remote() []GitRemote {
+	return gc.remote
+}
+
+// ----------------------------------
+//
+//	Return git remote push output
+//
+// ----------------------------------
+func (gc *GitCommit) GitRemotePushOutput() []string {
+	return gc.gitRemotePushOutput
 }
 
 func (gc *GitCommit) GitFetch() {
@@ -70,7 +95,7 @@ func (gc *GitCommit) GitFetch() {
 	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 	_, err := cmd.Output()
 	if err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
 	}
 }
 
@@ -79,43 +104,38 @@ func (gc *GitCommit) GitFetch() {
 //	Related to Git Stash & Commit
 //
 // ----------------------------------
-func (gc *GitCommit) GitStashAndCommit(message, description string) int {
+func (gc *GitCommit) GitStageAndCommit(message, description string, stagedFiles []string) int {
 	if !gc.isGitStashAndCommitProcessRunning.CompareAndSwap(false, true) {
 		return -1
 	}
 	gc.ClearGitCommitOutput()
-	gc.GitStashAndCommitProcessMutex.Lock()
+	gc.gitStashAndCommitProcessMutex.Lock()
 
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
-		gc.GitStashAndCommitProcessMutex.Lock()
-		gc.gitStashAndCommitProcessReset()
+		gc.gitStashAndCommitProcessMutex.Lock()
+		gc.gitStageAndCommitProcessReset()
 		gc.gitReset()
-		gc.GitStashAndCommitProcessMutex.Unlock()
+		gc.gitStashAndCommitProcessMutex.Unlock()
 	}()
 
-	stashGitArgs := []string{"add"}
-
-	// stage selected files.
-	GITFILES.GitFilesMutex.Lock()
-	for _, files := range GITFILES.FilesStatus {
-		if files.SelectedForStage {
-			stashGitArgs = append(stashGitArgs, files.FileName)
-		}
+	stageGitArgs := []string{"add"}
+	if len(stagedFiles) > 0 {
+		stageGitArgs = append(stageGitArgs, stagedFiles...)
 	}
-	GITFILES.GitFilesMutex.Unlock()
-	stashCmd := cmd.GittiCmd.RunGitCmd(stashGitArgs)
-	gc.GitStashAndCommitProcess = stashCmd
 
-	if len(stashGitArgs) == 1 {
+	stageCmd := cmd.GittiCmd.RunGitCmd(stageGitArgs)
+	gc.gitStashAndCommitProcess = stageCmd
+
+	if len(stageGitArgs) == 1 {
 		// No files selected, nothing to stage
-		gc.GitStashAndCommitProcessMutex.Unlock()
+		gc.gitStashAndCommitProcessMutex.Unlock()
 		return -1
 	}
 
-	if _, err := stashCmd.Output(); err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT STAGE ERROR]: %w", err))
-		gc.GitStashAndCommitProcessMutex.Unlock()
+	if _, err := stageCmd.Output(); err != nil {
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT STAGE ERROR]: %w", err))
+		gc.gitStashAndCommitProcessMutex.Unlock()
 		return -1
 	}
 
@@ -125,19 +145,19 @@ func (gc *GitCommit) GitStashAndCommit(message, description string) int {
 	}
 
 	commitCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
-	gc.GitStashAndCommitProcess = commitCmd
-	gc.GitStashAndCommitProcessMutex.Unlock()
+	gc.gitStashAndCommitProcess = commitCmd
+	gc.gitStashAndCommitProcessMutex.Unlock()
 
 	// Combine stderr into stdout
 	stdout, err := commitCmd.StdoutPipe()
 	if err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
 	commitCmd.Stderr = commitCmd.Stdout
 
 	if err := commitCmd.Start(); err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[START ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
 
@@ -150,9 +170,9 @@ func (gc *GitCommit) GitStashAndCommit(message, description string) int {
 		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 		for scanner.Scan() {
 			line := scanner.Text()
-			gc.GitCommitOutput = append(gc.GitCommitOutput, line)
+			gc.gitCommitOutput = append(gc.gitCommitOutput, line)
 			select {
-			case gc.UpdateChannel <- GIT_COMMIT_OUTPUT_UPDATE:
+			case gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE:
 			default:
 			}
 		}
@@ -164,10 +184,10 @@ func (gc *GitCommit) GitStashAndCommit(message, description string) int {
 	if waitErr != nil {
 		if exitErr, ok := waitErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
-			gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", waitErr))
+			gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", waitErr))
 			return status
 		}
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", waitErr))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", waitErr))
 		return -1
 	}
 
@@ -175,21 +195,21 @@ func (gc *GitCommit) GitStashAndCommit(message, description string) int {
 }
 
 func (gc *GitCommit) ClearGitCommitOutput() {
-	gc.GitCommitOutput = []string{}
+	gc.gitCommitOutput = []string{}
 }
 
 // This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
-func (gc *GitCommit) KillGitStashAndCommitCmd() {
-	gc.GitStashAndCommitProcessMutex.Lock()
-	defer gc.GitStashAndCommitProcessMutex.Unlock()
+func (gc *GitCommit) KillGitStageAndCommitCmd() {
+	gc.gitStashAndCommitProcessMutex.Lock()
+	defer gc.gitStashAndCommitProcessMutex.Unlock()
 
-	if gc.GitStashAndCommitProcess != nil && gc.GitStashAndCommitProcess.Process != nil {
-		_ = gc.GitStashAndCommitProcess.Process.Kill()
+	if gc.gitStashAndCommitProcess != nil && gc.gitStashAndCommitProcess.Process != nil {
+		_ = gc.gitStashAndCommitProcess.Process.Kill()
 	}
 }
 
-func (gc *GitCommit) gitStashAndCommitProcessReset() {
-	gc.GitStashAndCommitProcess = nil
+func (gc *GitCommit) gitStageAndCommitProcessReset() {
+	gc.gitStashAndCommitProcess = nil
 	gc.isGitStashAndCommitProcessRunning.Store(false)
 }
 
@@ -201,7 +221,7 @@ func (gc *GitCommit) gitStashAndCommitProcessReset() {
 func (gc *GitCommit) gitReset() {
 	resetCmd := cmd.GittiCmd.RunGitCmd([]string{"reset"})
 	if _, err := resetCmd.Output(); err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT RESET ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT RESET ERROR]: %w", err))
 	}
 }
 
@@ -214,44 +234,44 @@ func (gc *GitCommit) gitReset() {
 //	Related to Git Push
 //
 // ----------------------------------
-func (gc *GitCommit) GitPush(originName string, pushType string) int {
+func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pushType string) int {
 	if !gc.isGitRemotePushProcessRunning.CompareAndSwap(false, true) {
 		return -1
 	}
 	gc.ClearGitRemotePushOutput()
-	gc.GitRemotePushProcessMutex.Lock()
-	gitArgs := []string{"push", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+	gc.gitRemotePushProcessMutex.Lock()
+	gitArgs := []string{"push", "-u", originName, currentCheckOutBranch}
 	switch pushType {
 	case FORCEPUSHSAFE:
-		gitArgs = []string{"push", "--force-with-lease", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+		gitArgs = []string{"push", "--force-with-lease", "-u", originName, currentCheckOutBranch}
 	case FORCEPUSHDANGEROUS:
-		gitArgs = []string{"push", "--force", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+		gitArgs = []string{"push", "--force", "-u", originName, currentCheckOutBranch}
 	default:
-		gitArgs = []string{"push", "-u", originName, GITBRANCH.CurrentCheckOut.BranchName}
+		gitArgs = []string{"push", "-u", originName, currentCheckOutBranch}
 	}
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
-	gc.GitRemotePushProcess = cmd
-	gc.GitRemotePushProcessMutex.Unlock()
+	gc.gitRemotePushProcess = cmd
+	gc.gitRemotePushProcessMutex.Unlock()
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
-		gc.GitRemotePushProcessMutex.Lock()
+		gc.gitRemotePushProcessMutex.Lock()
 		gc.resetGitRemotePushProcesstatus()
-		gc.GitRemotePushProcessMutex.Unlock()
+		gc.gitRemotePushProcessMutex.Unlock()
 	}()
 
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
 	cmd.Stderr = cmd.Stdout
 
 	if err := cmd.Start(); err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[START ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
 
@@ -264,9 +284,9 @@ func (gc *GitCommit) GitPush(originName string, pushType string) int {
 		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 		for scanner.Scan() {
 			line := scanner.Text()
-			gc.GitRemotePushOutput = append(gc.GitRemotePushOutput, line)
+			gc.gitRemotePushOutput = append(gc.gitRemotePushOutput, line)
 			select {
-			case gc.UpdateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE:
+			case gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE:
 			default:
 			}
 		}
@@ -278,31 +298,31 @@ func (gc *GitCommit) GitPush(originName string, pushType string) int {
 	if waitErr != nil {
 		if exitErr, ok := waitErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
-			gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT PUSH ERROR]: %w", waitErr))
+			gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT PUSH ERROR]: %w", waitErr))
 			return status
 		}
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", waitErr))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", waitErr))
 		return -1
 	}
 	return 0
 }
 
 func (gc *GitCommit) ClearGitRemotePushOutput() {
-	gc.GitRemotePushOutput = []string{}
+	gc.gitRemotePushOutput = []string{}
 }
 
 // This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
 func (gc *GitCommit) KillGitRemotePushCmd() {
-	gc.GitRemotePushProcessMutex.Lock()
-	defer gc.GitRemotePushProcessMutex.Unlock()
+	gc.gitRemotePushProcessMutex.Lock()
+	defer gc.gitRemotePushProcessMutex.Unlock()
 
-	if gc.GitRemotePushProcess != nil && gc.GitRemotePushProcess.Process != nil {
-		_ = gc.GitRemotePushProcess.Process.Kill()
+	if gc.gitRemotePushProcess != nil && gc.gitRemotePushProcess.Process != nil {
+		_ = gc.gitRemotePushProcess.Process.Kill()
 	}
 }
 
 func (gc *GitCommit) resetGitRemotePushProcesstatus() {
-	gc.GitRemotePushProcess = nil
+	gc.gitRemotePushProcess = nil
 	gc.isGitRemotePushProcessRunning.Store(false)
 }
 
@@ -315,16 +335,16 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 	if !gc.isGitAddRemoteProcessRunning.CompareAndSwap(false, true) {
 		return []string{}, -1
 	}
-	gc.GitAddRemoteProcessMutex.Lock()
+	gc.gitAddRemoteProcessMutex.Lock()
 	gitArgs := []string{"remote", "add", originName, url}
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 
-	gc.GitAddRemoteProcess = cmd
-	gc.GitAddRemoteProcessMutex.Unlock()
+	gc.gitAddRemoteProcess = cmd
+	gc.gitAddRemoteProcessMutex.Unlock()
 	defer func() {
-		gc.GitAddRemoteProcessMutex.Lock()
+		gc.gitAddRemoteProcessMutex.Lock()
 		gc.gitAddRemoteProcessReset()
-		gc.GitAddRemoteProcessMutex.Unlock()
+		gc.gitAddRemoteProcessMutex.Unlock()
 	}()
 	if !isValidGitRemoteURL(url) {
 		return []string{i18n.LANGUAGEMAPPING.AddRemotePopUpInvalidRemoteUrlFormat}, -1
@@ -336,10 +356,10 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
-			gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT ADD REMOTE ERROR]: %w", err))
+			gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT ADD REMOTE ERROR]: %w", err))
 			return gitAddRemoteOutput, status
 		}
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", err))
 		return gitAddRemoteOutput, -1
 
 	}
@@ -351,16 +371,16 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 // This method is thread-safe and can be called from multiple goroutines.
 // This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
 func (gc *GitCommit) KillGitAddRemoteCmd() {
-	gc.GitAddRemoteProcessMutex.Lock()
-	defer gc.GitAddRemoteProcessMutex.Unlock()
+	gc.gitAddRemoteProcessMutex.Lock()
+	defer gc.gitAddRemoteProcessMutex.Unlock()
 
-	if gc.GitAddRemoteProcess != nil && gc.GitAddRemoteProcess.Process != nil {
-		_ = gc.GitAddRemoteProcess.Process.Kill()
+	if gc.gitAddRemoteProcess != nil && gc.gitAddRemoteProcess.Process != nil {
+		_ = gc.gitAddRemoteProcess.Process.Kill()
 	}
 }
 
 func (gc *GitCommit) gitAddRemoteProcessReset() {
-	gc.GitAddRemoteProcess = nil
+	gc.gitAddRemoteProcess = nil
 	gc.isGitAddRemoteProcessRunning.Store(false)
 }
 
@@ -369,7 +389,7 @@ func (gc *GitCommit) CheckRemoteExist() bool {
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitOutput, err := cmd.Output()
 	if err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
 	}
 	remotes := strings.SplitSeq(strings.TrimSpace(string(gitOutput)), "\n")
 	var remoteStruct []GitRemote
@@ -386,8 +406,8 @@ func (gc *GitCommit) CheckRemoteExist() bool {
 			Url:  remoteLinePart[1],
 		})
 	}
-	gc.Remote = remoteStruct
-	return len(gc.Remote) > 0
+	gc.remote = remoteStruct
+	return len(gc.remote) > 0
 }
 
 // ----------------------------------

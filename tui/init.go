@@ -17,10 +17,10 @@ import (
 
 func initBranchList(m *GittiModel) {
 	items := []list.Item{
-		gitBranchItem(git.GITBRANCH.CurrentCheckOut),
+		gitBranchItem(m.GitState.GitBranch.CurrentCheckOut()),
 	}
 
-	for _, branch := range git.GITBRANCH.AllBranches {
+	for _, branch := range m.GitState.GitBranch.AllBranches() {
 		items = append(items, gitBranchItem(branch))
 	}
 
@@ -42,7 +42,7 @@ func initBranchList(m *GittiModel) {
 }
 
 func initModifiedFilesList(m *GittiModel) {
-	latestModifiedFilesArray := git.GITFILES.FilesStatus
+	latestModifiedFilesArray := m.GitState.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))
 	for _, modifiedFile := range latestModifiedFilesArray {
 		items = append(items, gitModifiedFilesItem(modifiedFile))
@@ -204,7 +204,7 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 }
 
 func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string, pushType string) (*GittiModel, tea.Cmd) {
-	git.GITCOMMIT.ClearGitRemotePushOutput()
+	m.GitState.GitCommit.ClearGitRemotePushOutput()
 	if popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
 		initGitRemotePushPopUpModel(m)
 	} else {

@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"gitti/api/git"
 	"gitti/i18n"
 
 	"github.com/charmbracelet/lipgloss/v2"
@@ -126,7 +125,7 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 	if ok {
 		popUp.GitCommitOutputViewport.SetWidth(min(maxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		var gitCommitOutputLog string
-		logs := git.GITCOMMIT.GitCommitOutput
+		logs := m.GitState.GitCommit.GitCommitOutput()
 		for _, line := range logs {
 			logLine := newStyle.Render(line)
 			gitCommitOutputLog += logLine + "\n"
@@ -327,7 +326,7 @@ func updateGitRemotePushOutputViewport(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
 		popUp.GitRemotePushOutputViewport.SetWidth(min(maxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-		logs := git.GITCOMMIT.GitRemotePushOutput
+		logs := m.GitState.GitCommit.GitRemotePushOutput()
 		var GitPushLog string
 		for _, line := range logs {
 			logLine := newStyle.Render(line)

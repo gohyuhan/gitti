@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"gitti/api"
 	"gitti/api/git"
 
 	"github.com/charmbracelet/bubbles/v2/list"
@@ -12,7 +13,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea/v2"
 )
 
-func NewGittiModel(repoPath string) *GittiModel {
+func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
@@ -30,6 +31,7 @@ func NewGittiModel(repoPath string) *GittiModel {
 		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
 		PopUpType:                             NoPopUp,
 		PopUpModel:                            struct{}{},
+		GitState:                              gitState,
 	}
 	gitti.ShowPopUp.Store(false)
 	gitti.IsTyping.Store(false)

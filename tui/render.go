@@ -131,7 +131,7 @@ func renderModifiedFilesDiffViewPort(m *GittiModel) {
 	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FileName)
 	previousDiffRowNum := 0
 	modifiedDiffRowNum := 0
-	fileDiff := git.GITFILES.GetFilesDiffInfo(fileStatus)
+	fileDiff := m.GitState.GitFiles.GetFilesDiffInfo(fileStatus)
 	if fileDiff == nil {
 		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
 		m.CurrentSelectedFileDiffViewport.SetContent(vpLine)

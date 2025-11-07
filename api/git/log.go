@@ -11,8 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-var GITCOMMITLOG *GitCommitLog
-
 const (
 	mergePipe     = "╲"
 	verticalPipe  = "│"
@@ -34,14 +32,14 @@ type CommitLogInfo struct {
 }
 
 type GitCommitLog struct {
-	ID                          uuid.UUID // because this is a slow operation and to prevent race override, we use ID to detect and only allow override whe the ID matches
-	GitCommitLogs               []CommitLogInfo
-	GitCommitLogsDAG            [][]string
-	ErrorLog                    []error
-	GetCurrentBranchOrAllCommit string
-	AllBranch                   bool
-	MU                          sync.Mutex
-	Status                      string
+	id                          uuid.UUID // because this is a slow operation and to prevent race override, we use ID to detect and only allow override whe the ID matches
+	gitCommitLogs               []CommitLogInfo
+	gitCommitLogsDAG            [][]string
+	errorLog                    []error
+	getCurrentBranchOrAllCommit string
+	allBranch                   bool
+	mu                          sync.Mutex
+	status                      string
 }
 
 const (
@@ -54,33 +52,33 @@ const (
 	DONE         = "DONE"
 )
 
-func InitGitCommitLog(allBranch bool) {
+func InitGitCommitLog(allBranch bool) *GitCommitLog {
 	branch := CURRENTBRANCH
 	if allBranch {
 		branch = ALLBRANCH
 	}
 	gitCommitLog := GitCommitLog{
-		ID:                          uuid.New(),
-		GitCommitLogs:               make([]CommitLogInfo, 0, 1),
-		GitCommitLogsDAG:            make([][]string, 0, 1),
-		ErrorLog:                    []error{},
-		GetCurrentBranchOrAllCommit: branch,
-		AllBranch:                   allBranch,
+		id:                          uuid.New(),
+		gitCommitLogs:               make([]CommitLogInfo, 0, 1),
+		gitCommitLogsDAG:            make([][]string, 0, 1),
+		errorLog:                    []error{},
+		getCurrentBranchOrAllCommit: branch,
+		allBranch:                   allBranch,
 	}
 
-	GITCOMMITLOG = &gitCommitLog
+	return &gitCommitLog
 }
 
 func (gc *GitCommitLog) GetLatestGitCommitLogInfoAndDAG(updateChannel chan string) {
-	gc.ID = uuid.New()
-	gc.MU.Lock()
-	gc.Status = INITIALIZING
-	currentID := gc.ID
-	gc.GitCommitLogsDAG = make([][]string, 0, 1)
-	gc.GitCommitLogs = make([]CommitLogInfo, 0, 1)
+	gc.id = uuid.New()
+	gc.mu.Lock()
+	gc.status = INITIALIZING
+	currentID := gc.id
+	gc.gitCommitLogsDAG = make([][]string, 0, 1)
+	gc.gitCommitLogs = make([]CommitLogInfo, 0, 1)
 	gc.getCommitLogInfo(currentID, updateChannel)
-	gc.Status = DONE
-	gc.MU.Unlock()
+	gc.status = DONE
+	gc.mu.Unlock()
 }
 
 func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan string) {
@@ -89,7 +87,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	const recordSeparator = "<<COMMITLOGENDOFLINE>>"
 
 	// early return is Id is not the same when the process starts
-	if gc.ID != currentID {
+	if gc.id != currentID {
 		return
 	}
 
@@ -99,7 +97,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 
 	// Construct the `git log` command.
 	gitArgs := []string{"--no-pager", "log", "--graph", "--topo-order", "--color=always", gitLogFormat}
-	if gc.GetCurrentBranchOrAllCommit == ALLBRANCH {
+	if gc.getCurrentBranchOrAllCommit == ALLBRANCH {
 		gitArgs = append(gitArgs, "--all")
 	} else {
 		gitArgs = append(gitArgs, "HEAD")
@@ -108,7 +106,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitStreamOutput, err := cmd.StdoutPipe()
 	if err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
 		return
 	}
 	cmd.Stderr = cmd.Stdout
@@ -117,18 +115,18 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	scanner := bufio.NewScanner(gitStreamOutput)
 
 	// preallocate space
-	gc.GitCommitLogs = make([]CommitLogInfo, 0)
+	gc.gitCommitLogs = make([]CommitLogInfo, 0)
 	var pendingGraphLines []string
 
 	//start the streaming
 	err = cmd.Start()
 	if err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
 		return
 	}
 
 	for scanner.Scan() {
-		if gc.ID != currentID {
+		if gc.id != currentID {
 			return
 		}
 		line := strings.TrimSpace(scanner.Text())
@@ -139,7 +137,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 			// Split the record into its constituent fields.
 			logParts := strings.Split(record, fieldSeparator)
 			if len(logParts) < 8 {
-				gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: invalid git log format"))
+				gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: invalid git log format"))
 				return
 			}
 
@@ -206,7 +204,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 			}
 
 			// Create and append the CommitLogInfo struct.
-			gc.GitCommitLogs = append(gc.GitCommitLogs, CommitLogInfo{
+			gc.gitCommitLogs = append(gc.gitCommitLogs, CommitLogInfo{
 				CommitGraphLines: commitGraphLines,
 				ShortHash:        shortCommitHash,
 				Hash:             fullCommitHash,
@@ -225,6 +223,6 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	// wait for proper clean up
 	err = cmd.Wait()
 	if err != nil {
-		gc.ErrorLog = append(gc.ErrorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
 	}
 }

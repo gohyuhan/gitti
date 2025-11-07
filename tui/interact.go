@@ -2,7 +2,6 @@ package tui
 
 import (
 	"gitti/api"
-	"gitti/api/git"
 
 	tea "github.com/charmbracelet/bubbletea/v2"
 )
@@ -188,7 +187,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if m.CurrentSelectedContainer == ModifiedFilesComponent {
 			m.ShowPopUp.Store(true)
 			m.PopUpType = CommitPopUp
-			git.GITCOMMIT.ClearGitCommitOutput()
+			m.GitState.GitCommit.ClearGitCommitOutput()
 
 			// if the current pop up model is not commit pop up model, then init it
 			if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
@@ -203,7 +202,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if m.CurrentSelectedContainer == ModifiedFilesComponent || m.CurrentSelectedContainer == NoneSelected || m.CurrentSelectedContainer == LocalBranchComponent {
 			// first we need to check if there are any push origin for this repo
 			// if not we prompt the user to add a new remote origin
-			if !git.GITCOMMIT.CheckRemoteExist() {
+			if !m.GitState.GitCommit.CheckRemoteExist() {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it
@@ -216,15 +215,16 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			} else {
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				if len(git.GITCOMMIT.Remote) == 1 {
+				remotes := m.GitState.GitCommit.Remote()
+				if len(remotes) == 1 {
 					m.PopUpType = ChoosePushTypePopUp
 					// if the current pop up model is not commit pop up model, then init it and start git push service
-					initChoosePushTypePopUpModel(m, git.GITCOMMIT.Remote[0].Name)
-				} else if len(git.GITCOMMIT.Remote) > 1 {
+					initChoosePushTypePopUpModel(m, remotes[0].Name)
+				} else if len(remotes) > 1 {
 					// if remote is more than 1 let user choose which remote to push to first before pushing
 					m.PopUpType = ChooseRemotePopUp
 					if _, ok := m.PopUpModel.(*ChooseRemotePopUpModel); !ok {
-						initGitRemotePushChooseRemotePopUpModel(m, git.GITCOMMIT.Remote)
+						initGitRemotePushChooseRemotePopUpModel(m, remotes)
 					}
 				}
 			}
@@ -294,7 +294,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			var fileName string
 			if currentSelectedModifiedFile != nil {
 				fileName = currentSelectedModifiedFile.(gitModifiedFilesItem).FileName
-				git.GITFILES.ToggleFilesStageStatus(fileName)
+				m.GitState.GitFiles.ToggleFilesStageStatus(fileName)
 			}
 		}
 		return m, nil

@@ -12,14 +12,14 @@ import (
 	"gitti/i18n"
 )
 
-func GetUpdatedGitInfo(updateChannel chan string) {
+func GetUpdatedGitInfo(gitState *GitState, updateChannel chan string) {
 	go func() {
-		git.GITFILES.GetGitFilesStatus()
+		gitState.GitFiles.GetGitFilesStatus()
 		updateChannel <- git.GIT_FILES_STATUS_UPDATE
 	}()
 
 	go func() {
-		git.GITBRANCH.GetLatestBranchesinfo()
+		gitState.GitBranch.GetLatestBranchesinfo()
 		updateChannel <- git.GIT_BRANCH_UPDATE
 	}()
 
@@ -72,5 +72,13 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 	default:
 		fmt.Println(i18n.LANGUAGEMAPPING.GitInitPromptInvalidInput)
 		os.Exit(1)
+	}
+}
+
+func InitGitState(updateChannel chan string) *GitState {
+	return &GitState{
+		GitBranch: git.InitGitBranch(),
+		GitCommit: git.InitGitCommit(updateChannel),
+		GitFiles:  git.InitGitFile(updateChannel),
 	}
 }

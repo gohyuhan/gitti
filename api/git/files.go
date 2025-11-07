@@ -10,8 +10,6 @@ import (
 	"gitti/cmd"
 )
 
-var GITFILES *GitFiles
-
 const (
 	AddLine        = "ADDLINE"
 	RemoveLine     = "REMOVELINE"
@@ -31,21 +29,30 @@ type FileDiffLine struct {
 }
 
 type GitFiles struct {
-	FilesStatus                 []FileStatus
-	FilesPosition               map[string]int
-	UpdateChannel               chan string
-	FilesSelectedForStageStatus map[string]bool // centralized recording the user selection if they want to stage a file
-	ErrorLog                    []error
-	GitFilesMutex               sync.Mutex
+	filesStatus                 []FileStatus
+	filesPosition               map[string]int
+	updateChannel               chan string
+	filesSelectedForStageStatus map[string]bool // centralized recording the user selection if they want to stage a file
+	errorLog                    []error
+	gitFilesMutex               sync.Mutex
 }
 
-func InitGitFile(updateChannel chan string) {
+func InitGitFile(updateChannel chan string) *GitFiles {
 	gitFiles := GitFiles{
-		FilesStatus:                 make([]FileStatus, 0),
-		UpdateChannel:               updateChannel,
-		FilesSelectedForStageStatus: make(map[string]bool),
+		filesStatus:                 make([]FileStatus, 0),
+		updateChannel:               updateChannel,
+		filesSelectedForStageStatus: make(map[string]bool),
 	}
-	GITFILES = &gitFiles
+	return &gitFiles
+}
+
+// ----------------------------------
+//
+//	Return filesStatus
+//
+// ----------------------------------
+func (gf *GitFiles) FilesStatus() []FileStatus {
+	return gf.filesStatus
 }
 
 func (gf *GitFiles) GetGitFilesStatus() {
@@ -54,7 +61,7 @@ func (gf *GitFiles) GetGitFilesStatus() {
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 	gitOutput, err := cmd.Output()
 	if err != nil {
-		gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES ERROR]: %w", err))
+		gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES ERROR]: %w", err))
 	}
 
 	files := strings.Split(strings.TrimRight(string(gitOutput), "\n"), "\n")
@@ -62,7 +69,7 @@ func (gf *GitFiles) GetGitFilesStatus() {
 	modifiedFilesStatus := []FileStatus{}
 	modifiedFilesPositionHashmap := make(map[string]int)
 
-	gf.GitFilesMutex.Lock()
+	gf.gitFilesMutex.Lock()
 	for index, file := range files {
 		if len(file) < 3 {
 			continue
@@ -72,24 +79,24 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		worktree := string(file[1])
 		fileName := strings.TrimSpace(file[3:])
 
-		// check if this was also in the previsou list before any update to the list and retrieve back the SelectedForStage info
-		_, exist := gf.FilesSelectedForStageStatus[fileName]
+		// check if this was also in the previous list before any update to the list and retrieve back the SelectedForStage info
+		_, exist := gf.filesSelectedForStageStatus[fileName]
 		if !exist {
-			gf.FilesSelectedForStageStatus[fileName] = true
+			gf.filesSelectedForStageStatus[fileName] = true
 		}
 
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
 			FileName:         fileName,
 			IndexState:       indexState,
 			WorkTree:         worktree,
-			SelectedForStage: gf.FilesSelectedForStageStatus[fileName],
+			SelectedForStage: gf.filesSelectedForStageStatus[fileName],
 		})
 		modifiedFilesPositionHashmap[fileName] = index
 	}
 
-	gf.FilesPosition = modifiedFilesPositionHashmap
-	gf.FilesStatus = modifiedFilesStatus
-	gf.GitFilesMutex.Unlock()
+	gf.filesPosition = modifiedFilesPositionHashmap
+	gf.filesStatus = modifiedFilesStatus
+	gf.gitFilesMutex.Unlock()
 }
 
 // get the file diff content
@@ -111,18 +118,18 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 		exitError, ok := err.(*exec.ExitError)
 		if ok {
 			if exitError.ExitCode() != 1 {
-				gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
+				gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
 				return nil
 			}
 		} else {
-			gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
+			gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
 			return nil
 		}
 	}
 
 	fileDiffOneLineString := strings.SplitN(string(gitOutput), "@@", 3)
 	if len(fileDiffOneLineString) < 3 {
-		gf.ErrorLog = append(gf.ErrorLog, fmt.Errorf("There is no diff for the selected file or the file format is not supported for preview"))
+		gf.errorLog = append(gf.errorLog, fmt.Errorf("There is no diff for the selected file or the file format is not supported for preview"))
 		return nil
 	}
 	fileDiffLines := strings.SplitSeq(strings.TrimSpace(fileDiffOneLineString[2]), "\n")
@@ -145,14 +152,26 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 	return fileDiff
 }
 
-func (gf *GitFiles) ToggleFilesStageStatus(fileName string) {
-	gf.GitFilesMutex.Lock()
-	_, fileStatusExist := gf.FilesSelectedForStageStatus[fileName]
-	fileIndex, fileIndexExist := gf.FilesPosition[fileName]
-	if fileIndexExist && fileStatusExist {
-		gf.FilesSelectedForStageStatus[fileName] = !gf.FilesSelectedForStageStatus[fileName]
-		gf.FilesStatus[fileIndex].SelectedForStage = gf.FilesSelectedForStageStatus[fileName]
-		gf.UpdateChannel <- GIT_FILES_STATUS_UPDATE
+func (gf *GitFiles) GetSelectedForStageFiles() []string {
+	var stagedFiles []string
+	gf.gitFilesMutex.Lock()
+	for _, file := range gf.filesStatus {
+		if file.SelectedForStage {
+			stagedFiles = append(stagedFiles, file.FileName)
+		}
 	}
-	gf.GitFilesMutex.Unlock()
+	gf.gitFilesMutex.Unlock()
+	return stagedFiles
+}
+
+func (gf *GitFiles) ToggleFilesStageStatus(fileName string) {
+	gf.gitFilesMutex.Lock()
+	_, fileStatusExist := gf.filesSelectedForStageStatus[fileName]
+	fileIndex, fileIndexExist := gf.filesPosition[fileName]
+	if fileIndexExist && fileStatusExist {
+		gf.filesSelectedForStageStatus[fileName] = !gf.filesSelectedForStageStatus[fileName]
+		gf.filesStatus[fileIndex].SelectedForStage = gf.filesSelectedForStageStatus[fileName]
+		gf.updateChannel <- GIT_FILES_STATUS_UPDATE
+	}
+	gf.gitFilesMutex.Unlock()
 }
