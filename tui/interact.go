@@ -2,9 +2,11 @@ package tui
 
 import (
 	"gitti/api"
+	"gitti/api/git"
 	"gitti/tui/constant"
 
 	tea "github.com/charmbracelet/bubbletea/v2"
+	"github.com/google/uuid"
 )
 
 // the function to handle bubbletea key interactions
@@ -28,6 +30,10 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 			gitCommitCancelService(m)
 		case constant.AddRemotePromptPopUp:
 			gitAddRemoteCancelService(m)
+		case constant.CreateNewBranchPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpModel = nil
 		}
 		return m, nil
 	// in typing mode, tab is move to next input
@@ -124,7 +130,21 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 					gitAddRemoteService(m)
 				}
 			}
-
+		case constant.CreateNewBranchPopUp:
+			popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
+			if ok {
+				// we direclty trigger the branch creation operation and close the pop up, we will assume this always result in success
+				validBranchName, _ := api.IsBranchNameValid(popUp.NewBranchNameInput.Value())
+				switch popUp.CreateType {
+				case git.NEWBRANCH:
+					m.GitState.GitBranch.GitCreateNewBranch(validBranchName)
+				case git.NEWBRANCHANDSWITCH:
+					m.GitState.GitBranch.GitCreateNewBranchAndSwitch(validBranchName)
+				}
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+			}
 		}
 		return m, nil
 	}
@@ -159,7 +179,13 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				return m, cmd
 			}
 		}
-
+	case constant.CreateNewBranchPopUp:
+		popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.NewBranchNameInput, cmd = popUp.NewBranchNameInput.Update(msg)
+			return m, cmd
+		}
 	}
 	return m, nil
 }
@@ -170,6 +196,18 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	case "ctrl+c":
 		api.GITDAEMON.Stop()
 		return m, tea.Quit
+	case "n", "N":
+		if !m.ShowPopUp.Load() {
+			if m.CurrentSelectedContainer == constant.LocalBranchComponent {
+				m.PopUpType = constant.ChooseNewBranchTypePopUp
+				m.IsTyping.Store(false)
+				m.ShowPopUp.Store(true)
+				if _, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel); !ok {
+					initChooseNewBranchTypePopUpModel(m)
+				}
+			}
+		}
+		return m, nil
 	case "b", "B":
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedContainer != constant.LocalBranchComponent {
@@ -200,6 +238,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					initGitCommitPopUpModel(m)
 				} else {
 					popUp.GitCommitOutputViewport.SetContent("")
+					popUp.SessionID = uuid.New()
 				}
 				m.IsTyping.Store(true)
 			}
@@ -265,6 +304,15 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					selectedOption := popUp.PushOptionList.SelectedItem()
 					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(gitPushOptionItem).pushType)
 				}
+			case constant.ChooseNewBranchTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
+				if ok {
+					m.PopUpType = constant.CreateNewBranchPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+					selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
+					initCreateNewBranchPopUpModel(m, selectedOption.(gitNewBranchTypeOptionItem).newBranchType)
+				}
 			}
 		}
 		return m, nil
@@ -276,8 +324,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case constant.ChooseRemotePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
-
 			case constant.ChoosePushTypePopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+			case constant.ChooseNewBranchTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpModel = nil
@@ -344,6 +395,12 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
 					return m, cmd
 				}
+			case constant.ChooseNewBranchTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
+				if ok {
+					popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
+					return m, cmd
+				}
 			}
 		}
 		return m, nil
@@ -382,6 +439,12 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
 				if ok {
 					popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
+					return m, cmd
+				}
+			case constant.ChooseNewBranchTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
+				if ok {
+					popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
 					return m, cmd
 				}
 			}

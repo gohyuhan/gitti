@@ -47,6 +47,8 @@ type LanguageMapping struct {
 	KeyBindingForGitRemotePushPopUp          []string
 	KeyBindingForChooseRemotePopUp           []string
 	KeyBindingForChoosePushTypePopUp         []string
+	KeyBindingForChooseNewBranchTypePopUp    []string
+	KeyBindingForCreateNewBranchPopUp        []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -70,4 +72,17 @@ type LanguageMapping struct {
 	GitRemotePushOptionTitle     string
 	// Choose Remote
 	ChooseRemoteTitle string
+	// Choose push option
+	NormalPush         string
+	ForcePushSafe      string
+	ForcePushDangerous string
+	// Create New Branch
+	CreateNewBranchPrompt    string
+	ChooseNewBranchTypeTitle string
+	NewBranchInvalidWarning  string
+	// Create Branch Option
+	CreateNewBranchTitle                string
+	CreateNewBranchDescription          string
+	CreateNewBranchAndSwitchTitle       string
+	CreateNewBranchAndSwitchDescription string
 }

@@ -6,12 +6,14 @@ package constant
 //
 // -----------------------------------------------------------------------------
 const (
-	NoPopUp              = "NoPopUp"
-	CommitPopUp          = "CommitPopUp"          // IsTyping will be true
-	AddRemotePromptPopUp = "AddRemotePromptPopUp" // IsTyping will be true
-	ChoosePushTypePopUp  = "ChoosePushTypePopUp"  // IsTyping will be false
-	ChooseRemotePopUp    = "ChooseRemotePopUp"    // IsTyping will be false
-	GitRemotePushPopUp   = "GitRemotePushPopUp"   // IsTyping will be false
+	NoPopUp                  = "NoPopUp"
+	CommitPopUp              = "CommitPopUp"              // IsTyping will be true
+	AddRemotePromptPopUp     = "AddRemotePromptPopUp"     // IsTyping will be true
+	ChoosePushTypePopUp      = "ChoosePushTypePopUp"      // IsTyping will be false
+	ChooseRemotePopUp        = "ChooseRemotePopUp"        // IsTyping will be false
+	GitRemotePushPopUp       = "GitRemotePushPopUp"       // IsTyping will be false
+	ChooseNewBranchTypePopUp = "ChooseNewBranchTypePopUp" // IsTyping will be false
+	CreateNewBranchPopUp     = "CreateNewBranchPopUp"     // IsTyping will be true
 )
 
 const AUTOCLOSEINTERVAL = 500
@@ -25,18 +27,21 @@ const (
 
 	ListItemOrTitleWidthPad = 5
 
-	MaxLeftPanelWidth            = 80
-	MaxCommitPopUpWidth          = 100
-	MaxAddRemotePromptPopUpWidth = 100
-	MaxGitRemotePushPopUpWidth   = 100
-	MaxChooseRemotePopUpWidth    = 100
-	MaxChoosePushTypePopUpWidth  = 100
+	MaxLeftPanelWidth                = 80
+	MaxCommitPopUpWidth              = 100
+	MaxAddRemotePromptPopUpWidth     = 100
+	MaxGitRemotePushPopUpWidth       = 100
+	MaxChooseRemotePopUpWidth        = 100
+	MaxChoosePushTypePopUpWidth      = 100
+	MaxChooseNewBranchTypePopUpWidth = 100
+	MaxCreateNewBranchPopUpWidth     = 100
 
 	PopUpGitCommitOutputViewPortHeight     = 10
 	PopUpAddRemoteOutputViewPortHeight     = 2
 	PopUpGitRemotePushOutputViewportHeight = 10
 	PopUpChooseRemoteHeight                = 10
-	PopUpChoosePushTypeHeight              = 10
+	PopUpChoosePushTypeHeight              = 6
+	PopUpChooseNewBranchTypeHeight         = 4
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

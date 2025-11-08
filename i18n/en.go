@@ -30,15 +30,13 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[p] push changes",
-		"[s] stash all file(s)",
-		"[u] unstage all file(s)",
+		"[n] new branch",
 		"[esc] unselect component",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] switch branch",
 		"[p] push changes",
-		"[s] stash all file(s)",
-		"[u] unstage all file(s)",
+		"[n] new branch",
 		"[esc] unselect component",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
@@ -93,6 +91,15 @@ var eN = LanguageMapping{
 		"[enter] select push option and push",
 		"[esc] cancel / close",
 	},
+	KeyBindingForChooseNewBranchTypePopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select create new branch option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForCreateNewBranchPopUp: []string{
+		"[ctrl+enter] add branch",
+		"[esc] cancel and close",
+	},
 	CommitPopUpMessageTitle:                      "* Commit Message",
 	CommitPopUpMessageInputPlaceHolder:           "Enter commit message",
 	CommitPopUpDescriptionTitle:                  "Description",
@@ -109,4 +116,14 @@ var eN = LanguageMapping{
 	GitRemotePushPopUpProcessing:                 "Pushing...",
 	GitRemotePushOptionTitle:                     "Push Option",
 	ChooseRemoteTitle:                            "Choose a remote to push to",
+	NormalPush:                                   "Push",
+	ForcePushSafe:                                "Force Push (safe)",
+	ForcePushDangerous:                           "Force Push (Dangerous)",
+	CreateNewBranchPrompt:                        "Enter the new branch name",
+	ChooseNewBranchTypeTitle:                     "How would you like to proceed with creating a new git branch",
+	NewBranchInvalidWarning:                      "Invalid naming for a branch name, it will be replace with `%s` instead",
+	CreateNewBranchTitle:                         "Create new branch",
+	CreateNewBranchDescription:                   "Create new branch and stay at current branch",
+	CreateNewBranchAndSwitchTitle:                "Create new branch and move changes",
+	CreateNewBranchAndSwitchDescription:          "Create new branch and move all the changes to the newly created branch",
 }

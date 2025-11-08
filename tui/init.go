@@ -222,6 +222,7 @@ func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remo
 	return m, nil
 }
 
+// init the popup model to choose remote to push to
 func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.GitRemote) {
 	items := make([]list.Item, 0, len(remoteList))
 	for _, remote := range remoteList {
@@ -239,20 +240,21 @@ func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.Git
 	}
 }
 
+// init the popup model for choosing push type
 func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
 	pushTypeOption := []gitPushOptionItem{
 		{
-			Name:     "Push",
+			Name:     i18n.LANGUAGEMAPPING.NormalPush,
 			Info:     "git push",
 			pushType: git.PUSH,
 		},
 		{
-			Name:     "Force Push (Safe)",
+			Name:     i18n.LANGUAGEMAPPING.ForcePushSafe,
 			Info:     "git push --force",
 			pushType: git.FORCEPUSHSAFE,
 		},
 		{
-			Name:     "Force Push (Dangerous)",
+			Name:     i18n.LANGUAGEMAPPING.ForcePushDangerous,
 			Info:     "git push --force-with-lease",
 			pushType: git.FORCEPUSHDANGEROUS,
 		},
@@ -272,5 +274,49 @@ func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
 	m.PopUpModel = &ChoosePushTypePopUpModel{
 		PushOptionList: pOL,
 		RemoteName:     remoteName,
+	}
+}
+
+// init the popup model for creating a new branch
+func initCreateNewBranchPopUpModel(m *GittiModel, createType string) {
+	NewBranchNameInput := textinput.New()
+	NewBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.CreateNewBranchPrompt
+	NewBranchNameInput.Focus()
+	NewBranchNameInput.VirtualCursor = true
+
+	m.PopUpModel = &CreateNewBranchPopUpModel{
+		NewBranchNameInput: NewBranchNameInput,
+		CreateType:         createType,
+	}
+}
+
+// init the popup model for choosing new branch creation option
+func initChooseNewBranchTypePopUpModel(m *GittiModel) {
+	newBranchTypeOption := []gitNewBranchTypeOptionItem{
+		{
+			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchTitle,
+			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchDescription,
+			newBranchType: git.NEWBRANCH,
+		},
+		{
+			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchAndSwitchTitle,
+			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchAndSwitchDescription,
+			newBranchType: git.NEWBRANCHANDSWITCH,
+		},
+	}
+
+	items := make([]list.Item, 0, len(newBranchTypeOption))
+	for _, newBranchOption := range newBranchTypeOption {
+		items = append(items, gitNewBranchTypeOptionItem(newBranchOption))
+	}
+	width := (min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	nBTOL := list.New(items, gitNewBranchTypeOptionDelegate{}, width, constant.PopUpChooseNewBranchTypeHeight)
+	nBTOL.SetShowStatusBar(false)
+	nBTOL.SetFilteringEnabled(false)
+	nBTOL.SetShowHelp(false)
+	nBTOL.SetShowTitle(false)
+
+	m.PopUpModel = &ChooseNewBranchTypeOptionPopUpModel{
+		NewBranchTypeOptionList: nBTOL,
 	}
 }

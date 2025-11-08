@@ -55,6 +55,12 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 	return gf.filesStatus
 }
 
+// ----------------------------------
+//
+//		Retrieve File Status
+//	 * Passive, this should onyl be trigger by system
+//
+// ----------------------------------
 func (gf *GitFiles) GetGitFilesStatus() {
 	gitArgs := []string{"status", "--porcelain", "-uall"}
 

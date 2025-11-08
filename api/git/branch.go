@@ -55,7 +55,8 @@ func (gb *GitBranch) IsRepoUnborn() bool {
 
 // ----------------------------------
 //
-//	Related to Branches Info
+//		Retrieve Branches Info
+//	 * Passive, this should only be trigger by system
 //
 // ----------------------------------
 func (gb *GitBranch) GetLatestBranchesinfo() {

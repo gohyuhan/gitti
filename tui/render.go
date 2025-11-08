@@ -67,6 +67,10 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseRemotePopUp
 		case constant.ChoosePushTypePopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChoosePushTypePopUp
+		case constant.ChooseNewBranchTypePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseNewBranchTypePopUp
+		case constant.CreateNewBranchPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateNewBranchPopUp
 		}
 	} else {
 		switch m.CurrentSelectedContainer {
@@ -221,6 +225,12 @@ func tuiWindowSizing(m *GittiModel) {
 			if exist {
 				width := (min(constant.MaxChooseRemotePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 				popUp.RemoteList.SetWidth(width)
+			}
+		case constant.ChooseNewBranchTypePopUp:
+			popUp, exist := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
+			if exist {
+				width := (min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.NewBranchTypeOptionList.SetWidth(width)
 			}
 		}
 	}

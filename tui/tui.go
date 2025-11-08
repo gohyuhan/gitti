@@ -232,3 +232,35 @@ func (d gitPushOptionDelegate) Render(w io.Writer, m list.Model, index int, list
 
 	fmt.Fprint(w, fn(fullStr))
 }
+
+// for new branch creation type selection
+func (d gitNewBranchTypeOptionDelegate) Height() int                             { return 1 }
+func (d gitNewBranchTypeOptionDelegate) Spacing() int                            { return 0 }
+func (d gitNewBranchTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d gitNewBranchTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(gitNewBranchTypeOptionItem)
+	if !ok {
+		return
+	}
+
+	nameStr := fmt.Sprintf("   %s", i.Name)
+	infoStr := fmt.Sprintf("    %s", i.Info)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+
+	nameStr = utils.TruncateString(nameStr, componentWidth)
+	infoStr = utils.TruncateString(infoStr, componentWidth)
+
+	nameRendered := style.ItemStyle.Render(nameStr)
+	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
+	fullStr := nameRendered + "\n" + infoRendered
+
+	fn := style.ItemStyle.Render
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(fullStr))
+}

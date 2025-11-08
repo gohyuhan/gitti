@@ -10,18 +10,8 @@ import (
 
 	"gitti/api/git"
 	"gitti/i18n"
+	"gitti/settings"
 )
-
-func GetUpdatedGitInfo(gitState *GitState, updateChannel chan string) {
-	gitState.GitFiles.GetGitFilesStatus()
-	updateChannel <- git.GIT_FILES_STATUS_UPDATE
-	gitState.GitBranch.GetLatestBranchesinfo()
-	updateChannel <- git.GIT_BRANCH_UPDATE
-	// not included in v0.1.0
-	// go func() {
-	// 	GITCOMMIT.GetLatestGitCommitLogInfoAndDAG(updateChannel)
-	// }()
-}
 
 func IsGitInstalled(repoPath string) {
 	gitArgs := []string{"--version"}
@@ -58,7 +48,7 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 
 	switch input {
 	case "Y":
-		git.GitInit(repoPath)
+		git.GitInit(repoPath, settings.GITTICONFIGSETTINGS.GitInitDefaultBranch)
 	case "N":
 		fmt.Println(i18n.LANGUAGEMAPPING.GitInitRefuse)
 		os.Exit(0)
@@ -74,4 +64,17 @@ func InitGitState(updateChannel chan string) *GitState {
 		GitCommit: git.InitGitCommit(updateChannel),
 		GitFiles:  git.InitGitFile(updateChannel),
 	}
+}
+
+func IsBranchNameValid(branchName string) (string, bool) {
+	var modifiedBranchName string
+
+	modifiedBranchName = branchName
+	modifiedBranchName = strings.ReplaceAll(modifiedBranchName, " ", "-")
+
+	if modifiedBranchName != branchName {
+		return modifiedBranchName, false
+	}
+
+	return branchName, true
 }

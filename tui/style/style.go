@@ -53,4 +53,7 @@ var (
 				BorderForeground(ColorBasic)
 	SpinnerStyle = NewStyle.
 			Foreground(ColorPrimary)
+	BranchInvalidWarningStyle = NewStyle.
+					Foreground(ColorSecondary).
+					Faint(true)
 )

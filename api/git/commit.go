@@ -15,12 +15,6 @@ import (
 	"gitti/i18n"
 )
 
-const (
-	PUSH               = "PUSH"
-	FORCEPUSHSAFE      = "FORCEPUSHSAFE"
-	FORCEPUSHDANGEROUS = "FORCEPUSHDANGEROUS"
-)
-
 type GitCommit struct {
 	errorLog                          []error
 	gitStashAndCommitProcess          *exec.Cmd
@@ -434,13 +428,23 @@ func (gc *GitCommit) CheckRemoteExist() bool {
 //	Related to Git Init
 //
 // ----------------------------------
-func GitInit(repoPath string) {
-	gitArgs := []string{"init"}
+func GitInit(repoPath string, initBranchName string) {
+	initGitArgs := []string{"init"}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
-	_, err := cmd.Output()
-	if err != nil {
-		fmt.Printf("[GIT INIT ERROR]: %v", err)
+	initCmd := cmd.GittiCmd.RunGitCmd(initGitArgs)
+	_, initErr := initCmd.Output()
+	if initErr != nil {
+		fmt.Printf("[GIT INIT ERROR]: %v", initErr)
+		os.Exit(1)
+	}
+
+	// set the branch
+	checkoutBranchGitArgs := []string{"checkout", "-b", initBranchName}
+
+	checkoutBranchCmd := cmd.GittiCmd.RunGitCmd(checkoutBranchGitArgs)
+	_, checkoutBranchErr := checkoutBranchCmd.Output()
+	if checkoutBranchErr != nil {
+		fmt.Printf("[GIT INIT ERROR]: %v", checkoutBranchErr)
 		os.Exit(1)
 	}
 }

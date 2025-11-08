@@ -1,6 +1,9 @@
 package tui
 
 import (
+	"fmt"
+
+	"gitti/api"
 	"gitti/i18n"
 	"gitti/tui/constant"
 	"gitti/tui/style"
@@ -28,6 +31,11 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderChooseRemotePopUp(m)
 	case constant.ChoosePushTypePopUp:
 		popUp = renderChoosePushTypePopUp(m)
+	case constant.ChooseNewBranchTypePopUp:
+		popUp = renderChooseNewBranchTypePopUp(m)
+	case constant.CreateNewBranchPopUp:
+		popUp = renderCreateNewBranchPopUp(m)
+
 	}
 	return popUp
 }
@@ -321,4 +329,56 @@ func updateGitRemotePushOutputViewport(m *GittiModel) {
 		popUp.GitRemotePushOutputViewport.SetContent(GitPushLog)
 		popUp.GitRemotePushOutputViewport.ViewDown()
 	}
+}
+
+// ------------------------------------
+//
+//	For Creating New Git branch
+//
+// ------------------------------------
+// pop up that confirm the option for creating a new branch, just create or create and move everything to the new branch
+func renderChooseNewBranchTypePopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChooseNewBranchTypeTitle)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			popUp.NewBranchTypeOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// to prompt user for new branch name and then proceed to trigger the creation of branch and optionally move changes
+func renderCreateNewBranchPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CreateNewBranchTitle)
+		popUp.NewBranchNameInput.SetWidth(popUpWidth - 4)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			popUp.NewBranchNameInput.View(),
+		)
+		modifiedBranchName, isValid := api.IsBranchNameValid(popUp.NewBranchNameInput.Value())
+		if !isValid {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				popUp.NewBranchNameInput.View(),
+				"",
+				style.BranchInvalidWarningStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.NewBranchInvalidWarning, modifiedBranchName)),
+			)
+
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
 }

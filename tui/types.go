@@ -13,6 +13,11 @@ import (
 	"github.com/google/uuid"
 )
 
+// ---------------------------------
+//
+// # Main Model for TUI
+//
+// ---------------------------------
 type GittiModel struct {
 	CurrentSelectedContainer              string
 	RepoPath                              string
@@ -36,6 +41,11 @@ type GittiModel struct {
 	GitState                              *api.GitState
 }
 
+// ---------------------------------
+//
+// # For git commit process pop up mdel
+//
+// ---------------------------------
 type GitCommitPopUpModel struct {
 	MessageTextInput         textinput.Model // input index 1
 	DescriptionTextAreaInput textarea.Model  // input index 2
@@ -52,6 +62,11 @@ type GitCommitPopUpModel struct {
 	SessionID uuid.UUID
 }
 
+// ---------------------------------
+//
+// # For add Remote prompt pop up
+//
+// ---------------------------------
 type AddRemotePromptPopUpModel struct {
 	RemoteNameTextInput     textinput.Model // input index 1
 	RemoteUrlTextInput      textinput.Model // input index 2
@@ -68,6 +83,11 @@ type AddRemotePromptPopUpModel struct {
 	SessionID uuid.UUID
 }
 
+// ---------------------------------
+//
+// # For Remote push process pop up
+//
+// ---------------------------------
 type GitRemotePushPopUpModel struct {
 	GitRemotePushOutputViewport viewport.Model // to log out the output from git operation
 	Spinner                     spinner.Model  // spinner for showing processing state
@@ -80,23 +100,59 @@ type GitRemotePushPopUpModel struct {
 	SessionID uuid.UUID
 }
 
+// ---------------------------------
+//
 // user choose how do they want to push the commit, push /  push --force / push --force-with-lease
+//
+// ---------------------------------
 type ChoosePushTypePopUpModel struct {
 	PushOptionList list.Model
 	RemoteName     string
 }
 
+// ---------------------------------
+//
+// choose a remote to push to
+//
+// ---------------------------------
 type ChooseRemotePopUpModel struct {
 	RemoteList list.Model
 }
 
+// ---------------------------------
+//
+// create a new branch and remain on current branch
+//
+// ---------------------------------
+type CreateNewBranchPopUpModel struct {
+	NewBranchNameInput textinput.Model
+	CreateType         string
+}
+
+// ---------------------------------
+//
+// choose on how to create the new branch, just create or create and move changes
+//
+// ---------------------------------
+type ChooseNewBranchTypeOptionPopUpModel struct {
+	NewBranchTypeOptionList list.Model
+}
+
+// ---------------------------------
+//
 // to record the current navigation index position
+//
+// ---------------------------------
 type GittiComponentsCurrentNavigationIndexPosition struct {
 	LocalBranchComponent   int
 	ModifiedFilesComponent int
 }
 
+// ---------------------------------
+//
 // for list component of git branch
+//
+// ---------------------------------
 type gitBranchItemDelegate struct{}
 type gitBranchItem struct {
 	BranchName   string
@@ -107,7 +163,11 @@ func (i gitBranchItem) FilterValue() string {
 	return i.BranchName
 }
 
+// ---------------------------------
+//
 // for list component of git modified files
+//
+// ---------------------------------
 type gitModifiedFilesItemDelegate struct{}
 type gitModifiedFilesItem struct {
 	FileName         string
@@ -120,7 +180,11 @@ func (i gitModifiedFilesItem) FilterValue() string {
 	return i.FileName
 }
 
+// ---------------------------------
+//
 // for list component of git remote
+//
+// ---------------------------------
 type gitRemoteItemDelegate struct{}
 type gitRemoteItem struct {
 	Name string
@@ -131,7 +195,11 @@ func (i gitRemoteItem) FilterValue() string {
 	return i.Name
 }
 
+// ---------------------------------
+//
 // for push selection option
+//
+// ---------------------------------
 type gitPushOptionDelegate struct{}
 type gitPushOptionItem struct {
 	Name     string
@@ -143,5 +211,25 @@ func (i gitPushOptionItem) FilterValue() string {
 	return i.Name
 }
 
+// ---------------------------------
+//
+// for new branch option selection option
+//
+// ---------------------------------
+type gitNewBranchTypeOptionDelegate struct{}
+type gitNewBranchTypeOptionItem struct {
+	Name          string
+	Info          string
+	newBranchType string
+}
+
+func (i gitNewBranchTypeOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// ---------------------------------
+//
 // tea msg
+//
+// ---------------------------------
 type GitUpdateMsg string
