@@ -100,6 +100,14 @@ var jA = LanguageMapping{
 		"[ctrl+enter] ブランチを追加",
 		"[esc] キャンセルして閉じる",
 	},
+	KeyBindingForChooseSwitchBranchTypePopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] ブランチ切り替えオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForSwitchBranchOutputPopUp: []string{
+		"[esc] 閉じる",
+	},
 	CommitPopUpMessageTitle:                      "* コミットメッセージ",
 	CommitPopUpMessageInputPlaceHolder:           "コミットメッセージを入力",
 	CommitPopUpDescriptionTitle:                  "説明",
@@ -126,4 +134,12 @@ var jA = LanguageMapping{
 	CreateNewBranchDescription:                   "新しいブランチを作成し、現在のブランチに留まります",
 	CreateNewBranchAndSwitchTitle:                "新しいブランチを作成して変更を移動",
 	CreateNewBranchAndSwitchDescription:          "新しいブランチを作成し、すべての変更を新しいブランチに移動します",
+	ChooseSwitchBranchTypeTitle:                  "どの方法で %s に切り替えますか？",
+	SwitchBranchTitle:                            "変更を持たずにブランチを切り替え",
+	SwitchBranchDescription:                      "すべての変更は一時保存（stash）され、新しいブランチに切り替わります. 切り替え先のブランチには変更は引き継がれません",
+	SwitchBranchWithChangesTitle:                 "変更を保持してブランチを切り替え",
+	SwitchBranchWithChangesDescription:           "すべての変更と修正は切り替え先のブランチに引き継がれます. * 競合が発生する可能性があります",
+	SwitchBranchSwitchingToPopUpTitle:            " %s に切り替え中",
+	SwitchBranchPopUpSwitchProcessing:            "切り替え中...",
+	SwitchBranchPopUpSwitchWithChangesProcessing: "変更を持ち越して切り替え中...",
 }

@@ -320,3 +320,61 @@ func initChooseNewBranchTypePopUpModel(m *GittiModel) {
 		NewBranchTypeOptionList: nBTOL,
 	}
 }
+
+// init the popup model for switching branch
+func initChooseSwitchBranchTypePopUpModel(m *GittiModel, branchName string) {
+	switchBranchTypeOption := []gitSwitchBranchTypeOptionItem{
+		{
+			Name:             i18n.LANGUAGEMAPPING.SwitchBranchTitle,
+			Info:             i18n.LANGUAGEMAPPING.SwitchBranchDescription,
+			switchBranchType: git.SWITCHBRANCH,
+		},
+		{
+			Name:             i18n.LANGUAGEMAPPING.SwitchBranchWithChangesTitle,
+			Info:             i18n.LANGUAGEMAPPING.SwitchBranchWithChangesDescription,
+			switchBranchType: git.SWITCHBRANCHWITHCHANGES,
+		},
+	}
+
+	items := make([]list.Item, 0, len(switchBranchTypeOption))
+	for _, switchBranchOption := range switchBranchTypeOption {
+		items = append(items, gitSwitchBranchTypeOptionItem(switchBranchOption))
+	}
+
+	width := (min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	sBTOL := list.New(items, gitSwitchBranchTypeOptionDelegate{}, width, constant.PopUpChooseSwitchBranchTypeHeight)
+	sBTOL.SetShowStatusBar(false)
+	sBTOL.SetFilteringEnabled(false)
+	sBTOL.SetShowHelp(false)
+	sBTOL.SetShowTitle(false)
+
+	m.PopUpModel = &ChooseSwitchBranchTypePopUpModel{
+		SwitchTypeOptionList: sBTOL,
+		BranchName:           branchName,
+	}
+}
+
+func initSwitchBranchOutputPopUpModel(m *GittiModel, branchName string, switchType string) {
+	// for git push output viewport,
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpSwitchBranchOutputViewPortHeight)
+	vp.SetWidth(min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &SwitchBranchOutputPopUpModel{
+		BranchName:                 branchName,
+		SwitchType:                 switchType,
+		SwitchBranchOutputViewport: vp,
+		Spinner:                    s,
+	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	m.PopUpModel = popUpModel
+}

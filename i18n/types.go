@@ -49,6 +49,8 @@ type LanguageMapping struct {
 	KeyBindingForChoosePushTypePopUp         []string
 	KeyBindingForChooseNewBranchTypePopUp    []string
 	KeyBindingForCreateNewBranchPopUp        []string
+	KeyBindingForChooseSwitchBranchTypePopUp []string
+	KeyBindingForSwitchBranchOutputPopUp     []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -85,4 +87,15 @@ type LanguageMapping struct {
 	CreateNewBranchDescription          string
 	CreateNewBranchAndSwitchTitle       string
 	CreateNewBranchAndSwitchDescription string
+	// switch branch
+	ChooseSwitchBranchTypeTitle string
+	// Switch Branch Option
+	SwitchBranchTitle                  string
+	SwitchBranchDescription            string
+	SwitchBranchWithChangesTitle       string
+	SwitchBranchWithChangesDescription string
+	// for switch branch output
+	SwitchBranchSwitchingToPopUpTitle            string
+	SwitchBranchPopUpSwitchProcessing            string
+	SwitchBranchPopUpSwitchWithChangesProcessing string
 }

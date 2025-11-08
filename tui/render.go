@@ -71,6 +71,16 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseNewBranchTypePopUp
 		case constant.CreateNewBranchPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateNewBranchPopUp
+		case constant.ChooseSwitchBranchTypePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseSwitchBranchTypePopUp
+		case constant.SwitchBranchOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseSwitchBranchTypePopUp
+			popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+			if ok {
+				if popUp.IsProcessing.Load() {
+					keys = []string{""} // nothing can be done during switching, only force quit gitti is possible
+				}
+			}
 		}
 	} else {
 		switch m.CurrentSelectedContainer {
@@ -231,6 +241,12 @@ func tuiWindowSizing(m *GittiModel) {
 			if exist {
 				width := (min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 				popUp.NewBranchTypeOptionList.SetWidth(width)
+			}
+		case constant.ChooseSwitchBranchTypePopUp:
+			popUp, exist := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
+			if exist {
+				width := (min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.SwitchTypeOptionList.SetWidth(width)
 			}
 		}
 	}

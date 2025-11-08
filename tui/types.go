@@ -140,6 +140,31 @@ type ChooseNewBranchTypeOptionPopUpModel struct {
 
 // ---------------------------------
 //
+// choose a switch type when switching branch
+//
+// ---------------------------------
+type ChooseSwitchBranchTypePopUpModel struct {
+	SwitchTypeOptionList list.Model
+	BranchName           string
+}
+
+// ---------------------------------
+//
+// # A pop up to show branch switch result
+//
+// ---------------------------------
+type SwitchBranchOutputPopUpModel struct {
+	BranchName                 string // the branch name of the branch it was switching to
+	SwitchType                 string
+	SwitchBranchOutputViewport viewport.Model // to log out the output from git operation
+	Spinner                    spinner.Model  // spinner for showing processing state
+	IsProcessing               atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                   atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess             atomic.Bool    // has the process sucessfuly executed
+}
+
+// ---------------------------------
+//
 // to record the current navigation index position
 //
 // ---------------------------------
@@ -224,6 +249,22 @@ type gitNewBranchTypeOptionItem struct {
 }
 
 func (i gitNewBranchTypeOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// ---------------------------------
+//
+// for new branch option selection option
+//
+// ---------------------------------
+type gitSwitchBranchTypeOptionDelegate struct{}
+type gitSwitchBranchTypeOptionItem struct {
+	Name             string
+	Info             string
+	switchBranchType string
+}
+
+func (i gitSwitchBranchTypeOptionItem) FilterValue() string {
 	return i.Name
 }
 

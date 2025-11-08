@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"gitti/api/git"
 	"gitti/i18n"
 	"gitti/tui/constant"
 )
@@ -229,4 +230,50 @@ func gitRemotePushCancelService(m *GittiModel) {
 		popUp.HasError.Store(false)
 		popUp.ProcessSuccess.Store(false)
 	}
+}
+
+// ------------------------------------
+//
+//	For Git Switching brnach ( only swithc or switch while bringing changes )
+//
+// ------------------------------------
+func gitSwitchBranchService(m *GittiModel, branchName string, switchType string) {
+	go func() {
+		popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+
+		if ok {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+		} else {
+			return
+		}
+
+		var gitOpsOutput []string
+		var success bool
+		switch switchType {
+		case git.SWITCHBRANCH:
+			gitOpsOutput, success = m.GitState.GitBranch.GitSwitchBranch(branchName)
+		case git.SWITCHBRANCHWITHCHANGES:
+			gitOpsOutput, success = m.GitState.GitBranch.GitSwitchBranchWithChanges(branchName)
+		}
+
+		updateSwitchBranchOutputViewPort(m, gitOpsOutput)
+
+		if success {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(true)
+
+			time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpModel = nil
+			m.PopUpType = constant.NoPopUp
+			popUp.IsProcessing.Store(false)
+		} else {
+			popUp.HasError.Store(true)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(false)
+		}
+	}()
 }

@@ -281,8 +281,21 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "enter":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedContainer == constant.ModifiedFilesComponent && len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
-				m.CurrentSelectedContainer = constant.FileDiffComponent
+			switch m.CurrentSelectedContainer {
+			case constant.ModifiedFilesComponent:
+				if len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
+					m.CurrentSelectedContainer = constant.FileDiffComponent
+				}
+			case constant.LocalBranchComponent:
+				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(gitBranchItem)
+				// only proceed if the local branch selected is not current checkedout branch
+				// we can't switch from current checkout branch to current checkout branch, do we
+				if !currentSelectedLocalBranch.IsCheckedOut {
+					m.PopUpType = constant.ChooseSwitchBranchTypePopUp
+					m.IsTyping.Store(false)
+					m.ShowPopUp.Store(true)
+					initChooseSwitchBranchTypePopUpModel(m, currentSelectedLocalBranch.BranchName)
+				}
 			}
 		} else {
 			switch m.PopUpType {
@@ -313,6 +326,21 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
 					initCreateNewBranchPopUpModel(m, selectedOption.(gitNewBranchTypeOptionItem).newBranchType)
 				}
+			case constant.ChooseSwitchBranchTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
+				if ok {
+					m.PopUpType = constant.SwitchBranchOutputPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					selectedOption := popUp.SwitchTypeOptionList.SelectedItem().(gitSwitchBranchTypeOptionItem)
+					branchName := popUp.BranchName
+					initSwitchBranchOutputPopUpModel(m, branchName, selectedOption.switchBranchType)
+					popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+					if ok {
+						popUp.IsProcessing.Store(true) // set it directly first
+						gitSwitchBranchService(m, branchName, selectedOption.switchBranchType)
+					}
+				}
 			}
 		}
 		return m, nil
@@ -329,6 +357,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.IsTyping.Store(false)
 				m.PopUpModel = nil
 			case constant.ChooseNewBranchTypePopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+			case constant.ChooseSwitchBranchTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpModel = nil
@@ -401,6 +433,13 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
 					return m, cmd
 				}
+			case constant.ChooseSwitchBranchTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
+				if ok {
+					popUp.SwitchTypeOptionList, cmd = popUp.SwitchTypeOptionList.Update(msg)
+					return m, cmd
+				}
+
 			}
 		}
 		return m, nil
@@ -445,6 +484,12 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
 				if ok {
 					popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
+					return m, cmd
+				}
+			case constant.ChooseSwitchBranchTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
+				if ok {
+					popUp.SwitchTypeOptionList, cmd = popUp.SwitchTypeOptionList.Update(msg)
 					return m, cmd
 				}
 			}

@@ -100,6 +100,14 @@ var zH_HANS = LanguageMapping{
 		"[ctrl+enter] 添加分支",
 		"[esc] 取消并关闭",
 	},
+	KeyBindingForChooseSwitchBranchTypePopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择切换分支选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForSwitchBranchOutputPopUp: []string{
+		"[esc] 关闭",
+	},
 	CommitPopUpMessageTitle:                      "* 提交信息",
 	CommitPopUpMessageInputPlaceHolder:           "输入提交信息",
 	CommitPopUpDescriptionTitle:                  "描述",
@@ -126,4 +134,12 @@ var zH_HANS = LanguageMapping{
 	CreateNewBranchDescription:                   "创建新分支并停留在当前分支",
 	CreateNewBranchAndSwitchTitle:                "创建新分支并移动更改",
 	CreateNewBranchAndSwitchDescription:          "创建新分支并将所有更改移动到新分支",
+	ChooseSwitchBranchTypeTitle:                  "您希望如何切换到 %s？",
+	SwitchBranchTitle:                            "切换分支（不带修改）",
+	SwitchBranchDescription:                      "所有更改将被暂存（stash）.切换到新分支后不会带入原分支的更改",
+	SwitchBranchWithChangesTitle:                 "切换分支（带修改）",
+	SwitchBranchWithChangesDescription:           "所有更改和修改将带入切换后的分支. * 可能会出现冲突",
+	SwitchBranchSwitchingToPopUpTitle:            "正在切换到 %s",
+	SwitchBranchPopUpSwitchProcessing:            "正在切换...",
+	SwitchBranchPopUpSwitchWithChangesProcessing: "正在切换并带入更改...",
 }

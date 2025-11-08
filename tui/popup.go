@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"gitti/api"
+	"gitti/api/git"
 	"gitti/i18n"
 	"gitti/tui/constant"
 	"gitti/tui/style"
@@ -35,7 +36,10 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderChooseNewBranchTypePopUp(m)
 	case constant.CreateNewBranchPopUp:
 		popUp = renderCreateNewBranchPopUp(m)
-
+	case constant.ChooseSwitchBranchTypePopUp:
+		popUp = renderChooseSwitchBranchTypePopUp(m)
+	case constant.SwitchBranchOutputPopUp:
+		popUp = renderSwitchBranchOutputPopUp(m)
 	}
 	return popUp
 }
@@ -381,4 +385,88 @@ func renderCreateNewBranchPopUp(m *GittiModel) string {
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
+}
+
+// ------------------------------------
+//
+//	For Switching Git branch
+//
+// ------------------------------------
+// pop up that confirm the option for switching a branch, just switch or switch to the branch while bringing all the changes
+func renderChooseSwitchBranchTypePopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.ChooseSwitchBranchTypeTitle, popUp.BranchName))
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			popUp.SwitchTypeOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// pop up to redner the output of the switch branch operation
+// because we allow switching with bring changes over, there is conflict possiblities there fore we need to show the output
+// so that the user is aware of it
+func renderSwitchBranchOutputPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.SwitchBranchSwitchingToPopUpTitle, popUp.BranchName))
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpSwitchBranchOutputViewPortHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorAccent)
+		}
+
+		logViewPort := logViewPortStyle.Render(popUp.SwitchBranchOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.SwitchBranchPopUpSwitchProcessing)
+			if popUp.SwitchType == git.SWITCHBRANCHWITHCHANGES {
+				processingText = style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.SwitchBranchPopUpSwitchWithChangesProcessing)
+			}
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+func updateSwitchBranchOutputViewPort(m *GittiModel, gitOpsOutput []string) {
+	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+	if ok {
+		popUp.SwitchBranchOutputViewport.SetWidth(min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		var gitOpsOutputLogs string
+		for _, line := range gitOpsOutput {
+			logLine := style.NewStyle.Render(line)
+			gitOpsOutputLogs += logLine + "\n"
+			popUp.SwitchBranchOutputViewport.SetContent(gitOpsOutputLogs)
+			popUp.SwitchBranchOutputViewport.ViewDown()
+		}
+	}
 }

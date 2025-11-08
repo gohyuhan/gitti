@@ -100,6 +100,14 @@ var eN = LanguageMapping{
 		"[ctrl+enter] add branch",
 		"[esc] cancel and close",
 	},
+	KeyBindingForChooseSwitchBranchTypePopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select switch branch option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForSwitchBranchOutputPopUp: []string{
+		"[esc] close",
+	},
 	CommitPopUpMessageTitle:                      "* Commit Message",
 	CommitPopUpMessageInputPlaceHolder:           "Enter commit message",
 	CommitPopUpDescriptionTitle:                  "Description",
@@ -126,4 +134,12 @@ var eN = LanguageMapping{
 	CreateNewBranchDescription:                   "Create new branch and stay at current branch",
 	CreateNewBranchAndSwitchTitle:                "Create new branch and move changes",
 	CreateNewBranchAndSwitchDescription:          "Create new branch and move all the changes to the newly created branch",
+	ChooseSwitchBranchTypeTitle:                  "How would you like to proceed to switch to %s",
+	SwitchBranchTitle:                            "Switch branch without changes",
+	SwitchBranchDescription:                      "All changes will be stash and changes to the new branch. No changes will be brought over to the switched branch",
+	SwitchBranchWithChangesTitle:                 "Switch branch with changes",
+	SwitchBranchWithChangesDescription:           "All changes and modification will be brought over to the switched branch. * There will be possibilities of conflict.",
+	SwitchBranchSwitchingToPopUpTitle:            "Switching to %s",
+	SwitchBranchPopUpSwitchProcessing:            "Switching...",
+	SwitchBranchPopUpSwitchWithChangesProcessing: "Switching And Bringing Changes over...",
 }

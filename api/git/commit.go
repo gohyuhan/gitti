@@ -365,7 +365,7 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 	gitOutput, err := cmd.CombinedOutput()
 	gc.gitAddRemoteProcessMutex.Unlock()
 
-	gitAddRemoteOutput := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
+	gitAddRemoteOutput := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
