@@ -39,6 +39,16 @@ type GittiModel struct {
 	PopUpModel                       interface{}
 	IsTyping                         atomic.Bool
 	GitState                         *api.GitState
+	GlobalKeyBindingKeyMapLargestLen int // this was use for global key binding pop up styling, we save it once so we don't have to recompute
+}
+
+// ---------------------------------
+//
+// # A pop up helper for global keybinding
+//
+// ---------------------------------
+type GlobalKeyBindingPopUpModel struct {
+	GlobalKeyBindingViewport viewport.Model
 }
 
 // ---------------------------------

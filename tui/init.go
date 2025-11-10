@@ -92,6 +92,20 @@ func reinitAndRenderModifiedFileDiffViewPort(m *GittiModel) {
 	renderDetailPanelViewPort(m)
 }
 
+// init the viewport pop up for showing info of global key binding
+func initGlobalKeyBindingPopUpModel(m *GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(min(constant.PopUpGlobalKeyBindingViewPortHeight, int(float64(m.Height)*0.8)))
+	vp.SetWidth(min(constant.MaxGlobalKeyBindingPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	m.PopUpModel = &GlobalKeyBindingPopUpModel{
+		GlobalKeyBindingViewport: vp,
+	}
+}
+
 // init the popup model for git commit
 func initGitCommitPopUpModel(m *GittiModel) {
 	CommitMessageTextInput := textinput.New()
@@ -429,7 +443,7 @@ func initGitPullOutputPopUpModel(m *GittiModel) {
 
 	popUpModel := &GitPullOutputPopUpModel{
 		GitPullOutputViewport: vp,
-		Spinner:                    s,
+		Spinner:               s,
 	}
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)

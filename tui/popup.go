@@ -22,6 +22,8 @@ func renderPopUpComponent(m *GittiModel) string {
 	var popUp string
 
 	switch m.PopUpType {
+	case constant.GlobalKeyBindingPopUp:
+		popUp = renderGlobalKeyBindingPopUp(m)
 	case constant.CommitPopUp:
 		popUp = renderGitCommitPopUp(m)
 	case constant.AddRemotePromptPopUp:
@@ -46,6 +48,46 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderGitPullOutputPopUp(m)
 	}
 	return popUp
+}
+
+// ------------------------------------
+//
+//	For Global Key binding pop up
+//
+// ------------------------------------
+func renderGlobalKeyBindingPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
+	if ok {
+		keyBindingLine := "\n"
+
+		// this will usually only be run once for the entire gitti session
+		if m.GlobalKeyBindingKeyMapLargestLen < 1 {
+			maxLen := 0
+			for _, line := range i18n.LANGUAGEMAPPING.GlobalKeyBinding {
+				if l := len(line.KeyBindingLine); l > maxLen {
+					maxLen = l
+				}
+			}
+			m.GlobalKeyBindingKeyMapLargestLen = maxLen
+		}
+		for _, line := range i18n.LANGUAGEMAPPING.GlobalKeyBinding {
+			switch line.LineType {
+			case i18n.TITLE:
+				keyBindingLine += " " + fmt.Sprintf("%*s", m.GlobalKeyBindingKeyMapLargestLen, line.KeyBindingLine) +
+					"  " +
+					style.GlobalKeyBindingTitleLineStyle.Render(line.TitleOrInfoLine) +
+					"\n"
+			case i18n.INFO:
+				keyBindingLine += " " + style.GlobalKeyBindingKeyMappingLineStyle.Render(fmt.Sprintf("%*s", m.GlobalKeyBindingKeyMapLargestLen, line.KeyBindingLine)) +
+					"  " +
+					line.TitleOrInfoLine +
+					"\n"
+			}
+		}
+		popUp.GlobalKeyBindingViewport.SetContent(keyBindingLine)
+		return style.GlobalKeyBindingPopUpStyle.Render(popUp.GlobalKeyBindingViewport.View())
+	}
+	return ""
 }
 
 // ------------------------------------

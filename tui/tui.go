@@ -29,6 +29,7 @@ func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
 		PopUpType:                        constant.NoPopUp,
 		PopUpModel:                       struct{}{},
 		GitState:                         gitState,
+		GlobalKeyBindingKeyMapLargestLen: 0,
 	}
 	gitti.ShowPopUp.Store(false)
 	gitti.IsTyping.Store(false)

@@ -310,7 +310,7 @@ func gitPullService(m *GittiModel, pullType string) {
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitPullOutputPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
-					m.ShowPopUp.Store(false)                        // close the pop up
+					m.ShowPopUp.Store(false) // close the pop up
 					m.IsTyping.Store(false)
 					popUp.GitPullOutputViewport.SetContent("") // set the git commit output viewport to nothing
 					popUp.IsProcessing.Store(false)

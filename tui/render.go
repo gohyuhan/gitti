@@ -53,7 +53,7 @@ func renderFileDiffPanel(width int, height int, m *GittiModel) string {
 }
 
 func renderKeyBindingPanel(width int, m *GittiModel) string {
-	keys:=[]string{""} // to prevent a misconfiguration on key binding will not crash the program
+	keys := []string{""} // to prevent a misconfiguration on key binding will not crash the program
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.CommitPopUp:
@@ -84,6 +84,8 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseGitPullTypePopUp
 		case constant.GitPullOutputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitPullOutputPopUp
+		case constant.GlobalKeyBindingPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGlobalKeyBindingPopUp
 		}
 	} else {
 		switch m.CurrentSelectedContainer {
@@ -116,10 +118,9 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 		}
 	}
 
-
 	var keyBindingLine string
-	keyBindingLine = "  "+strings.Join(keys, "  |  ")
-	keyBindingLine =  utils.TruncateString(keyBindingLine, width) 
+	keyBindingLine = "  " + strings.Join(keys, "  |  ")
+	keyBindingLine = utils.TruncateString(keyBindingLine, width)
 
 	return style.BottomKeyBindingStyle.
 		Width(width).
@@ -205,6 +206,14 @@ func tuiWindowSizing(m *GittiModel) {
 	// update list of viewport component width within pop up
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
+		case constant.GlobalKeyBindingPopUp:
+			popUp, exist := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
+			if exist {
+				height := min(constant.PopUpGlobalKeyBindingViewPortHeight, int(float64(m.Height)*0.8))
+				width := min(constant.MaxGlobalKeyBindingPopUpWidth, int(float64(m.Width)*0.8)-4)
+				popUp.GlobalKeyBindingViewport.SetWidth(width)
+				popUp.GlobalKeyBindingViewport.SetHeight(height)
+			}
 		case constant.CommitPopUp:
 			popUp, exist := m.PopUpModel.(*GitCommitPopUpModel)
 			if exist {

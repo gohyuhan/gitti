@@ -208,17 +208,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			return m, tea.Quit
 		}
 
-	case "n":
-		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedContainer == constant.LocalBranchComponent {
-				m.PopUpType = constant.ChooseNewBranchTypePopUp
-				m.IsTyping.Store(false)
-				m.ShowPopUp.Store(true)
-				if _, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel); !ok {
-					initChooseNewBranchTypePopUpModel(m)
-				}
-			}
-		}
+	case "?":
+		m.ShowPopUp.Store(true)
+		m.IsTyping.Store(false)
+		m.PopUpType = constant.GlobalKeyBindingPopUp
+		initGlobalKeyBindingPopUpModel(m)
 		return m, nil
 
 	case "0":
@@ -233,6 +227,19 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedContainer != constant.ModifiedFilesComponent {
 				m.CurrentSelectedContainer = constant.ModifiedFilesComponent
+			}
+		}
+		return m, nil
+
+	case "n":
+		if !m.ShowPopUp.Load() {
+			if m.CurrentSelectedContainer == constant.LocalBranchComponent {
+				m.PopUpType = constant.ChooseNewBranchTypePopUp
+				m.IsTyping.Store(false)
+				m.ShowPopUp.Store(true)
+				if _, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel); !ok {
+					initChooseNewBranchTypePopUpModel(m)
+				}
 			}
 		}
 		return m, nil
@@ -392,7 +399,6 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 						return m, popUp.Spinner.Tick
 					}
 				}
-
 			}
 		}
 		return m, nil
@@ -400,6 +406,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	case "esc":
 		if m.ShowPopUp.Load() {
 			switch m.PopUpType {
+			case constant.GlobalKeyBindingPopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
 			case constant.GitRemotePushPopUp:
 				gitRemotePushCancelService(m)
 			case constant.GitPullOutputPopUp:
@@ -407,21 +418,27 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case constant.ChooseRemotePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
 			case constant.ChoosePushTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			case constant.ChooseNewBranchTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			case constant.ChooseSwitchBranchTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			case constant.ChooseGitPullTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
 			return m, nil
@@ -547,33 +564,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 			return m, cmd
 		} else {
-			// for pop up that have viewport
-			switch m.PopUpType {
-			case constant.CommitPopUp:
-				popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
-				if ok {
-					popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
-					return m, cmd
-				}
-			case constant.GitRemotePushPopUp:
-				popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
-				if ok {
-					popUp.GitRemotePushOutputViewport, cmd = popUp.GitRemotePushOutputViewport.Update(msg)
-					return m, cmd
-				}
-			case constant.GitPullOutputPopUp:
-				popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
-				if ok {
-					popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
-					return m, cmd
-				}
-			case constant.AddRemotePromptPopUp:
-				popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
-				if ok {
-					popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
-					return m, cmd
-				}
-			}
+			return upDownMouseMsgUpdateForPopUp(msg, m)
 		}
 
 	case "wheeldown":
@@ -581,7 +572,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 			return m, cmd
 		} else {
-			upDownMouseMsgUpdateForPopUp(msg, m)
+			return upDownMouseMsgUpdateForPopUp(msg, m)
 		}
 	}
 	return m, nil
@@ -592,6 +583,12 @@ func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea
 	// for within pop up component
 	switch m.PopUpType {
 	// following is for list component
+	case constant.GlobalKeyBindingPopUp:
+		popUp, ok := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
+		if ok {
+			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
+			return m, cmd
+		}
 	case constant.ChooseRemotePopUp:
 		popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
 		if ok {
@@ -655,6 +652,12 @@ func upDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *GittiModel) (*GittiModel,
 	var cmd tea.Cmd
 	// for pop up that have viewport
 	switch m.PopUpType {
+	case constant.GlobalKeyBindingPopUp:
+		popUp, ok := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
+		if ok {
+			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
+			return m, cmd
+		}
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 		if ok {

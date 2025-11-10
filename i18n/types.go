@@ -1,10 +1,23 @@
 package i18n
 
-// -------------------------------------------------------
-//     Language Data Structure
-//     * the sequence and structure will follow EN's
-// -------------------------------------------------------
+// this was use to structure for the global keybinding
+const (
+	TITLE = "TITLE"
+	INFO  = "INFO"
+)
 
+type GlobalKeyBindingMappingFormat struct {
+	KeyBindingLine  string
+	TitleOrInfoLine string
+	LineType        string
+}
+
+// -------------------------------------------------------
+//
+//	Language Data Structure
+//	* the sequence and structure will follow EN's
+//
+// -------------------------------------------------------
 type LanguageMapping struct {
 	// flag expalnation
 	FlagLangCode          string
@@ -57,7 +70,7 @@ type LanguageMapping struct {
 	//  For Pop Up
 	// -----------------
 	// Global Key KeyBinding
-	GlobalKeyBinding []string
+	GlobalKeyBinding []GlobalKeyBindingMappingFormat
 	// commit
 	CommitPopUpMessageTitle                      string
 	CommitPopUpMessageInputPlaceHolder           string

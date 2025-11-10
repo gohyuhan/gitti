@@ -106,16 +106,7 @@ var eN = LanguageMapping{
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
-	GlobalKeyBinding: []string{
-		" -- Global Key Binding --",
-		" * global key binding doesn't not apply when there is a pop up ",
-		"",
-		" [q/Q] quit",
-		" [ctrl +c] force quit (this work even if there is a pop up)",
-		" [c] commit changes",
-		" [p] push changes",
-		" [P] pull from remote",
-	},
+	GlobalKeyBinding:                             enGlobalKeyBinding,
 	CommitPopUpMessageTitle:                      "* Commit Message",
 	CommitPopUpMessageInputPlaceHolder:           "Enter commit message",
 	CommitPopUpDescriptionTitle:                  "Description",
@@ -156,4 +147,48 @@ var eN = LanguageMapping{
 	GitPullMergeOption:                           "Merge",
 	GitPullTitle:                                 "Git Pull",
 	GitPullProcessing:                            "Pulling...",
+}
+
+// the global key binding for en
+var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Global Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: " * global key binding doesn't not apply when there is a pop up ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[Q/q]",
+		TitleOrInfoLine: "quit",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+c]",
+		TitleOrInfoLine: "force quit (this works even if there is a pop up)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[c]",
+		TitleOrInfoLine: "commit changes",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[p]",
+		TitleOrInfoLine: "push changes",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[P]",
+		TitleOrInfoLine: "pull from remote",
+		LineType:        INFO,
+	},
 }

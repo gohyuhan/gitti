@@ -106,16 +106,7 @@ var jA = LanguageMapping{
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
-	GlobalKeyBinding: []string{
-		" -- グローバルキー操作 --",
-		" * ポップアップが表示されている場合は適用されません",
-		"",
-		" [q/Q] 終了",
-		" [ctrl + c] 強制終了（ポップアップが表示されていても有効）",
-		" [c] 変更をコミット",
-		" [p] 変更をプッシュ",
-		" [P] リモートリポジトリからプル (Git Pull)",
-	},
+	GlobalKeyBinding:                             jaGlobalKeyBinding,
 	CommitPopUpMessageTitle:                      "* コミットメッセージ",
 	CommitPopUpMessageInputPlaceHolder:           "コミットメッセージを入力",
 	CommitPopUpDescriptionTitle:                  "説明",
@@ -156,4 +147,48 @@ var jA = LanguageMapping{
 	GitPullMergeOption:                           "マージ",
 	GitPullTitle:                                 "Git プル",
 	GitPullProcessing:                            "プル中...",
+}
+
+// the global key binding for ja
+var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- グローバルキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: " * ポップアップが表示されている場合は適用されません",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[Q/q]",
+		TitleOrInfoLine: "終了",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+c]",
+		TitleOrInfoLine: "強制終了（ポップアップが表示されていても有効）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[c]",
+		TitleOrInfoLine: "変更をコミット",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[p]",
+		TitleOrInfoLine: "変更をプッシュ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[P]",
+		TitleOrInfoLine: "リモートリポジトリからプル (Git Pull)",
+		LineType:        INFO,
+	},
 }

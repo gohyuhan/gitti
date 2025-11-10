@@ -56,4 +56,13 @@ var (
 	BranchInvalidWarningStyle = NewStyle.
 					Foreground(ColorSecondary).
 					Faint(true)
+	GlobalKeyBindingPopUpStyle = NewStyle.
+					Border(lipgloss.ThickBorder()).
+					Padding(0).
+					Margin(0).
+					BorderForeground(ColorPrompt)
+	GlobalKeyBindingTitleLineStyle = NewStyle.
+					Foreground(ColorPrompt)
+	GlobalKeyBindingKeyMappingLineStyle = NewStyle.
+						Foreground(ColorKeyBinding)
 )

@@ -106,16 +106,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 關閉",
 	},
-	GlobalKeyBinding: []string{
-		" -- 全域快捷鍵 --",
-		" * 當彈出視窗存在時不適用",
-		"",
-		" [q/Q] 離開",
-		" [ctrl + c] 強制離開（即使有彈出視窗也可使用）",
-		" [c] 提交更改",
-		" [p] 推送更改",
-		" [P] 從遠端倉庫拉取 (Git Pull)",
-	},
+	GlobalKeyBinding:                             zhHantGlobalKeyBinding,
 	CommitPopUpMessageTitle:                      "* 提交訊息",
 	CommitPopUpMessageInputPlaceHolder:           "輸入提交訊息",
 	CommitPopUpDescriptionTitle:                  "描述",
@@ -156,4 +147,48 @@ var zH_HANT = LanguageMapping{
 	GitPullMergeOption:                           "合併",
 	GitPullTitle:                                 "Git Pull",
 	GitPullProcessing:                            "正在拉取...",
+}
+
+// the global key binding for zh-hant
+var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 全域快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: " * 當彈出視窗存在時不適用",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[Q/q]",
+		TitleOrInfoLine: "離開",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+c]",
+		TitleOrInfoLine: "強制離開（即使有彈出視窗也可使用）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[c]",
+		TitleOrInfoLine: "提交更改",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[p]",
+		TitleOrInfoLine: "推送更改",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[P]",
+		TitleOrInfoLine: "從遠端倉庫拉取 (Git Pull)",
+		LineType:        INFO,
+	},
 }

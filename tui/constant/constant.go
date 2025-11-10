@@ -7,6 +7,7 @@ package constant
 // -----------------------------------------------------------------------------
 const (
 	NoPopUp                     = "NoPopUp"
+	GlobalKeyBindingPopUp       = "GlobalKeyBindingPopUp"
 	CommitPopUp                 = "CommitPopUp"                 // IsTyping will be true
 	AddRemotePromptPopUp        = "AddRemotePromptPopUp"        // IsTyping will be true
 	ChoosePushTypePopUp         = "ChoosePushTypePopUp"         // IsTyping will be false
@@ -32,6 +33,7 @@ const (
 	ListItemOrTitleWidthPad = 5
 
 	MaxLeftPanelWidth                   = 80
+	MaxGlobalKeyBindingPopUpWidth       = 150
 	MaxCommitPopUpWidth                 = 150
 	MaxAddRemotePromptPopUpWidth        = 150
 	MaxGitRemotePushPopUpWidth          = 150
@@ -44,6 +46,7 @@ const (
 	MaxChooseGitPullTypePopUpWidth      = 150
 	MaxGitPullOutputPopUpWidth          = 150
 
+	PopUpGlobalKeyBindingViewPortHeight    = 30
 	PopUpGitCommitOutputViewPortHeight     = 10
 	PopUpAddRemoteOutputViewPortHeight     = 2
 	PopUpGitRemotePushOutputViewportHeight = 10
