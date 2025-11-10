@@ -234,7 +234,7 @@ func gitRemotePushCancelService(m *GittiModel) {
 
 // ------------------------------------
 //
-//	For Git Switching brnach ( only swithc or switch while bringing changes )
+//	For Git Switching brnach ( only switch or switch while bringing changes )
 //
 // ------------------------------------
 func gitSwitchBranchService(m *GittiModel, branchName string, switchType string) {
@@ -276,4 +276,66 @@ func gitSwitchBranchService(m *GittiModel, branchName string, switchType string)
 			popUp.IsProcessing.Store(false)
 		}
 	}()
+}
+
+// ------------------------------------
+//
+//	For Git Pull
+//
+// ------------------------------------
+func gitPullService(m *GittiModel, pullType string) {
+	go func() {
+		// git push
+		popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+		var sessionID uuid.UUID
+
+		if ok {
+			sessionID = popUp.SessionID // Capture the session ID at start
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+			popUp.IsCancelled.Store(false)
+		} else {
+			return
+		}
+
+		exitStatusCode := m.GitState.GitPull.GitPull(pullType)
+		popUp, ok = m.PopUpModel.(*GitPullOutputPopUpModel)
+		if ok && !popUp.IsCancelled.Load() {
+			popUp.IsProcessing.Store(false) // update the processing status
+			// if sucessful exitcode will be 0
+			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(true)
+				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
+				// Check if user cancelled during sleep and verify this is still the same popup session
+				popUp, ok = m.PopUpModel.(*GitPullOutputPopUpModel)
+				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
+					m.ShowPopUp.Store(false)                        // close the pop up
+					m.IsTyping.Store(false)
+					popUp.GitPullOutputViewport.SetContent("") // set the git commit output viewport to nothing
+					popUp.IsProcessing.Store(false)
+					popUp.HasError.Store(false)
+					popUp.ProcessSuccess.Store(false)
+				}
+			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
+				popUp.HasError.Store(true)
+			}
+		}
+	}()
+}
+
+func gitPullCancelService(m *GittiModel) {
+	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+	if ok {
+		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
+	}
+	m.GitState.GitPull.KillGitPullCmd() // kill the cmd process if exist
+	m.ShowPopUp.Store(false)            // close the pop up
+	m.IsTyping.Store(false)             // and reset typing mode
+	if ok {
+		popUp.GitPullOutputViewport.SetContent("") // set the git commit output viewport to nothing
+		popUp.IsProcessing.Store(false)
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+	}
 }

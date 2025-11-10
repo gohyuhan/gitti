@@ -17,18 +17,18 @@ func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
 	vp.SetHorizontalStep(1)
 	vp.MouseWheelDelta = 1
 	gitti := &GittiModel{
-		CurrentSelectedContainer:              constant.ModifiedFilesComponent,
-		RepoPath:                              repoPath,
-		Width:                                 0,
-		Height:                                0,
-		CurrentRepoBranchesInfoList:           list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfoList:      list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
-		CurrentSelectedFileDiffViewport:       vp,
-		CurrentSelectedFileDiffViewportOffset: 0,
-		NavigationIndexPosition:               GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
-		PopUpType:                             constant.NoPopUp,
-		PopUpModel:                            struct{}{},
-		GitState:                              gitState,
+		CurrentSelectedContainer:         constant.ModifiedFilesComponent,
+		RepoPath:                         repoPath,
+		Width:                            0,
+		Height:                           0,
+		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
+		DetailPanelViewport:              vp,
+		DetailPanelViewportOffset:        0,
+		NavigationIndexPosition:          GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
+		PopUpType:                        constant.NoPopUp,
+		PopUpModel:                       struct{}{},
+		GitState:                         gitState,
 	}
 	gitti.ShowPopUp.Store(false)
 	gitti.IsTyping.Store(false)
@@ -62,11 +62,13 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			initBranchList(m)
 		case git.GIT_FILES_STATUS_UPDATE:
 			initModifiedFilesList(m)
-			renderModifiedFilesDiffViewPort(m)
+			renderDetailPanelViewPort(m)
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
 			updatePopUpCommitOutputViewPort(m)
 		case git.GIT_REMOTE_PUSH_OUTPUT_UPDATE:
 			updateGitRemotePushOutputViewport(m)
+		case git.GIT_PULL_OUTPUT_UPDATE:
+			updateGitPullOutputViewport(m)
 		}
 		return m, nil
 	case tea.MouseMsg:
@@ -75,15 +77,25 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	// Update spinners in popups when they are processing
 	if m.ShowPopUp.Load() {
-		if commitPopup, ok := m.PopUpModel.(*GitCommitPopUpModel); ok && commitPopup.IsProcessing.Load() {
-			var cmd tea.Cmd
-			commitPopup.Spinner, cmd = commitPopup.Spinner.Update(msg)
-			cmds = append(cmds, cmd)
-		}
-		if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok && pushPopup.IsProcessing.Load() {
-			var cmd tea.Cmd
-			pushPopup.Spinner, cmd = pushPopup.Spinner.Update(msg)
-			cmds = append(cmds, cmd)
+		switch m.PopUpType {
+		case constant.CommitPopUp:
+			if commitPopup, ok := m.PopUpModel.(*GitCommitPopUpModel); ok && commitPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				commitPopup.Spinner, cmd = commitPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.GitRemotePushPopUp:
+			if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok && pushPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				pushPopup.Spinner, cmd = pushPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.GitPullOutputPopUp:
+			if pullPopup, ok := m.PopUpModel.(*GitPullOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
 		}
 	}
 

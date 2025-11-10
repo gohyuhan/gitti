@@ -63,13 +63,13 @@ func gittiMainPageView(m *GittiModel) string {
 	gittiVersionPanel := style.PanelBorderStyle.Width(m.HomeTabLeftPanelWidth).Height(1).Render(fmt.Sprintf("%s %s", settings.AppName, settings.AppVersion))
 	localBranchesPanel := renderLocalBranchesPanel(m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight, m)
 	changedFilesPanel := renderChangedFilesPanel(m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight, m)
-	fileDiffPanel := renderFileDiffPanel(m.HomeTabFileDiffPanelWidth, m.HomeTabFileDiffPanelHeight, m)
+	detailPanel := renderFileDiffPanel(m.HomeTabFileDiffPanelWidth, m.HomeTabFileDiffPanelHeight, m)
 	bottomBar := renderKeyBindingPanel(m.Width, m)
 
 	leftPanel := lipgloss.JoinVertical(lipgloss.Left, gittiVersionPanel, localBranchesPanel, changedFilesPanel)
 
 	// Combine panels horizontally with explicit top alignment
-	content := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, fileDiffPanel)
+	content := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, detailPanel)
 
 	// Stack vertically with explicit left alignment
 	mainView := lipgloss.JoinVertical(lipgloss.Left, content, bottomBar)

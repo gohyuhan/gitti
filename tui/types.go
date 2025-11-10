@@ -19,26 +19,26 @@ import (
 //
 // ---------------------------------
 type GittiModel struct {
-	CurrentSelectedContainer              string
-	RepoPath                              string
-	Width                                 int
-	Height                                int
-	HomeTabLeftPanelWidth                 int
-	HomeTabFileDiffPanelWidth             int
-	HomeTabCoreContentHeight              int
-	HomeTabFileDiffPanelHeight            int
-	HomeTabLocalBranchesPanelHeight       int
-	HomeTabChangedFilesPanelHeight        int
-	CurrentRepoBranchesInfoList           list.Model
-	CurrentRepoModifiedFilesInfoList      list.Model
-	CurrentSelectedFileDiffViewport       viewport.Model
-	CurrentSelectedFileDiffViewportOffset int
-	NavigationIndexPosition               GittiComponentsCurrentNavigationIndexPosition
-	ShowPopUp                             atomic.Bool
-	PopUpType                             string
-	PopUpModel                            interface{}
-	IsTyping                              atomic.Bool
-	GitState                              *api.GitState
+	CurrentSelectedContainer         string
+	RepoPath                         string
+	Width                            int
+	Height                           int
+	HomeTabLeftPanelWidth            int
+	HomeTabFileDiffPanelWidth        int
+	HomeTabCoreContentHeight         int
+	HomeTabFileDiffPanelHeight       int
+	HomeTabLocalBranchesPanelHeight  int
+	HomeTabChangedFilesPanelHeight   int
+	CurrentRepoBranchesInfoList      list.Model
+	CurrentRepoModifiedFilesInfoList list.Model
+	DetailPanelViewport              viewport.Model
+	DetailPanelViewportOffset        int
+	NavigationIndexPosition          GittiComponentsCurrentNavigationIndexPosition
+	ShowPopUp                        atomic.Bool
+	PopUpType                        string
+	PopUpModel                       interface{}
+	IsTyping                         atomic.Bool
+	GitState                         *api.GitState
 }
 
 // ---------------------------------
@@ -165,6 +165,33 @@ type SwitchBranchOutputPopUpModel struct {
 
 // ---------------------------------
 //
+// choose a pull type, git pull, git pull rebase or git pull merge
+//
+// ---------------------------------
+type ChooseGitPullTypePopUpModel struct {
+	PullTypeOptionList list.Model
+}
+
+// ---------------------------------
+//
+// # A pop up to show git pull result
+//
+// ---------------------------------
+type GitPullOutputPopUpModel struct {
+	PullType              string
+	GitPullOutputViewport viewport.Model // to log out the output from git operation
+	Spinner               spinner.Model  // spinner for showing processing state
+	IsProcessing          atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError              atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess        atomic.Bool    // has the process sucessfuly executed
+	IsCancelled           atomic.Bool    // flag to indicate if the operation was cancelled by user
+	// SessionID is a unique UUID for each popup instance to prevent
+	// stale goroutines from affecting new popups
+	SessionID uuid.UUID
+}
+
+// ---------------------------------
+//
 // to record the current navigation index position
 //
 // ---------------------------------
@@ -254,7 +281,7 @@ func (i gitNewBranchTypeOptionItem) FilterValue() string {
 
 // ---------------------------------
 //
-// for new branch option selection option
+// for switch branch option selection option
 //
 // ---------------------------------
 type gitSwitchBranchTypeOptionDelegate struct{}
@@ -265,6 +292,22 @@ type gitSwitchBranchTypeOptionItem struct {
 }
 
 func (i gitSwitchBranchTypeOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// ---------------------------------
+//
+// for pull option selection option
+//
+// ---------------------------------
+type gitPullTypeOptionDelegate struct{}
+type gitPullTypeOptionItem struct {
+	Name     string
+	Info     string
+	PullType string
+}
+
+func (i gitPullTypeOptionItem) FilterValue() string {
 	return i.Name
 }
 

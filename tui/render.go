@@ -2,8 +2,7 @@ package tui
 
 import (
 	"fmt"
-
-	"github.com/charmbracelet/lipgloss/v2"
+	"strings"
 
 	"gitti/api/git"
 	"gitti/i18n"
@@ -18,7 +17,7 @@ import (
 //	Functions that help construct the view
 //
 // -----------------------------------------------------------------------------
-// Render the Local Branches panel (top 25%)
+// Render the Local Branches panel
 func renderLocalBranchesPanel(width int, height int, m *GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedContainer == constant.LocalBranchComponent {
@@ -30,7 +29,7 @@ func renderLocalBranchesPanel(width int, height int, m *GittiModel) string {
 		Render(m.CurrentRepoBranchesInfoList.View())
 }
 
-// Render the Changed Files panel (bottom 75%)
+// Render the Changed Files panel
 func renderChangedFilesPanel(width int, height int, m *GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedContainer == constant.ModifiedFilesComponent {
@@ -50,11 +49,11 @@ func renderFileDiffPanel(width int, height int, m *GittiModel) string {
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(m.CurrentSelectedFileDiffViewport.View())
+		Render(m.DetailPanelViewport.View())
 }
 
 func renderKeyBindingPanel(width int, m *GittiModel) string {
-	var keys []string
+	keys:=[]string{""} // to prevent a misconfiguration on key binding will not crash the program
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.CommitPopUp:
@@ -78,14 +77,16 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 			popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 			if ok {
 				if popUp.IsProcessing.Load() {
-					keys = []string{""} // nothing can be done during switching, only force quit gitti is possible
+					keys = []string{"..."} // nothing can be done during switching, only force quit gitti is possible
 				}
 			}
+		case constant.ChooseGitPullTypePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseGitPullTypePopUp
+		case constant.GitPullOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitPullOutputPopUp
 		}
 	} else {
 		switch m.CurrentSelectedContainer {
-		case constant.NoneSelected:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingNoneSelected
 		case constant.LocalBranchComponent:
 			CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 			if CurrentSelectedBranch == nil {
@@ -115,19 +116,10 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 		}
 	}
 
-	distributedWidth := (width / len(keys))
 
 	var keyBindingLine string
-
-	for _, key := range keys {
-		truncated := utils.TruncateString(key, distributedWidth) // truncate manually
-		cell := style.NewStyle.
-			Width(distributedWidth).    // fixed box width
-			MaxWidth(distributedWidth). // disallow overflow expansion
-			Align(lipgloss.Center).
-			Render(truncated)
-		keyBindingLine += cell
-	}
+	keyBindingLine = "  "+strings.Join(keys, "  |  ")
+	keyBindingLine =  utils.TruncateString(keyBindingLine, width) 
 
 	return style.BottomKeyBindingStyle.
 		Width(width).
@@ -136,13 +128,13 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 }
 
 // for the current selected modified file preview viewport
-func renderModifiedFilesDiffViewPort(m *GittiModel) {
+func renderDetailPanelViewPort(m *GittiModel) {
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
 		fileStatus = git.FileStatus(currentSelectedModifiedFile.(gitModifiedFilesItem))
 	} else {
-		m.CurrentSelectedFileDiffViewport.SetContent("")
+		m.DetailPanelViewport.SetContent("")
 		return
 	}
 
@@ -152,7 +144,7 @@ func renderModifiedFilesDiffViewPort(m *GittiModel) {
 	fileDiff := m.GitState.GitFiles.GetFilesDiffInfo(fileStatus)
 	if fileDiff == nil {
 		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
-		m.CurrentSelectedFileDiffViewport.SetContent(vpLine)
+		m.DetailPanelViewport.SetContent(vpLine)
 		return
 	}
 	diffDigitLength := len(fmt.Sprintf("%d", len(fileDiff))) + 1
@@ -178,7 +170,7 @@ func renderModifiedFilesDiffViewPort(m *GittiModel) {
 		diffLine = lineStyle.Render(Line.Line)
 		vpLine += rowNum + diffLine + "\n"
 	}
-	m.CurrentSelectedFileDiffViewport.SetContent(vpLine)
+	m.DetailPanelViewport.SetContent(vpLine)
 }
 
 // to update the width and height of all components
@@ -204,12 +196,13 @@ func tuiWindowSizing(m *GittiModel) {
 	// m.CurrentRepoModifiedFilesInfoList.Title = truncateString(fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth - listItemOrTitleWidthPad - 2)
 
 	// update viewport
-	m.CurrentSelectedFileDiffViewport.SetHeight(m.HomeTabFileDiffPanelHeight) //some margin
-	m.CurrentSelectedFileDiffViewport.SetWidth(m.HomeTabFileDiffPanelWidth - 2)
-	m.CurrentSelectedFileDiffViewportOffset = max(0, int(m.CurrentSelectedFileDiffViewport.HorizontalScrollPercent()*float64(m.CurrentSelectedFileDiffViewportOffset))-1)
-	m.CurrentSelectedFileDiffViewport.SetXOffset(m.CurrentSelectedFileDiffViewportOffset)
-	m.CurrentSelectedFileDiffViewport.SetYOffset(m.CurrentSelectedFileDiffViewport.YOffset)
+	m.DetailPanelViewport.SetHeight(m.HomeTabFileDiffPanelHeight) //some margin
+	m.DetailPanelViewport.SetWidth(m.HomeTabFileDiffPanelWidth - 2)
+	m.DetailPanelViewportOffset = max(0, int(m.DetailPanelViewport.HorizontalScrollPercent()*float64(m.DetailPanelViewportOffset))-1)
+	m.DetailPanelViewport.SetXOffset(m.DetailPanelViewportOffset)
+	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset)
 
+	// update list of viewport component width within pop up
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.CommitPopUp:
@@ -248,7 +241,18 @@ func tuiWindowSizing(m *GittiModel) {
 				width := (min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 				popUp.SwitchTypeOptionList.SetWidth(width)
 			}
+		case constant.ChooseGitPullTypePopUp:
+			popUp, exist := m.PopUpModel.(*ChooseGitPullTypePopUpModel)
+			if exist {
+				width := (min(constant.MaxChooseGitPullTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.PullTypeOptionList.SetWidth(width)
+			}
+		case constant.GitPullOutputPopUp:
+			popUp, exist := m.PopUpModel.(*GitPullOutputPopUpModel)
+			if exist {
+				width := (min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.GitPullOutputViewport.SetWidth(width)
+			}
 		}
 	}
-
 }

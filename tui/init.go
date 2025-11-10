@@ -31,7 +31,7 @@ func initBranchList(m *GittiModel) {
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
-	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[b]  %s:", i18n.LANGUAGEMAPPING.Branches), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[0]  %s:", i18n.LANGUAGEMAPPING.Branches), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
 
@@ -40,8 +40,6 @@ func initBranchList(m *GittiModel) {
 	} else {
 		m.CurrentRepoBranchesInfoList.Select(m.NavigationIndexPosition.LocalBranchComponent)
 	}
-
-	return
 }
 
 func initModifiedFilesList(m *GittiModel) {
@@ -67,7 +65,7 @@ func initModifiedFilesList(m *GittiModel) {
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
-	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
 
 	if len(items) < 1 {
@@ -84,15 +82,14 @@ func initModifiedFilesList(m *GittiModel) {
 			m.CurrentRepoModifiedFilesInfoList.Select(m.NavigationIndexPosition.ModifiedFilesComponent)
 		}
 	}
-	return
 }
 
 // reinit and render diff file viewport
 func reinitAndRenderModifiedFileDiffViewPort(m *GittiModel) {
-	m.CurrentSelectedFileDiffViewportOffset = 0
-	m.CurrentSelectedFileDiffViewport.SetXOffset(0)
-	m.CurrentSelectedFileDiffViewport.SetYOffset(0)
-	renderModifiedFilesDiffViewPort(m)
+	m.DetailPanelViewportOffset = 0
+	m.DetailPanelViewport.SetXOffset(0)
+	m.DetailPanelViewport.SetYOffset(0)
+	renderDetailPanelViewPort(m)
 }
 
 // init the popup model for git commit
@@ -376,5 +373,67 @@ func initSwitchBranchOutputPopUpModel(m *GittiModel, branchName string, switchTy
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)
 	popUpModel.ProcessSuccess.Store(false)
+	m.PopUpModel = popUpModel
+}
+
+func initChooseGitPullTypePopUp(m *GittiModel) {
+	pullTypeOption := []gitPullTypeOptionItem{
+		{
+			Name:     i18n.LANGUAGEMAPPING.GitPullOption,
+			Info:     "git pull --no-edit",
+			PullType: git.GITPULL,
+		},
+		{
+			Name:     i18n.LANGUAGEMAPPING.GitPullRebaseOption,
+			Info:     "git pull --rebase --autostash --no-edit",
+			PullType: git.GITPULLREBASE,
+		},
+		{
+			Name:     i18n.LANGUAGEMAPPING.GitPullMergeOption,
+			Info:     "git pull --no-rebase --no-edit",
+			PullType: git.GITPULLMERGE,
+		},
+	}
+
+	items := make([]list.Item, 0, len(pullTypeOption))
+	for _, pullOption := range pullTypeOption {
+		items = append(items, gitPullTypeOptionItem(pullOption))
+	}
+
+	width := (min(constant.MaxChooseGitPullTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	cGPOL := list.New(items, gitPullTypeOptionDelegate{}, width, constant.PopUpChooseGitPullTypeHeight)
+	cGPOL.SetShowStatusBar(false)
+	cGPOL.SetFilteringEnabled(false)
+	cGPOL.SetShowHelp(false)
+	cGPOL.SetShowTitle(false)
+
+	popUpModel := &ChooseGitPullTypePopUpModel{
+		PullTypeOptionList: cGPOL,
+	}
+
+	m.PopUpModel = popUpModel
+}
+
+func initGitPullOutputPopUpModel(m *GittiModel) {
+	// for git pull output viewport
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpSwitchBranchOutputViewPortHeight)
+	vp.SetWidth(min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &GitPullOutputPopUpModel{
+		GitPullOutputViewport: vp,
+		Spinner:                    s,
+	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
 	m.PopUpModel = popUpModel
 }

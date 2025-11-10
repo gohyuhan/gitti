@@ -15,7 +15,9 @@ const (
 	ChooseNewBranchTypePopUp    = "ChooseNewBranchTypePopUp"    // IsTyping will be false
 	CreateNewBranchPopUp        = "CreateNewBranchPopUp"        // IsTyping will be true
 	ChooseSwitchBranchTypePopUp = "ChooseSwitchBranchTypePopUp" // IsTyping will be false
-	SwitchBranchOutputPopUp     = "SwitchBranchOutputPopUp"     //IsTyping will be false
+	SwitchBranchOutputPopUp     = "SwitchBranchOutputPopUp"     // IsTyping will be false
+	ChooseGitPullTypePopUp      = "ChooseGitPullTypePopUp"      // IsTyping will be false
+	GitPullOutputPopUp          = "GitPullOutputPopUp"          // IsTyping will be false
 )
 
 const AUTOCLOSEINTERVAL = 500
@@ -39,6 +41,8 @@ const (
 	MaxCreateNewBranchPopUpWidth        = 150
 	MaxChooseSwitchBranchTypePopUpWidth = 150
 	MaxSwitchBranchOutputPopUpWidth     = 150
+	MaxChooseGitPullTypePopUpWidth      = 150
+	MaxGitPullOutputPopUpWidth          = 150
 
 	PopUpGitCommitOutputViewPortHeight     = 10
 	PopUpAddRemoteOutputViewPortHeight     = 2
@@ -48,12 +52,12 @@ const (
 	PopUpChooseNewBranchTypeHeight         = 6
 	PopUpChooseSwitchBranchTypeHeight      = 6
 	PopUpSwitchBranchOutputViewPortHeight  = 10
+	PopUpChooseGitPullTypeHeight           = 6
+	PopUpGitPullOutputViewportHeight       = 10
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
 const (
-	NoneSelected = "0"
-
 	LocalBranchComponent   = "C1"
 	ModifiedFilesComponent = "C2"
 	FileDiffComponent      = "C3"

@@ -24,6 +24,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 	case "ctrl+c":
 		api.GITDAEMON.Stop()
 		return m, tea.Quit
+
 	case "esc":
 		switch m.PopUpType {
 		case constant.CommitPopUp:
@@ -36,7 +37,8 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 			m.PopUpModel = nil
 		}
 		return m, nil
-	// in typing mode, tab is move to next input
+
+		// in typing mode, tab is move to next input
 	case "tab":
 		switch m.PopUpType {
 		case constant.CommitPopUp:
@@ -117,6 +119,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 					return m, popUp.Spinner.Tick
 				}
 			}
+
 		case constant.AddRemotePromptPopUp:
 			popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 			if ok {
@@ -130,6 +133,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 					gitAddRemoteService(m)
 				}
 			}
+
 		case constant.CreateNewBranchPopUp:
 			popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
 			if ok {
@@ -196,7 +200,15 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	case "ctrl+c":
 		api.GITDAEMON.Stop()
 		return m, tea.Quit
-	case "n", "N":
+
+	case "q", "Q":
+		// only work when there is no pop up
+		if !m.ShowPopUp.Load() {
+			api.GITDAEMON.Stop()
+			return m, tea.Quit
+		}
+
+	case "n":
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedContainer == constant.LocalBranchComponent {
 				m.PopUpType = constant.ChooseNewBranchTypePopUp
@@ -208,73 +220,92 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			}
 		}
 		return m, nil
-	case "b", "B":
+
+	case "0":
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedContainer != constant.LocalBranchComponent {
 				m.CurrentSelectedContainer = constant.LocalBranchComponent
-			} else {
-				m.CurrentSelectedContainer = constant.NoneSelected
 			}
 		}
 		return m, nil
-	case "f", "F":
+
+	case "1":
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedContainer != constant.ModifiedFilesComponent {
 				m.CurrentSelectedContainer = constant.ModifiedFilesComponent
-			} else {
-				m.CurrentSelectedContainer = constant.NoneSelected
 			}
 		}
 		return m, nil
-	case "c", "C":
-		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedContainer == constant.ModifiedFilesComponent {
-				m.ShowPopUp.Store(true)
-				m.PopUpType = constant.CommitPopUp
-				m.GitState.GitCommit.ClearGitCommitOutput()
 
+	case "c":
+		if !m.ShowPopUp.Load() {
+			m.ShowPopUp.Store(true)
+			m.PopUpType = constant.CommitPopUp
+			m.GitState.GitCommit.ClearGitCommitOutput()
+
+			// if the current pop up model is not commit pop up model, then init it
+			if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
+				initGitCommitPopUpModel(m)
+			} else {
+				popUp.GitCommitOutputViewport.SetContent("")
+				popUp.SessionID = uuid.New()
+			}
+			m.IsTyping.Store(true)
+		}
+		return m, nil
+
+	case "p":
+		if !m.ShowPopUp.Load() {
+			// first we need to check if there are any push/pull origin origin for this repo
+			// if not we prompt the user to add a new remote origin
+			if !m.GitState.GitCommit.CheckRemoteExist() {
+				m.ShowPopUp.Store(true)
+				m.PopUpType = constant.AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it
-				if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
-					initGitCommitPopUpModel(m)
+				if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
+					initAddRemotePromptPopUpModel(m, true)
 				} else {
-					popUp.GitCommitOutputViewport.SetContent("")
-					popUp.SessionID = uuid.New()
+					popUp.AddRemoteOutputViewport.SetContent("")
 				}
 				m.IsTyping.Store(true)
+			} else {
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				remotes := m.GitState.GitCommit.Remote()
+				if len(remotes) == 1 {
+					m.PopUpType = constant.ChoosePushTypePopUp
+					// if the current pop up model is not commit pop up model, then init it and start git push service
+					initChoosePushTypePopUpModel(m, remotes[0].Name)
+				} else if len(remotes) > 1 {
+					// if remote is more than 1 let user choose which remote to push to first before pushing
+					m.PopUpType = constant.ChooseRemotePopUp
+					if _, ok := m.PopUpModel.(*ChooseRemotePopUpModel); !ok {
+						initGitRemotePushChooseRemotePopUpModel(m, remotes)
+					}
+				}
 			}
 		}
 		return m, nil
-	case "p", "P":
+
+	case "P":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedContainer == constant.ModifiedFilesComponent || m.CurrentSelectedContainer == constant.NoneSelected || m.CurrentSelectedContainer == constant.LocalBranchComponent {
-				// first we need to check if there are any push origin for this repo
-				// if not we prompt the user to add a new remote origin
-				if !m.GitState.GitCommit.CheckRemoteExist() {
-					m.ShowPopUp.Store(true)
-					m.PopUpType = constant.AddRemotePromptPopUp
-					// if the current pop up model is not commit pop up model, then init it
-					if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
-						initAddRemotePromptPopUpModel(m, true)
-					} else {
-						popUp.AddRemoteOutputViewport.SetContent("")
-					}
-					m.IsTyping.Store(true)
+			// first we need to check if there are any push/pull origin for this repo
+			// if not we prompt the user to add a new remote origin
+			if !m.GitState.GitCommit.CheckRemoteExist() {
+				m.ShowPopUp.Store(true)
+				m.PopUpType = constant.AddRemotePromptPopUp
+				// if the current pop up model is not commit pop up model, then init it
+				if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
+					initAddRemotePromptPopUpModel(m, true)
 				} else {
-					m.ShowPopUp.Store(true)
-					m.IsTyping.Store(false)
-					remotes := m.GitState.GitCommit.Remote()
-					if len(remotes) == 1 {
-						m.PopUpType = constant.ChoosePushTypePopUp
-						// if the current pop up model is not commit pop up model, then init it and start git push service
-						initChoosePushTypePopUpModel(m, remotes[0].Name)
-					} else if len(remotes) > 1 {
-						// if remote is more than 1 let user choose which remote to push to first before pushing
-						m.PopUpType = constant.ChooseRemotePopUp
-						if _, ok := m.PopUpModel.(*ChooseRemotePopUpModel); !ok {
-							initGitRemotePushChooseRemotePopUpModel(m, remotes)
-						}
-					}
+					popUp.AddRemoteOutputViewport.SetContent("")
 				}
+				m.IsTyping.Store(true)
+			} else {
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.ChooseGitPullTypePopUp
+				initChooseGitPullTypePopUp(m)
 			}
 		}
 		return m, nil
@@ -308,6 +339,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					m.IsTyping.Store(false)
 					initChoosePushTypePopUpModel(m, remote.(gitRemoteItem).Name)
 				}
+
 			case constant.ChoosePushTypePopUp:
 				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
 				if ok {
@@ -317,6 +349,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					selectedOption := popUp.PushOptionList.SelectedItem()
 					return initGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(gitPushOptionItem).pushType)
 				}
+
 			case constant.ChooseNewBranchTypePopUp:
 				popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
 				if ok {
@@ -326,6 +359,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
 					initCreateNewBranchPopUpModel(m, selectedOption.(gitNewBranchTypeOptionItem).newBranchType)
 				}
+
 			case constant.ChooseSwitchBranchTypePopUp:
 				popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
 				if ok {
@@ -341,14 +375,35 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 						gitSwitchBranchService(m, branchName, selectedOption.switchBranchType)
 					}
 				}
+
+			case constant.ChooseGitPullTypePopUp:
+				popUp, ok := m.PopUpModel.(*ChooseGitPullTypePopUpModel)
+				if ok {
+					m.PopUpType = constant.GitPullOutputPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					selectedOption := popUp.PullTypeOptionList.SelectedItem().(gitPullTypeOptionItem)
+					initGitPullOutputPopUpModel(m)
+					popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+					if ok {
+						popUp.IsProcessing.Store(true) // set it directly first
+						// start the git pull service
+						gitPullService(m, selectedOption.PullType)
+						return m, popUp.Spinner.Tick
+					}
+				}
+
 			}
 		}
 		return m, nil
+
 	case "esc":
 		if m.ShowPopUp.Load() {
 			switch m.PopUpType {
 			case constant.GitRemotePushPopUp:
 				gitRemotePushCancelService(m)
+			case constant.GitPullOutputPopUp:
+				gitPullCancelService(m)
 			case constant.ChooseRemotePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
@@ -364,23 +419,21 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpModel = nil
+			case constant.ChooseGitPullTypePopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
 			}
 			return m, nil
 		} else {
 			switch m.CurrentSelectedContainer {
-			case constant.NoneSelected:
-				api.GITDAEMON.Stop()
-				return m, tea.Quit
 			case constant.FileDiffComponent:
 				m.CurrentSelectedContainer = constant.ModifiedFilesComponent
-			case constant.LocalBranchComponent:
-				m.CurrentSelectedContainer = constant.NoneSelected
-			case constant.ModifiedFilesComponent:
-				m.CurrentSelectedContainer = constant.NoneSelected
 			}
 		}
 		return m, nil
-	case "s", "S":
+
+	case "s":
 		if m.CurrentSelectedContainer == constant.ModifiedFilesComponent {
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			var fileName string
@@ -390,6 +443,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			}
 		}
 		return m, nil
+
 	case "up", "k":
 		if !m.ShowPopUp.Load() {
 			switch m.CurrentSelectedContainer {
@@ -409,40 +463,14 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					reinitAndRenderModifiedFileDiffViewPort(m)
 				}
 			case constant.FileDiffComponent:
-				m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
+				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
 			}
 		} else {
-			// for within pop up component
-			switch m.PopUpType {
-			case constant.ChooseRemotePopUp:
-				popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
-				if ok {
-					popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
-					return m, cmd
-				}
-			case constant.ChoosePushTypePopUp:
-				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
-				if ok {
-					popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
-					return m, cmd
-				}
-			case constant.ChooseNewBranchTypePopUp:
-				popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
-				if ok {
-					popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
-					return m, cmd
-				}
-			case constant.ChooseSwitchBranchTypePopUp:
-				popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
-				if ok {
-					popUp.SwitchTypeOptionList, cmd = popUp.SwitchTypeOptionList.Update(msg)
-					return m, cmd
-				}
-
-			}
+			return upDownKeyMsgUpdateForPopUp(msg, m)
 		}
 		return m, nil
+
 	case "down", "j":
 		if !m.ShowPopUp.Load() {
 			switch m.CurrentSelectedContainer {
@@ -462,42 +490,17 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					reinitAndRenderModifiedFileDiffViewPort(m)
 				}
 			case constant.FileDiffComponent:
-				m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
+				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
 			}
 		} else {
-			// for within pop up component
-			switch m.PopUpType {
-			case constant.ChooseRemotePopUp:
-				popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
-				if ok {
-					popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
-					return m, cmd
-				}
-			case constant.ChoosePushTypePopUp:
-				popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
-				if ok {
-					popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
-					return m, cmd
-				}
-			case constant.ChooseNewBranchTypePopUp:
-				popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
-				if ok {
-					popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
-					return m, cmd
-				}
-			case constant.ChooseSwitchBranchTypePopUp:
-				popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
-				if ok {
-					popUp.SwitchTypeOptionList, cmd = popUp.SwitchTypeOptionList.Update(msg)
-					return m, cmd
-				}
-			}
+			return upDownKeyMsgUpdateForPopUp(msg, m)
 		}
 		return m, nil
+
 	case "left", "h":
 		if !m.ShowPopUp.Load() {
-			m.CurrentSelectedFileDiffViewport.MoveLeft(1)
+			m.DetailPanelViewport.MoveLeft(1)
 		} else {
 			switch m.PopUpType {
 			case constant.CommitPopUp:
@@ -508,9 +511,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				}
 			}
 		}
+
 	case "right", "l":
 		if !m.ShowPopUp.Load() {
-			m.CurrentSelectedFileDiffViewport.MoveRight(1)
+			m.DetailPanelViewport.MoveRight(1)
 		} else {
 			switch m.PopUpType {
 			case constant.CommitPopUp:
@@ -530,17 +534,20 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 	switch msg.String() {
 	case "wheelleft":
 		if !m.ShowPopUp.Load() {
-			m.CurrentSelectedFileDiffViewport.MoveLeft(1)
+			m.DetailPanelViewport.MoveLeft(1)
 		}
+
 	case "wheelright":
 		if !m.ShowPopUp.Load() {
-			m.CurrentSelectedFileDiffViewport.MoveRight(1)
+			m.DetailPanelViewport.MoveRight(1)
 		}
+
 	case "wheelup":
 		if !m.ShowPopUp.Load() {
-			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
+			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 			return m, cmd
 		} else {
+			// for pop up that have viewport
 			switch m.PopUpType {
 			case constant.CommitPopUp:
 				popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
@@ -548,23 +555,131 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 					popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
 					return m, cmd
 				}
-			}
-		}
-	case "wheeldown":
-		if !m.ShowPopUp.Load() {
-			m.CurrentSelectedFileDiffViewport, cmd = m.CurrentSelectedFileDiffViewport.Update(msg)
-			return m, cmd
-		} else {
-			switch m.PopUpType {
-			case constant.CommitPopUp:
-				popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+			case constant.GitRemotePushPopUp:
+				popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 				if ok {
-					popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+					popUp.GitRemotePushOutputViewport, cmd = popUp.GitRemotePushOutputViewport.Update(msg)
+					return m, cmd
+				}
+			case constant.GitPullOutputPopUp:
+				popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+				if ok {
+					popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
+					return m, cmd
+				}
+			case constant.AddRemotePromptPopUp:
+				popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+				if ok {
+					popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
 					return m, cmd
 				}
 			}
 		}
 
+	case "wheeldown":
+		if !m.ShowPopUp.Load() {
+			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+			return m, cmd
+		} else {
+			upDownMouseMsgUpdateForPopUp(msg, m)
+		}
 	}
+	return m, nil
+}
+
+func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+	// for within pop up component
+	switch m.PopUpType {
+	// following is for list component
+	case constant.ChooseRemotePopUp:
+		popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
+		if ok {
+			popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
+			return m, cmd
+		}
+	case constant.ChoosePushTypePopUp:
+		popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
+		if ok {
+			popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
+			return m, cmd
+		}
+	case constant.ChooseNewBranchTypePopUp:
+		popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
+		if ok {
+			popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
+			return m, cmd
+		}
+	case constant.ChooseSwitchBranchTypePopUp:
+		popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
+		if ok {
+			popUp.SwitchTypeOptionList, cmd = popUp.SwitchTypeOptionList.Update(msg)
+			return m, cmd
+		}
+	case constant.ChooseGitPullTypePopUp:
+		popUp, ok := m.PopUpModel.(*ChooseGitPullTypePopUpModel)
+		if ok {
+			popUp.PullTypeOptionList, cmd = popUp.PullTypeOptionList.Update(msg)
+			return m, cmd
+		}
+	// following is for viewport
+	case constant.CommitPopUp:
+		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+		if ok {
+			popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.GitRemotePushPopUp:
+		popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
+		if ok {
+			popUp.GitRemotePushOutputViewport, cmd = popUp.GitRemotePushOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.GitPullOutputPopUp:
+		popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+		if ok {
+			popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.AddRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+		if ok {
+			popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
+			return m, cmd
+		}
+	}
+	return m, nil
+}
+
+func upDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+	// for pop up that have viewport
+	switch m.PopUpType {
+	case constant.CommitPopUp:
+		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+		if ok {
+			popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.GitRemotePushPopUp:
+		popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
+		if ok {
+			popUp.GitRemotePushOutputViewport, cmd = popUp.GitRemotePushOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.GitPullOutputPopUp:
+		popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+		if ok {
+			popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.AddRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
+		if ok {
+			popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
+			return m, cmd
+		}
+	}
+
 	return m, nil
 }

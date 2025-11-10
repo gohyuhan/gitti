@@ -40,6 +40,10 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderChooseSwitchBranchTypePopUp(m)
 	case constant.SwitchBranchOutputPopUp:
 		popUp = renderSwitchBranchOutputPopUp(m)
+	case constant.ChooseGitPullTypePopUp:
+		popUp = renderChooseGitPullTypePopUp(m)
+	case constant.GitPullOutputPopUp:
+		popUp = renderGitPullOutputPopUp(m)
 	}
 	return popUp
 }
@@ -409,7 +413,7 @@ func renderChooseSwitchBranchTypePopUp(m *GittiModel) string {
 	return ""
 }
 
-// pop up to redner the output of the switch branch operation
+// pop up to render the output of the switch branch operation
 // because we allow switching with bring changes over, there is conflict possiblities there fore we need to show the output
 // so that the user is aware of it
 func renderSwitchBranchOutputPopUp(m *GittiModel) string {
@@ -468,5 +472,85 @@ func updateSwitchBranchOutputViewPort(m *GittiModel, gitOpsOutput []string) {
 			popUp.SwitchBranchOutputViewport.SetContent(gitOpsOutputLogs)
 			popUp.SwitchBranchOutputViewport.ViewDown()
 		}
+	}
+}
+
+// ------------------------------------
+//
+//	For Git Pull
+//
+// ------------------------------------
+// choose git pull option
+func renderChooseGitPullTypePopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChooseGitPullTypePopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxChooseGitPullTypePopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChoosePullOptionPrompt)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			popUp.PullTypeOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// for git pull output
+func renderGitPullOutputPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitPullTitle)
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpGitPullOutputViewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorAccent)
+		}
+
+		logViewPort := logViewPortStyle.Render(popUp.GitPullOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitPullProcessing)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+func updateGitPullOutputViewport(m *GittiModel) {
+	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+	if ok {
+		popUp.GitPullOutputViewport.SetWidth(min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		logs := m.GitState.GitPull.GetGitPullOutput()
+		var GitPullLog string
+		for _, line := range logs {
+			logLine := style.NewStyle.Render(line)
+			GitPullLog += logLine + "\n"
+		}
+		popUp.GitPullOutputViewport.SetContent(GitPullLog)
+		popUp.GitPullOutputViewport.ViewDown()
 	}
 }

@@ -34,7 +34,6 @@ type LanguageMapping struct {
 	CurrentTerminalWidth       string
 	MinimumTerminalWidth       string
 	// for Key Bindings
-	KeyBindingNoneSelected                   []string
 	KeyBindingLocalBranchComponentIsCheckOut []string
 	KeyBindingLocalBranchComponentDefault    []string
 	KeyBindingLocalBranchComponentNone       []string
@@ -51,9 +50,14 @@ type LanguageMapping struct {
 	KeyBindingForCreateNewBranchPopUp        []string
 	KeyBindingForChooseSwitchBranchTypePopUp []string
 	KeyBindingForSwitchBranchOutputPopUp     []string
+	KeyBindingForChooseGitPullTypePopUp      []string
+	KeyBindingForGitPullOutputPopUp          []string
+	KeyBindingForGlobalKeyBindingPopUp       []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
+	// Global Key KeyBinding
+	GlobalKeyBinding []string
 	// commit
 	CommitPopUpMessageTitle                      string
 	CommitPopUpMessageInputPlaceHolder           string
@@ -98,4 +102,12 @@ type LanguageMapping struct {
 	SwitchBranchSwitchingToPopUpTitle            string
 	SwitchBranchPopUpSwitchProcessing            string
 	SwitchBranchPopUpSwitchWithChangesProcessing string
+	// Git Pull Option
+	ChoosePullOptionPrompt string
+	GitPullOption          string
+	GitPullRebaseOption    string
+	GitPullMergeOption     string
+	// for git pull output
+	GitPullTitle      string
+	GitPullProcessing string
 }

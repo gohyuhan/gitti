@@ -61,11 +61,11 @@ func (gp *GitPull) GitPull(pullType string) int {
 	var gitPullArgs []string
 	switch pullType {
 	case GITPULL:
-		gitPullArgs = []string{"pull"}
+		gitPullArgs = []string{"pull", "--no-edit"}
 	case GITPULLREBASE:
-		gitPullArgs = []string{"pull", "--rebase", "--autostash"}
+		gitPullArgs = []string{"pull", "--rebase", "--autostash", "--no-edit"}
 	case GITPULLMERGE:
-		gitPullArgs = []string{"pull", "--no-rebase"}
+		gitPullArgs = []string{"pull", "--no-rebase", "--no-edit"}
 	}
 
 	cmd := cmd.GittiCmd.RunGitCmd(gitPullArgs)

@@ -178,7 +178,7 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 		return
 	}
 
-	createBranchGitArgs := []string{"switch", "-c", branchName}
+	createBranchGitArgs := []string{"checkout", "-b", branchName}
 	createBranchCmd := cmd.GittiCmd.RunGitCmd(createBranchGitArgs)
 	_, createBranchErr := createBranchCmd.CombinedOutput()
 	if createBranchErr != nil {
@@ -212,7 +212,7 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 		return gitOpsOutput, false
 	}
 
-	switchBranchGitArgs := []string{"switch", branchName}
+	switchBranchGitArgs := []string{"checkout", branchName}
 	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs)
 	switchBranchOutput, switchBranchErr := switchBranchCmd.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(switchBranchOutput)...)
@@ -241,7 +241,7 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 		return gitOpsOutput, false
 	}
 
-	switchBranchGitArgs := []string{"switch", branchName}
+	switchBranchGitArgs := []string{"checkout", branchName}
 	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs)
 	switchBranchOutput, switchBranchErr := switchBranchCmd.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(switchBranchOutput)...)
