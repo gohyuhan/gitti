@@ -52,6 +52,8 @@ func InitGitFile(updateChannel chan string) *GitFiles {
 //
 // ----------------------------------
 func (gf *GitFiles) FilesStatus() []FileStatus {
+	gf.gitFilesMutex.Lock()
+	defer gf.gitFilesMutex.Unlock()
 	return gf.filesStatus
 }
 
