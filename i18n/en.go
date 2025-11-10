@@ -158,7 +158,7 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "",
-		TitleOrInfoLine: " * global key binding doesn't not apply when there is a pop up ",
+		TitleOrInfoLine: " * global key binding doesn't apply when there is a pop up ",
 		LineType:        INFO,
 	},
 	{
