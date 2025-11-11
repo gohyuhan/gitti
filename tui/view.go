@@ -6,7 +6,6 @@ import (
 	"github.com/charmbracelet/lipgloss/v2"
 
 	"gitti/i18n"
-	"gitti/settings"
 	"gitti/tui/constant"
 	"gitti/tui/style"
 )
@@ -60,13 +59,14 @@ func gittiMainPageView(m *GittiModel) string {
 	}
 
 	// --- Components ---
-	gittiVersionPanel := style.PanelBorderStyle.Width(m.HomeTabLeftPanelWidth).Height(1).Render(fmt.Sprintf("%s %s", settings.AppName, settings.AppVersion))
-	localBranchesPanel := renderLocalBranchesPanel(m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight, m)
-	changedFilesPanel := renderChangedFilesPanel(m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight, m)
-	detailPanel := renderFileDiffPanel(m.HomeTabFileDiffPanelWidth, m.HomeTabFileDiffPanelHeight, m)
-	bottomBar := renderKeyBindingPanel(m.Width, m)
+	gittiStatusPanel := renderGittiStatusComponentPanel(m)
+	localBranchesPanel := renderLocalBranchesComponentPanel(m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight, m)
+	modifiedFilesPanel := renderModifiedFilesComponentPanel(m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight, m)
+	stashFilesPanel := renderStashComponentPanel(m.WindowLeftPanelWidth, m.StashComponentPanelHeight, m)
+	detailPanel := renderDetailComponentPanel(m.DetailComponentPanelWidth, m.DetailComponentPanelHeight, m)
+	bottomBar := renderKeyBindingComponentPanel(m.Width, m)
 
-	leftPanel := lipgloss.JoinVertical(lipgloss.Left, gittiVersionPanel, localBranchesPanel, changedFilesPanel)
+	leftPanel := lipgloss.JoinVertical(lipgloss.Left, gittiStatusPanel, localBranchesPanel, modifiedFilesPanel, stashFilesPanel)
 
 	// Combine panels horizontally with explicit top alignment
 	content := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, detailPanel)

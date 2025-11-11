@@ -23,6 +23,8 @@ const (
 
 const AUTOCLOSEINTERVAL = 500
 
+const SelectedLeftPanelComponentHeightRatio = 0.4
+
 const (
 	MinWidth  = 80
 	MinHeight = 24
@@ -30,7 +32,7 @@ const (
 	Padding                             = 1
 	MainPageKeyBindingLayoutPanelHeight = 1
 
-	ListItemOrTitleWidthPad = 5
+	ListItemOrTitleWidthPad = 4
 
 	MaxLeftPanelWidth                   = 80
 	MaxGlobalKeyBindingPopUpWidth       = 150
@@ -61,7 +63,20 @@ const (
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
 const (
-	LocalBranchComponent   = "C1"
-	ModifiedFilesComponent = "C2"
-	FileDiffComponent      = "C3"
+	GittiStatusComponent   = "C0" // component index 0
+	LocalBranchComponent   = "C1" // component index 1
+	ModifiedFilesComponent = "C2" // component index 2
+	StashComponent         = "C3" // component index 3
+
+	// this is not a selectable component from key binding but act like an extension for each component to enter for more detail,
+	// no component index, the current selected component index will be still set as its parent's
+	DetailComponent = "EC-DT" // extended component -  detail component
 )
+
+// will be used by the key binding navigation of going to previous or next component panel
+var ComponentNavigationList = []string{
+	GittiStatusComponent,
+	LocalBranchComponent,
+	ModifiedFilesComponent,
+	StashComponent,
+}

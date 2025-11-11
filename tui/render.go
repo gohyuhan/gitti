@@ -17,10 +17,23 @@ import (
 //	Functions that help construct the view
 //
 // -----------------------------------------------------------------------------
-// Render the Local Branches panel
-func renderLocalBranchesPanel(width int, height int, m *GittiModel) string {
+// render the Gitti Status Panel
+func renderGittiStatusComponentPanel(m *GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedContainer == constant.LocalBranchComponent {
+	if m.CurrentSelectedComponent == constant.GittiStatusComponent {
+		borderStyle = style.SelectedBorderStyle
+	}
+
+	return borderStyle.
+		Width(m.WindowLeftPanelWidth).
+		Height(1).
+		Render(fmt.Sprintf("%s %s", settings.AppName, settings.AppVersion))
+}
+
+// Render the Local Branches panel
+func renderLocalBranchesComponentPanel(width int, height int, m *GittiModel) string {
+	borderStyle := style.PanelBorderStyle
+	if m.CurrentSelectedComponent == constant.LocalBranchComponent {
 		borderStyle = style.SelectedBorderStyle
 	}
 	return borderStyle.
@@ -30,9 +43,9 @@ func renderLocalBranchesPanel(width int, height int, m *GittiModel) string {
 }
 
 // Render the Changed Files panel
-func renderChangedFilesPanel(width int, height int, m *GittiModel) string {
+func renderModifiedFilesComponentPanel(width int, height int, m *GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedContainer == constant.ModifiedFilesComponent {
+	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 		borderStyle = style.SelectedBorderStyle
 	}
 	return borderStyle.
@@ -41,9 +54,12 @@ func renderChangedFilesPanel(width int, height int, m *GittiModel) string {
 		Render(m.CurrentRepoModifiedFilesInfoList.View())
 }
 
-func renderFileDiffPanel(width int, height int, m *GittiModel) string {
+// Render the detial component part at the right of the window,
+// however the content within it will be dynamic based on the current selected component
+// ( will be implemented after v0.1.0 alpha, as of now it will always be the file diff view )
+func renderDetailComponentPanel(width int, height int, m *GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedContainer == constant.FileDiffComponent {
+	if m.CurrentSelectedComponent == constant.DetailComponent {
 		borderStyle = style.SelectedBorderStyle
 	}
 	return borderStyle.
@@ -52,7 +68,19 @@ func renderFileDiffPanel(width int, height int, m *GittiModel) string {
 		Render(m.DetailPanelViewport.View())
 }
 
-func renderKeyBindingPanel(width int, m *GittiModel) string {
+func renderStashComponentPanel(width int, height int, m *GittiModel) string {
+	borderStyle := style.PanelBorderStyle
+	if m.CurrentSelectedComponent == constant.StashComponent {
+		borderStyle = style.SelectedBorderStyle
+	}
+	return borderStyle.
+		Width(width).
+		Height(height).
+		Render(m.CurrentRepoStashInfoList.View())
+
+}
+
+func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 	keys := []string{""} // to prevent a misconfiguration on key binding will not crash the program
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
@@ -88,7 +116,9 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGlobalKeyBindingPopUp
 		}
 	} else {
-		switch m.CurrentSelectedContainer {
+		switch m.CurrentSelectedComponent {
+		case constant.GittiStatusComponent:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGittiStatusComponent
 		case constant.LocalBranchComponent:
 			CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 			if CurrentSelectedBranch == nil {
@@ -113,8 +143,8 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
 				}
 			}
-		case constant.FileDiffComponent:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingFileDiffComponent
+		case constant.DetailComponent:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 		}
 	}
 
@@ -129,7 +159,7 @@ func renderKeyBindingPanel(width int, m *GittiModel) string {
 }
 
 // for the current selected modified file preview viewport
-func renderDetailPanelViewPort(m *GittiModel) {
+func renderDetailComponentPanelViewPort(m *GittiModel) {
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
@@ -177,28 +207,18 @@ func renderDetailPanelViewPort(m *GittiModel) {
 // to update the width and height of all components
 func tuiWindowSizing(m *GittiModel) {
 	// Compute panel widths
-	m.HomeTabLeftPanelWidth = min(int(float64(m.Width)*settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio), constant.MaxLeftPanelWidth)
-	m.HomeTabFileDiffPanelWidth = m.Width - m.HomeTabLeftPanelWidth
+	m.WindowLeftPanelWidth = min(int(float64(m.Width)*settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio), constant.MaxLeftPanelWidth)
+	m.DetailComponentPanelWidth = m.Width - m.WindowLeftPanelWidth
 
-	m.HomeTabCoreContentHeight = m.Height - constant.MainPageKeyBindingLayoutPanelHeight - 2*constant.Padding
-	m.HomeTabFileDiffPanelHeight = m.HomeTabCoreContentHeight
+	m.WindowCoreContentHeight = m.Height - constant.MainPageKeyBindingLayoutPanelHeight - 2*constant.Padding
+	m.DetailComponentPanelHeight = m.WindowCoreContentHeight
 
-	leftPanelRemainingHeight := m.HomeTabCoreContentHeight - 3 // this is after reserving the height for the gitti version panel
-	m.HomeTabLocalBranchesPanelHeight = int(float64(leftPanelRemainingHeight)*settings.GITTICONFIGSETTINGS.GitBranchComponentHeightRatio) - 2*constant.Padding
-	m.HomeTabChangedFilesPanelHeight = leftPanelRemainingHeight - m.HomeTabLocalBranchesPanelHeight - 2*constant.Padding
-
-	// update all components Width and Height
-	m.CurrentRepoBranchesInfoList.SetWidth(m.HomeTabLeftPanelWidth - 2)
-	m.CurrentRepoBranchesInfoList.SetHeight(m.HomeTabLocalBranchesPanelHeight)
-	// m.CurrentRepoBranchesInfoList.Title = truncateString(fmt.Sprintf("[b]  %s:", i18n.LANGUAGEMAPPING.Branches), m.HomeTabLeftPanelWidth - listItemOrTitleWidthPad -2 )
-
-	m.CurrentRepoModifiedFilesInfoList.SetWidth(m.HomeTabLeftPanelWidth - 2)
-	m.CurrentRepoModifiedFilesInfoList.SetHeight(m.HomeTabChangedFilesPanelHeight)
-	// m.CurrentRepoModifiedFilesInfoList.Title = truncateString(fmt.Sprintf("[f] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth - listItemOrTitleWidthPad - 2)
+	// update the dynamic size of the left panel
+	leftPanelDynamicResize(m)
 
 	// update viewport
-	m.DetailPanelViewport.SetHeight(m.HomeTabFileDiffPanelHeight) //some margin
-	m.DetailPanelViewport.SetWidth(m.HomeTabFileDiffPanelWidth - 2)
+	m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight) //some margin
+	m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
 	m.DetailPanelViewportOffset = max(0, int(m.DetailPanelViewport.HorizontalScrollPercent()*float64(m.DetailPanelViewportOffset))-1)
 	m.DetailPanelViewport.SetXOffset(m.DetailPanelViewportOffset)
 	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset)
@@ -264,4 +284,40 @@ func tuiWindowSizing(m *GittiModel) {
 			}
 		}
 	}
+}
+
+func leftPanelDynamicResize(m *GittiModel) {
+	leftPanelRemainingHeight := m.WindowCoreContentHeight - 7 // this is after reserving the height for the gitti version panel and also Padding
+
+	// we minus 2 if GittiStatusComponent is not the one chosen is because GittiStatusComponent
+	// and the one that got selected will not be account in to the dynamic height calculation
+	// ( gitti status component's height is fix at 3, while the selected one will always get 40% )
+	componentWithDynamicHeight := (len(constant.ComponentNavigationList) - 2)
+	unSelectedComponentPanelHeightPerComponent := (int(float64(leftPanelRemainingHeight)*(1.0-constant.SelectedLeftPanelComponentHeightRatio)) / componentWithDynamicHeight)
+	selectedComponentPanelHeight := leftPanelRemainingHeight - (unSelectedComponentPanelHeightPerComponent * componentWithDynamicHeight)
+	m.LocalBranchesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+	m.ModifiedFilesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+	m.StashComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+
+	switch m.CurrentSelectedComponent {
+	case constant.LocalBranchComponent:
+		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+	case constant.ModifiedFilesComponent:
+		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+	case constant.StashComponent:
+		m.StashComponentPanelHeight = selectedComponentPanelHeight
+	case constant.GittiStatusComponent:
+		// if it was the Gitti status component panel that got selected (because its height is fix),
+		// the next panel will get the selected height which is the branch component panel
+		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+	}
+	// update all components Width and Height
+	m.CurrentRepoBranchesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoBranchesInfoList.SetHeight(m.LocalBranchesComponentPanelHeight)
+
+	m.CurrentRepoModifiedFilesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoModifiedFilesInfoList.SetHeight(m.ModifiedFilesComponentPanelHeight)
+
+	m.CurrentRepoStashInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)
 }

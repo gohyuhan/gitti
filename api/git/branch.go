@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"strings"
+	"sync"
 
 	"gitti/cmd"
 )
@@ -17,6 +18,7 @@ type GitBranch struct {
 	currentCheckOut BranchInfo
 	allBranches     []BranchInfo
 	errorLog        []error
+	gitBranchMutex  sync.Mutex
 }
 
 func InitGitBranch() *GitBranch {
@@ -32,6 +34,8 @@ func InitGitBranch() *GitBranch {
 //
 // ----------------------------------
 func (gb *GitBranch) CurrentCheckOut() BranchInfo {
+	gb.gitBranchMutex.Lock()
+	defer gb.gitBranchMutex.Unlock()
 	return gb.currentCheckOut
 }
 
@@ -41,7 +45,12 @@ func (gb *GitBranch) CurrentCheckOut() BranchInfo {
 //
 // ----------------------------------
 func (gb *GitBranch) AllBranches() []BranchInfo {
-	return gb.allBranches
+	gb.gitBranchMutex.Lock()
+	defer gb.gitBranchMutex.Unlock()
+
+	copied := make([]BranchInfo, len(gb.allBranches))
+	copy(copied, gb.allBranches)
+	return copied
 }
 
 // ----------------------------------
@@ -50,6 +59,8 @@ func (gb *GitBranch) AllBranches() []BranchInfo {
 //
 // ----------------------------------
 func (gb *GitBranch) IsRepoUnborn() bool {
+	gb.gitBranchMutex.Lock()
+	defer gb.gitBranchMutex.Unlock()
 	return gb.isRepoUnborn
 }
 
@@ -70,6 +81,9 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	}
 
 	gitBranches := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
+
+	gb.gitBranchMutex.Lock()
+	defer gb.gitBranchMutex.Unlock()
 	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommited branch
 	if len(gitBranches) < 1 {
@@ -124,7 +138,7 @@ func SetGitInitDefaultBranch(branchName string, cwd string) {
 //	Related to Git Stash
 //
 // ----------------------------------
-func (gb *GitBranch) GitStash() {
+func (gb *GitBranch) GitStashAll() {
 	gitArgs := []string{"stash", "--all"}
 
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
@@ -139,7 +153,7 @@ func (gb *GitBranch) GitStash() {
 //	Related to Git UnStash
 //
 // ----------------------------------
-func (gb *GitBranch) GitUnstash() {
+func (gb *GitBranch) GitUnstashAll() {
 	gitArgs := []string{"stash", "pop"}
 
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)

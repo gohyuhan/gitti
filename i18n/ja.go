@@ -16,12 +16,16 @@ var jA = LanguageMapping{
 	GitInitPromptInvalidInput:          "無効な入力です. [Y/y] または [N/n] を入力してください.",
 	Branches:                           "ブランチ",
 	ModifiedFiles:                      "変更されたファイル",
+	Stash:                              "スタッシュ",
 	FileTypeUnSupportedPreview:         "現在選択されているファイル形式はプレビューに対応していません",
 	TerminalSizeWarning:                "端末サイズが小さすぎます - サイズを変更してください.",
 	CurrentTerminalHeight:              "現在の高さ",
 	MinimumTerminalHeight:              "必要な最小の高さ",
 	CurrentTerminalWidth:               "現在の幅",
 	MinimumTerminalWidth:               "必要な最小の幅",
+	KeyBindingForGittiStatusComponent: []string{
+		"[?] グローバルキー操作",
+	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新しいブランチ",
 		"[?] グローバルキー操作",
@@ -35,22 +39,22 @@ var jA = LanguageMapping{
 		"[?] グローバルキー操作",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
-		"[s] この変更をアンステージ",
+		"[space] この変更をアンステージ",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
-		"[s] この変更をステージ",
+		"[space] この変更をステージ",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
 		"[?] グローバルキー操作",
 	},
-	KeyBindingFileDiffComponent: []string{
+	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右に移動",
 		"[↑/↓] 上下に移動",
-		"[esc] ファイルコンポーネントに戻る",
+		"[esc] 戻る",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingForCommitPopUp: []string{
@@ -189,6 +193,16 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "[P]",
 		TitleOrInfoLine: "リモートリポジトリからプル (Git Pull)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[tab]",
+		TitleOrInfoLine: "次のコンポーネントパネルに移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[shift+tab]",
+		TitleOrInfoLine: "前のパネルに移動",
 		LineType:        INFO,
 	},
 }

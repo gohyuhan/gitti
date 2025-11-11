@@ -3,6 +3,7 @@ package i18n
 var eN = LanguageMapping{
 	FlagLangCode:                       "set the language code, e.g. 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
+	FlagInitStashGitIgnoredFile:        "set stash behaviour for ignore file, by gitti system default, it will respect .gitignore and will not stash it",
 	FlagGlobal:                         "also apply to system git if supported",
 	FailToGetCWD:                       "Failed to get current working directory",
 	TuiRunFail:                         "Alas, there's been an error",
@@ -16,12 +17,16 @@ var eN = LanguageMapping{
 	GitInitPromptInvalidInput:          "Invalid input, please enter [Y/y] or [N/n].",
 	Branches:                           "Branches",
 	ModifiedFiles:                      "Modified Files",
+	Stash:                              "Stash",
 	FileTypeUnSupportedPreview:         "The current selected file type is not supported for preview",
 	TerminalSizeWarning:                "Terminal too small — resize to continue.",
 	CurrentTerminalHeight:              "Current height",
 	MinimumTerminalHeight:              "Minimum required height",
 	CurrentTerminalWidth:               "Current width",
 	MinimumTerminalWidth:               "Minimum required height",
+	KeyBindingForGittiStatusComponent: []string{
+		"[?] global key binding",
+	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] new branch",
 		"[?] global key binding",
@@ -35,22 +40,22 @@ var eN = LanguageMapping{
 		"[?] global key binding",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
-		"[s] unstage this change",
+		"[space] unstage this change",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
-		"[s] stage this change",
+		"[space] stage this change",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
 		"[?] global key binding",
 	},
-	KeyBindingFileDiffComponent: []string{
+	KeyBindingKeyDetailComponent: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
-		"[esc] back to file component",
+		"[esc] back",
 		"[?] global key binding",
 	},
 	KeyBindingForCommitPopUp: []string{
@@ -189,6 +194,16 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "[P]",
 		TitleOrInfoLine: "pull from remote",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[tab]",
+		TitleOrInfoLine: "move to next component panel",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[shift+tab]",
+		TitleOrInfoLine: "move to next previous panel",
 		LineType:        INFO,
 	},
 }

@@ -19,8 +19,6 @@ type GittiConfigSettings struct {
 	GitInitDefaultBranch            string  `json:"git_init_default_branch"`
 	LeftPanelWidthRatio             float64 `json:"left_panel_width_ratio"`
 	RightPanelWidthRatio            float64 `json:"right_panel_width_ratio"`
-	GitBranchComponentHeightRatio   float64 `json:"git_branch_component_height_ratio"`
-	GitFilesComponentHeightRatio    float64 `json:"git_files_component_height_ratio"`
 	LanguageCode                    string  `json:"language_code"`
 }
 
@@ -31,8 +29,6 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	GitInitDefaultBranch:            "master",
 	LeftPanelWidthRatio:             0.3,
 	RightPanelWidthRatio:            0.7,
-	GitBranchComponentHeightRatio:   0.4,
-	GitFilesComponentHeightRatio:    0.6,
 	LanguageCode:                    "EN",
 }
 

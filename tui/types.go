@@ -19,27 +19,33 @@ import (
 //
 // ---------------------------------
 type GittiModel struct {
-	CurrentSelectedContainer         string
-	RepoPath                         string
-	Width                            int
-	Height                           int
-	HomeTabLeftPanelWidth            int
-	HomeTabFileDiffPanelWidth        int
-	HomeTabCoreContentHeight         int
-	HomeTabFileDiffPanelHeight       int
-	HomeTabLocalBranchesPanelHeight  int
-	HomeTabChangedFilesPanelHeight   int
-	CurrentRepoBranchesInfoList      list.Model
-	CurrentRepoModifiedFilesInfoList list.Model
-	DetailPanelViewport              viewport.Model
-	DetailPanelViewportOffset        int
-	NavigationIndexPosition          GittiComponentsCurrentNavigationIndexPosition
-	ShowPopUp                        atomic.Bool
-	PopUpType                        string
-	PopUpModel                       interface{}
-	IsTyping                         atomic.Bool
-	GitState                         *api.GitState
-	GlobalKeyBindingKeyMapLargestLen int // this was use for global key binding pop up styling, we save it once so we don't have to recompute
+	IsRenderInit                      atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
+	CurrentSelectedComponent          string
+	CurrentSelectedComponentIndex     int
+	TotalComponentCount               int
+	RepoPath                          string
+	Width                             int
+	Height                            int
+	WindowLeftPanelWidth              int // this is the left part of the window
+	DetailComponentPanelWidth         int // this is the right part of the window, will always be for detail component panel only
+	WindowCoreContentHeight           int // this is the height of the part where key binding panel is not included
+	DetailComponentPanelHeight        int
+	LocalBranchesComponentPanelHeight int
+	ModifiedFilesComponentPanelHeight int
+	StashComponentPanelHeight         int
+	CurrentRepoBranchesInfoList       list.Model
+	CurrentRepoModifiedFilesInfoList  list.Model
+	CurrentRepoStashInfoList          list.Model
+	DetailPanelParentComponent        string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
+	DetailPanelViewport               viewport.Model
+	DetailPanelViewportOffset         int
+	ListNavigationIndexPosition       GittiComponentsCurrentListNavigationIndexPosition
+	ShowPopUp                         atomic.Bool
+	PopUpType                         string
+	PopUpModel                        interface{}
+	IsTyping                          atomic.Bool
+	GitState                          *api.GitState
+	GlobalKeyBindingKeyMapLargestLen  int // this was use for global key binding pop up styling, we save it once so we don't have to recompute
 }
 
 // ---------------------------------
@@ -205,9 +211,10 @@ type GitPullOutputPopUpModel struct {
 // to record the current navigation index position
 //
 // ---------------------------------
-type GittiComponentsCurrentNavigationIndexPosition struct {
+type GittiComponentsCurrentListNavigationIndexPosition struct {
 	LocalBranchComponent   int
 	ModifiedFilesComponent int
+	StashComponent         int
 }
 
 // ---------------------------------
@@ -240,6 +247,21 @@ type gitModifiedFilesItem struct {
 
 func (i gitModifiedFilesItem) FilterValue() string {
 	return i.FileName
+}
+
+// ---------------------------------
+//
+// for list component of git stashed files
+//
+// ---------------------------------
+type gitStashItemDelegate struct{}
+type gitStashItem struct {
+	Id      string
+	Message string
+}
+
+func (i gitStashItem) FilterValue() string {
+	return i.Message
 }
 
 // ---------------------------------

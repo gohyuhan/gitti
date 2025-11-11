@@ -18,30 +18,36 @@ import (
 	"github.com/google/uuid"
 ) // this was for various components part init or reinit function due to update or newly create
 
+// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
+
+// init the list component for Branch Component
 func initBranchList(m *GittiModel) {
-	items := []list.Item{
+	latestBranchArray := []list.Item{
 		gitBranchItem(m.GitState.GitBranch.CurrentCheckOut()),
 	}
 
 	for _, branch := range m.GitState.GitBranch.AllBranches() {
-		items = append(items, gitBranchItem(branch))
+		latestBranchArray = append(latestBranchArray, gitBranchItem(branch))
 	}
 
-	m.CurrentRepoBranchesInfoList = list.New(items, gitBranchItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabLocalBranchesPanelHeight)
+	m.CurrentRepoBranchesInfoList = list.New(latestBranchArray, gitBranchItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
-	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[0]  %s:", i18n.LANGUAGEMAPPING.Branches), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
+	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf418 %s:", i18n.LANGUAGEMAPPING.Branches), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
 
-	if m.NavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
+	if m.ListNavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
 		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)
+		m.ListNavigationIndexPosition.LocalBranchComponent = len(m.CurrentRepoBranchesInfoList.Items()) - 1
 	} else {
-		m.CurrentRepoBranchesInfoList.Select(m.NavigationIndexPosition.LocalBranchComponent)
+		m.CurrentRepoBranchesInfoList.Select(m.ListNavigationIndexPosition.LocalBranchComponent)
 	}
 }
 
+// init the list component for Modified Files Component
 func initModifiedFilesList(m *GittiModel) {
 	latestModifiedFilesArray := m.GitState.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))
@@ -60,12 +66,12 @@ func initModifiedFilesList(m *GittiModel) {
 		}
 	}
 
-	m.CurrentRepoModifiedFilesInfoList = list.New(items, gitModifiedFilesItemDelegate{}, m.HomeTabLeftPanelWidth, m.HomeTabChangedFilesPanelHeight)
+	m.CurrentRepoModifiedFilesInfoList = list.New(items, gitModifiedFilesItemDelegate{}, m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight)
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
-	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] 📄%s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.HomeTabLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[2] \ueae9 %s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
 
 	if len(items) < 1 {
@@ -74,12 +80,57 @@ func initModifiedFilesList(m *GittiModel) {
 
 	if selectedFilesPosition >= 0 {
 		m.CurrentRepoModifiedFilesInfoList.Select(selectedFilesPosition)
-		m.NavigationIndexPosition.ModifiedFilesComponent = selectedFilesPosition
+		m.ListNavigationIndexPosition.ModifiedFilesComponent = selectedFilesPosition
 	} else {
-		if m.NavigationIndexPosition.ModifiedFilesComponent > len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
+		if m.ListNavigationIndexPosition.ModifiedFilesComponent > len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
 			m.CurrentRepoModifiedFilesInfoList.Select(len(m.CurrentRepoModifiedFilesInfoList.Items()) - 1)
+			m.ListNavigationIndexPosition.ModifiedFilesComponent = len(m.CurrentRepoModifiedFilesInfoList.Items()) - 1
 		} else {
-			m.CurrentRepoModifiedFilesInfoList.Select(m.NavigationIndexPosition.ModifiedFilesComponent)
+			m.CurrentRepoModifiedFilesInfoList.Select(m.ListNavigationIndexPosition.ModifiedFilesComponent)
+		}
+	}
+}
+
+// init the list component for Stash info Component
+func initStashList(m *GittiModel) {
+	latestStashArray := []gitStashItem{}
+	items := make([]list.Item, 0, len(latestStashArray))
+	for _, stashInfo := range latestStashArray {
+		items = append(items, gitStashItem(stashInfo))
+	}
+
+	// get the previous selected file and see if it was within the new list if yes get the latest position of the previous selected file
+	previousSelectedFile := m.CurrentRepoStashInfoList.SelectedItem()
+	selectedFilesPosition := -1
+
+	for index, item := range items {
+		if item == previousSelectedFile {
+			selectedFilesPosition = index
+			break
+		}
+	}
+
+	m.CurrentRepoStashInfoList = list.New(items, gitStashItemDelegate{}, m.WindowLeftPanelWidth, m.StashComponentPanelHeight)
+	m.CurrentRepoStashInfoList.SetShowStatusBar(false)
+	m.CurrentRepoStashInfoList.SetFilteringEnabled(false)
+	m.CurrentRepoStashInfoList.SetShowHelp(false)
+	m.CurrentRepoStashInfoList.SetShowPagination(false)
+	m.CurrentRepoStashInfoList.Title = utils.TruncateString(fmt.Sprintf("[3] \ueaf7 %s:", i18n.LANGUAGEMAPPING.Stash), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoStashInfoList.Styles.Title = style.TitleStyle
+
+	if len(items) < 1 {
+		return
+	}
+
+	if selectedFilesPosition >= 0 {
+		m.CurrentRepoStashInfoList.Select(selectedFilesPosition)
+		m.ListNavigationIndexPosition.StashComponent = selectedFilesPosition
+	} else {
+		if m.ListNavigationIndexPosition.StashComponent > len(m.CurrentRepoStashInfoList.Items())-1 {
+			m.CurrentRepoStashInfoList.Select(len(m.CurrentRepoStashInfoList.Items()) - 1)
+			m.ListNavigationIndexPosition.StashComponent = len(m.CurrentRepoStashInfoList.Items()) - 1
+		} else {
+			m.CurrentRepoStashInfoList.Select(m.ListNavigationIndexPosition.StashComponent)
 		}
 	}
 }
@@ -89,7 +140,7 @@ func reinitAndRenderModifiedFileDiffViewPort(m *GittiModel) {
 	m.DetailPanelViewportOffset = 0
 	m.DetailPanelViewport.SetXOffset(0)
 	m.DetailPanelViewport.SetYOffset(0)
-	renderDetailPanelViewPort(m)
+	renderDetailComponentPanelViewPort(m)
 }
 
 // init the viewport pop up for showing info of global key binding

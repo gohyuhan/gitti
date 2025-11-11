@@ -17,20 +17,25 @@ func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
 	vp.SetHorizontalStep(1)
 	vp.MouseWheelDelta = 1
 	gitti := &GittiModel{
-		CurrentSelectedContainer:         constant.ModifiedFilesComponent,
+		CurrentSelectedComponent:         constant.ModifiedFilesComponent,
+		CurrentSelectedComponentIndex:    2,
+		TotalComponentCount:              4,
 		RepoPath:                         repoPath,
 		Width:                            0,
 		Height:                           0,
 		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
 		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
+		CurrentRepoStashInfoList:         list.New([]list.Item{}, gitStashItemDelegate{}, 0, 0),
+		DetailPanelParentComponent:       "",
 		DetailPanelViewport:              vp,
 		DetailPanelViewportOffset:        0,
-		NavigationIndexPosition:          GittiComponentsCurrentNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0},
+		ListNavigationIndexPosition:      GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
 		PopUpType:                        constant.NoPopUp,
 		PopUpModel:                       struct{}{},
 		GitState:                         gitState,
 		GlobalKeyBindingKeyMapLargestLen: 0,
 	}
+	gitti.IsRenderInit.Store(false)
 	gitti.ShowPopUp.Store(false)
 	gitti.IsTyping.Store(false)
 
@@ -54,6 +59,11 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Height = msg.Height
 		// recompute layout instantly
 		tuiWindowSizing(m)
+		if m.IsRenderInit.CompareAndSwap(false, true) {
+			initBranchList(m)
+			initModifiedFilesList(m)
+			initStashList(m)
+		}
 	case tea.KeyMsg:
 		return gittiKeyInteraction(msg, m)
 	case GitUpdateMsg:
@@ -63,7 +73,9 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			initBranchList(m)
 		case git.GIT_FILES_STATUS_UPDATE:
 			initModifiedFilesList(m)
-			renderDetailPanelViewPort(m)
+			renderDetailComponentPanelViewPort(m)
+		case git.GIT_STASH_UPDATE:
+			initStashList(m)
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
 			updatePopUpCommitOutputViewPort(m)
 		case git.GIT_REMOTE_PUSH_OUTPUT_UPDATE:

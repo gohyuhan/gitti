@@ -16,12 +16,16 @@ var zH_HANS = LanguageMapping{
 	GitInitPromptInvalidInput:          "输入无效, 请输入 [Y/y] 或 [N/n].",
 	Branches:                           "分支",
 	ModifiedFiles:                      "已修改的文件",
+	Stash:                              "暂存",
 	FileTypeUnSupportedPreview:         "当前选择的文件类型不支持预览",
 	TerminalSizeWarning:                "终端窗口太小 — 请调整大小后继续.",
 	CurrentTerminalHeight:              "当前高度",
 	MinimumTerminalHeight:              "最小要求高度",
 	CurrentTerminalWidth:               "当前宽度",
 	MinimumTerminalWidth:               "最小要求宽度",
+	KeyBindingForGittiStatusComponent: []string{
+		"[?] 全局快捷键",
+	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新建分支",
 		"[?] 全局快捷键",
@@ -35,22 +39,22 @@ var zH_HANS = LanguageMapping{
 		"[?] 全局快捷键",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
-		"[s] 取消暂存此更改",
+		"[space] 取消暂存此更改",
 		"[enter] 查看修改内容",
 		"[?] 全局���捷键",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
-		"[s] 暂存此更改",
+		"[space] 暂存此更改",
 		"[enter] 查看修改内容",
 		"[?] 全局快捷键",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
 		"[?] 全局快捷键",
 	},
-	KeyBindingFileDiffComponent: []string{
+	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",
-		"[esc] 返回文件组件",
+		"[esc] 返回",
 		"[?] 全局快捷键",
 	},
 	KeyBindingForCommitPopUp: []string{
@@ -189,6 +193,16 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "[P]",
 		TitleOrInfoLine: "从远程仓库拉取 (Git Pull)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[tab]",
+		TitleOrInfoLine: "移动到下一个组件面板",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[shift+tab]",
+		TitleOrInfoLine: "移动到上一个面板",
 		LineType:        INFO,
 	},
 }

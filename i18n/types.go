@@ -20,9 +20,10 @@ type GlobalKeyBindingMappingFormat struct {
 // -------------------------------------------------------
 type LanguageMapping struct {
 	// flag expalnation
-	FlagLangCode          string
-	FlagInitDefaultBranch string
-	FlagGlobal            string
+	FlagLangCode                string
+	FlagInitDefaultBranch       string
+	FlagInitStashGitIgnoredFile string
+	FlagGlobal                  string
 	// Run Error
 	FailToGetCWD string
 	TuiRunFail   string
@@ -32,6 +33,9 @@ type LanguageMapping struct {
 	// init default branch
 	GittiDefaultBranchSet              string
 	GittiDefaultAndGitDefaultBranchSet string
+	// update to stash ignored file setting
+	GittiStashIgnoredFile        string
+	GittiWillNotStashIgnoredFile string
 	// Gitti terminal text
 	GitNotInstalledError      string
 	GitNotInitPrompt          string
@@ -40,6 +44,7 @@ type LanguageMapping struct {
 	// Gitti UI text
 	Branches                   string
 	ModifiedFiles              string
+	Stash                      string
 	FileTypeUnSupportedPreview string
 	TerminalSizeWarning        string
 	CurrentTerminalHeight      string
@@ -47,13 +52,14 @@ type LanguageMapping struct {
 	CurrentTerminalWidth       string
 	MinimumTerminalWidth       string
 	// for Key Bindings
+	KeyBindingForGittiStatusComponent        []string
 	KeyBindingLocalBranchComponentIsCheckOut []string
 	KeyBindingLocalBranchComponentDefault    []string
 	KeyBindingLocalBranchComponentNone       []string
 	KeyBindingModifiedFilesComponentIsStaged []string
 	KeyBindingModifiedFilesComponentDefault  []string
 	KeyBindingModifiedFilesComponentNone     []string
-	KeyBindingFileDiffComponent              []string
+	KeyBindingKeyDetailComponent             []string
 	KeyBindingForCommitPopUp                 []string
 	KeyBindingForAddRemotePromptPopUp        []string
 	KeyBindingForGitRemotePushPopUp          []string

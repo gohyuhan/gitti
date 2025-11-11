@@ -16,7 +16,36 @@ import (
 // -----------------------------------------------------------------------------
 // implementation for list compoenent
 // -----------------------------------------------------------------------------
-// to record the current navigation index position
+
+// for list component of git branch
+func (d gitBranchItemDelegate) Height() int                             { return 1 }
+func (d gitBranchItemDelegate) Spacing() int                            { return 0 }
+func (d gitBranchItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(gitBranchItem)
+	if !ok {
+		return
+	}
+
+	str := fmt.Sprintf("   %s", i.BranchName)
+	if i.IsCheckedOut {
+		str = fmt.Sprintf(" * %s", i.BranchName)
+	}
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+
+	fn := style.ItemStyle.Render
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
+		}
+	}
+	str = utils.TruncateString(str, componentWidth)
+
+	fmt.Fprint(w, fn(str))
+}
+
+// for list component of modified files
 func (d gitModifiedFilesItemDelegate) Height() int                             { return 1 }
 func (d gitModifiedFilesItemDelegate) Spacing() int                            { return 0 }
 func (d gitModifiedFilesItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -44,20 +73,17 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 	fmt.Fprint(w, fn(str))
 }
 
-// for list component of git branch
-func (d gitBranchItemDelegate) Height() int                             { return 1 }
-func (d gitBranchItemDelegate) Spacing() int                            { return 0 }
-func (d gitBranchItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(gitBranchItem)
+// for list component of modified files
+func (d gitStashItemDelegate) Height() int                             { return 1 }
+func (d gitStashItemDelegate) Spacing() int                            { return 0 }
+func (d gitStashItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d gitStashItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(gitStashItem)
 	if !ok {
 		return
 	}
 
-	str := fmt.Sprintf("   %s", i.BranchName)
-	if i.IsCheckedOut {
-		str = fmt.Sprintf(" * %s", i.BranchName)
-	}
+	str := fmt.Sprintf(" %s", i.Message)
 
 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 

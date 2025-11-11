@@ -27,9 +27,11 @@ func TruncateString(s string, maxWidth int) string {
 	}
 
 	if len(result) < len(runes) {
-		// Add ellipsis and a space padding if possible
-		if maxWidth-displayWidth >= 0 {
-			result = append(result[:len(result)-2], '…')
+		// Add ellipsis if we have room
+		if len(result) >= 2 {
+			result = append(result[:len(result)-1], '…')
+		} else if len(result) == 1 {
+			result = []rune{'…'}
 		}
 	}
 

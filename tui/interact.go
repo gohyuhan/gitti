@@ -208,6 +208,24 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			return m, tea.Quit
 		}
 
+	case "tab":
+		// next component navigation
+		nextNavigation := m.CurrentSelectedComponentIndex + 1
+		if nextNavigation < len(constant.ComponentNavigationList) {
+			m.CurrentSelectedComponentIndex = nextNavigation
+			m.CurrentSelectedComponent = constant.ComponentNavigationList[nextNavigation]
+			leftPanelDynamicResize(m)
+		}
+		return m, nil
+	case "shift+tab":
+		// previous component navigation
+		previousNavigation := m.CurrentSelectedComponentIndex - 1
+		if previousNavigation >= 0 {
+			m.CurrentSelectedComponentIndex = previousNavigation
+			m.CurrentSelectedComponent = constant.ComponentNavigationList[previousNavigation]
+			leftPanelDynamicResize(m)
+		}
+		return m, nil
 	case "?":
 		m.ShowPopUp.Store(true)
 		m.IsTyping.Store(false)
@@ -215,25 +233,29 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		initGlobalKeyBindingPopUpModel(m)
 		return m, nil
 
-	case "0":
+	case "1":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedContainer != constant.LocalBranchComponent {
-				m.CurrentSelectedContainer = constant.LocalBranchComponent
+			if m.CurrentSelectedComponent != constant.LocalBranchComponent {
+				m.CurrentSelectedComponent = constant.LocalBranchComponent
+				m.CurrentSelectedComponentIndex = 1
+				leftPanelDynamicResize(m)
 			}
 		}
 		return m, nil
 
-	case "1":
+	case "2":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedContainer != constant.ModifiedFilesComponent {
-				m.CurrentSelectedContainer = constant.ModifiedFilesComponent
+			if m.CurrentSelectedComponent != constant.ModifiedFilesComponent {
+				m.CurrentSelectedComponent = constant.ModifiedFilesComponent
+				m.CurrentSelectedComponentIndex = 2
+				leftPanelDynamicResize(m)
 			}
 		}
 		return m, nil
 
 	case "n":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedContainer == constant.LocalBranchComponent {
+			if m.CurrentSelectedComponent == constant.LocalBranchComponent {
 				m.PopUpType = constant.ChooseNewBranchTypePopUp
 				m.IsTyping.Store(false)
 				m.ShowPopUp.Store(true)
@@ -319,10 +341,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "enter":
 		if !m.ShowPopUp.Load() {
-			switch m.CurrentSelectedContainer {
+			switch m.CurrentSelectedComponent {
 			case constant.ModifiedFilesComponent:
 				if len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
-					m.CurrentSelectedContainer = constant.FileDiffComponent
+					m.CurrentSelectedComponent = constant.DetailComponent
+					m.DetailPanelParentComponent = constant.ModifiedFilesComponent
 				}
 			case constant.LocalBranchComponent:
 				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(gitBranchItem)
@@ -443,15 +466,16 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			}
 			return m, nil
 		} else {
-			switch m.CurrentSelectedContainer {
-			case constant.FileDiffComponent:
-				m.CurrentSelectedContainer = constant.ModifiedFilesComponent
+			switch m.CurrentSelectedComponent {
+			case constant.DetailComponent:
+				m.CurrentSelectedComponent = m.DetailPanelParentComponent
+				m.DetailPanelParentComponent = ""
 			}
 		}
 		return m, nil
 
-	case "s":
-		if m.CurrentSelectedContainer == constant.ModifiedFilesComponent {
+	case "space":
+		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			var fileName string
 			if currentSelectedModifiedFile != nil {
@@ -463,23 +487,23 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "up", "k":
 		if !m.ShowPopUp.Load() {
-			switch m.CurrentSelectedContainer {
+			switch m.CurrentSelectedComponent {
 			case constant.LocalBranchComponent:
 				// we don't use the list native Update() because we track the current selected index
 				if m.CurrentRepoBranchesInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() - 1
 					m.CurrentRepoBranchesInfoList.Select(latestIndex)
-					m.NavigationIndexPosition.LocalBranchComponent = latestIndex
+					m.ListNavigationIndexPosition.LocalBranchComponent = latestIndex
 				}
 			case constant.ModifiedFilesComponent:
 				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
 				if m.CurrentRepoModifiedFilesInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() - 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
-					m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
+					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
 					reinitAndRenderModifiedFileDiffViewPort(m)
 				}
-			case constant.FileDiffComponent:
+			case constant.DetailComponent:
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
 			}
@@ -490,23 +514,23 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "down", "j":
 		if !m.ShowPopUp.Load() {
-			switch m.CurrentSelectedContainer {
+			switch m.CurrentSelectedComponent {
 			case constant.LocalBranchComponent:
 				// we don't use the list native Update() because we track the current selected index
 				if m.CurrentRepoBranchesInfoList.Index() < len(m.CurrentRepoBranchesInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() + 1
 					m.CurrentRepoBranchesInfoList.Select(latestIndex)
-					m.NavigationIndexPosition.LocalBranchComponent = latestIndex
+					m.ListNavigationIndexPosition.LocalBranchComponent = latestIndex
 				}
 			case constant.ModifiedFilesComponent:
 				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
 				if m.CurrentRepoModifiedFilesInfoList.Index() < len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
-					m.NavigationIndexPosition.ModifiedFilesComponent = latestIndex
+					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
 					reinitAndRenderModifiedFileDiffViewPort(m)
 				}
-			case constant.FileDiffComponent:
+			case constant.DetailComponent:
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
 			}
