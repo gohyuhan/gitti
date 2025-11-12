@@ -26,6 +26,8 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderGlobalKeyBindingPopUp(m)
 	case constant.CommitPopUp:
 		popUp = renderGitCommitPopUp(m)
+	case constant.AmendCommitPopUp:
+		popUp = renderGitAmendCommitPopUp(m)
 	case constant.AddRemotePromptPopUp:
 		popUp = renderAddRemotePromptPopUp(m)
 	case constant.GitRemotePushPopUp:
@@ -80,6 +82,10 @@ func renderGlobalKeyBindingPopUp(m *GittiModel) string {
 			case i18n.INFO:
 				keyBindingLine += " " + style.GlobalKeyBindingKeyMappingLineStyle.Render(fmt.Sprintf("%*s", m.GlobalKeyBindingKeyMapLargestLen, line.KeyBindingLine)) +
 					"  " +
+					line.TitleOrInfoLine +
+					"\n"
+			case i18n.WARN:
+				keyBindingLine += " " + style.GlobalKeyBindingKeyMappingLineStyle.Render(fmt.Sprintf("%s", line.KeyBindingLine)) +
 					line.TitleOrInfoLine +
 					"\n"
 			}
@@ -176,6 +182,95 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 		}
 		popUp.GitCommitOutputViewport.SetContent(gitCommitOutputLog)
 		popUp.GitCommitOutputViewport.ViewDown()
+	}
+}
+
+// ------------------------------------
+//
+//	For Git Commit (Amend)
+//
+// ------------------------------------
+func renderGitAmendCommitPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8))
+		popUp.MessageTextInput.SetWidth(popUpWidth - 4)
+		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
+
+		// Rendered content
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitleAmendVersion)
+		inputView := popUp.MessageTextInput.View()
+		descLabel := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpDescriptionTitleAmendVersion)
+		descView := popUp.DescriptionTextAreaInput.View()
+
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			inputView,
+			"", // 1-line padding
+			descLabel,
+			descView,
+		)
+		if popUp.GitAmendCommitOutputViewport.GetContent() != "" {
+			logViewPortStyle := style.PanelBorderStyle.
+				Width(popUpWidth - 2).
+				Height(constant.PopUpGitCommitOutputViewPortHeight + 2)
+			if popUp.HasError.Load() {
+				logViewPortStyle = style.PanelBorderStyle.
+					BorderForeground(style.ColorError)
+			} else if popUp.ProcessSuccess.Load() {
+				logViewPortStyle = style.PanelBorderStyle.
+					BorderForeground(style.ColorAccent)
+			}
+
+			logViewPort := logViewPortStyle.Render(popUp.GitAmendCommitOutputViewport.View())
+
+			// Show spinner above viewport when processing
+			if popUp.IsProcessing.Load() {
+				processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.CommitPopUpProcessing)
+				content = lipgloss.JoinVertical(
+					lipgloss.Left,
+					title,
+					inputView,
+					"", // 1-line padding
+					descLabel,
+					descView,
+					"",
+					processingText,
+					logViewPort,
+				)
+			} else {
+				content = lipgloss.JoinVertical(
+					lipgloss.Left,
+					title,
+					inputView,
+					"", // 1-line padding
+					descLabel,
+					descView,
+					"",
+					logViewPort,
+				)
+			}
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// to update the amend commit output log for git amend commit
+// this also take care of log by pre commit and post commit
+func updatePopUpAmendCommitOutputViewPort(m *GittiModel) {
+	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
+	if ok {
+		popUp.GitAmendCommitOutputViewport.SetWidth(min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		var gitCommitOutputLog string
+		logs := m.GitState.GitCommit.GitCommitOutput()
+		for _, line := range logs {
+			logLine := style.NewStyle.Render(line)
+			gitCommitOutputLog += logLine + "\n"
+		}
+		popUp.GitAmendCommitOutputViewport.SetContent(gitCommitOutputLog)
+		popUp.GitAmendCommitOutputViewport.ViewDown()
 	}
 }
 

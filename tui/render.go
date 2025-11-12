@@ -12,6 +12,10 @@ import (
 	"gitti/tui/utils"
 )
 
+// for bubbletea list component, we can't get rid of the "No items." natively for now as there was no exposed api
+// see https://github.com/charmbracelet/bubbles/blob/master/list/list.go#L1222
+// we are using ReplaceAll as a hack for now to replace "No items." with ""
+
 // -----------------------------------------------------------------------------
 //
 //	Functions that help construct the view
@@ -39,7 +43,7 @@ func renderLocalBranchesComponentPanel(width int, height int, m *GittiModel) str
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(m.CurrentRepoBranchesInfoList.View())
+		Render(strings.ReplaceAll(m.CurrentRepoBranchesInfoList.View(), "No items.", ""))
 }
 
 // Render the Changed Files panel
@@ -51,7 +55,7 @@ func renderModifiedFilesComponentPanel(width int, height int, m *GittiModel) str
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(m.CurrentRepoModifiedFilesInfoList.View())
+		Render(strings.ReplaceAll(m.CurrentRepoModifiedFilesInfoList.View(), "No items.", ""))
 }
 
 // Render the detial component part at the right of the window,
@@ -76,8 +80,7 @@ func renderStashComponentPanel(width int, height int, m *GittiModel) string {
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(m.CurrentRepoStashInfoList.View())
-
+		Render(strings.ReplaceAll(m.CurrentRepoStashInfoList.View(), "No items.", ""))
 }
 
 func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
@@ -86,6 +89,8 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 		switch m.PopUpType {
 		case constant.CommitPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForCommitPopUp
+		case constant.AmendCommitPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForAmendCommitPopUp
 		case constant.AddRemotePromptPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForAddRemotePromptPopUp
 		case constant.GitRemotePushPopUp:
@@ -247,6 +252,12 @@ func tuiWindowSizing(m *GittiModel) {
 			if exist {
 				width := (min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 				popUp.GitCommitOutputViewport.SetWidth(width)
+			}
+		case constant.AmendCommitPopUp:
+			popUp, exist := m.PopUpModel.(*GitAmendCommitPopUpModel)
+			if exist {
+				width := (min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.GitAmendCommitOutputViewport.SetWidth(width)
 			}
 		case constant.GitRemotePushPopUp:
 			popUp, exist := m.PopUpModel.(*GitRemotePushPopUpModel)

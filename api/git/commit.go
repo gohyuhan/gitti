@@ -16,20 +16,24 @@ import (
 )
 
 type GitCommit struct {
-	errorLog                      []error
-	gitCommitProcess              *exec.Cmd
-	gitRemotePushProcess          *exec.Cmd
-	gitAddRemoteProcess           *exec.Cmd
-	gitCommitOutput               []string
-	gitRemotePushOutput           []string
-	updateChannel                 chan string
-	gitCommitProcessMutex         sync.Mutex
-	gitRemotePushProcessMutex     sync.Mutex
-	gitAddRemoteProcessMutex      sync.Mutex
-	isGitCommitProcessRunning     atomic.Bool
-	isGitRemotePushProcessRunning atomic.Bool
-	isGitAddRemoteProcessRunning  atomic.Bool
-	remote                        []GitRemote
+	errorLog                       []error
+	gitCommitProcess               *exec.Cmd
+	gitAmendCommitProcess          *exec.Cmd
+	gitRemotePushProcess           *exec.Cmd
+	gitAddRemoteProcess            *exec.Cmd
+	gitCommitOutput                []string
+	gitAmendCommitOutput           []string
+	gitRemotePushOutput            []string
+	updateChannel                  chan string
+	gitCommitProcessMutex          sync.Mutex
+	gitAmendCommitProcessMutex     sync.Mutex
+	gitRemotePushProcessMutex      sync.Mutex
+	gitAddRemoteProcessMutex       sync.Mutex
+	isGitCommitProcessRunning      atomic.Bool
+	isGitAmendCommitProcessRunning atomic.Bool
+	isGitRemotePushProcessRunning  atomic.Bool
+	isGitAddRemoteProcessRunning   atomic.Bool
+	remote                         []GitRemote
 }
 
 type GitRemote struct {
@@ -37,18 +41,30 @@ type GitRemote struct {
 	Url  string
 }
 
+type GitAmendFileSelectionForRemoval struct {
+	FileName           string
+	SelectedForRemoval bool
+}
+
+type LatestCommitMsgAndDesc struct {
+	Message     string
+	Description string
+}
+
 func InitGitCommit(updateChannel chan string) *GitCommit {
 	gitCommit := GitCommit{
-		gitCommitProcess:     nil,
-		gitRemotePushProcess: nil,
-		gitAddRemoteProcess:  nil,
-		gitCommitOutput:      []string{},
-		gitRemotePushOutput:  []string{},
-		updateChannel:        updateChannel,
-		remote:               []GitRemote{},
+		gitCommitProcess:      nil,
+		gitAmendCommitProcess: nil,
+		gitRemotePushProcess:  nil,
+		gitAddRemoteProcess:   nil,
+		gitCommitOutput:       []string{},
+		gitRemotePushOutput:   []string{},
+		updateChannel:         updateChannel,
+		remote:                []GitRemote{},
 	}
 
 	gitCommit.isGitCommitProcessRunning.Store(false)
+	gitCommit.isGitAmendCommitProcessRunning.Store(false)
 	gitCommit.isGitRemotePushProcessRunning.Store(false)
 	gitCommit.isGitAddRemoteProcessRunning.Store(false)
 
@@ -95,10 +111,10 @@ func (gc *GitCommit) GitFetch() {
 
 // ----------------------------------
 //
-//	Related to Git Stage & Commit
+//	Related to Git Commit
 //
 // ----------------------------------
-func (gc *GitCommit) GitCommit(message, description string) int {
+func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) int {
 	if !gc.isGitCommitProcessRunning.CompareAndSwap(false, true) {
 		return -1
 	}
@@ -114,6 +130,9 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 	gc.gitCommitProcessMutex.Lock()
 
 	gitArgs := []string{"commit", "-m", message}
+	if isAmendCommit {
+		gitArgs = []string{"commit", "--amend", "-m", message}
+	}
 	if len(description) > 0 {
 		gitArgs = append(gitArgs, "-m", description)
 	}
@@ -150,9 +169,10 @@ func (gc *GitCommit) GitCommit(message, description string) int {
 		for scanner.Scan() {
 			line := scanner.Text()
 			gc.gitCommitOutput = append(gc.gitCommitOutput, line)
-			select {
-			case gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE:
-			default:
+			if isAmendCommit {
+				gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE
+			} else {
+				gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE
 			}
 		}
 	}()
@@ -190,6 +210,33 @@ func (gc *GitCommit) KillGitCommitCmd() {
 func (gc *GitCommit) gitCommitProcessReset() {
 	gc.gitCommitProcess = nil
 	gc.isGitCommitProcessRunning.Store(false)
+}
+
+// ----------------------------------
+//
+//	Related to Git Commit (Amend)
+//
+// ----------------------------------
+func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
+	gitArgs := []string{"log", "-1", "--pretty=format:%s%n%b", "HEAD"}
+	latestCommitCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	commitMsgAndDesc, cmdErr := latestCommitCmd.Output()
+	if cmdErr != nil {
+		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GET LATEST COMMIT INFO ERROR]: %w", cmdErr))
+		return LatestCommitMsgAndDesc{}
+	}
+
+	parsed := strings.SplitN(string(commitMsgAndDesc), "\n", 2)
+	title := parsed[0]
+	description := ""
+	if len(parsed) > 1 {
+		description = parsed[1]
+	}
+
+	return LatestCommitMsgAndDesc{
+		Message:     title,
+		Description: description,
+	}
 }
 
 // ----------------------------------

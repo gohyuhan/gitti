@@ -23,7 +23,7 @@ type GittiConfigSettings struct {
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
-	FileWatcherDebounceMS:           450,
+	FileWatcherDebounceMS:           200,
 	GitFilesActiveRefreshDurationMS: 2500,
 	GitFetchDurationMS:              60000,
 	GitInitDefaultBranch:            "master",

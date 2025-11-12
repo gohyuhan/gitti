@@ -78,6 +78,8 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			initStashList(m)
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
 			updatePopUpCommitOutputViewPort(m)
+		case git.GIT_AMEND_COMMIT_OUTPUT_UPDATE:
+			updatePopUpAmendCommitOutputViewPort(m)
 		case git.GIT_REMOTE_PUSH_OUTPUT_UPDATE:
 			updateGitRemotePushOutputViewport(m)
 		case git.GIT_PULL_OUTPUT_UPDATE:
@@ -97,6 +99,12 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				commitPopup.Spinner, cmd = commitPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
+		case constant.AmendCommitPopUp:
+			if amendCommitPopup, ok := m.PopUpModel.(*GitAmendCommitPopUpModel); ok && amendCommitPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				amendCommitPopup.Spinner, cmd = amendCommitPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
 		case constant.GitRemotePushPopUp:
 			if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok && pushPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
@@ -105,6 +113,12 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case constant.GitPullOutputPopUp:
 			if pullPopup, ok := m.PopUpModel.(*GitPullOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.SwitchBranchOutputPopUp:
+			if pullPopup, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)

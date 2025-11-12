@@ -155,6 +155,8 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 
 func (gf *GitFiles) StageOrUnstageFile(fileName string) {
 	gf.gitFilesMutex.Lock()
+	defer gf.gitFilesMutex.Unlock()
+
 	fileIndex, fileIndexExist := gf.filesPosition[fileName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
@@ -183,7 +185,32 @@ func (gf *GitFiles) StageOrUnstageFile(fileName string) {
 			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
 			stageCmd.Run()
 		}
-		gf.updateChannel <- GIT_FILES_STATUS_UPDATE
 	}
-	gf.gitFilesMutex.Unlock()
+}
+
+func (gf *GitFiles) ResetFile() {
+
+}
+
+func (gf *GitFiles) StageAllChanges() {
+	gf.gitFilesMutex.Lock()
+	defer gf.gitFilesMutex.Unlock()
+
+	var gitArgs []string
+
+	gitArgs = []string{"add", "."}
+	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	stageCmd.Run()
+}
+
+func (gf *GitFiles) UnstageAllChanges() {
+	gf.gitFilesMutex.Lock()
+	defer gf.gitFilesMutex.Unlock()
+
+	var gitArgs []string
+
+	gitArgs = []string{"reset", "HEAD"}
+	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	stageCmd.Run()
+
 }

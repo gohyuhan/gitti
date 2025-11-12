@@ -19,6 +19,8 @@ import (
 ) // this was for various components part init or reinit function due to update or newly create
 
 // those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
+// for bubbletea list component, we can't get rid of the "No items." for now as we couldn't access into it or modify it
+// see https://github.com/charmbracelet/bubbles/blob/master/list/list.go#L1222
 
 // init the list component for Branch Component
 func initBranchList(m *GittiModel) {
@@ -159,14 +161,21 @@ func initGlobalKeyBindingPopUpModel(m *GittiModel) {
 
 // init the popup model for git commit
 func initGitCommitPopUpModel(m *GittiModel) {
+	commitMsg := ""
+	commitDesc := ""
+	commitMsgPlaceholder := i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolder
+	commitDescPlaceholder := i18n.LANGUAGEMAPPING.CommitPopUpCommitDescriptionInputPlaceHolder
+
 	CommitMessageTextInput := textinput.New()
-	CommitMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolder
+	CommitMessageTextInput.SetValue(commitMsg)
+	CommitMessageTextInput.Placeholder = commitMsgPlaceholder
 	CommitMessageTextInput.Focus()
 	CommitMessageTextInput.VirtualCursor = true
 
 	CommitDescriptionTextAreaInput := textarea.New()
+	CommitDescriptionTextAreaInput.SetValue(commitDesc)
 	CommitDescriptionTextAreaInput.ShowLineNumbers = false
-	CommitDescriptionTextAreaInput.Placeholder = i18n.LANGUAGEMAPPING.CommitPopUpCommitDescriptionInputPlaceHolder
+	CommitDescriptionTextAreaInput.Placeholder = commitDescPlaceholder
 	CommitDescriptionTextAreaInput.SetHeight(5)
 	CommitDescriptionTextAreaInput.Blur()
 
@@ -185,6 +194,7 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	newSessionID := uuid.New()
 
 	popUpModel := &GitCommitPopUpModel{
+		IsAmendCommit:            false,
 		MessageTextInput:         CommitMessageTextInput,
 		DescriptionTextAreaInput: CommitDescriptionTextAreaInput,
 		TotalInputCount:          2,
@@ -192,6 +202,58 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		GitCommitOutputViewport:  vp,
 		Spinner:                  s,
 		SessionID:                newSessionID,
+	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+	m.PopUpModel = popUpModel
+}
+
+// init the popup model for git amend commit
+func initGitAmendCommitPopUpModel(m *GittiModel) {
+	commitMsgAndDesc := m.GitState.GitCommit.GetLatestCommitMsgAndDesc()
+	commitMsg := commitMsgAndDesc.Message
+	commitDesc := commitMsgAndDesc.Description
+	commitMsgPlaceholder := i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolderAmendVersion
+	commitDescPlaceholder := i18n.LANGUAGEMAPPING.CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion
+
+	CommitMessageTextInput := textinput.New()
+	CommitMessageTextInput.SetValue(commitMsg)
+	CommitMessageTextInput.Placeholder = commitMsgPlaceholder
+	CommitMessageTextInput.Focus()
+	CommitMessageTextInput.VirtualCursor = true
+
+	CommitDescriptionTextAreaInput := textarea.New()
+	CommitDescriptionTextAreaInput.SetValue(commitDesc)
+	CommitDescriptionTextAreaInput.ShowLineNumbers = false
+	CommitDescriptionTextAreaInput.Placeholder = commitDescPlaceholder
+	CommitDescriptionTextAreaInput.SetHeight(5)
+	CommitDescriptionTextAreaInput.Blur()
+
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpGitAmendCommitOutputViewPortHeight)
+	vp.SetWidth(min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	// Generate a unique UUID for this popup session
+	newSessionID := uuid.New()
+
+	popUpModel := &GitAmendCommitPopUpModel{
+		IsAmendCommit:                true,
+		MessageTextInput:             CommitMessageTextInput,
+		DescriptionTextAreaInput:     CommitDescriptionTextAreaInput,
+		TotalInputCount:              2,
+		CurrentActiveInputIndex:      1,
+		GitAmendCommitOutputViewport: vp,
+		Spinner:                      s,
+		SessionID:                    newSessionID,
 	}
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)

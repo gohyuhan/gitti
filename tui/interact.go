@@ -11,6 +11,19 @@ import (
 
 // the function to handle bubbletea key interactions
 func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+	// global key binding
+	switch msg.String() {
+	case "ctrl+c":
+		api.GITDAEMON.Stop()
+		return m, tea.Quit
+	case "ctrl+s":
+		gitStageAllChangesService(m)
+		return m, nil
+	case "ctrl+u":
+		gitUnstageAllChangesService(m)
+		return m, nil
+	}
+
 	if m.IsTyping.Load() {
 		return handleTypingKeyBindingInteraction(msg, m)
 	} else {
@@ -21,14 +34,12 @@ func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 // typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
 func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	switch msg.String() {
-	case "ctrl+c":
-		api.GITDAEMON.Stop()
-		return m, tea.Quit
-
 	case "esc":
 		switch m.PopUpType {
 		case constant.CommitPopUp:
 			gitCommitCancelService(m)
+		case constant.AmendCommitPopUp:
+			gitAmendCommitCancelService(m)
 		case constant.AddRemotePromptPopUp:
 			gitAddRemoteCancelService(m)
 		case constant.CreateNewBranchPopUp:
@@ -43,6 +54,19 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 		switch m.PopUpType {
 		case constant.CommitPopUp:
 			popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+			if ok {
+				popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+				switch popUp.CurrentActiveInputIndex {
+				case 1:
+					popUp.MessageTextInput.Focus()
+					popUp.DescriptionTextAreaInput.Blur()
+				case 2:
+					popUp.MessageTextInput.Blur()
+					popUp.DescriptionTextAreaInput.Focus()
+				}
+			}
+		case constant.AmendCommitPopUp:
+			popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 			if ok {
 				popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
 				switch popUp.CurrentActiveInputIndex {
@@ -86,6 +110,19 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 					popUp.DescriptionTextAreaInput.Focus()
 				}
 			}
+		case constant.AmendCommitPopUp:
+			popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
+			if ok {
+				popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+				switch popUp.CurrentActiveInputIndex {
+				case 1:
+					popUp.MessageTextInput.Focus()
+					popUp.DescriptionTextAreaInput.Blur()
+				case 2:
+					popUp.MessageTextInput.Blur()
+					popUp.DescriptionTextAreaInput.Focus()
+				}
+			}
 		case constant.AddRemotePromptPopUp:
 			popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 			if ok {
@@ -111,10 +148,23 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				popUp.MessageTextInput.Focus()
 				popUp.DescriptionTextAreaInput.Blur()
 				popUp.CurrentActiveInputIndex = 1
-				// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
+				// start a seperate thread commit them and set the value of msg and desc to "" if committed successfully
 				// also do not start any git operation is message is no provided
 				if !popUp.IsProcessing.Load() {
-					gitCommitService(m)
+					gitCommitService(m, popUp.IsAmendCommit)
+					// Start spinner ticking
+					return m, popUp.Spinner.Tick
+				}
+			}
+		case constant.AmendCommitPopUp:
+			popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
+			if ok {
+				// once they start for amend commit process, reinit the input focus
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+				popUp.CurrentActiveInputIndex = 1
+				if !popUp.IsProcessing.Load() {
+					gitAmendCommitService(m, popUp.IsAmendCommit)
 					// Start spinner ticking
 					return m, popUp.Spinner.Tick
 				}
@@ -168,6 +218,21 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				return m, cmd
 			}
 		}
+	case constant.AmendCommitPopUp:
+		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 		if ok {
@@ -197,10 +262,6 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg.String() {
-	case "ctrl+c":
-		api.GITDAEMON.Stop()
-		return m, tea.Quit
-
 	case "q", "Q":
 		// only work when there is no pop up
 		if !m.ShowPopUp.Load() {
@@ -279,6 +340,18 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				popUp.GitCommitOutputViewport.SetContent("")
 				popUp.SessionID = uuid.New()
 			}
+			m.IsTyping.Store(true)
+		}
+		return m, nil
+
+	case "A":
+		if !m.ShowPopUp.Load() {
+			m.ShowPopUp.Store(true)
+			m.PopUpType = constant.AmendCommitPopUp
+			m.GitState.GitCommit.ClearGitCommitOutput()
+
+			initGitAmendCommitPopUpModel(m)
+
 			m.IsTyping.Store(true)
 		}
 		return m, nil
@@ -403,6 +476,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					if ok {
 						popUp.IsProcessing.Store(true) // set it directly first
 						gitSwitchBranchService(m, branchName, selectedOption.switchBranchType)
+						return m, popUp.Spinner.Tick
 					}
 				}
 
@@ -480,9 +554,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			var fileName string
 			if currentSelectedModifiedFile != nil {
 				fileName = currentSelectedModifiedFile.(gitModifiedFilesItem).FileName
-				go func() {
-					m.GitState.GitFiles.StageOrUnstageFile(fileName)
-				}()
+				gitStageOrUnstageService(m, fileName)
 			}
 		}
 		return m, nil

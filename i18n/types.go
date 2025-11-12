@@ -4,6 +4,7 @@ package i18n
 const (
 	TITLE = "TITLE"
 	INFO  = "INFO"
+	WARN  = "WARN"
 )
 
 type GlobalKeyBindingMappingFormat struct {
@@ -61,6 +62,7 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentNone     []string
 	KeyBindingKeyDetailComponent             []string
 	KeyBindingForCommitPopUp                 []string
+	KeyBindingForAmendCommitPopUp            []string
 	KeyBindingForAddRemotePromptPopUp        []string
 	KeyBindingForGitRemotePushPopUp          []string
 	KeyBindingForChooseRemotePopUp           []string
@@ -78,11 +80,15 @@ type LanguageMapping struct {
 	// Global Key KeyBinding
 	GlobalKeyBinding []GlobalKeyBindingMappingFormat
 	// commit
-	CommitPopUpMessageTitle                      string
-	CommitPopUpMessageInputPlaceHolder           string
-	CommitPopUpDescriptionTitle                  string
-	CommitPopUpCommitDescriptionInputPlaceHolder string
-	CommitPopUpProcessing                        string
+	CommitPopUpMessageTitle                                  string
+	CommitPopUpMessageInputPlaceHolder                       string
+	CommitPopUpDescriptionTitle                              string
+	CommitPopUpCommitDescriptionInputPlaceHolder             string
+	CommitPopUpProcessing                                    string
+	CommitPopUpMessageTitleAmendVersion                      string
+	CommitPopUpMessageInputPlaceHolderAmendVersion           string
+	CommitPopUpDescriptionTitleAmendVersion                  string
+	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion string
 	// prompt to add remote origin
 	AddRemotePopUpPrompt                 string
 	AddRemotePopUpRemoteNameTitle        string

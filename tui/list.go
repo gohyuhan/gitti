@@ -34,10 +34,14 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 
 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
 	str = utils.TruncateString(str, componentWidth)
@@ -66,17 +70,21 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 
 	str := fmt.Sprintf(" %s%s %s", indexState, workTree, fileName)
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
 
 	fmt.Fprint(w, fn(str))
 }
 
-// for list component of modified files
+// for list component of stash
 func (d gitStashItemDelegate) Height() int                             { return 1 }
 func (d gitStashItemDelegate) Spacing() int                            { return 0 }
 func (d gitStashItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -90,12 +98,17 @@ func (d gitStashItemDelegate) Render(w io.Writer, m list.Model, index int, listI
 
 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
+
 	str = utils.TruncateString(str, componentWidth)
 
 	fmt.Fprint(w, fn(str))

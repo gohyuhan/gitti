@@ -8,6 +8,7 @@ package constant
 const (
 	NoPopUp                     = "NoPopUp"
 	GlobalKeyBindingPopUp       = "GlobalKeyBindingPopUp"
+	AmendCommitPopUp            = "AmendCommitPopUp"            // IsTyping will be true
 	CommitPopUp                 = "CommitPopUp"                 // IsTyping will be true
 	AddRemotePromptPopUp        = "AddRemotePromptPopUp"        // IsTyping will be true
 	ChoosePushTypePopUp         = "ChoosePushTypePopUp"         // IsTyping will be false
@@ -37,6 +38,7 @@ const (
 	MaxLeftPanelWidth                   = 80
 	MaxGlobalKeyBindingPopUpWidth       = 150
 	MaxCommitPopUpWidth                 = 150
+	MaxAmendCommitPopUpWidth            = 150
 	MaxAddRemotePromptPopUpWidth        = 150
 	MaxGitRemotePushPopUpWidth          = 150
 	MaxChooseRemotePopUpWidth           = 150
@@ -48,17 +50,18 @@ const (
 	MaxChooseGitPullTypePopUpWidth      = 150
 	MaxGitPullOutputPopUpWidth          = 150
 
-	PopUpGlobalKeyBindingViewPortHeight    = 30
-	PopUpGitCommitOutputViewPortHeight     = 10
-	PopUpAddRemoteOutputViewPortHeight     = 2
-	PopUpGitRemotePushOutputViewportHeight = 10
-	PopUpChooseRemoteHeight                = 10
-	PopUpChoosePushTypeHeight              = 6
-	PopUpChooseNewBranchTypeHeight         = 6
-	PopUpChooseSwitchBranchTypeHeight      = 6
-	PopUpSwitchBranchOutputViewPortHeight  = 10
-	PopUpChooseGitPullTypeHeight           = 6
-	PopUpGitPullOutputViewportHeight       = 10
+	PopUpGlobalKeyBindingViewPortHeight     = 30
+	PopUpGitCommitOutputViewPortHeight      = 10
+	PopUpGitAmendCommitOutputViewPortHeight = 10
+	PopUpAddRemoteOutputViewPortHeight      = 2
+	PopUpGitRemotePushOutputViewportHeight  = 10
+	PopUpChooseRemoteHeight                 = 10
+	PopUpChoosePushTypeHeight               = 6
+	PopUpChooseNewBranchTypeHeight          = 6
+	PopUpChooseSwitchBranchTypeHeight       = 6
+	PopUpSwitchBranchOutputViewPortHeight   = 10
+	PopUpChooseGitPullTypeHeight            = 6
+	PopUpGitPullOutputViewportHeight        = 10
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

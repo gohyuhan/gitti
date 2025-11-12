@@ -6,7 +6,7 @@ import (
 
 var (
 	// Base colors
-	ColorPrimary    = lipgloss.Color("#00BFFF")
+	ColorPrimary    = lipgloss.Color("#009ACD")
 	ColorSecondary  = lipgloss.Color("#AAAAAA")
 	ColorHighlight  = lipgloss.Color("#FFD700")
 	ColorAccent     = lipgloss.Color("#98FB98")

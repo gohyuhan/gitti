@@ -59,10 +59,11 @@ type GlobalKeyBindingPopUpModel struct {
 
 // ---------------------------------
 //
-// # For git commit process pop up mdel
+// # For git commit process pop up model
 //
 // ---------------------------------
 type GitCommitPopUpModel struct {
+	IsAmendCommit            bool            // to indicate is this is a normal commit or an amend commit operation
 	MessageTextInput         textinput.Model // input index 1
 	DescriptionTextAreaInput textarea.Model  // input index 2
 	TotalInputCount          int             // to tell us how many input were there
@@ -73,6 +74,28 @@ type GitCommitPopUpModel struct {
 	HasError                 atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess           atomic.Bool     // has the process sucessfuly executed
 	IsCancelled              atomic.Bool     // flag to indicate if the operation was cancelled by user
+	// SessionID is a unique UUID for each popup instance to prevent
+	// stale goroutines from affecting new popups
+	SessionID uuid.UUID
+}
+
+// ---------------------------------
+//
+// # For git amend commit process pop up model
+//
+// ---------------------------------
+type GitAmendCommitPopUpModel struct {
+	IsAmendCommit                bool            // to indicate is this is a normal commit or an amend commit operation
+	MessageTextInput             textinput.Model // input index 1
+	DescriptionTextAreaInput     textarea.Model  // input index 2
+	TotalInputCount              int             // to tell us how many input were there
+	CurrentActiveInputIndex      int             // to tell us which input should be shown as highlighted/focus and be updated
+	GitAmendCommitOutputViewport viewport.Model  // to log out the output from git operation
+	Spinner                      spinner.Model   // spinner for showing processing state
+	IsProcessing                 atomic.Bool     // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                     atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess               atomic.Bool     // has the process sucessfuly executed
+	IsCancelled                  atomic.Bool     // flag to indicate if the operation was cancelled by user
 	// SessionID is a unique UUID for each popup instance to prevent
 	// stale goroutines from affecting new popups
 	SessionID uuid.UUID
