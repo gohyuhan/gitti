@@ -239,10 +239,9 @@ func (i gitBranchItem) FilterValue() string {
 // ---------------------------------
 type gitModifiedFilesItemDelegate struct{}
 type gitModifiedFilesItem struct {
-	FileName         string
-	IndexState       string
-	WorkTree         string
-	SelectedForStage bool
+	FileName   string
+	IndexState string
+	WorkTree   string
 }
 
 func (i gitModifiedFilesItem) FilterValue() string {

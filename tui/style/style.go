@@ -65,4 +65,8 @@ var (
 					Foreground(ColorPrompt)
 	GlobalKeyBindingKeyMappingLineStyle = NewStyle.
 						Foreground(ColorKeyBinding)
+	StagedFileStyle = NewStyle.
+			Foreground(ColorAccent)
+	UnstagedFileStyle = NewStyle.
+				Foreground(ColorError)
 )

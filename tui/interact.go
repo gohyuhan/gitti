@@ -480,7 +480,9 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			var fileName string
 			if currentSelectedModifiedFile != nil {
 				fileName = currentSelectedModifiedFile.(gitModifiedFilesItem).FileName
-				m.GitState.GitFiles.ToggleFilesStageStatus(fileName)
+				go func() {
+					m.GitState.GitFiles.StageOrUnstageFile(fileName)
+				}()
 			}
 		}
 		return m, nil

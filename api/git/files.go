@@ -17,10 +17,9 @@ const (
 )
 
 type FileStatus struct {
-	FileName         string
-	IndexState       string
-	WorkTree         string
-	SelectedForStage bool
+	FileName   string
+	IndexState string
+	WorkTree   string
 }
 
 type FileDiffLine struct {
@@ -29,19 +28,17 @@ type FileDiffLine struct {
 }
 
 type GitFiles struct {
-	filesStatus                 []FileStatus
-	filesPosition               map[string]int
-	updateChannel               chan string
-	filesSelectedForStageStatus map[string]bool // centralized recording the user selection if they want to stage a file
-	errorLog                    []error
-	gitFilesMutex               sync.Mutex
+	filesStatus   []FileStatus
+	filesPosition map[string]int
+	updateChannel chan string
+	errorLog      []error
+	gitFilesMutex sync.Mutex
 }
 
 func InitGitFile(updateChannel chan string) *GitFiles {
 	gitFiles := GitFiles{
-		filesStatus:                 make([]FileStatus, 0),
-		updateChannel:               updateChannel,
-		filesSelectedForStageStatus: make(map[string]bool),
+		filesStatus:   make([]FileStatus, 0),
+		updateChannel: updateChannel,
 	}
 	return &gitFiles
 }
@@ -90,17 +87,10 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		worktree := string(file[1])
 		fileName := strings.TrimSpace(file[3:])
 
-		// check if this was also in the previous list before any update to the list and retrieve back the SelectedForStage info
-		_, exist := gf.filesSelectedForStageStatus[fileName]
-		if !exist {
-			gf.filesSelectedForStageStatus[fileName] = true
-		}
-
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
-			FileName:         fileName,
-			IndexState:       indexState,
-			WorkTree:         worktree,
-			SelectedForStage: gf.filesSelectedForStageStatus[fileName],
+			FileName:   fileName,
+			IndexState: indexState,
+			WorkTree:   worktree,
 		})
 		modifiedFilesPositionHashmap[fileName] = index
 	}
@@ -163,25 +153,36 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 	return fileDiff
 }
 
-func (gf *GitFiles) GetSelectedForStageFiles() []string {
-	var stagedFiles []string
+func (gf *GitFiles) StageOrUnstageFile(fileName string) {
 	gf.gitFilesMutex.Lock()
-	for _, file := range gf.filesStatus {
-		if file.SelectedForStage {
-			stagedFiles = append(stagedFiles, file.FileName)
-		}
-	}
-	gf.gitFilesMutex.Unlock()
-	return stagedFiles
-}
-
-func (gf *GitFiles) ToggleFilesStageStatus(fileName string) {
-	gf.gitFilesMutex.Lock()
-	_, fileStatusExist := gf.filesSelectedForStageStatus[fileName]
 	fileIndex, fileIndexExist := gf.filesPosition[fileName]
-	if fileIndexExist && fileStatusExist {
-		gf.filesSelectedForStageStatus[fileName] = !gf.filesSelectedForStageStatus[fileName]
-		gf.filesStatus[fileIndex].SelectedForStage = gf.filesSelectedForStageStatus[fileName]
+	if fileIndexExist {
+		file := gf.filesStatus[fileIndex]
+		var gitArgs []string
+		if file.IndexState == "?" && file.WorkTree == "?" {
+			// not tracked
+			gitArgs = []string{"add", "--", fileName}
+			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			stageCmd.Run()
+		} else if file.IndexState != " " && file.WorkTree != " " {
+			// staged but have modification later
+			gitArgs = []string{"add", "--", fileName}
+			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			stageCmd.Run()
+		} else if file.IndexState != " " && file.WorkTree == " " {
+			// staged and no latest modification, so we need to unstage it or revert back
+			gitArgs = []string{"reset", "HEAD", "--", fileName}
+			if file.IndexState == "A" {
+				gitArgs = []string{"rm", "--cached", "--force", "--", fileName}
+			}
+			unstageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			unstageCmd.Run()
+		} else if file.IndexState == " " && file.WorkTree != " " {
+			// tracked but not staged
+			gitArgs = []string{"add", "--", fileName}
+			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			stageCmd.Run()
+		}
 		gf.updateChannel <- GIT_FILES_STATUS_UPDATE
 	}
 	gf.gitFilesMutex.Unlock()

@@ -136,10 +136,18 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 			if CurrentSelectedFile == nil {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentNone
 			} else {
-				isFileStaged := CurrentSelectedFile.(gitModifiedFilesItem).SelectedForStage
-				if isFileStaged {
+				file := CurrentSelectedFile.(gitModifiedFilesItem)
+				if file.IndexState == "?" && file.WorkTree == "?" {
+					// not tracked
+					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
+				} else if file.IndexState != " " && file.WorkTree != " " {
+					// staged but have modification later
+					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
+				} else if file.IndexState != " " && file.WorkTree == " " {
+					// staged and no latest modification
 					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentIsStaged
-				} else {
+				} else if file.IndexState == " " && file.WorkTree != " " {
+					// tracked but not staged
 					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
 				}
 			}

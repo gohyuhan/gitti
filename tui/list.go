@@ -37,7 +37,7 @@ func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	fn := style.ItemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Width(m.Width() - 2).Render("> " + strings.Join(s, " "))
 		}
 	}
 	str = utils.TruncateString(str, componentWidth)
@@ -55,20 +55,23 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 		return
 	}
 
-	str := fmt.Sprintf(" [ ] %s", i.FileName)
-	if i.SelectedForStage {
-		str = fmt.Sprintf(" [X] %s", i.FileName)
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 5
+	fileName := utils.TruncateString(i.FileName, componentWidth)
+
+	indexState := style.StagedFileStyle.Render(i.IndexState)
+	workTree := style.UnstagedFileStyle.Render(i.WorkTree)
+	if i.IndexState == "?" {
+		indexState = style.UnstagedFileStyle.Render(i.IndexState)
 	}
 
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+	str := fmt.Sprintf(" %s%s %s", indexState, workTree, fileName)
 
 	fn := style.ItemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Width(m.Width() - 2).Render("> " + strings.Join(s, " "))
 		}
 	}
-	str = utils.TruncateString(str, componentWidth)
 
 	fmt.Fprint(w, fn(str))
 }
@@ -90,7 +93,7 @@ func (d gitStashItemDelegate) Render(w io.Writer, m list.Model, index int, listI
 	fn := style.ItemStyle.Render
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render("> " + strings.Join(s, " "))
+			return style.SelectedItemStyle.Width(m.Width() - 2).Render("> " + strings.Join(s, " "))
 		}
 	}
 	str = utils.TruncateString(str, componentWidth)
@@ -149,8 +152,8 @@ func (d gitPushOptionDelegate) Render(w io.Writer, m list.Model, index int, list
 	urlStr = utils.TruncateString(urlStr, componentWidth)
 
 	nameRendered := style.ItemStyle.Render(nameStr)
-	urlRendered := style.ItemStyle.Faint(true).Render(urlStr)
-	fullStr := nameRendered + "\n" + urlRendered
+	infoRendered := style.ItemStyle.Faint(true).Render(urlStr)
+	fullStr := nameRendered + "\n" + infoRendered
 
 	fn := style.ItemStyle.Render
 	if index == m.Index() {

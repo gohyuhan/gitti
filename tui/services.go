@@ -42,7 +42,7 @@ func gitCommitService(m *GittiModel) {
 			return
 		}
 		// stage the changes based on what was chosen by user and commit it
-		exitStatusCode = m.GitState.GitCommit.GitStageAndCommit(message, description, m.GitState.GitFiles.GetSelectedForStageFiles())
+		exitStatusCode = m.GitState.GitCommit.GitCommit(message, description)
 
 		popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
@@ -77,8 +77,8 @@ func gitCommitCancelService(m *GittiModel) {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
 	// Clean up git processes and state
-	m.GitState.GitCommit.KillGitStageAndCommitCmd() // kill the git stash and commit cmd process if exist
-	m.GitState.GitCommit.ClearGitCommitOutput()     // clear the git commit output log
+	m.GitState.GitCommit.KillGitCommitCmd()     // kill the git stash and commit cmd process if exist
+	m.GitState.GitCommit.ClearGitCommitOutput() // clear the git commit output log
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode
