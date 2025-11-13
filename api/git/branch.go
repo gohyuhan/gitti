@@ -74,7 +74,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	gitArgs := []string{"branch"}
 	allBranches := []BranchInfo{}
 
-	bCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	bCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	gitOutput, err := bCmd.Output()
 	if err != nil {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
@@ -88,7 +88,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	// meaning this was a newly init repo with a uncommited branch
 	if len(gitBranches) < 1 {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
-		bCmd = cmd.GittiCmd.RunGitCmd(gitArgs)
+		bCmd = cmd.GittiCmd.RunGitCmd(gitArgs, false)
 		gitOutput, err := bCmd.Output()
 		if err != nil {
 			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
@@ -129,7 +129,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 func SetGitInitDefaultBranch(branchName string, cwd string) {
 	gitArgs := []string{"config", "--global", "init.defaultBranch", branchName}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	_ = cmd.Run()
 }
 
@@ -141,7 +141,7 @@ func SetGitInitDefaultBranch(branchName string, cwd string) {
 func (gb *GitBranch) GitStashAll() {
 	gitArgs := []string{"stash", "--all"}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH ERROR]: %w", err))
@@ -156,7 +156,7 @@ func (gb *GitBranch) GitStashAll() {
 func (gb *GitBranch) GitUnstashAll() {
 	gitArgs := []string{"stash", "pop"}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH ERROR]: %w", err))
@@ -171,7 +171,7 @@ func (gb *GitBranch) GitUnstashAll() {
 func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 	gitArgs := []string{"branch", branchName}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	_, err := cmd.CombinedOutput()
 	if err != nil {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE BRANCH ERROR]: %w", err))
@@ -185,7 +185,7 @@ func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 // ----------------------------------
 func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	stashChangesGitArgs := []string{"stash", "push", "--all"}
-	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs)
+	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs, false)
 	_, stashChangesErr := stashChangesCmd.CombinedOutput()
 	if stashChangesErr != nil {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
@@ -193,7 +193,7 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	}
 
 	createBranchGitArgs := []string{"checkout", "-b", branchName}
-	createBranchCmd := cmd.GittiCmd.RunGitCmd(createBranchGitArgs)
+	createBranchCmd := cmd.GittiCmd.RunGitCmd(createBranchGitArgs, false)
 	_, createBranchErr := createBranchCmd.CombinedOutput()
 	if createBranchErr != nil {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE AND SWITCH BRANCH ERROR]: %w", createBranchErr))
@@ -201,7 +201,7 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	}
 
 	unstashChangesGitArgs := []string{"stash", "pop"}
-	unstashChangesCmd := cmd.GittiCmd.RunGitCmd(unstashChangesGitArgs)
+	unstashChangesCmd := cmd.GittiCmd.RunGitCmd(unstashChangesGitArgs, false)
 	_, unstashChangesErr := unstashChangesCmd.CombinedOutput()
 	if unstashChangesErr != nil {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH CHANGE ERROR]: %w", unstashChangesErr))
@@ -218,7 +218,7 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 	var gitOpsOutput []string
 
 	stashChangesGitArgs := []string{"stash", "push", "--all"}
-	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs)
+	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs, false)
 	stashChangesOutput, stashChangesErr := stashChangesCmd.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(stashChangesOutput)...)
 	if stashChangesErr != nil {
@@ -226,8 +226,8 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 		return gitOpsOutput, false
 	}
 
-	switchBranchGitArgs := []string{"checkout", branchName}
-	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs)
+	switchBranchGitArgs := []string{"checkout", "-B", branchName}
+	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs, false)
 	switchBranchOutput, switchBranchErr := switchBranchCmd.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(switchBranchOutput)...)
 	if switchBranchErr != nil {
@@ -247,7 +247,7 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 	var gitOpsOutput []string
 
 	stashChangesGitArgs := []string{"stash", "push", "--all"}
-	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs)
+	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs, false)
 	stashChangesOutput, stashChangesErr := stashChangesCmd.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(stashChangesOutput)...)
 	if stashChangesErr != nil {
@@ -255,8 +255,8 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 		return gitOpsOutput, false
 	}
 
-	switchBranchGitArgs := []string{"checkout", branchName}
-	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs)
+	switchBranchGitArgs := []string{"checkout", "-B", branchName}
+	switchBranchCmd := cmd.GittiCmd.RunGitCmd(switchBranchGitArgs, false)
 	switchBranchOutput, switchBranchErr := switchBranchCmd.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(switchBranchOutput)...)
 	if switchBranchErr != nil {
@@ -265,7 +265,7 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 	}
 
 	unstashChangesGitArgs := []string{"stash", "pop"}
-	unstashChangesCmd := cmd.GittiCmd.RunGitCmd(unstashChangesGitArgs)
+	unstashChangesCmd := cmd.GittiCmd.RunGitCmd(unstashChangesGitArgs, false)
 	unstashChangesOutput, unstashChangesErr := unstashChangesCmd.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(unstashChangesOutput)...)
 	if unstashChangesErr != nil {
@@ -275,3 +275,5 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 
 	return gitOpsOutput, true
 }
+
+//test

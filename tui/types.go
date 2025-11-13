@@ -231,6 +231,16 @@ type GitPullOutputPopUpModel struct {
 
 // ---------------------------------
 //
+// # A pop up to prompt for git stash message
+//
+// ---------------------------------
+type GitStashMessagePopUpModel struct {
+	StashMessageInput textinput.Model
+	FilePathName      string
+}
+
+// ---------------------------------
+//
 // to record the current navigation index position
 //
 // ---------------------------------
@@ -262,13 +272,13 @@ func (i gitBranchItem) FilterValue() string {
 // ---------------------------------
 type gitModifiedFilesItemDelegate struct{}
 type gitModifiedFilesItem struct {
-	FileName   string
-	IndexState string
-	WorkTree   string
+	FilePathname string
+	IndexState   string
+	WorkTree     string
 }
 
 func (i gitModifiedFilesItem) FilterValue() string {
-	return i.FileName
+	return i.FilePathname
 }
 
 // ---------------------------------

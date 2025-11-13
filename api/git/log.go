@@ -96,14 +96,14 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	const gitLogFormat = "--pretty=format:" + fieldSeparator + "%h" + fieldSeparator + "%H" + fieldSeparator + "%P" + fieldSeparator + "%d" + fieldSeparator + "%an" + fieldSeparator + "%s" + fieldSeparator + "%ci" + recordSeparator
 
 	// Construct the `git log` command.
-	gitArgs := []string{"--no-pager", "log", "--graph", "--topo-order", "--color=always", gitLogFormat}
+	gitArgs := []string{"--no-pager", "log", "--graph", "--topo-order", gitLogFormat}
 	if gc.getCurrentBranchOrAllCommit == ALLBRANCH {
 		gitArgs = append(gitArgs, "--all")
 	} else {
 		gitArgs = append(gitArgs, "HEAD")
 	}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, true)
 	gitStreamOutput, err := cmd.StdoutPipe()
 	if err != nil {
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))

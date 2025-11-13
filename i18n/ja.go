@@ -39,12 +39,14 @@ var jA = LanguageMapping{
 		"[?] グローバルキー操作",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
-		"[space] この変更をアンステージ",
+		"[space] この変更のステージを解除",
+		"[s] スタッシュ",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] この変更をステージ",
+		"[s] スタッシュ",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
@@ -113,6 +115,10 @@ var jA = LanguageMapping{
 	KeyBindingForGitPullOutputPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitStashMessagePopUp: []string{
+		"[enter] 入力したスタッシュメッセージを実行",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -161,6 +167,8 @@ var jA = LanguageMapping{
 	GitPullMergeOption:                                       "マージ",
 	GitPullTitle:                                             "Git プル",
 	GitPullProcessing:                                        "プル中...",
+	GitStashMessageTitle:                                     "Git スタッシュのメッセージ",
+	GitStashMessagePlaceholder:                               "スタッシュ用のメッセージを入力してください（* 任意）",
 }
 
 // the global key binding for ja

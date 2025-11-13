@@ -60,7 +60,7 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 	}
 
 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 5
-	fileName := utils.TruncateString(i.FileName, componentWidth)
+	filePathName := utils.TruncateString(i.FilePathname, componentWidth)
 
 	indexState := style.StagedFileStyle.Render(i.IndexState)
 	workTree := style.UnstagedFileStyle.Render(i.WorkTree)
@@ -68,7 +68,7 @@ func (d gitModifiedFilesItemDelegate) Render(w io.Writer, m list.Model, index in
 		indexState = style.UnstagedFileStyle.Render(i.IndexState)
 	}
 
-	str := fmt.Sprintf(" %s%s %s", indexState, workTree, fileName)
+	str := fmt.Sprintf(" %s%s %s", indexState, workTree, filePathName)
 
 	var fn func(...string) string
 	if index == m.Index() {
@@ -127,19 +127,23 @@ func (d gitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	nameStr := fmt.Sprintf("   %s", i.Name)
 	urlStr := fmt.Sprintf("    %s", i.Url)
 
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
 
 	nameStr = utils.TruncateString(nameStr, componentWidth)
 	urlStr = utils.TruncateString(urlStr, componentWidth)
 
 	nameRendered := style.ItemStyle.Render(nameStr)
 	urlRendered := style.ItemStyle.Faint(true).Render(urlStr)
-	fullStr := nameRendered + "\n" + urlRendered
+	fullStr := nameRendered + "\n" + "  " + urlRendered
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
 
@@ -159,19 +163,23 @@ func (d gitPushOptionDelegate) Render(w io.Writer, m list.Model, index int, list
 	nameStr := fmt.Sprintf("   %s", i.Name)
 	urlStr := fmt.Sprintf("    %s", i.Info)
 
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
 
 	nameStr = utils.TruncateString(nameStr, componentWidth)
 	urlStr = utils.TruncateString(urlStr, componentWidth)
 
 	nameRendered := style.ItemStyle.Render(nameStr)
 	infoRendered := style.ItemStyle.Faint(true).Render(urlStr)
-	fullStr := nameRendered + "\n" + infoRendered
+	fullStr := nameRendered + "\n" + "  " + infoRendered
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
 
@@ -191,19 +199,23 @@ func (d gitNewBranchTypeOptionDelegate) Render(w io.Writer, m list.Model, index 
 	nameStr := fmt.Sprintf("   %s", i.Name)
 	infoStr := fmt.Sprintf("    %s", i.Info)
 
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
 
 	nameStr = utils.TruncateString(nameStr, componentWidth)
 	infoStr = utils.TruncateString(infoStr, componentWidth)
 
 	nameRendered := style.ItemStyle.Render(nameStr)
 	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
-	fullStr := nameRendered + "\n" + infoRendered
+	fullStr := nameRendered + "\n" + "  " + infoRendered
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
 
@@ -223,19 +235,23 @@ func (d gitSwitchBranchTypeOptionDelegate) Render(w io.Writer, m list.Model, ind
 	nameStr := fmt.Sprintf("   %s", i.Name)
 	infoStr := fmt.Sprintf("    %s", i.Info)
 
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
 
 	nameStr = utils.TruncateString(nameStr, componentWidth)
 	infoStr = utils.TruncateString(infoStr, componentWidth)
 
 	nameRendered := style.ItemStyle.Render(nameStr)
 	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
-	fullStr := nameRendered + "\n" + infoRendered
+	fullStr := nameRendered + "\n" + "  " + infoRendered
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
 
@@ -255,19 +271,23 @@ func (d gitPullTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, 
 	nameStr := fmt.Sprintf("   %s", i.Name)
 	infoStr := fmt.Sprintf("    %s", i.Info)
 
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
 
 	nameStr = utils.TruncateString(nameStr, componentWidth)
 	infoStr = utils.TruncateString(infoStr, componentWidth)
 
 	nameRendered := style.ItemStyle.Render(nameStr)
 	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
-	fullStr := nameRendered + "\n" + infoRendered
+	fullStr := nameRendered + "\n" + "  " + infoRendered
 
-	fn := style.ItemStyle.Render
+	var fn func(...string) string
 	if index == m.Index() {
 		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Width(m.Width() - 2).Reverse(true).Render(strings.Join(s, " "))
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
 		}
 	}
 

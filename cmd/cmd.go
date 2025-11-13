@@ -14,7 +14,10 @@ func InitCmd(repoPath string) {
 	}
 }
 
-func (c *Cmd) RunGitCmd(gitArgs []string) *exec.Cmd {
+func (c *Cmd) RunGitCmd(gitArgs []string, colorized bool) *exec.Cmd {
+	if colorized {
+		gitArgs = append([]string{"-c", "color.ui=always"}, gitArgs...)
+	}
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = c.repoPath
 

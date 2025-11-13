@@ -45,6 +45,12 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 		case constant.CreateNewBranchPopUp:
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		case constant.GitStashMessagePopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
 			m.PopUpModel = nil
 		}
 		return m, nil
@@ -197,11 +203,25 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				}
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
+		case constant.GitStashMessagePopUp:
+			popUp, ok := m.PopUpModel.(*GitStashMessagePopUpModel)
+			if ok {
+				// we direclty trigger the branch creation operation and close the pop up, we will assume this always result in success
+				msg := popUp.StashMessageInput.Value()
+				gitStashIndividualFileService(m, popUp.FilePathName, msg)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
 		}
 		return m, nil
 	}
+
+	// for input typing update
 	switch m.PopUpType {
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
@@ -219,7 +239,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 			}
 		}
 	case constant.AmendCommitPopUp:
-		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+		popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:
@@ -253,6 +273,13 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 		if ok {
 			var cmd tea.Cmd
 			popUp.NewBranchNameInput, cmd = popUp.NewBranchNameInput.Update(msg)
+			return m, cmd
+		}
+	case constant.GitStashMessagePopUp:
+		popUp, ok := m.PopUpModel.(*GitStashMessagePopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.StashMessageInput, cmd = popUp.StashMessageInput.Update(msg)
 			return m, cmd
 		}
 	}
@@ -309,6 +336,16 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			if m.CurrentSelectedComponent != constant.ModifiedFilesComponent {
 				m.CurrentSelectedComponent = constant.ModifiedFilesComponent
 				m.CurrentSelectedComponentIndex = 2
+				leftPanelDynamicResize(m)
+			}
+		}
+		return m, nil
+
+	case "3":
+		if !m.ShowPopUp.Load() {
+			if m.CurrentSelectedComponent != constant.StashComponent {
+				m.CurrentSelectedComponent = constant.StashComponent
+				m.CurrentSelectedComponentIndex = 3
 				leftPanelDynamicResize(m)
 			}
 		}
@@ -551,10 +588,24 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	case "space":
 		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-			var fileName string
+			var filePathName string
 			if currentSelectedModifiedFile != nil {
-				fileName = currentSelectedModifiedFile.(gitModifiedFilesItem).FileName
-				gitStageOrUnstageService(m, fileName)
+				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+				gitStageOrUnstageService(m, filePathName)
+			}
+		}
+		return m, nil
+
+	case "s":
+		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+			var filePathName string
+			if currentSelectedModifiedFile != nil {
+				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+				m.PopUpType = constant.GitStashMessagePopUp
+				m.ShowPopUp.Store(true)
+				initGitStashMessagePopUpModel(m, filePathName)
+				m.IsTyping.Store(true)
 			}
 		}
 		return m, nil
@@ -576,6 +627,13 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
 					reinitAndRenderModifiedFileDiffViewPort(m)
+				}
+			case constant.StashComponent:
+				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
+				if m.CurrentRepoStashInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoStashInfoList.Index() - 1
+					m.CurrentRepoStashInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.StashComponent = latestIndex
 				}
 			case constant.DetailComponent:
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
@@ -603,6 +661,13 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
 					reinitAndRenderModifiedFileDiffViewPort(m)
+				}
+			case constant.StashComponent:
+				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
+				if m.CurrentRepoStashInfoList.Index() < len(m.CurrentRepoStashInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoStashInfoList.Index() + 1
+					m.CurrentRepoStashInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.StashComponent = latestIndex
 				}
 			case constant.DetailComponent:
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)

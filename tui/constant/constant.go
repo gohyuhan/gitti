@@ -20,6 +20,7 @@ const (
 	SwitchBranchOutputPopUp     = "SwitchBranchOutputPopUp"     // IsTyping will be false
 	ChooseGitPullTypePopUp      = "ChooseGitPullTypePopUp"      // IsTyping will be false
 	GitPullOutputPopUp          = "GitPullOutputPopUp"          // IsTyping will be false
+	GitStashMessagePopUp        = "GitStashMessagePopUp"        // IsTyping will be true
 )
 
 const AUTOCLOSEINTERVAL = 500
@@ -49,6 +50,7 @@ const (
 	MaxSwitchBranchOutputPopUpWidth     = 150
 	MaxChooseGitPullTypePopUpWidth      = 150
 	MaxGitPullOutputPopUpWidth          = 150
+	MaxGitStashMessagePopUpWidth        = 150
 
 	PopUpGlobalKeyBindingViewPortHeight     = 30
 	PopUpGitCommitOutputViewPortHeight      = 10
@@ -61,7 +63,7 @@ const (
 	PopUpChooseSwitchBranchTypeHeight       = 6
 	PopUpSwitchBranchOutputViewPortHeight   = 10
 	PopUpChooseGitPullTypeHeight            = 6
-	PopUpGitPullOutputViewportHeight        = 10
+	PopUpGitPullOutputViewportHeight        = 16
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

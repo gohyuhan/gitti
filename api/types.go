@@ -7,4 +7,5 @@ type GitState struct {
 	GitCommit *git.GitCommit
 	GitFiles  *git.GitFiles
 	GitPull   *git.GitPull
+	GitStash  *git.GitStash
 }

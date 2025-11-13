@@ -40,11 +40,13 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] 取消暂存此更改",
+		"[s] 储藏 (stash)",
 		"[enter] 查看修改内容",
-		"[?] 全局���捷键",
+		"[?] 全局快捷键",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] 暂存此更改",
+		"[s] 储藏 (stash)",
 		"[enter] 查看修改内容",
 		"[?] 全局快捷键",
 	},
@@ -113,6 +115,10 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForGitPullOutputPopUp: []string{
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitStashMessagePopUp: []string{
+		"[enter] 执行输入的储藏信息",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -161,6 +167,8 @@ var zH_HANS = LanguageMapping{
 	GitPullMergeOption:                                       "合并",
 	GitPullTitle:                                             "Git Pull",
 	GitPullProcessing:                                        "正在拉取...",
+	GitStashMessageTitle:                                     "Git 储藏信息",
+	GitStashMessagePlaceholder:                               "输入储藏消息（* 可选）",
 }
 
 // the global key binding for zh-hans

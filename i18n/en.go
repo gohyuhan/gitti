@@ -41,11 +41,13 @@ var eN = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] unstage this change",
+		"[s] stash",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] stage this change",
+		"[s] stash",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
@@ -114,6 +116,10 @@ var eN = LanguageMapping{
 	KeyBindingForGitPullOutputPopUp: []string{
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitStashMessagePopUp: []string{
+		"[enter] proceed with entered stash message",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -162,6 +168,8 @@ var eN = LanguageMapping{
 	GitPullMergeOption:                                       "Merge",
 	GitPullTitle:                                             "Git Pull",
 	GitPullProcessing:                                        "Pulling...",
+	GitStashMessageTitle:                                     "Message for git stash",
+	GitStashMessagePlaceholder:                               "Enter a message for stash (* optional)",
 }
 
 // the global key binding for en

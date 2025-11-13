@@ -23,6 +23,7 @@ type GitDaemon struct {
 	gitFetchActiveRefreshDur       time.Duration
 	isGitBranchPassiveRunning      atomic.Bool
 	isGitFilesPassiveActiveRunning atomic.Bool
+	isGitStashPassiveRunning       atomic.Bool
 	isGitFetchActiveRunning        atomic.Bool
 	watcherTimer                   *time.Timer
 	gitFilesActiveTimer            *time.Timer
@@ -61,6 +62,7 @@ func InitGitDaemon(repoPath string, updateChannel chan string, gitState *GitStat
 	gd.isGitFilesPassiveActiveRunning.Store(false)
 	gd.isGitFetchActiveRunning.Store(false)
 	gd.isGitBranchPassiveRunning.Store(false)
+	gd.isGitStashPassiveRunning.Store(false)
 	gd.watcherTimer.Stop()
 	gd.gitFilesActiveTimer.Stop()
 	gd.gitFetchActiveTimer.Stop()
@@ -90,20 +92,7 @@ func (gd *GitDaemon) Start() {
 	go func() {
 		// Initial call to get info of git
 		if gd.updateChannel != nil {
-			go func() {
-				if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
-					defer gd.isGitFilesPassiveActiveRunning.Store(false)
-					gd.gitState.GitFiles.GetGitFilesStatus()
-					gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
-				}
-			}()
-			go func() {
-				if gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
-					defer gd.isGitBranchPassiveRunning.Store(false)
-					gd.gitState.GitBranch.GetLatestBranchesinfo()
-					gd.updateChannel <- git.GIT_BRANCH_UPDATE
-				}
-			}()
+			gd.gitLatestInfoFetch()
 		}
 		gd.gitFilesActiveTimer.Reset(gd.gitFilesActiveRefreshDur)
 		gd.gitFetchActiveTimer.Reset(gd.gitFetchActiveRefreshDur)
@@ -118,20 +107,7 @@ func (gd *GitDaemon) Start() {
 				fmt.Println("Watcher error:", err)
 
 			case <-gd.watcherTimer.C:
-				go func() {
-					if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
-						defer gd.isGitFilesPassiveActiveRunning.Store(false)
-						gd.gitState.GitFiles.GetGitFilesStatus()
-						gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
-					}
-				}()
-				go func() {
-					if gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
-						defer gd.isGitBranchPassiveRunning.Store(false)
-						gd.gitState.GitBranch.GetLatestBranchesinfo()
-						gd.updateChannel <- git.GIT_BRANCH_UPDATE
-					}
-				}()
+				gd.gitLatestInfoFetch()
 			case <-gd.gitFilesActiveTimer.C:
 				// reset first to avoid losing ticks, then run work in background
 				gd.gitFilesActiveTimer.Reset(gd.gitFilesActiveRefreshDur)
@@ -166,6 +142,31 @@ func (gd *GitDaemon) resetDebounce() {
 		}
 	}
 	gd.watcherTimer.Reset(gd.debounceDur)
+}
+
+func (gd *GitDaemon) gitLatestInfoFetch() {
+	go func() {
+		if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitFilesPassiveActiveRunning.Store(false)
+			gd.gitState.GitFiles.GetGitFilesStatus()
+			gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
+		}
+	}()
+	go func() {
+		if gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitBranchPassiveRunning.Store(false)
+			gd.gitState.GitBranch.GetLatestBranchesinfo()
+			gd.updateChannel <- git.GIT_BRANCH_UPDATE
+		}
+	}()
+	go func() {
+		if gd.isGitStashPassiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitStashPassiveRunning.Store(false)
+			gd.gitState.GitStash.GetLatestStashInfo()
+			gd.updateChannel <- git.GIT_STASH_UPDATE
+		}
+	}()
+
 }
 
 func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {

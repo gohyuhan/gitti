@@ -16,34 +16,26 @@ import (
 )
 
 type GitCommit struct {
-	errorLog                       []error
-	gitCommitProcess               *exec.Cmd
-	gitAmendCommitProcess          *exec.Cmd
-	gitRemotePushProcess           *exec.Cmd
-	gitAddRemoteProcess            *exec.Cmd
-	gitCommitOutput                []string
-	gitAmendCommitOutput           []string
-	gitRemotePushOutput            []string
-	updateChannel                  chan string
-	gitCommitProcessMutex          sync.Mutex
-	gitAmendCommitProcessMutex     sync.Mutex
-	gitRemotePushProcessMutex      sync.Mutex
-	gitAddRemoteProcessMutex       sync.Mutex
-	isGitCommitProcessRunning      atomic.Bool
-	isGitAmendCommitProcessRunning atomic.Bool
-	isGitRemotePushProcessRunning  atomic.Bool
-	isGitAddRemoteProcessRunning   atomic.Bool
-	remote                         []GitRemote
+	errorLog                      []error
+	gitCommitProcess              *exec.Cmd
+	gitRemotePushProcess          *exec.Cmd
+	gitAddRemoteProcess           *exec.Cmd
+	gitCommitOutput               []string
+	gitAmendCommitOutput          []string
+	gitRemotePushOutput           []string
+	updateChannel                 chan string
+	gitCommitProcessMutex         sync.Mutex
+	gitRemotePushProcessMutex     sync.Mutex
+	gitAddRemoteProcessMutex      sync.Mutex
+	isGitCommitProcessRunning     atomic.Bool
+	isGitRemotePushProcessRunning atomic.Bool
+	isGitAddRemoteProcessRunning  atomic.Bool
+	remote                        []GitRemote
 }
 
 type GitRemote struct {
 	Name string
 	Url  string
-}
-
-type GitAmendFileSelectionForRemoval struct {
-	FileName           string
-	SelectedForRemoval bool
 }
 
 type LatestCommitMsgAndDesc struct {
@@ -53,18 +45,16 @@ type LatestCommitMsgAndDesc struct {
 
 func InitGitCommit(updateChannel chan string) *GitCommit {
 	gitCommit := GitCommit{
-		gitCommitProcess:      nil,
-		gitAmendCommitProcess: nil,
-		gitRemotePushProcess:  nil,
-		gitAddRemoteProcess:   nil,
-		gitCommitOutput:       []string{},
-		gitRemotePushOutput:   []string{},
-		updateChannel:         updateChannel,
-		remote:                []GitRemote{},
+		gitCommitProcess:     nil,
+		gitRemotePushProcess: nil,
+		gitAddRemoteProcess:  nil,
+		gitCommitOutput:      []string{},
+		gitRemotePushOutput:  []string{},
+		updateChannel:        updateChannel,
+		remote:               []GitRemote{},
 	}
 
 	gitCommit.isGitCommitProcessRunning.Store(false)
-	gitCommit.isGitAmendCommitProcessRunning.Store(false)
 	gitCommit.isGitRemotePushProcessRunning.Store(false)
 	gitCommit.isGitAddRemoteProcessRunning.Store(false)
 
@@ -100,7 +90,7 @@ func (gc *GitCommit) GitRemotePushOutput() []string {
 
 func (gc *GitCommit) GitFetch() {
 	gitArgs := []string{"fetch"}
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 	_, err := cmd.Output()
@@ -137,7 +127,7 @@ func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) 
 		gitArgs = append(gitArgs, "-m", description)
 	}
 
-	commitCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	commitCmd := cmd.GittiCmd.RunGitCmd(gitArgs, true)
 	gc.gitCommitProcess = commitCmd
 
 	// Combine stderr into stdout
@@ -219,7 +209,7 @@ func (gc *GitCommit) gitCommitProcessReset() {
 // ----------------------------------
 func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 	gitArgs := []string{"log", "-1", "--pretty=format:%s%n%b", "HEAD"}
-	latestCommitCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	latestCommitCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	commitMsgAndDesc, cmdErr := latestCommitCmd.Output()
 	if cmdErr != nil {
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GET LATEST COMMIT INFO ERROR]: %w", cmdErr))
@@ -267,7 +257,7 @@ func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pu
 	default:
 		gitArgs = []string{"push", "-u", originName, currentCheckOutBranch}
 	}
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, true)
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
@@ -368,7 +358,7 @@ func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int)
 
 	gc.gitAddRemoteProcessMutex.Lock()
 	gitArgs := []string{"remote", "add", originName, url}
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	gc.gitAddRemoteProcess = cmd
 
 	// CombinedOutput starts and waits for the command
@@ -409,7 +399,7 @@ func (gc *GitCommit) gitAddRemoteProcessReset() {
 
 func (gc *GitCommit) CheckRemoteExist() bool {
 	gitArgs := []string{"remote", "-v"}
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmd.Output()
 	if err != nil {
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
@@ -441,7 +431,7 @@ func (gc *GitCommit) CheckRemoteExist() bool {
 func GitInit(repoPath string, initBranchName string) {
 	initGitArgs := []string{"init"}
 
-	initCmd := cmd.GittiCmd.RunGitCmd(initGitArgs)
+	initCmd := cmd.GittiCmd.RunGitCmd(initGitArgs, false)
 	_, initErr := initCmd.Output()
 	if initErr != nil {
 		fmt.Printf("[GIT INIT ERROR]: %v", initErr)
@@ -451,7 +441,7 @@ func GitInit(repoPath string, initBranchName string) {
 	// set the branch
 	checkoutBranchGitArgs := []string{"checkout", "-b", initBranchName}
 
-	checkoutBranchCmd := cmd.GittiCmd.RunGitCmd(checkoutBranchGitArgs)
+	checkoutBranchCmd := cmd.GittiCmd.RunGitCmd(checkoutBranchGitArgs, false)
 	_, checkoutBranchErr := checkoutBranchCmd.Output()
 	if checkoutBranchErr != nil {
 		fmt.Printf("[GIT INIT ERROR]: %v", checkoutBranchErr)

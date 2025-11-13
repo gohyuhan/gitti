@@ -48,6 +48,8 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderChooseGitPullTypePopUp(m)
 	case constant.GitPullOutputPopUp:
 		popUp = renderGitPullOutputPopUp(m)
+	case constant.GitStashMessagePopUp:
+		popUp = renderGitStashMessagePopUp(m)
 	}
 	return popUp
 }
@@ -118,7 +120,6 @@ func renderGitCommitPopUp(m *GittiModel) string {
 			lipgloss.Left,
 			title,
 			inputView,
-			"", // 1-line padding
 			descLabel,
 			descView,
 		)
@@ -143,10 +144,8 @@ func renderGitCommitPopUp(m *GittiModel) string {
 					lipgloss.Left,
 					title,
 					inputView,
-					"", // 1-line padding
 					descLabel,
 					descView,
-					"",
 					processingText,
 					logViewPort,
 				)
@@ -155,10 +154,8 @@ func renderGitCommitPopUp(m *GittiModel) string {
 					lipgloss.Left,
 					title,
 					inputView,
-					"", // 1-line padding
 					descLabel,
 					descView,
-					"",
 					logViewPort,
 				)
 			}
@@ -207,7 +204,6 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 			lipgloss.Left,
 			title,
 			inputView,
-			"", // 1-line padding
 			descLabel,
 			descView,
 		)
@@ -232,10 +228,8 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 					lipgloss.Left,
 					title,
 					inputView,
-					"", // 1-line padding
 					descLabel,
 					descView,
-					"",
 					processingText,
 					logViewPort,
 				)
@@ -244,10 +238,8 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 					lipgloss.Left,
 					title,
 					inputView,
-					"", // 1-line padding
 					descLabel,
 					descView,
-					"",
 					logViewPort,
 				)
 			}
@@ -299,7 +291,6 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 			lipgloss.Left,
 			remoteNameTitle,
 			remoteNameInputView,
-			"", // 1-line padding
 			remoteUrlTitle,
 			remoteUrlTitleInputView,
 		)
@@ -307,10 +298,8 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				addRemotePrompt,
-				"",
 				remoteNameTitle,
 				remoteNameInputView,
-				"", // 1-line padding
 				remoteUrlTitle,
 				remoteUrlTitleInputView,
 			)
@@ -332,23 +321,18 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 				lipgloss.Left,
 				remoteNameTitle,
 				remoteNameInputView,
-				"", // 1-line padding
 				remoteUrlTitle,
 				remoteUrlTitleInputView,
-				"",
 				logViewPort,
 			)
 			if noInitialRemote {
 				content = lipgloss.JoinVertical(
 					lipgloss.Left,
 					addRemotePrompt,
-					"",
 					remoteNameTitle,
 					remoteNameInputView,
-					"", // 1-line padding
 					remoteUrlTitle,
 					remoteUrlTitleInputView,
-					"",
 					logViewPort,
 				)
 			}
@@ -385,7 +369,6 @@ func renderChooseRemotePopUp(m *GittiModel) string {
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
-			"",
 			popUp.RemoteList.View(),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
@@ -406,7 +389,6 @@ func renderChoosePushTypePopUp(m *GittiModel) string {
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
-			"",
 			popUp.PushOptionList.View(),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
@@ -444,7 +426,6 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
-				"",
 				processingText,
 				logViewPort,
 			)
@@ -452,7 +433,6 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
-				"",
 				logViewPort,
 			)
 		}
@@ -490,7 +470,6 @@ func renderChooseNewBranchTypePopUp(m *GittiModel) string {
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
-			"",
 			popUp.NewBranchTypeOptionList.View(),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
@@ -508,7 +487,6 @@ func renderCreateNewBranchPopUp(m *GittiModel) string {
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
-			"",
 			popUp.NewBranchNameInput.View(),
 		)
 		modifiedBranchName, isValid := api.IsBranchNameValid(popUp.NewBranchNameInput.Value())
@@ -516,9 +494,7 @@ func renderCreateNewBranchPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
-				"",
 				popUp.NewBranchNameInput.View(),
-				"",
 				style.BranchInvalidWarningStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.NewBranchInvalidWarning, modifiedBranchName)),
 			)
 
@@ -542,7 +518,6 @@ func renderChooseSwitchBranchTypePopUp(m *GittiModel) string {
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
-			"",
 			popUp.SwitchTypeOptionList.View(),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
@@ -581,7 +556,6 @@ func renderSwitchBranchOutputPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
-				"",
 				processingText,
 				logViewPort,
 			)
@@ -589,7 +563,6 @@ func renderSwitchBranchOutputPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
-				"",
 				logViewPort,
 			)
 		}
@@ -626,7 +599,6 @@ func renderChooseGitPullTypePopUp(m *GittiModel) string {
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
-			"",
 			popUp.PullTypeOptionList.View(),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
@@ -660,7 +632,6 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
-				"",
 				processingText,
 				logViewPort,
 			)
@@ -668,7 +639,6 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
-				"",
 				logViewPort,
 			)
 		}
@@ -690,4 +660,26 @@ func updateGitPullOutputViewport(m *GittiModel) {
 		popUp.GitPullOutputViewport.SetContent(GitPullLog)
 		popUp.GitPullOutputViewport.ViewDown()
 	}
+}
+
+// ------------------------------------
+//
+//	For Git Stash to prompt for stash message
+//
+// ------------------------------------
+func renderGitStashMessagePopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitStashMessagePopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitStashMessagePopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashMessageTitle)
+		popUp.StashMessageInput.SetWidth(popUpWidth - 4)
+
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.StashMessageInput.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
 }

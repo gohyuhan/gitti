@@ -158,6 +158,8 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 			}
 		case constant.DetailComponent:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
+		case constant.GitStashMessagePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashMessagePopUp
 		}
 	}
 
@@ -182,7 +184,7 @@ func renderDetailComponentPanelViewPort(m *GittiModel) {
 		return
 	}
 
-	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FileName)
+	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
 	previousDiffRowNum := 0
 	modifiedDiffRowNum := 0
 	fileDiff := m.GitState.GitFiles.GetFilesDiffInfo(fileStatus)

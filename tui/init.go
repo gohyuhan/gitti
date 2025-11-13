@@ -35,11 +35,13 @@ func initBranchList(m *GittiModel) {
 	m.CurrentRepoBranchesInfoList = list.New(latestBranchArray, gitBranchItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
+	m.CurrentRepoBranchesInfoList.SetShowFilter(false)
 	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
 	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
 	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf418 %s:", i18n.LANGUAGEMAPPING.Branches), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
+	m.CurrentRepoBranchesInfoList.Styles.TitleBar = style.NewStyle
 
 	if m.ListNavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
 		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)
@@ -71,10 +73,12 @@ func initModifiedFilesList(m *GittiModel) {
 	m.CurrentRepoModifiedFilesInfoList = list.New(items, gitModifiedFilesItemDelegate{}, m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight)
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
+	m.CurrentRepoModifiedFilesInfoList.SetShowFilter(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
 	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[2] \ueae9 %s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
+	m.CurrentRepoModifiedFilesInfoList.Styles.TitleBar = style.NewStyle
 
 	if len(items) < 1 {
 		return
@@ -95,7 +99,7 @@ func initModifiedFilesList(m *GittiModel) {
 
 // init the list component for Stash info Component
 func initStashList(m *GittiModel) {
-	latestStashArray := []gitStashItem{}
+	latestStashArray := m.GitState.GitStash.AllStash()
 	items := make([]list.Item, 0, len(latestStashArray))
 	for _, stashInfo := range latestStashArray {
 		items = append(items, gitStashItem(stashInfo))
@@ -115,10 +119,12 @@ func initStashList(m *GittiModel) {
 	m.CurrentRepoStashInfoList = list.New(items, gitStashItemDelegate{}, m.WindowLeftPanelWidth, m.StashComponentPanelHeight)
 	m.CurrentRepoStashInfoList.SetShowStatusBar(false)
 	m.CurrentRepoStashInfoList.SetFilteringEnabled(false)
+	m.CurrentRepoStashInfoList.SetShowFilter(false)
 	m.CurrentRepoStashInfoList.SetShowHelp(false)
 	m.CurrentRepoStashInfoList.SetShowPagination(false)
 	m.CurrentRepoStashInfoList.Title = utils.TruncateString(fmt.Sprintf("[3] \ueaf7 %s:", i18n.LANGUAGEMAPPING.Stash), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoStashInfoList.Styles.Title = style.TitleStyle
+	m.CurrentRepoStashInfoList.Styles.TitleBar = style.NewStyle
 
 	if len(items) < 1 {
 		return
@@ -176,7 +182,7 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	CommitDescriptionTextAreaInput.SetValue(commitDesc)
 	CommitDescriptionTextAreaInput.ShowLineNumbers = false
 	CommitDescriptionTextAreaInput.Placeholder = commitDescPlaceholder
-	CommitDescriptionTextAreaInput.SetHeight(5)
+	CommitDescriptionTextAreaInput.SetHeight(4)
 	CommitDescriptionTextAreaInput.Blur()
 
 	vp := viewport.New()
@@ -228,7 +234,7 @@ func initGitAmendCommitPopUpModel(m *GittiModel) {
 	CommitDescriptionTextAreaInput.SetValue(commitDesc)
 	CommitDescriptionTextAreaInput.ShowLineNumbers = false
 	CommitDescriptionTextAreaInput.Placeholder = commitDescPlaceholder
-	CommitDescriptionTextAreaInput.SetHeight(5)
+	CommitDescriptionTextAreaInput.SetHeight(4)
 	CommitDescriptionTextAreaInput.Blur()
 
 	vp := viewport.New()
@@ -562,5 +568,19 @@ func initGitPullOutputPopUpModel(m *GittiModel) {
 	popUpModel.HasError.Store(false)
 	popUpModel.ProcessSuccess.Store(false)
 	popUpModel.IsCancelled.Store(false)
+	m.PopUpModel = popUpModel
+}
+
+func initGitStashMessagePopUpModel(m *GittiModel, filePathName string) {
+	stashMessageTextInput := textinput.New()
+	stashMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.GitStashMessagePlaceholder
+	stashMessageTextInput.Focus()
+	stashMessageTextInput.VirtualCursor = true
+
+	popUpModel := &GitStashMessagePopUpModel{
+		StashMessageInput: stashMessageTextInput,
+		FilePathName:      filePathName,
+	}
+
 	m.PopUpModel = popUpModel
 }

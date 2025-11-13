@@ -73,6 +73,7 @@ type LanguageMapping struct {
 	KeyBindingForSwitchBranchOutputPopUp     []string
 	KeyBindingForChooseGitPullTypePopUp      []string
 	KeyBindingForGitPullOutputPopUp          []string
+	KeyBindingForGitStashMessagePopUp        []string
 	KeyBindingForGlobalKeyBindingPopUp       []string
 	// -----------------
 	//  For Pop Up
@@ -135,4 +136,7 @@ type LanguageMapping struct {
 	// for git pull output
 	GitPullTitle      string
 	GitPullProcessing string
+	// for stash message prompt
+	GitStashMessageTitle       string
+	GitStashMessagePlaceholder string
 }

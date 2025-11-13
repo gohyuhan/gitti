@@ -52,11 +52,10 @@ func (gp *GitPull) GitPull(pullType string) int {
 	defer func() {
 		gp.gitPullProcessMutex.Lock()
 		gp.gitPullProcessReset()
-		gp.clearGitPullOutput()
 		gp.gitPullProcessMutex.Unlock()
 	}()
 
-	gp.clearGitPullOutput()
+	gp.ClearGitPullOutput()
 	gp.gitPullProcessMutex.Lock()
 	var gitPullArgs []string
 	switch pullType {
@@ -68,7 +67,7 @@ func (gp *GitPull) GitPull(pullType string) int {
 		gitPullArgs = []string{"pull", "--no-rebase", "--no-edit"}
 	}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitPullArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitPullArgs, true)
 
 	gp.gitPullProcessCmd = cmd
 
@@ -128,7 +127,7 @@ func (gp *GitPull) GitPull(pullType string) int {
 // # Clear the Git Process Output
 //
 // --------------------------------
-func (gp *GitPull) clearGitPullOutput() {
+func (gp *GitPull) ClearGitPullOutput() {
 	gp.gitPullOutput = []string{}
 }
 

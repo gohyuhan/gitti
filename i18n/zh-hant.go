@@ -40,11 +40,13 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] 取消暫存此更改",
+		"[s] 儲藏 (stash)",
 		"[enter] 查看修改內容",
 		"[?] 全域快捷鍵",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] 暫存此更改",
+		"[s] 儲藏 (stash)",
 		"[enter] 查看修改內容",
 		"[?] 全域快捷鍵",
 	},
@@ -113,6 +115,10 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForGitPullOutputPopUp: []string{
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForGitStashMessagePopUp: []string{
+		"[enter] 執行輸入的儲藏訊息",
+		"[esc] 取消 / 關閉",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 關閉",
 	},
@@ -161,6 +167,8 @@ var zH_HANT = LanguageMapping{
 	GitPullMergeOption:                                       "合併",
 	GitPullTitle:                                             "Git Pull",
 	GitPullProcessing:                                        "正在拉取...",
+	GitStashMessageTitle:                                     "Git 儲藏訊息",
+	GitStashMessagePlaceholder:                               "輸入儲藏訊息（* 可選）",
 }
 
 // the global key binding for zh-hant

@@ -17,9 +17,9 @@ const (
 )
 
 type FileStatus struct {
-	FileName   string
-	IndexState string
-	WorkTree   string
+	FilePathname string
+	IndexState   string
+	WorkTree     string
 }
 
 type FileDiffLine struct {
@@ -30,15 +30,13 @@ type FileDiffLine struct {
 type GitFiles struct {
 	filesStatus   []FileStatus
 	filesPosition map[string]int
-	updateChannel chan string
 	errorLog      []error
 	gitFilesMutex sync.Mutex
 }
 
-func InitGitFile(updateChannel chan string) *GitFiles {
+func InitGitFile() *GitFiles {
 	gitFiles := GitFiles{
-		filesStatus:   make([]FileStatus, 0),
-		updateChannel: updateChannel,
+		filesStatus: make([]FileStatus, 0),
 	}
 	return &gitFiles
 }
@@ -66,7 +64,7 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 func (gf *GitFiles) GetGitFilesStatus() {
 	gitArgs := []string{"status", "--porcelain", "-uall"}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmd.Output()
 	if err != nil {
 		gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES ERROR]: %w", err))
@@ -85,14 +83,14 @@ func (gf *GitFiles) GetGitFilesStatus() {
 
 		indexState := string(file[0])
 		worktree := string(file[1])
-		fileName := strings.TrimSpace(file[3:])
+		filePathName := strings.TrimSpace(file[3:])
 
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
-			FileName:   fileName,
-			IndexState: indexState,
-			WorkTree:   worktree,
+			FilePathname: filePathName,
+			IndexState:   indexState,
+			WorkTree:     worktree,
 		})
-		modifiedFilesPositionHashmap[fileName] = index
+		modifiedFilesPositionHashmap[filePathName] = index
 	}
 
 	gf.filesPosition = modifiedFilesPositionHashmap
@@ -102,7 +100,7 @@ func (gf *GitFiles) GetGitFilesStatus() {
 
 // get the file diff content
 func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
-	gitArgs := []string{"diff", "HEAD", "--diff-filter=ADM", "-U99999", "--", fileStatus.FileName}
+	gitArgs := []string{"diff", "HEAD", "--diff-filter=ADM", "-U99999", "--", fileStatus.FilePathname}
 	// the file is untracked
 	if fileStatus.WorkTree == "?" || fileStatus.IndexState == "?" {
 		// empty file for git diff --no-index to compares two arbitrary files outside the Git index.
@@ -110,10 +108,10 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 		if runtime.GOOS == "windows" {
 			nullFile = "NUL"
 		}
-		gitArgs = []string{"diff", "--no-index", "-U99999", nullFile, "--", fileStatus.FileName}
+		gitArgs = []string{"diff", "--no-index", "-U99999", nullFile, "--", fileStatus.FilePathname}
 	}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmd.Output()
 	if err != nil {
 		exitError, ok := err.(*exec.ExitError)
@@ -153,36 +151,36 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 	return fileDiff
 }
 
-func (gf *GitFiles) StageOrUnstageFile(fileName string) {
+func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	gf.gitFilesMutex.Lock()
 	defer gf.gitFilesMutex.Unlock()
 
-	fileIndex, fileIndexExist := gf.filesPosition[fileName]
+	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
 		var gitArgs []string
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
-			gitArgs = []string{"add", "--", fileName}
-			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			gitArgs = []string{"add", "--", filePathName}
+			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 			stageCmd.Run()
 		} else if file.IndexState != " " && file.WorkTree != " " {
 			// staged but have modification later
-			gitArgs = []string{"add", "--", fileName}
-			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			gitArgs = []string{"add", "--", filePathName}
+			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 			stageCmd.Run()
 		} else if file.IndexState != " " && file.WorkTree == " " {
 			// staged and no latest modification, so we need to unstage it or revert back
-			gitArgs = []string{"reset", "HEAD", "--", fileName}
+			gitArgs = []string{"reset", "HEAD", "--", filePathName}
 			if file.IndexState == "A" {
-				gitArgs = []string{"rm", "--cached", "--force", "--", fileName}
+				gitArgs = []string{"rm", "--cached", "--force", "--", filePathName}
 			}
-			unstageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			unstageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 			unstageCmd.Run()
 		} else if file.IndexState == " " && file.WorkTree != " " {
 			// tracked but not staged
-			gitArgs = []string{"add", "--", fileName}
-			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+			gitArgs = []string{"add", "--", filePathName}
+			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 			stageCmd.Run()
 		}
 	}
@@ -199,7 +197,7 @@ func (gf *GitFiles) StageAllChanges() {
 	var gitArgs []string
 
 	gitArgs = []string{"add", "."}
-	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	stageCmd.Run()
 }
 
@@ -210,7 +208,7 @@ func (gf *GitFiles) UnstageAllChanges() {
 	var gitArgs []string
 
 	gitArgs = []string{"reset", "HEAD"}
-	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs)
+	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
 	stageCmd.Run()
 
 }

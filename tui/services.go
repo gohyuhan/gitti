@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/google/uuid"
 
@@ -53,17 +52,11 @@ func gitCommitService(m *GittiModel, isAmendCommit bool) {
 				popUp.ProcessSuccess.Store(true)
 				popUp.MessageTextInput.Reset()
 				popUp.DescriptionTextAreaInput.Reset()
-				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
-					m.GitState.GitCommit.ClearGitCommitOutput() // clear the git commit output log
-					m.ShowPopUp.Store(false)                    // close the pop up
-					m.IsTyping.Store(false)
-					popUp.GitCommitOutputViewport.SetContent("") // set the git commit output viewport to nothing
 					popUp.IsProcessing.Store(false)
 					popUp.HasError.Store(false)
-					popUp.ProcessSuccess.Store(false)
 				}
 			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
 				popUp.HasError.Store(true)
@@ -83,6 +76,7 @@ func gitCommitCancelService(m *GittiModel) {
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode
+	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.GitCommitOutputViewport.SetContent("") // set the git commit output viewport to nothing
 		popUp.IsProcessing.Store(false)
@@ -131,17 +125,11 @@ func gitAmendCommitService(m *GittiModel, isAmendCommit bool) {
 				popUp.ProcessSuccess.Store(true)
 				popUp.MessageTextInput.Reset()
 				popUp.DescriptionTextAreaInput.Reset()
-				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitAmendCommitPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
-					m.GitState.GitCommit.ClearGitCommitOutput() // clear the git commit output log
-					m.ShowPopUp.Store(false)                    // close the pop up
-					m.IsTyping.Store(false)
-					popUp.GitAmendCommitOutputViewport.SetContent("") // set the git commit output viewport to nothing
 					popUp.IsProcessing.Store(false)
 					popUp.HasError.Store(false)
-					popUp.ProcessSuccess.Store(false)
 				}
 			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
 				popUp.HasError.Store(true)
@@ -161,6 +149,7 @@ func gitAmendCommitCancelService(m *GittiModel) {
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode
+	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.GitAmendCommitOutputViewport.SetContent("") // set the git commit output viewport to nothing
 		popUp.IsProcessing.Store(false)
@@ -210,16 +199,11 @@ func gitAddRemoteService(m *GittiModel) {
 				popUp.NoInitialRemote = false
 				gitAddRemoteResult = append(gitAddRemoteResult, fmt.Sprintf(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteAddSuccess, remoteName, remoteUrl))
 				updateAddRemoteOutputViewport(m, gitAddRemoteResult)
-				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*AddRemotePromptPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
-					m.ShowPopUp.Store(false) // close the pop up
-					m.IsTyping.Store(false)
-					popUp.AddRemoteOutputViewport.SetContent("") // set the git commit output viewport to nothing
-					popUp.IsProcessing.Store(false)
 					popUp.HasError.Store(false)
-					popUp.ProcessSuccess.Store(false)
+					popUp.ProcessSuccess.Store(true)
 				}
 			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
 				popUp.HasError.Store(true)
@@ -239,6 +223,7 @@ func gitAddRemoteCancelService(m *GittiModel) {
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode
+	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.AddRemoteOutputViewport.SetContent("") // set the git commit output viewport to nothing
 		popUp.IsProcessing.Store(false)
@@ -275,17 +260,11 @@ func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 			// if sucessful exitcode will be 0
 			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
 				popUp.ProcessSuccess.Store(true)
-				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
-					m.GitState.GitCommit.ClearGitRemotePushOutput() // clear the git commit output log
-					m.ShowPopUp.Store(false)                        // close the pop up
-					m.IsTyping.Store(false)
-					popUp.GitRemotePushOutputViewport.SetContent("") // set the git commit output viewport to nothing
-					popUp.IsProcessing.Store(false)
 					popUp.HasError.Store(false)
-					popUp.ProcessSuccess.Store(false)
+					popUp.ProcessSuccess.Store(true)
 				}
 			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
 				popUp.HasError.Store(true)
@@ -303,6 +282,7 @@ func gitRemotePushCancelService(m *GittiModel) {
 	m.GitState.GitCommit.ClearGitRemotePushOutput() // clear the git commit output log
 	m.ShowPopUp.Store(false)                        // close the pop up
 	m.IsTyping.Store(false)                         // and reset typing mode
+	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.GitRemotePushOutputViewport.SetContent("") // set the git commit output viewport to nothing
 		popUp.IsProcessing.Store(false)
@@ -342,12 +322,6 @@ func gitSwitchBranchService(m *GittiModel, branchName string, switchType string)
 		if success {
 			popUp.HasError.Store(false)
 			popUp.ProcessSuccess.Store(true)
-
-			time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpModel = nil
-			m.PopUpType = constant.NoPopUp
 			popUp.IsProcessing.Store(false)
 		} else {
 			popUp.HasError.Store(true)
@@ -385,16 +359,11 @@ func gitPullService(m *GittiModel, pullType string) {
 			// if sucessful exitcode will be 0
 			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
 				popUp.ProcessSuccess.Store(true)
-				time.Sleep(constant.AUTOCLOSEINTERVAL * time.Millisecond)
 				// Check if user cancelled during sleep and verify this is still the same popup session
 				popUp, ok = m.PopUpModel.(*GitPullOutputPopUpModel)
 				if ok && !popUp.IsCancelled.Load() && popUp.SessionID == sessionID {
-					m.ShowPopUp.Store(false) // close the pop up
-					m.IsTyping.Store(false)
-					popUp.GitPullOutputViewport.SetContent("") // set the git commit output viewport to nothing
-					popUp.IsProcessing.Store(false)
 					popUp.HasError.Store(false)
-					popUp.ProcessSuccess.Store(false)
+					popUp.ProcessSuccess.Store(true)
 				}
 			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
 				popUp.HasError.Store(true)
@@ -408,9 +377,11 @@ func gitPullCancelService(m *GittiModel) {
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
+	m.GitState.GitPull.ClearGitPullOutput()
 	m.GitState.GitPull.KillGitPullCmd() // kill the cmd process if exist
 	m.ShowPopUp.Store(false)            // close the pop up
 	m.IsTyping.Store(false)             // and reset typing mode
+	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.GitPullOutputViewport.SetContent("") // set the git commit output viewport to nothing
 		popUp.IsProcessing.Store(false)
@@ -424,9 +395,9 @@ func gitPullCancelService(m *GittiModel) {
 //	For Git Individual file stage or unstage
 //
 // ------------------------------------
-func gitStageOrUnstageService(m *GittiModel, fileName string) {
+func gitStageOrUnstageService(m *GittiModel, filePathName string) {
 	go func() {
-		m.GitState.GitFiles.StageOrUnstageFile(fileName)
+		m.GitState.GitFiles.StageOrUnstageFile(filePathName)
 	}()
 }
 
@@ -449,5 +420,16 @@ func gitStageAllChangesService(m *GittiModel) {
 func gitUnstageAllChangesService(m *GittiModel) {
 	go func() {
 		m.GitState.GitFiles.UnstageAllChanges()
+	}()
+}
+
+// ------------------------------------
+//
+//	For Git stash individual file
+//
+// ------------------------------------
+func gitStashIndividualFileService(m *GittiModel, filePathName string, msg string) {
+	go func() {
+		m.GitState.GitStash.GitStashFile(filePathName, msg)
 	}()
 }

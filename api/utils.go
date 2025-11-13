@@ -62,8 +62,9 @@ func InitGitState(updateChannel chan string) *GitState {
 	return &GitState{
 		GitBranch: git.InitGitBranch(),
 		GitCommit: git.InitGitCommit(updateChannel),
-		GitFiles:  git.InitGitFile(updateChannel),
+		GitFiles:  git.InitGitFile(),
 		GitPull:   git.InitGitPull(updateChannel),
+		GitStash:  git.InitGitStash(),
 	}
 }
 
