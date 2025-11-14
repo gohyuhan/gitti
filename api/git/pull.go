@@ -5,28 +5,27 @@ import (
 	"fmt"
 	"os/exec"
 	"sync"
-	"sync/atomic"
 
 	"gitti/cmd"
 )
 
 type GitPull struct {
-	errorLog                []error
-	gitPullOutput           []string
-	gitPullProcessMutex     sync.Mutex
-	gitPullProcessCmd       *exec.Cmd
-	isGitPullProcessRunning atomic.Bool
-	updateChannel           chan string
+	errorLog            []error
+	gitPullOutput       []string
+	gitPullProcessMutex sync.Mutex
+	gitPullProcessCmd   *exec.Cmd
+	gitProcessLock      *GitProcessLock
+	updateChannel       chan string
 }
 
-func InitGitPull(updateChannel chan string) *GitPull {
+func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock) *GitPull {
 	gitPull := &GitPull{
-		errorLog:      []error{},
-		gitPullOutput: []string{},
-		updateChannel: updateChannel,
+		errorLog:       []error{},
+		gitPullOutput:  []string{},
+		updateChannel:  updateChannel,
+		gitProcessLock: gitProcessLock,
 	}
 	gitPull.gitPullProcessCmd = nil
-	gitPull.isGitPullProcessRunning.Store(false)
 
 	return gitPull
 }
@@ -46,7 +45,7 @@ func (gp *GitPull) GetGitPullOutput() []string {
 //
 // --------------------------------
 func (gp *GitPull) GitPull(pullType string) int {
-	if !gp.isGitPullProcessRunning.CompareAndSwap(false, true) {
+	if !gp.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
 	defer func() {
@@ -55,8 +54,8 @@ func (gp *GitPull) GitPull(pullType string) int {
 		gp.gitPullProcessMutex.Unlock()
 	}()
 
-	gp.ClearGitPullOutput()
 	gp.gitPullProcessMutex.Lock()
+	gp.ClearGitPullOutput()
 	var gitPullArgs []string
 	switch pullType {
 	case GITPULL:
@@ -99,7 +98,8 @@ func (gp *GitPull) GitPull(pullType string) int {
 		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 		for scanner.Scan() {
 			line := scanner.Text()
-			gp.gitPullOutput = append(gp.gitPullOutput, line)
+			cleanedLine := cleanGitOutput(line)
+			gp.gitPullOutput = append(gp.gitPullOutput, cleanedLine)
 			select {
 			case gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE:
 			default:
@@ -152,5 +152,6 @@ func (gp *GitPull) KillGitPullCmd() {
 // --------------------------------
 func (gp *GitPull) gitPullProcessReset() {
 	gp.gitPullProcessCmd = nil
-	gp.isGitPullProcessRunning.Store(false)
+	gp.gitProcessLock.ReleaseGitOpsLock()
 }
+

@@ -7,6 +7,7 @@ var eN = LanguageMapping{
 	FlagGlobal:                         "also apply to system git if supported",
 	FailToGetCWD:                       "Failed to get current working directory",
 	TuiRunFail:                         "Alas, there's been an error",
+	OtherGitOpsIsRunningWarning:        "There are other git operarion running within gitti, please try again shortly",
 	LanguageNotSupportedPanic:          "[%s] is not supported, Please choose between %v",
 	LanguageSet:                        "Language set to %s",
 	GittiDefaultBranchSet:              "Gitti default init branch set to '%s'",
@@ -42,12 +43,14 @@ var eN = LanguageMapping{
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] unstage this change",
 		"[s] stash",
+		"[S] stash all changes",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] stage this change",
 		"[s] stash",
+		"[S] stash all changes",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
@@ -60,23 +63,33 @@ var eN = LanguageMapping{
 		"[esc] back",
 		"[?] global key binding",
 	},
+	KeyBindingKeyStashComponent: []string{
+		"[↑/↓] move up and down",
+		"[space] apply",
+		"[backspace] pop",
+		"[d] discard",
+		"[?] global key binding",
+	},
+	KeyBindingKeyStashComponentNone: []string{
+		"[?] global key binding",
+	},
 	KeyBindingForCommitPopUp: []string{
 		"[tab] move to next input",
 		"[shift+tab] move to previous input",
-		"[esc] cancel / close",
 		"[ctrl+enter] commit changes",
+		"[esc] cancel / close",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
 		"[tab] move to next input",
 		"[shift+tab] move to previous input",
-		"[esc] cancel / close",
 		"[ctrl+enter] commit updated changes",
+		"[esc] cancel / close",
 	},
 	KeyBindingForAddRemotePromptPopUp: []string{
 		"[tab] move to next input",
 		"[shift+tab] move to previous input",
-		"[esc] cancel / close",
 		"[ctrl+enter] add remote",
+		"[esc] cancel / close",
 	},
 	KeyBindingForGitRemotePushPopUp: []string{
 		"[esc] cancel / close",
@@ -117,7 +130,7 @@ var eN = LanguageMapping{
 		"[esc] cancel / close",
 	},
 	KeyBindingForGitStashMessagePopUp: []string{
-		"[enter] proceed with entered stash message",
+		"[ctrl+enter] proceed with entered stash message",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -240,7 +253,7 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[A]",
+		KeyBindingLine:  "[space]",
 		TitleOrInfoLine: "amend commit (modifies the latest commit)",
 		LineType:        INFO,
 	},

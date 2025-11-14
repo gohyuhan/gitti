@@ -6,6 +6,7 @@ var zH_HANT = LanguageMapping{
 	FlagGlobal:                         "同時套用至系統 git（若支援）",
 	FailToGetCWD:                       "無法取得目前工作目錄",
 	TuiRunFail:                         "發生錯誤",
+	OtherGitOpsIsRunningWarning:        "Gitti 中有其他 Git 操作正在執行, 請稍後再試",
 	LanguageNotSupportedPanic:          "不支援[%s], 請選擇 %v 之一",
 	LanguageSet:                        "語言已設定為 %s",
 	GittiDefaultBranchSet:              "Gitti 預設初始化分支已設為「%s」",
@@ -41,12 +42,14 @@ var zH_HANT = LanguageMapping{
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] 取消暫存此更改",
 		"[s] 儲藏 (stash)",
+		"[S] 儲藏所有變更",
 		"[enter] 查看修改內容",
 		"[?] 全域快捷鍵",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] 暫存此更改",
 		"[s] 儲藏 (stash)",
+		"[S] 儲藏所有變更",
 		"[enter] 查看修改內容",
 		"[?] 全域快捷鍵",
 	},
@@ -59,23 +62,33 @@ var zH_HANT = LanguageMapping{
 		"[esc] 返回",
 		"[?] 全域快捷鍵",
 	},
+	KeyBindingKeyStashComponent: []string{
+		"[↑/↓] 上下移動",
+		"[space] 套用",
+		"[backspace] 彈出",
+		"[d] 丟棄",
+		"[?] 全域按鍵綁定",
+	},
+	KeyBindingKeyStashComponentNone: []string{
+		"[?] 全域按鍵綁定",
+	},
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[esc] 取消 / 關閉",
 		"[ctrl+enter] 提交更新的變更",
+		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[esc] 取消 / 關閉",
 		"[ctrl+enter] 提交變更",
+		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForAddRemotePromptPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[esc] 取消 / 關閉",
 		"[ctrl+enter] 新增遠端",
+		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGitRemotePushPopUp: []string{
 		"[esc] 取消 / 關閉",
@@ -116,7 +129,7 @@ var zH_HANT = LanguageMapping{
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGitStashMessagePopUp: []string{
-		"[enter] 執行輸入的儲藏訊息",
+		"[ctrl+enter] 執行輸入的儲藏訊息",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -239,7 +252,7 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[A]",
+		KeyBindingLine:  "[space]",
 		TitleOrInfoLine: "修改提交（僅修改最近一次提交）",
 		LineType:        INFO,
 	},

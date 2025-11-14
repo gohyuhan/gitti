@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"strings"
 	"sync"
-	"sync/atomic"
 
 	"gitti/cmd"
 )
@@ -29,18 +28,18 @@ type FileDiffLine struct {
 }
 
 type GitFiles struct {
-	filesStatus          []FileStatus
-	filesPosition        map[string]int
-	errorLog             []error
-	gitFilesMutex        sync.Mutex
-	isGitStageProcessing atomic.Bool
+	filesStatus    []FileStatus
+	filesPosition  map[string]int
+	errorLog       []error
+	gitFilesMutex  sync.Mutex
+	gitProcessLock *GitProcessLock
 }
 
-func InitGitFile() *GitFiles {
+func InitGitFile(gitProcessLock *GitProcessLock) *GitFiles {
 	gitFiles := GitFiles{
-		filesStatus: make([]FileStatus, 0),
+		filesStatus:    make([]FileStatus, 0),
+		gitProcessLock: gitProcessLock,
 	}
-	gitFiles.isGitStageProcessing.Store(false)
 	return &gitFiles
 }
 
@@ -154,10 +153,11 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 }
 
 func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
-	if !gf.isGitStageProcessing.CompareAndSwap(false, true) {
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
 	}
-	defer gf.isGitStageProcessing.Store(false)
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
+
 	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
@@ -190,10 +190,10 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 }
 
 func (gf *GitFiles) StageAllChanges() {
-	if !gf.isGitStageProcessing.CompareAndSwap(false, true) {
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
 	}
-	defer gf.isGitStageProcessing.Store(false)
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
 	var gitArgs []string
 
@@ -203,10 +203,10 @@ func (gf *GitFiles) StageAllChanges() {
 }
 
 func (gf *GitFiles) UnstageAllChanges() {
-	if !gf.isGitStageProcessing.CompareAndSwap(false, true) {
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
 	}
-	defer gf.isGitStageProcessing.Store(false)
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
 	var gitArgs []string
 

@@ -9,28 +9,25 @@ import (
 	"regexp"
 	"strings"
 	"sync"
-	"sync/atomic"
 
 	"gitti/cmd"
 	"gitti/i18n"
 )
 
 type GitCommit struct {
-	errorLog                      []error
-	gitCommitProcess              *exec.Cmd
-	gitRemotePushProcess          *exec.Cmd
-	gitAddRemoteProcess           *exec.Cmd
-	gitCommitOutput               []string
-	gitAmendCommitOutput          []string
-	gitRemotePushOutput           []string
-	updateChannel                 chan string
-	gitCommitProcessMutex         sync.Mutex
-	gitRemotePushProcessMutex     sync.Mutex
-	gitAddRemoteProcessMutex      sync.Mutex
-	isGitCommitProcessRunning     atomic.Bool
-	isGitRemotePushProcessRunning atomic.Bool
-	isGitAddRemoteProcessRunning  atomic.Bool
-	remote                        []GitRemote
+	errorLog                  []error
+	gitCommitProcess          *exec.Cmd
+	gitRemotePushProcess      *exec.Cmd
+	gitAddRemoteProcess       *exec.Cmd
+	gitCommitOutput           []string
+	gitAmendCommitOutput      []string
+	gitRemotePushOutput       []string
+	updateChannel             chan string
+	gitCommitProcessMutex     sync.Mutex
+	gitRemotePushProcessMutex sync.Mutex
+	gitAddRemoteProcessMutex  sync.Mutex
+	gitProcessLock            *GitProcessLock
+	remote                    []GitRemote
 }
 
 type GitRemote struct {
@@ -43,7 +40,7 @@ type LatestCommitMsgAndDesc struct {
 	Description string
 }
 
-func InitGitCommit(updateChannel chan string) *GitCommit {
+func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock) *GitCommit {
 	gitCommit := GitCommit{
 		gitCommitProcess:     nil,
 		gitRemotePushProcess: nil,
@@ -51,12 +48,9 @@ func InitGitCommit(updateChannel chan string) *GitCommit {
 		gitCommitOutput:      []string{},
 		gitRemotePushOutput:  []string{},
 		updateChannel:        updateChannel,
+		gitProcessLock:       gitProcessLock,
 		remote:               []GitRemote{},
 	}
-
-	gitCommit.isGitCommitProcessRunning.Store(false)
-	gitCommit.isGitRemotePushProcessRunning.Store(false)
-	gitCommit.isGitAddRemoteProcessRunning.Store(false)
 
 	return &gitCommit
 }
@@ -105,10 +99,9 @@ func (gc *GitCommit) GitFetch() {
 //
 // ----------------------------------
 func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) int {
-	if !gc.isGitCommitProcessRunning.CompareAndSwap(false, true) {
+	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
-	gc.ClearGitCommitOutput()
 
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
@@ -119,6 +112,7 @@ func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) 
 
 	gc.gitCommitProcessMutex.Lock()
 
+	gc.ClearGitCommitOutput()
 	gitArgs := []string{"commit", "-m", message}
 	if isAmendCommit {
 		gitArgs = []string{"commit", "--amend", "-m", message}
@@ -199,7 +193,7 @@ func (gc *GitCommit) KillGitCommitCmd() {
 
 func (gc *GitCommit) gitCommitProcessReset() {
 	gc.gitCommitProcess = nil
-	gc.isGitCommitProcessRunning.Store(false)
+	gc.gitProcessLock.ReleaseGitOpsLock()
 }
 
 // ----------------------------------
@@ -235,11 +229,9 @@ func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 //
 // ----------------------------------
 func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pushType string) int {
-	if !gc.isGitRemotePushProcessRunning.CompareAndSwap(false, true) {
+	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
-	gc.ClearGitRemotePushOutput()
-
 	defer func() {
 		// ensure cleanup even if Start or Wait fails
 		gc.gitRemotePushProcessMutex.Lock()
@@ -248,6 +240,7 @@ func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pu
 	}()
 
 	gc.gitRemotePushProcessMutex.Lock()
+	gc.ClearGitRemotePushOutput()
 	var gitArgs []string
 	switch pushType {
 	case FORCEPUSHSAFE:
@@ -330,7 +323,7 @@ func (gc *GitCommit) KillGitRemotePushCmd() {
 
 func (gc *GitCommit) resetGitRemotePushProcesstatus() {
 	gc.gitRemotePushProcess = nil
-	gc.isGitRemotePushProcessRunning.Store(false)
+	gc.gitProcessLock.ReleaseGitOpsLock()
 }
 
 // ----------------------------------
@@ -339,8 +332,8 @@ func (gc *GitCommit) resetGitRemotePushProcesstatus() {
 //
 // ----------------------------------
 func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int) {
-	if !gc.isGitAddRemoteProcessRunning.CompareAndSwap(false, true) {
-		return []string{}, -1
+	if !gc.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gc.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
 	defer func() {
 		gc.gitAddRemoteProcessMutex.Lock()
@@ -394,7 +387,7 @@ func (gc *GitCommit) KillGitAddRemoteCmd() {
 
 func (gc *GitCommit) gitAddRemoteProcessReset() {
 	gc.gitAddRemoteProcess = nil
-	gc.isGitAddRemoteProcessRunning.Store(false)
+	gc.gitProcessLock.ReleaseGitOpsLock()
 }
 
 func (gc *GitCommit) CheckRemoteExist() bool {

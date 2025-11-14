@@ -146,6 +146,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 					inputView,
 					descLabel,
 					descView,
+					"",
 					processingText,
 					logViewPort,
 				)
@@ -230,6 +231,7 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 					inputView,
 					descLabel,
 					descView,
+					"",
 					processingText,
 					logViewPort,
 				)
@@ -426,6 +428,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
+				"",
 				processingText,
 				logViewPort,
 			)
@@ -556,6 +559,7 @@ func renderSwitchBranchOutputPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
+				"",
 				processingText,
 				logViewPort,
 			)
@@ -632,6 +636,7 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,
+				"",
 				processingText,
 				logViewPort,
 			)

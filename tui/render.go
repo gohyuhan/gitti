@@ -85,7 +85,13 @@ func renderStashComponentPanel(width int, height int, m *GittiModel) string {
 
 func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 	keys := []string{""} // to prevent a misconfiguration on key binding will not crash the program
+
 	if m.ShowPopUp.Load() {
+		//-----------------------------
+		//
+		// for popup keybinding render
+		//
+		//-----------------------------
 		switch m.PopUpType {
 		case constant.CommitPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForCommitPopUp
@@ -117,10 +123,17 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseGitPullTypePopUp
 		case constant.GitPullOutputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitPullOutputPopUp
+		case constant.GitStashMessagePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashMessagePopUp
 		case constant.GlobalKeyBindingPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGlobalKeyBindingPopUp
 		}
 	} else {
+		//-----------------------------
+		//
+		// for non-popup keybinding render
+		//
+		//-----------------------------
 		switch m.CurrentSelectedComponent {
 		case constant.GittiStatusComponent:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGittiStatusComponent
@@ -158,8 +171,12 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 			}
 		case constant.DetailComponent:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
-		case constant.GitStashMessagePopUp:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashMessagePopUp
+		case constant.StashComponent:
+			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyStashComponent
+			} else {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyStashComponentNone
+			}
 		}
 	}
 

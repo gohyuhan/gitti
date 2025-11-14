@@ -193,7 +193,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 		case constant.CreateNewBranchPopUp:
 			popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
 			if ok {
-				// we direclty trigger the branch creation operation and close the pop up, we will assume this always result in success
+				// we direclty close the pop up and trigger the branch creation operation
 				validBranchName, _ := api.IsBranchNameValid(popUp.NewBranchNameInput.Value())
 				switch popUp.CreateType {
 				case git.NEWBRANCH:
@@ -206,12 +206,17 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
+
 		case constant.GitStashMessagePopUp:
 			popUp, ok := m.PopUpModel.(*GitStashMessagePopUpModel)
 			if ok {
-				// we direclty trigger the branch creation operation and close the pop up, we will assume this always result in success
 				msg := popUp.StashMessageInput.Value()
-				gitStashIndividualFileService(m, popUp.FilePathName, msg)
+				switch popUp.StashType {
+				case git.STASHALL:
+					gitStashAllService(m, msg)
+				case git.STASHINDIVIDUAL:
+					gitStashIndividualFileService(m, popUp.FilePathName, msg)
+				}
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
@@ -289,31 +294,6 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg.String() {
-	case "q", "Q":
-		// only work when there is no pop up
-		if !m.ShowPopUp.Load() {
-			api.GITDAEMON.Stop()
-			return m, tea.Quit
-		}
-
-	case "tab":
-		// next component navigation
-		nextNavigation := m.CurrentSelectedComponentIndex + 1
-		if nextNavigation < len(constant.ComponentNavigationList) {
-			m.CurrentSelectedComponentIndex = nextNavigation
-			m.CurrentSelectedComponent = constant.ComponentNavigationList[nextNavigation]
-			leftPanelDynamicResize(m)
-		}
-		return m, nil
-	case "shift+tab":
-		// previous component navigation
-		previousNavigation := m.CurrentSelectedComponentIndex - 1
-		if previousNavigation >= 0 {
-			m.CurrentSelectedComponentIndex = previousNavigation
-			m.CurrentSelectedComponent = constant.ComponentNavigationList[previousNavigation]
-			leftPanelDynamicResize(m)
-		}
-		return m, nil
 	case "?":
 		m.ShowPopUp.Store(true)
 		m.IsTyping.Store(false)
@@ -351,16 +331,15 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 
-	case "n":
+	case "A":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedComponent == constant.LocalBranchComponent {
-				m.PopUpType = constant.ChooseNewBranchTypePopUp
-				m.IsTyping.Store(false)
-				m.ShowPopUp.Store(true)
-				if _, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel); !ok {
-					initChooseNewBranchTypePopUpModel(m)
-				}
-			}
+			m.ShowPopUp.Store(true)
+			m.PopUpType = constant.AmendCommitPopUp
+			m.GitState.GitCommit.ClearGitCommitOutput()
+
+			initGitAmendCommitPopUpModel(m)
+
+			m.IsTyping.Store(true)
 		}
 		return m, nil
 
@@ -381,15 +360,23 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 
-	case "A":
+	case "d":
+		if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponent {
+			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
+			gitStashDropService(m, selectedStashId.(gitStashItem).Id)
+		}
+		return m, nil
+
+	case "n":
 		if !m.ShowPopUp.Load() {
-			m.ShowPopUp.Store(true)
-			m.PopUpType = constant.AmendCommitPopUp
-			m.GitState.GitCommit.ClearGitCommitOutput()
-
-			initGitAmendCommitPopUpModel(m)
-
-			m.IsTyping.Store(true)
+			if m.CurrentSelectedComponent == constant.LocalBranchComponent {
+				m.PopUpType = constant.ChooseNewBranchTypePopUp
+				m.IsTyping.Store(false)
+				m.ShowPopUp.Store(true)
+				if _, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel); !ok {
+					initChooseNewBranchTypePopUpModel(m)
+				}
+			}
 		}
 		return m, nil
 
@@ -446,6 +433,48 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.PopUpType = constant.ChooseGitPullTypePopUp
 				initChooseGitPullTypePopUp(m)
 			}
+		}
+		return m, nil
+
+	case "s":
+		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+			var filePathName string
+			if currentSelectedModifiedFile != nil {
+				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+				m.PopUpType = constant.GitStashMessagePopUp
+				m.ShowPopUp.Store(true)
+				initGitStashMessagePopUpModel(m, filePathName, git.STASHINDIVIDUAL)
+				m.IsTyping.Store(true)
+			}
+		}
+		return m, nil
+
+	case "S":
+		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+			var filePathName string
+			if currentSelectedModifiedFile != nil {
+				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+				m.PopUpType = constant.GitStashMessagePopUp
+				m.ShowPopUp.Store(true)
+				initGitStashMessagePopUpModel(m, filePathName, git.STASHALL)
+				m.IsTyping.Store(true)
+			}
+		}
+		return m, nil
+
+	case "q", "Q":
+		// only work when there is no pop up
+		if !m.ShowPopUp.Load() {
+			api.GITDAEMON.Stop()
+			return m, tea.Quit
+		}
+
+	case "backspace":
+		if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponent {
+			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
+			gitStashPopService(m, selectedStashId.(gitStashItem).Id)
 		}
 		return m, nil
 
@@ -537,6 +566,43 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 
+	case "tab":
+		// next component navigation
+		nextNavigation := m.CurrentSelectedComponentIndex + 1
+		if nextNavigation < len(constant.ComponentNavigationList) {
+			m.CurrentSelectedComponentIndex = nextNavigation
+			m.CurrentSelectedComponent = constant.ComponentNavigationList[nextNavigation]
+			leftPanelDynamicResize(m)
+		}
+		return m, nil
+	case "shift+tab":
+		// previous component navigation
+		previousNavigation := m.CurrentSelectedComponentIndex - 1
+		if previousNavigation >= 0 {
+			m.CurrentSelectedComponentIndex = previousNavigation
+			m.CurrentSelectedComponent = constant.ComponentNavigationList[previousNavigation]
+			leftPanelDynamicResize(m)
+		}
+		return m, nil
+
+	case "space":
+		if !m.ShowPopUp.Load() {
+			switch m.CurrentSelectedComponent {
+			case constant.ModifiedFilesComponent:
+				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+				var filePathName string
+				if currentSelectedModifiedFile != nil {
+					filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+					gitStageOrUnstageService(m, filePathName)
+				}
+
+			case constant.StashComponent:
+				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
+				gitStashApplyService(m, selectedStashId.(gitStashItem).Id)
+			}
+		}
+		return m, nil
+
 	case "esc":
 		if m.ShowPopUp.Load() {
 			switch m.PopUpType {
@@ -569,6 +635,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
+			case constant.SwitchBranchOutputPopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
 			case constant.ChooseGitPullTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
@@ -581,31 +652,6 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case constant.DetailComponent:
 				m.CurrentSelectedComponent = m.DetailPanelParentComponent
 				m.DetailPanelParentComponent = ""
-			}
-		}
-		return m, nil
-
-	case "space":
-		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
-			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-			var filePathName string
-			if currentSelectedModifiedFile != nil {
-				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
-				gitStageOrUnstageService(m, filePathName)
-			}
-		}
-		return m, nil
-
-	case "s":
-		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
-			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-			var filePathName string
-			if currentSelectedModifiedFile != nil {
-				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
-				m.PopUpType = constant.GitStashMessagePopUp
-				m.ShowPopUp.Store(true)
-				initGitStashMessagePopUpModel(m, filePathName)
-				m.IsTyping.Store(true)
 			}
 		}
 		return m, nil

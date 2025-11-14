@@ -6,6 +6,7 @@ var jA = LanguageMapping{
 	FlagGlobal:                         "システムの git にも適用します（対応している場合）",
 	FailToGetCWD:                       "現在の作業ディレクトリの取得に失敗しました",
 	TuiRunFail:                         "エラーが発生しました",
+	OtherGitOpsIsRunningWarning:        "Gitti 内で他の Git 操作が実行中です. しばらくしてから再度お試しください",
 	LanguageNotSupportedPanic:          "[%s] はサポートされていません, 使用可能な言語は %v です",
 	LanguageSet:                        "言語を %s に設定しました",
 	GittiDefaultBranchSet:              "Gitti のデフォルト初期ブランチが「%s」に設定されました",
@@ -41,12 +42,14 @@ var jA = LanguageMapping{
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] この変更のステージを解除",
 		"[s] スタッシュ",
+		"[S] すべての変更をスタッシュ",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] この変更をステージ",
 		"[s] スタッシュ",
+		"[S] すべての変更をスタッシュ",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
@@ -59,23 +62,33 @@ var jA = LanguageMapping{
 		"[esc] 戻る",
 		"[?] グローバルキー操作",
 	},
+	KeyBindingKeyStashComponent: []string{
+		"[↑/↓] 上下に移動",
+		"[space] 適用",
+		"[backspace] ポップ",
+		"[d] 破棄",
+		"[?] グローバルキー操作",
+	},
+	KeyBindingKeyStashComponentNone: []string{
+		"[?] グローバルキー操作",
+	},
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 次の入力欄に移動",
 		"[shift+tab] 前の入力欄に移動",
-		"[esc] キャンセル / 閉じる",
 		"[ctrl+enter] 変更をコミット",
+		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
 		"[tab] 次の入力欄に移動",
 		"[shift+tab] 前の入力欄に移動",
-		"[esc] キャンセル / 閉じる",
 		"[ctrl+enter] 更新した変更をコミット",
+		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForAddRemotePromptPopUp: []string{
 		"[tab] 次の入力欄へ移動",
 		"[shift+tab] 前の入力欄へ移動",
-		"[esc] キャンセル / 閉じる",
 		"[ctrl+enter] リモートを追加",
+		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForGitRemotePushPopUp: []string{
 		"[esc] キャンセル / 閉じる",
@@ -239,7 +252,7 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[A]",
+		KeyBindingLine:  "[space]",
 		TitleOrInfoLine: "コミットを修正（最新のコミットを更新）",
 		LineType:        INFO,
 	},

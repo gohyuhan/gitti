@@ -84,6 +84,19 @@ func InitOrReadConfig() {
 		saveConfig(cfgPath, cfg)
 	}
 
+	// this is to ensure that the left panel ratio is within the set area
+	if cfg.LeftPanelWidthRatio > 0.5 || cfg.LeftPanelWidthRatio < 0.3 {
+		cfg.LeftPanelWidthRatio = 0.3
+		cfg.RightPanelWidthRatio = 0.7
+		saveConfig(cfgPath, cfg)
+	} else {
+		// this is to ensure that the set width ratio of both left and right add up to 1.0
+		if 1-cfg.LeftPanelWidthRatio != cfg.RightPanelWidthRatio {
+			cfg.RightPanelWidthRatio = 1 - cfg.LeftPanelWidthRatio
+			saveConfig(cfgPath, cfg)
+		}
+	}
+
 	GITTICONFIGSETTINGS = &cfg
 }
 

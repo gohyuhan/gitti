@@ -425,11 +425,55 @@ func gitUnstageAllChangesService(m *GittiModel) {
 
 // ------------------------------------
 //
+//	For Git stash all
+//
+// ------------------------------------
+func gitStashAllService(m *GittiModel, msg string) {
+	go func() {
+		m.GitState.GitStash.GitStashAll(msg)
+	}()
+}
+
+// ------------------------------------
+//
 //	For Git stash individual file
 //
 // ------------------------------------
 func gitStashIndividualFileService(m *GittiModel, filePathName string, msg string) {
 	go func() {
 		m.GitState.GitStash.GitStashFile(filePathName, msg)
+	}()
+}
+
+// ------------------------------------
+//
+//	For Git stash Apply
+//
+// ------------------------------------
+func gitStashApplyService(m *GittiModel, filePathName string) {
+	go func() {
+		m.GitState.GitStash.GitStashApply(filePathName)
+	}()
+}
+
+// ------------------------------------
+//
+//	For Git stash Pop
+//
+// ------------------------------------
+func gitStashPopService(m *GittiModel, filePathName string) {
+	go func() {
+		m.GitState.GitStash.GitStashPop(filePathName)
+	}()
+}
+
+// ------------------------------------
+//
+//	For Git stash drop
+//
+// ------------------------------------
+func gitStashDropService(m *GittiModel, filePathName string) {
+	go func() {
+		m.GitState.GitStash.GitStashDrop(filePathName)
 	}()
 }

@@ -3,7 +3,6 @@ package git
 import (
 	"fmt"
 	"strings"
-	"sync"
 
 	"gitti/cmd"
 )
@@ -18,12 +17,13 @@ type GitBranch struct {
 	currentCheckOut BranchInfo
 	allBranches     []BranchInfo
 	errorLog        []error
-	gitBranchMutex  sync.Mutex
+	gitProcessLock  *GitProcessLock
 }
 
-func InitGitBranch() *GitBranch {
+func InitGitBranch(gitProcessLock *GitProcessLock) *GitBranch {
 	gitBranch := GitBranch{
-		isRepoUnborn: false,
+		isRepoUnborn:   false,
+		gitProcessLock: gitProcessLock,
 	}
 	return &gitBranch
 }
@@ -34,8 +34,6 @@ func InitGitBranch() *GitBranch {
 //
 // ----------------------------------
 func (gb *GitBranch) CurrentCheckOut() BranchInfo {
-	gb.gitBranchMutex.Lock()
-	defer gb.gitBranchMutex.Unlock()
 	return gb.currentCheckOut
 }
 
@@ -45,9 +43,6 @@ func (gb *GitBranch) CurrentCheckOut() BranchInfo {
 //
 // ----------------------------------
 func (gb *GitBranch) AllBranches() []BranchInfo {
-	gb.gitBranchMutex.Lock()
-	defer gb.gitBranchMutex.Unlock()
-
 	copied := make([]BranchInfo, len(gb.allBranches))
 	copy(copied, gb.allBranches)
 	return copied
@@ -59,8 +54,6 @@ func (gb *GitBranch) AllBranches() []BranchInfo {
 //
 // ----------------------------------
 func (gb *GitBranch) IsRepoUnborn() bool {
-	gb.gitBranchMutex.Lock()
-	defer gb.gitBranchMutex.Unlock()
 	return gb.isRepoUnborn
 }
 
@@ -82,8 +75,6 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 
 	gitBranches := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
 
-	gb.gitBranchMutex.Lock()
-	defer gb.gitBranchMutex.Unlock()
 	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommited branch
 	if len(gitBranches) < 1 {
@@ -135,40 +126,15 @@ func SetGitInitDefaultBranch(branchName string, cwd string) {
 
 // ----------------------------------
 //
-//	Related to Git Stash
-//
-// ----------------------------------
-func (gb *GitBranch) GitStashAll() {
-	gitArgs := []string{"stash", "--all"}
-
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, err := cmd.CombinedOutput()
-	if err != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH ERROR]: %w", err))
-	}
-}
-
-// ----------------------------------
-//
-//	Related to Git UnStash
-//
-// ----------------------------------
-func (gb *GitBranch) GitUnstashAll() {
-	gitArgs := []string{"stash", "pop"}
-
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, err := cmd.CombinedOutput()
-	if err != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH ERROR]: %w", err))
-	}
-}
-
-// ----------------------------------
-//
 //	Related to Create New Branch ( only create, remain at current branch )
 //
 // ----------------------------------
 func (gb *GitBranch) GitCreateNewBranch(branchName string) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
 	gitArgs := []string{"branch", branchName}
 
 	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
@@ -184,6 +150,11 @@ func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 //
 // ----------------------------------
 func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
 	stashChangesGitArgs := []string{"stash", "push", "--all"}
 	stashChangesCmd := cmd.GittiCmd.RunGitCmd(stashChangesGitArgs, false)
 	_, stashChangesErr := stashChangesCmd.CombinedOutput()
@@ -215,6 +186,11 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 //
 // ----------------------------------
 func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
 	var gitOpsOutput []string
 
 	stashChangesGitArgs := []string{"stash", "push", "--all"}
@@ -244,6 +220,10 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 //
 // ----------------------------------
 func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bool) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
 	var gitOpsOutput []string
 
 	stashChangesGitArgs := []string{"stash", "push", "--all"}

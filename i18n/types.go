@@ -26,8 +26,9 @@ type LanguageMapping struct {
 	FlagInitStashGitIgnoredFile string
 	FlagGlobal                  string
 	// Run Error
-	FailToGetCWD string
-	TuiRunFail   string
+	FailToGetCWD                string
+	TuiRunFail                  string
+	OtherGitOpsIsRunningWarning string
 	// i18n
 	LanguageNotSupportedPanic string
 	LanguageSet               string
@@ -61,6 +62,8 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentDefault  []string
 	KeyBindingModifiedFilesComponentNone     []string
 	KeyBindingKeyDetailComponent             []string
+	KeyBindingKeyStashComponent              []string
+	KeyBindingKeyStashComponentNone          []string
 	KeyBindingForCommitPopUp                 []string
 	KeyBindingForAmendCommitPopUp            []string
 	KeyBindingForAddRemotePromptPopUp        []string

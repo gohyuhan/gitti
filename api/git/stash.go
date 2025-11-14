@@ -3,7 +3,6 @@ package git
 import (
 	"fmt"
 	"strings"
-	"sync/atomic"
 
 	"gitti/cmd"
 )
@@ -14,43 +13,23 @@ type StashInfo struct {
 }
 
 type GitStash struct {
-	allStash             []StashInfo
-	errorLog             []error
-	isGitStashProcessing atomic.Bool
+	allStash       []StashInfo
+	errorLog       []error
+	gitProcessLock *GitProcessLock
 }
 
-func InitGitStash() *GitStash {
+func InitGitStash(gitProcessLock *GitProcessLock) *GitStash {
 	gitStash := &GitStash{
-		allStash: []StashInfo{},
-		errorLog: []error{},
+		allStash:       []StashInfo{},
+		errorLog:       []error{},
+		gitProcessLock: gitProcessLock,
 	}
 
-	gitStash.isGitStashProcessing.Store(false)
 	return gitStash
 }
 
 func (gs *GitStash) AllStash() []StashInfo {
 	return gs.allStash
-}
-
-// ----------------------------------
-//
-//	Related to Git Stash including untacked ( except ignored )
-//
-// ----------------------------------
-func (gs *GitStash) GitStashAll() {
-	if !gs.isGitStashProcessing.CompareAndSwap(false, true) {
-		return
-	}
-	defer gs.isGitStashProcessing.Store(false)
-
-	gitArgs := []string{"stash", "-u"}
-
-	stashAllCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, stashAllErr := stashAllCmd.CombinedOutput()
-	if stashAllErr != nil {
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ALL ERROR]: %w", stashAllErr))
-	}
 }
 
 // ----------------------------------
@@ -88,14 +67,34 @@ func (gs *GitStash) GetLatestStashInfo() {
 
 // ----------------------------------
 //
+//	Related to Git Stash including untracked ( except ignored )
+//
+// ----------------------------------
+func (gs *GitStash) GitStashAll(message string) {
+	if !gs.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gs.gitProcessLock.ReleaseGitOpsLock()
+
+	gitArgs := []string{"stash", "push", "-u", "-m", message}
+
+	stashAllCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
+	_, stashAllErr := stashAllCmd.CombinedOutput()
+	if stashAllErr != nil {
+		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ALL ERROR]: %w", stashAllErr))
+	}
+}
+
+// ----------------------------------
+//
 // # Stash File changes
 //
 // ----------------------------------
 func (gs *GitStash) GitStashFile(filePathName string, message string) {
-	if !gs.isGitStashProcessing.CompareAndSwap(false, true) {
+	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return
 	}
-	defer gs.isGitStashProcessing.Store(false)
+	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	var gitArgs []string
 	if message == "" {
@@ -113,14 +112,14 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) {
 
 // ----------------------------------
 //
-// apply stash
+// # Git stash apply
 //
 // ----------------------------------
-func (gs *GitStash) GitApplyStash(stashId string) {
-	if !gs.isGitStashProcessing.CompareAndSwap(false, true) {
+func (gs *GitStash) GitStashApply(stashId string) {
+	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return
 	}
-	defer gs.isGitStashProcessing.Store(false)
+	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"stash", "apply", stashId}
 
@@ -133,14 +132,14 @@ func (gs *GitStash) GitApplyStash(stashId string) {
 
 // ----------------------------------
 //
-// pop stash
+// # Git stash pop
 //
 // ----------------------------------
-func (gs *GitStash) GitPopStash(stashId string) {
-	if !gs.isGitStashProcessing.CompareAndSwap(false, true) {
+func (gs *GitStash) GitStashPop(stashId string) {
+	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return
 	}
-	defer gs.isGitStashProcessing.Store(false)
+	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"stash", "pop", stashId}
 
@@ -153,14 +152,14 @@ func (gs *GitStash) GitPopStash(stashId string) {
 
 // ----------------------------------
 //
-// drop stash
+// # Git stash drop
 //
 // ----------------------------------
-func (gs *GitStash) GitDropStash(stashId string) {
-	if !gs.isGitStashProcessing.CompareAndSwap(false, true) {
+func (gs *GitStash) GitStashDrop(stashId string) {
+	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return
 	}
-	defer gs.isGitStashProcessing.Store(false)
+	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"stash", "drop", stashId}
 

@@ -571,7 +571,7 @@ func initGitPullOutputPopUpModel(m *GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func initGitStashMessagePopUpModel(m *GittiModel, filePathName string) {
+func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType string) {
 	stashMessageTextInput := textinput.New()
 	stashMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.GitStashMessagePlaceholder
 	stashMessageTextInput.Focus()
@@ -580,6 +580,7 @@ func initGitStashMessagePopUpModel(m *GittiModel, filePathName string) {
 	popUpModel := &GitStashMessagePopUpModel{
 		StashMessageInput: stashMessageTextInput,
 		FilePathName:      filePathName,
+		StashType:         stashType,
 	}
 
 	m.PopUpModel = popUpModel

@@ -237,6 +237,7 @@ type GitPullOutputPopUpModel struct {
 type GitStashMessagePopUpModel struct {
 	StashMessageInput textinput.Model
 	FilePathName      string
+	StashType         string
 }
 
 // ---------------------------------

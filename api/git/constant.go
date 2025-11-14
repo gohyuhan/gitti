@@ -21,3 +21,8 @@ const (
 	GITPULLREBASE = "GITPULLREBASE" // this pull and rebase
 	GITPULLMERGE  = "GITPULLMERGE"  // this pull and merge with local
 )
+
+const (
+	STASHALL        = "STASHALL"
+	STASHINDIVIDUAL = "STASHINDIVIDUAL"
+)
