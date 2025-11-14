@@ -98,9 +98,9 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) {
 
 	var gitArgs []string
 	if message == "" {
-		gitArgs = []string{"stash", "push", filePathName}
+		gitArgs = []string{"stash", "push", "-u", filePathName}
 	} else {
-		gitArgs = []string{"stash", "push", "-m", message, filePathName}
+		gitArgs = []string{"stash", "push", "-u", "-m", message, filePathName}
 	}
 
 	stashCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)

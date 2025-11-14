@@ -4,9 +4,15 @@ import (
 	"gitti/api"
 	"gitti/api/git"
 	"gitti/tui/constant"
+	"gitti/utils"
 
 	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/google/uuid"
+)
+
+const (
+	AUTHOR_GITHUB   = "https://github.com/gohyuhan"
+	AUTHOR_LINKEDIN = "https://my.linkedin.com/in/yu-han-goh-209480200"
 )
 
 // the function to handle bubbletea key interactions
@@ -21,6 +27,12 @@ func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 		return m, nil
 	case "ctrl+u":
 		gitUnstageAllChangesService(m)
+		return m, nil
+	case "ctrl+g":
+		utils.OpenBrowser(AUTHOR_GITHUB)
+		return m, nil
+	case "ctrl+l":
+		utils.OpenBrowser(AUTHOR_LINKEDIN)
 		return m, nil
 	}
 
@@ -307,6 +319,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.CurrentSelectedComponent = constant.LocalBranchComponent
 				m.CurrentSelectedComponentIndex = 1
 				leftPanelDynamicResize(m)
+				renderDetailComponentPanelViewPort(m)
 			}
 		}
 		return m, nil
@@ -317,6 +330,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.CurrentSelectedComponent = constant.ModifiedFilesComponent
 				m.CurrentSelectedComponentIndex = 2
 				leftPanelDynamicResize(m)
+				renderDetailComponentPanelViewPort(m)
 			}
 		}
 		return m, nil
@@ -327,6 +341,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.CurrentSelectedComponent = constant.StashComponent
 				m.CurrentSelectedComponentIndex = 3
 				leftPanelDynamicResize(m)
+				renderDetailComponentPanelViewPort(m)
 			}
 		}
 		return m, nil
@@ -573,6 +588,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			m.CurrentSelectedComponentIndex = nextNavigation
 			m.CurrentSelectedComponent = constant.ComponentNavigationList[nextNavigation]
 			leftPanelDynamicResize(m)
+			renderDetailComponentPanelViewPort(m)
 		}
 		return m, nil
 	case "shift+tab":
@@ -582,6 +598,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			m.CurrentSelectedComponentIndex = previousNavigation
 			m.CurrentSelectedComponent = constant.ComponentNavigationList[previousNavigation]
 			leftPanelDynamicResize(m)
+			renderDetailComponentPanelViewPort(m)
 		}
 		return m, nil
 
@@ -672,7 +689,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() - 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
-					reinitAndRenderModifiedFileDiffViewPort(m)
+					reinitAndRenderDetailComponentPanelViewPort(m)
 				}
 			case constant.StashComponent:
 				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
@@ -706,7 +723,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
-					reinitAndRenderModifiedFileDiffViewPort(m)
+					reinitAndRenderDetailComponentPanelViewPort(m)
 				}
 			case constant.StashComponent:
 				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index

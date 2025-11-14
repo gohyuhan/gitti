@@ -1,6 +1,7 @@
 package i18n
 
 var eN = LanguageMapping{
+	AboutGitti:                         aboutGittiEn,
 	FlagLangCode:                       "set the language code, e.g. 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
 	FlagInitStashGitIgnoredFile:        "set stash behaviour for ignore file, by gitti system default, it will respect .gitignore and will not stash it",
@@ -185,6 +186,25 @@ var eN = LanguageMapping{
 	GitStashMessagePlaceholder:                               "Enter a message for stash (* optional)",
 }
 
+// for about gitti
+var aboutGittiEn = []string{
+	"\n",
+	"Copyright (c) 2025 Yu Han Goh.\n",
+	"Gitti was created out of the author's personal need while working in Neovim,",
+	"where switching to a separate Git GUI for visual operations became disruptive.",
+	"Gitti bridges this gap by providing an intuitive,",
+	"lightweight TUI directly in the terminal.\n",
+	"Author:",
+	"\033[38;2;180;150;255mYu Han Goh <Software Engineer>\033[0m",
+	"           <github:   \033[38;2;130;170;255mhttps://github.com/gohyuhan\033[0m>",
+	"           <linkedin: \033[38;2;130;170;255mhttps://my.linkedin.com/in/yu-han-goh-209480200\033[0m>",
+	"You can press \033[38;2;240;210;120m<ctrl+g>\033[0m to open author github in browser or",
+	"\033[38;2;240;210;120m<ctrl+l>\033[0m to open author linkedin in browser\n",
+	"If you enjoy using Gitti, consider giving it a star at:",
+	"\033[38;2;130;170;255mhttps://github.com/gohyuhan/gitti\033[0m",
+	"You are also welcome to fork the project and adapt it to your workflow.",
+}
+
 // the global key binding for en
 var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
@@ -218,8 +238,13 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[c]",
-		TitleOrInfoLine: "commit changes",
+		KeyBindingLine:  "[ctrl+g]",
+		TitleOrInfoLine: "go to author github in browser [!!]",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+l]",
+		TitleOrInfoLine: "go to author linkedin in browser [!!]",
 		LineType:        INFO,
 	},
 	{

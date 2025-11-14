@@ -73,7 +73,6 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			initBranchList(m)
 		case git.GIT_FILES_STATUS_UPDATE:
 			initModifiedFilesList(m)
-			renderDetailComponentPanelViewPort(m)
 		case git.GIT_STASH_UPDATE:
 			initStashList(m)
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
@@ -85,6 +84,7 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_PULL_OUTPUT_UPDATE:
 			updateGitPullOutputViewport(m)
 		}
+		renderDetailComponentPanelViewPort(m)
 		return m, nil
 	case tea.MouseMsg:
 		return GittiMouseInteraction(msg, m)

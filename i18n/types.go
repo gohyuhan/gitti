@@ -20,6 +20,7 @@ type GlobalKeyBindingMappingFormat struct {
 //
 // -------------------------------------------------------
 type LanguageMapping struct {
+	AboutGitti []string
 	// flag expalnation
 	FlagLangCode                string
 	FlagInitDefaultBranch       string

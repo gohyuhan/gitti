@@ -1,6 +1,7 @@
 package i18n
 
 var jA = LanguageMapping{
+	AboutGitti:                         aboutGittiJa,
 	FlagLangCode:                       "言語コードを設定します. 例: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "git init のデフォルトブランチを設定します.\nこれは gitti を通して行われる git init にのみ影響します.\ngit 自体のデフォルトブランチ名を変更するには、'--global' フラグも追加してください.",
 	FlagGlobal:                         "システムの git にも適用します（対応している場合）",
@@ -184,6 +185,27 @@ var jA = LanguageMapping{
 	GitStashMessagePlaceholder:                               "スタッシュ用のメッセージを入力してください（* 任意）",
 }
 
+// for about gitti
+var aboutGittiJa = []string{
+	"\n",
+	"Copyright (c) 2025 Yu Han Goh.\n",
+	"Gitti は, 作者が Neovim で作業している際に, ",
+	"視覚的な操作のために外部の Git GUI に切り替える必要があり, ",
+	"その作業フローが中断されるという個人的な課題から生まれました.",
+	"Gitti は, このギャップを埋めるために, 直感的で軽量な TUI を",
+	"ターミナル上に直接提供します.\n",
+	"作者:",
+	"\033[38;2;180;150;255mYu Han Goh <ソフトウェアエンジニア>\033[0m",
+	"           <github:   \033[38;2;130;170;255mhttps://github.com/gohyuhan\033[0m>",
+	"           <linkedin: \033[38;2;130;170;255mhttps://my.linkedin.com/in/yu-han-goh-209480200\033[0m>",
+	"\033[38;2;240;210;120m<ctrl+g>\033[0m を押すと作者の GitHub をブラウザで開きます.",
+	"\033[38;2;240;210;120m<ctrl+l>\033[0m を押すと作者の LinkedIn を開きます.\n",
+	"Gitti を気に入っていただけたな, ぜひスターをお願いします:",
+	"\033[38;2;130;170;255mhttps://github.com/gohyuhan/gitti\033[0m",
+	"また, プロジェクトをフォークして自分のワークフローに合わせて",
+	"カスタマイズすることも歓迎します.",
+}
+
 // the global key binding for ja
 var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
@@ -214,6 +236,16 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "[ctrl+c]",
 		TitleOrInfoLine: "強制終了 [!!]",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+g]",
+		TitleOrInfoLine: "ブラウザで作者の GitHub を開く [!!]",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+l]",
+		TitleOrInfoLine: "ブラウザで作者の LinkedIn を開く [!!]",
 		LineType:        INFO,
 	},
 	{

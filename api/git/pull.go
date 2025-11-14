@@ -154,4 +154,3 @@ func (gp *GitPull) gitPullProcessReset() {
 	gp.gitPullProcessCmd = nil
 	gp.gitProcessLock.ReleaseGitOpsLock()
 }
-

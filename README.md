@@ -9,7 +9,7 @@ A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 Gitti is a visual Git client built for developers who live in the terminal. It provides an intuitive TUI (Terminal User Interface) for common Git operations without the overhead of traditional GUI applications or the verbosity of CLI commands.
 
 ## Why Gitti?
-Gitti is built for terminal-focused developers who need visual Git operations without breaking their flow. Traditional GUI clients like GitHub Desktop offer great interfaces but consume significant RAM and force context switching that disrupts your coding rhythm. Pure CLI commands are powerful but lack visual context for reviewing changes and managing branches. Born from personal need while working in Neovim, Gitti bridges this gap by bringing an intuitive, lightweight TUI directly into your terminal—no window management, no context switching, just seamless Git operations with visual clarity. Plus, it's universal with built-in support for English, Japanese, Simplified & Traditional Chinese.
+Gitti is built for terminal-focused developers who need visual Git operations without breaking their flow. Traditional GUI clients like GitHub Desktop offer great interfaces but consume significant RAM and force context switching that disrupts your coding rhythm. Pure CLI commands are powerful but lack visual context for reviewing changes and managing branches. Born from personal need while working in Neovim, Gitti bridges this gap by bringing an intuitive, lightweight TUI directly into your terminal, no window management, no context switching, just seamless Git operations with visual clarity. Plus, it's universal with built-in support for English, Japanese, Simplified & Traditional Chinese.
 
 ## Features
 

@@ -192,13 +192,37 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 
 // for the current selected modified file preview viewport
 func renderDetailComponentPanelViewPort(m *GittiModel) {
+	var contentLine string
+	var theCurrentSelectedComponent string
+	if m.CurrentSelectedComponent == constant.DetailComponent {
+		// if the current selected one is the detail component itself, the current selected one will be its parent (the component that led into the detail component)
+		theCurrentSelectedComponent = m.DetailPanelParentComponent
+	} else {
+		theCurrentSelectedComponent = m.CurrentSelectedComponent
+	}
+	switch theCurrentSelectedComponent {
+	case constant.ModifiedFilesComponent:
+		contentLine = generateModifiedFileDetailPanelContent(m)
+	default:
+		contentLine = generateAboutGittiContent()
+	}
+
+	if contentLine == "" {
+		// if the content will be empty, render about gitti for detail panel
+		contentLine = generateAboutGittiContent()
+	}
+
+	m.DetailPanelViewport.SetContent(contentLine)
+}
+
+// for modified file detail panel view
+func generateModifiedFileDetailPanelContent(m *GittiModel) string {
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
 		fileStatus = git.FileStatus(currentSelectedModifiedFile.(gitModifiedFilesItem))
 	} else {
-		m.DetailPanelViewport.SetContent("")
-		return
+		return ""
 	}
 
 	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
@@ -207,8 +231,7 @@ func renderDetailComponentPanelViewPort(m *GittiModel) {
 	fileDiff := m.GitState.GitFiles.GetFilesDiffInfo(fileStatus)
 	if fileDiff == nil {
 		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
-		m.DetailPanelViewport.SetContent(vpLine)
-		return
+		return vpLine
 	}
 	diffDigitLength := len(fmt.Sprintf("%d", len(fileDiff))) + 1
 	for _, Line := range fileDiff {
@@ -233,7 +256,20 @@ func renderDetailComponentPanelViewPort(m *GittiModel) {
 		diffLine = lineStyle.Render(Line.Line)
 		vpLine += rowNum + diffLine + "\n"
 	}
-	m.DetailPanelViewport.SetContent(vpLine)
+	return vpLine
+}
+
+// for about gitti content
+func generateAboutGittiContent() string {
+	var vpLine string
+
+	logoLineArray := style.GradientLines(gittiAsciiArtLogo)
+	aboutLines := i18n.LANGUAGEMAPPING.AboutGitti
+
+	vpLine += strings.Join(logoLineArray, "\n") + "\n"
+	vpLine += strings.Join(aboutLines, "\n")
+
+	return vpLine
 }
 
 // to update the width and height of all components

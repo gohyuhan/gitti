@@ -1,6 +1,7 @@
 package i18n
 
 var zH_HANT = LanguageMapping{
+	AboutGitti:                         aboutGittiZhHant,
 	FlagLangCode:                       "設定語言代碼, 例如：'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:              "設定 git init 的預設分支.\n此設定僅影響透過 gitti 執行的 git init.\n若要讓 git 本身預設使用此分支名稱，請同時加上 '--global' 參數.",
 	FlagGlobal:                         "同時套用至系統 git（若支援）",
@@ -184,6 +185,26 @@ var zH_HANT = LanguageMapping{
 	GitStashMessagePlaceholder:                               "輸入儲藏訊息（* 可選）",
 }
 
+// for about gitti
+var aboutGittiZhHant = []string{
+	"\n",
+	"Copyright (c) 2025 Yu Han Goh.\n",
+	"Gitti 源於作者在使用 Neovim 工作時的個人需求.",
+	"當時為了進行更直觀的 Git 操作, 不得不切換到外部的 Git GUI, ",
+	"導致中斷工作流程. ",
+	"Gitti 透過在終端機中直接提供直覺, 輕量的 TUI, ",
+	"填補了這個落差.\n",
+	"作者:",
+	"\033[38;2;180;150;255mYu Han Goh <軟體工程師>\033[0m",
+	"           <github:   \033[38;2;130;170;255mhttps://github.com/gohyuhan\033[0m>",
+	"           <linkedin: \033[38;2;130;170;255mhttps://my.linkedin.com/in/yu-han-goh-209480200\033[0m>\n",
+	"按下 \033[38;2;240;210;120m<ctrl+g>\033[0m 可在瀏覽器中開啟作者的 GitHub.",
+	"按下 \033[38;2;240;210;120m<ctrl+l>\033[0m 可開啟作者的 LinkedIn.\n",
+	"如果你喜歡 Gitti, 歡迎在這裡替它點一顆星:",
+	"\033[38;2;130;170;255mhttps://github.com/gohyuhan/gitti\033[0m",
+	"也歡迎你 fork 該專案, 並依照自己的工作流程進行調整.",
+}
+
 // the global key binding for zh-hant
 var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
@@ -209,6 +230,16 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "[Q/q]",
 		TitleOrInfoLine: "退出",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+g]",
+		TitleOrInfoLine: "在瀏覽器中開啟作者的 GitHub [!!]",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ctrl+l]",
+		TitleOrInfoLine: "在瀏覽器中開啟作者的 LinkedIn [!!]",
 		LineType:        INFO,
 	},
 	{
