@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"fmt"
 	"os/exec"
+	"strings"
 	"sync"
 
-	"gitti/cmd"
+	"gitti/executor"
 )
 
 type GitPull struct {
@@ -66,21 +67,21 @@ func (gp *GitPull) GitPull(pullType string) int {
 		gitPullArgs = []string{"pull", "--no-rebase", "--no-edit"}
 	}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitPullArgs, true)
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitPullArgs, true)
 
-	gp.gitPullProcessCmd = cmd
+	gp.gitPullProcessCmd = cmdExecutor
 
 	// Combine stderr into stdout
-	stdout, err := cmd.StdoutPipe()
+	stdout, err := cmdExecutor.StdoutPipe()
 	if err != nil {
 		gp.gitPullProcessMutex.Unlock()
 		gp.errorLog = append(gp.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
-	cmd.Stderr = cmd.Stdout
+	cmdExecutor.Stderr = cmdExecutor.Stdout
 
 	// Start the process while still holding the mutex
-	if err := cmd.Start(); err != nil {
+	if err := cmdExecutor.Start(); err != nil {
 		gp.gitPullProcessMutex.Unlock()
 		gp.errorLog = append(gp.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
@@ -98,6 +99,7 @@ func (gp *GitPull) GitPull(pullType string) int {
 		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
 		for scanner.Scan() {
 			line := scanner.Text()
+			line = strings.TrimSpace(line)
 			cleanedLine := cleanGitOutput(line)
 			gp.gitPullOutput = append(gp.gitPullOutput, cleanedLine)
 			select {
@@ -107,7 +109,7 @@ func (gp *GitPull) GitPull(pullType string) int {
 		}
 	}()
 
-	waitErr := cmd.Wait()
+	waitErr := cmdExecutor.Wait()
 	wg.Wait()
 
 	if waitErr != nil {

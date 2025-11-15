@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"gitti/api"
+	"gitti/executor"
 	"gitti/i18n"
 	"gitti/settings"
 )
@@ -38,11 +39,14 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) *api.GitState {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
 	// check if the user repo is git inited, is not prompt user to init it
-	api.IsRepoGitInitialized(repoPath)
+	gitRepoPathInfo := api.IsRepoGitInitialized(repoPath)
+
+	// after we successfully get the gitRepoPathInfo back we need to update the current cmd executor dir
+	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
 	gitState := api.InitGitState(updateChannel)
 	// git.InitGitCommitLog(false) // not included in v0.1.0
-	api.InitGitDaemon(repoPath, updateChannel, gitState)
+	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitState)
 
 	return gitState
 

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitti/cmd"
+	"gitti/executor"
 
 	"github.com/google/uuid"
 )
@@ -103,13 +103,13 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 		gitArgs = append(gitArgs, "HEAD")
 	}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, true)
-	gitStreamOutput, err := cmd.StdoutPipe()
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
+	gitStreamOutput, err := cmdExecutor.StdoutPipe()
 	if err != nil {
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
 		return
 	}
-	cmd.Stderr = cmd.Stdout
+	cmdExecutor.Stderr = cmdExecutor.Stdout
 
 	// to get line back from stdin out streaming
 	scanner := bufio.NewScanner(gitStreamOutput)
@@ -119,7 +119,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	var pendingGraphLines []string
 
 	//start the streaming
-	err = cmd.Start()
+	err = cmdExecutor.Start()
 	if err != nil {
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
 		return
@@ -221,7 +221,7 @@ func (gc *GitCommitLog) getCommitLogInfo(currentID uuid.UUID, updateChannel chan
 	}
 
 	// wait for proper clean up
-	err = cmd.Wait()
+	err = cmdExecutor.Wait()
 	if err != nil {
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT LOG ERROR]: %w", err))
 	}

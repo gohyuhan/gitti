@@ -36,7 +36,7 @@ type GitDaemon struct {
 
 var GITDAEMON *GitDaemon
 
-func InitGitDaemon(repoPath string, updateChannel chan string, gitState *GitState) {
+func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitState *GitState) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		return
@@ -46,7 +46,7 @@ func InitGitDaemon(repoPath string, updateChannel chan string, gitState *GitStat
 	gitFilesActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFilesActiveRefreshDurationMS) * time.Millisecond
 	gitFetchActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFetchDurationMS) * time.Millisecond
 	gd := &GitDaemon{
-		repoPath:                 filepath.Join(repoPath, ".git"),
+		repoPath:                 absoluteGitPath,
 		watcher:                  w,
 		debounceDur:              debounce,
 		gitFilesActiveRefreshDur: gitFilesActiveRefreshDur,

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitti/cmd"
+	"gitti/executor"
 )
 
 type StashInfo struct {
@@ -39,8 +39,8 @@ func (gs *GitStash) AllStash() []StashInfo {
 // ----------------------------------
 func (gs *GitStash) GetLatestStashInfo() {
 	gitArgs := []string{"stash", "list", "--format=%gd %s"}
-	stashInfocmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	stashInfoOutput, stashInfoErr := stashInfocmd.Output()
+	stashInfoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	stashInfoOutput, stashInfoErr := stashInfoCmdExecutor.Output()
 	if stashInfoErr != nil {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH INFO RETRIEVE ERROR]: %w", stashInfoErr))
 	}
@@ -78,8 +78,8 @@ func (gs *GitStash) GitStashAll(message string) {
 
 	gitArgs := []string{"stash", "push", "-u", "-m", message}
 
-	stashAllCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, stashAllErr := stashAllCmd.CombinedOutput()
+	stashAllCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_, stashAllErr := stashAllCmdExecutor.CombinedOutput()
 	if stashAllErr != nil {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ALL ERROR]: %w", stashAllErr))
 	}
@@ -103,8 +103,8 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) {
 		gitArgs = []string{"stash", "push", "-u", "-m", message, filePathName}
 	}
 
-	stashCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, stashErr := stashCmd.CombinedOutput()
+	stashCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_, stashErr := stashCmdExecutor.CombinedOutput()
 	if stashErr != nil {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ERROR]: %w", stashErr))
 	}
@@ -123,8 +123,8 @@ func (gs *GitStash) GitStashApply(stashId string) {
 
 	gitArgs := []string{"stash", "apply", stashId}
 
-	stashApplyCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, stashApplyErr := stashApplyCmd.CombinedOutput()
+	stashApplyCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_, stashApplyErr := stashApplyCmdExecutor.CombinedOutput()
 	if stashApplyErr != nil {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH APPLY ERROR]: %w", stashApplyErr))
 	}
@@ -143,8 +143,8 @@ func (gs *GitStash) GitStashPop(stashId string) {
 
 	gitArgs := []string{"stash", "pop", stashId}
 
-	stashPopCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, stashPopErr := stashPopCmd.CombinedOutput()
+	stashPopCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_, stashPopErr := stashPopCmdExecutor.CombinedOutput()
 	if stashPopErr != nil {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH POP ERROR]: %w", stashPopErr))
 	}
@@ -163,8 +163,8 @@ func (gs *GitStash) GitStashDrop(stashId string) {
 
 	gitArgs := []string{"stash", "drop", stashId}
 
-	stashDropCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	_, stashDropErr := stashDropCmd.CombinedOutput()
+	stashDropCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_, stashDropErr := stashDropCmdExecutor.CombinedOutput()
 	if stashDropErr != nil {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DROP ERROR]: %w", stashDropErr))
 	}
@@ -179,8 +179,8 @@ func (gs *GitStash) GitStashDetail(stashId string) []string {
 	var parsedDetail []string
 	gitArgs := []string{"stash", "show", "-p", "-u", stashId}
 
-	detailCmd := cmd.GittiCmd.RunGitCmd(gitArgs, true)
-	stashDetailOutput, detailCmdErr := detailCmd.Output()
+	detailCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
+	stashDetailOutput, detailCmdErr := detailCmdExecutor.Output()
 	if detailCmdErr != nil {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DETAIL ERROR]: %w", detailCmdErr))
 		return parsedDetail

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 
 	"gitti/api/git"
+	"gitti/executor"
 	"gitti/i18n"
 	"gitti/settings"
 )
@@ -16,9 +16,9 @@ import (
 func IsGitInstalled(repoPath string) {
 	gitArgs := []string{"--version"}
 
-	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = repoPath
-	err := cmd.Run()
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	cmdExecutor.Dir = repoPath
+	err := cmdExecutor.Run()
 	if err != nil {
 		_, notInSystem := err.(*exec.Error) // check if git is not installed wihitn the system, exec Error means it the executable was no within the system
 		if notInSystem {
@@ -29,14 +29,14 @@ func IsGitInstalled(repoPath string) {
 }
 
 // IsRepoGitInitialized checks if the given path is a Git repository
-func IsRepoGitInitialized(repoPath string) {
-	gitPath := filepath.Join(repoPath, ".git")
-
-	info, err := os.Stat(gitPath)
-	if err != nil || !info.IsDir() {
+func IsRepoGitInitialized(repoPath string) GitRepoPath {
+	gitPathInfo, err := getGitPathInfo()
+	if err != nil {
 		// .git does not exist or some other error
 		PromptUserForGitInitConfirmation(repoPath)
 	}
+
+	return gitPathInfo
 }
 
 func PromptUserForGitInitConfirmation(repoPath string) {
@@ -80,4 +80,30 @@ func IsBranchNameValid(branchName string) (string, bool) {
 	}
 
 	return branchName, true
+}
+
+func getGitPathInfo() (GitRepoPath, error) {
+	// get the most absolute git folder path
+	absGitPathArgs := []string{"rev-parse", "--absolute-git-dir"}
+	absGitPathCmd := executor.GittiCmdExecutor.RunGitCmd(absGitPathArgs, false)
+	absGitPathOutput, absGitPathErr := absGitPathCmd.Output()
+
+	if absGitPathErr != nil {
+		return GitRepoPath{}, fmt.Errorf("not git initialized")
+	}
+
+	// get the top level git path
+	topLevelGitPathArgs := []string{"rev-parse", "--show-toplevel"}
+	topLevelGitPathCmd := executor.GittiCmdExecutor.RunGitCmd(topLevelGitPathArgs, false)
+	topLevelGitPathOutput, topLevelGitPathErr := topLevelGitPathCmd.Output()
+	if topLevelGitPathErr != nil {
+		return GitRepoPath{}, fmt.Errorf("not git initialized")
+	}
+
+	gitRepoPath := GitRepoPath{
+		AbsoluteGitRepoPath: strings.TrimSpace(string(absGitPathOutput)),
+		TopLevelRepoPath:    strings.TrimSpace(string(topLevelGitPathOutput)),
+	}
+
+	return gitRepoPath, nil
 }

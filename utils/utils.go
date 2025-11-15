@@ -19,20 +19,20 @@ func Contains[T comparable](slice []T, item T) bool {
 
 func OpenBrowser(url string) {
 	go func() {
-		var cmd *exec.Cmd
+		var cmdExecutor *exec.Cmd
 
 		switch runtime.GOOS {
 		case "darwin":
 			// macOS
-			cmd = exec.Command("open", url)
+			cmdExecutor = exec.Command("open", url)
 		case "windows":
 			// Windows
-			cmd = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
+			cmdExecutor = exec.Command("rundll32", "url.dll,FileProtocolHandler", url)
 		default:
 			// Linux, BSD, WSL
-			cmd = exec.Command("xdg-open", url)
+			cmdExecutor = exec.Command("xdg-open", url)
 		}
 
-		cmd.Start()
+		cmdExecutor.Start()
 	}()
 }

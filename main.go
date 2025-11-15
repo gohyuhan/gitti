@@ -29,8 +29,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea/v2"
 
 	"gitti/api"
-	"gitti/cmd"
 	"gitti/config"
+	"gitti/executor"
 	"gitti/i18n"
 	"gitti/tui"
 )
@@ -42,6 +42,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	// setting and config need to be the first thing to be initialized
 	config.InitGlobalSettingAndLanguage()
 	langCode := flag.String("language", "", i18n.LANGUAGEMAPPING.FlagLangCode)
 	defaultInitBranch := flag.String("init-dbranch", "", i18n.LANGUAGEMAPPING.FlagInitDefaultBranch)
@@ -49,7 +50,8 @@ func main() {
 
 	flag.Parse()
 
-	cmd.InitCmd(repoPath)
+	// the Cmd Shoule be initialized right after gitti setting
+	executor.InitCmdExecutor(repoPath)
 
 	switch {
 	case *langCode != "":

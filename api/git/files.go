@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitti/cmd"
+	"gitti/executor"
 )
 
 const (
@@ -66,8 +66,8 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 func (gf *GitFiles) GetGitFilesStatus() {
 	gitArgs := []string{"status", "--porcelain", "-uall"}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	gitOutput, err := cmd.Output()
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gitOutput, err := cmdExecutor.Output()
 	if err != nil {
 		gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES ERROR]: %w", err))
 	}
@@ -113,8 +113,8 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 		gitArgs = []string{"diff", "--no-index", "-U99999", nullFile, "--", fileStatus.FilePathname}
 	}
 
-	cmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	gitOutput, err := cmd.Output()
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gitOutput, err := cmdExecutor.Output()
 	if err != nil {
 		exitError, ok := err.(*exec.ExitError)
 		if ok {
@@ -165,25 +165,25 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
 			gitArgs = []string{"add", "--", filePathName}
-			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-			stageCmd.Run()
+			stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree != " " {
 			// staged but have modification later
 			gitArgs = []string{"add", "--", filePathName}
-			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-			stageCmd.Run()
+			stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree == " " {
 			// staged and no latest modification, so we need to unstage it or revert back
 			gitArgs = []string{"reset", "HEAD", "--", filePathName}
 			if file.IndexState == "A" {
 				gitArgs = []string{"rm", "--cached", "--force", "--", filePathName}
 			}
-			unstageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
+			unstageCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			unstageCmd.Run()
 		} else if file.IndexState == " " && file.WorkTree != " " {
 			// tracked but not staged
 			gitArgs = []string{"add", "--", filePathName}
-			stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
+			stageCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			stageCmd.Run()
 		}
 	}
@@ -195,11 +195,9 @@ func (gf *GitFiles) StageAllChanges() {
 	}
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
-	var gitArgs []string
-
-	gitArgs = []string{"add", "."}
-	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	stageCmd.Run()
+	gitArgs := []string{"add", "."}
+	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	stageCmdExecutor.Run()
 }
 
 func (gf *GitFiles) UnstageAllChanges() {
@@ -208,10 +206,8 @@ func (gf *GitFiles) UnstageAllChanges() {
 	}
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
-	var gitArgs []string
-
-	gitArgs = []string{"reset", "HEAD"}
-	stageCmd := cmd.GittiCmd.RunGitCmd(gitArgs, false)
-	stageCmd.Run()
+	gitArgs := []string{"reset", "HEAD"}
+	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	stageCmdExecutor.Run()
 
 }
