@@ -12,6 +12,7 @@ var (
 	ColorPrimary    = lipgloss.Color("#009ACD")
 	ColorSecondary  = lipgloss.Color("#AAAAAA")
 	ColorHighlight  = lipgloss.Color("#FFD700")
+	ColorHighlight2 = lipgloss.Color("#FFEB66")
 	ColorAccent     = lipgloss.Color("#98FB98")
 	ColorError      = lipgloss.Color("#FF6B6B")
 	ColorBasic      = lipgloss.Color("#FFFFFF")
@@ -72,6 +73,8 @@ var (
 			Foreground(ColorAccent)
 	UnstagedFileStyle = NewStyle.
 				Foreground(ColorError)
+	StashIdStyle      = NewStyle.Foreground(ColorHighlight)
+	StashMessageStyle = NewStyle.Foreground(ColorHighlight2)
 )
 
 func GradientLines(lines []string) []string {

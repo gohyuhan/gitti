@@ -169,3 +169,22 @@ func (gs *GitStash) GitStashDrop(stashId string) {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DROP ERROR]: %w", stashDropErr))
 	}
 }
+
+// ----------------------------------
+//
+// # Git stash see deatil
+//
+// ----------------------------------
+func (gs *GitStash) GitStashDetail(stashId string) []string {
+	var parsedDetail []string
+	gitArgs := []string{"stash", "show", "-p", "-u", stashId}
+
+	detailCmd := cmd.GittiCmd.RunGitCmd(gitArgs, true)
+	stashDetailOutput, detailCmdErr := detailCmd.Output()
+	if detailCmdErr != nil {
+		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DETAIL ERROR]: %w", detailCmdErr))
+		return parsedDetail
+	}
+	parsedDetail = strings.Split(strings.TrimSpace(string(stashDetailOutput)), "\n")
+	return parsedDetail
+}

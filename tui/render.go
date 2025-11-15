@@ -203,6 +203,8 @@ func renderDetailComponentPanelViewPort(m *GittiModel) {
 	switch theCurrentSelectedComponent {
 	case constant.ModifiedFilesComponent:
 		contentLine = generateModifiedFileDetailPanelContent(m)
+	case constant.StashComponent:
+		contentLine = generateStashDetailPanelContent(m)
 	default:
 		contentLine = generateAboutGittiContent()
 	}
@@ -255,6 +257,33 @@ func generateModifiedFileDetailPanelContent(m *GittiModel) string {
 
 		diffLine = lineStyle.Render(Line.Line)
 		vpLine += rowNum + diffLine + "\n"
+	}
+	return vpLine
+}
+
+// for stash detail panel view
+func generateStashDetailPanelContent(m *GittiModel) string {
+	currentSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
+	var stash gitStashItem
+	if currentSelectedStash != nil {
+		stash = currentSelectedStash.(gitStashItem)
+	} else {
+		return ""
+	}
+
+	vpLine := fmt.Sprintf(
+		"[%s]\n[%s]\n\n",
+		style.StashIdStyle.Render(stash.Id),
+		style.StashMessageStyle.Render(stash.Message),
+	)
+
+	stashDetail := m.GitState.GitStash.GitStashDetail(stash.Id)
+	if len(stashDetail) < 1 {
+		return ""
+	}
+
+	for _, Line := range stashDetail {
+		vpLine += Line + "\n"
 	}
 	return vpLine
 }
