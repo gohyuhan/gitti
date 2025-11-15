@@ -228,6 +228,21 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "[1]",
+		TitleOrInfoLine: "切换到分支组件",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[2]",
+		TitleOrInfoLine: "切换到已修改文件组件",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[3]",
+		TitleOrInfoLine: "切换到暂存组件",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "[Q/q]",
 		TitleOrInfoLine: "退出",
 		LineType:        INFO,

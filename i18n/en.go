@@ -228,6 +228,21 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "[1]",
+		TitleOrInfoLine: "navigate to branch component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[2]",
+		TitleOrInfoLine: "navigate to modified file component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[3]",
+		TitleOrInfoLine: "naviagte to stash component",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "[Q/q]",
 		TitleOrInfoLine: "quit",
 		LineType:        INFO,

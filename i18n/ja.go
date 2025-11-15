@@ -229,6 +229,21 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "[1]",
+		TitleOrInfoLine: "ブランチコンポーネントに移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[2]",
+		TitleOrInfoLine: "変更されたファイルコンポーネントに移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[3]",
+		TitleOrInfoLine: "スタッシュコンポーネントに移動",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "[Q/q]",
 		TitleOrInfoLine: "終了",
 		LineType:        INFO,
