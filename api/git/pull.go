@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os/exec"
-	"strings"
 	"sync"
 
 	"gitti/executor"
@@ -60,11 +59,11 @@ func (gp *GitPull) GitPull(pullType string) int {
 	var gitPullArgs []string
 	switch pullType {
 	case GITPULL:
-		gitPullArgs = []string{"pull", "--no-edit"}
+		gitPullArgs = []string{"pull", "--progress", "--no-edit"}
 	case GITPULLREBASE:
-		gitPullArgs = []string{"pull", "--rebase", "--autostash", "--no-edit"}
+		gitPullArgs = []string{"pull", "--progress", "--rebase", "--autostash", "--no-edit"}
 	case GITPULLMERGE:
-		gitPullArgs = []string{"pull", "--no-rebase", "--no-edit"}
+		gitPullArgs = []string{"pull", "--progress", "--no-rebase", "--no-edit"}
 	}
 
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitPullArgs, true)
@@ -96,16 +95,13 @@ func (gp *GitPull) GitPull(pullType string) int {
 	go func() {
 		defer wg.Done()
 		scanner := bufio.NewScanner(stdout)
-		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+		scanner.Split(splitOnCarriageReturnOrNewline)
+		cursorIndex := 0
 		for scanner.Scan() {
-			line := scanner.Text()
-			line = strings.TrimSpace(line)
-			cleanedLine := cleanGitOutput(line)
-			gp.gitPullOutput = append(gp.gitPullOutput, cleanedLine)
-			select {
-			case gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE:
-			default:
-			}
+			updatedCursorIndex, updatedGitPullOutput := handleProgressOutputStream(cursorIndex, scanner, gp.gitPullOutput)
+			gp.gitPullOutput = updatedGitPullOutput
+			cursorIndex = updatedCursorIndex
+			gp.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
 		}
 	}()
 

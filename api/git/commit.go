@@ -148,11 +148,12 @@ func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) 
 	go func() {
 		defer wg.Done()
 		scanner := bufio.NewScanner(stdout)
-		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+		scanner.Split(splitOnCarriageReturnOrNewline)
+		cursorIndex := 0
 		for scanner.Scan() {
-			line := scanner.Text()
-			line = strings.TrimSpace(line)
-			gc.gitCommitOutput = append(gc.gitCommitOutput, line)
+			updatedCursorIndex, updatedGitCommitOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitCommitOutput)
+			gc.gitCommitOutput = updatedGitCommitOutput
+			cursorIndex = updatedCursorIndex
 			if isAmendCommit {
 				gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE
 			} else {
@@ -244,11 +245,11 @@ func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pu
 	var gitArgs []string
 	switch pushType {
 	case FORCEPUSHSAFE:
-		gitArgs = []string{"push", "--force-with-lease", "-u", originName, currentCheckOutBranch}
+		gitArgs = []string{"push", "--progress", "--force-with-lease", "-u", originName, currentCheckOutBranch}
 	case FORCEPUSHDANGEROUS:
-		gitArgs = []string{"push", "--force", "-u", originName, currentCheckOutBranch}
+		gitArgs = []string{"push", "--progress", "--force", "-u", originName, currentCheckOutBranch}
 	default:
-		gitArgs = []string{"push", "-u", originName, currentCheckOutBranch}
+		gitArgs = []string{"push", "--progress", "-u", originName, currentCheckOutBranch}
 	}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
 	// Disable interactive prompts for credentials
@@ -281,15 +282,13 @@ func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pu
 	go func() {
 		defer wg.Done()
 		scanner := bufio.NewScanner(stdout)
-		scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+		scanner.Split(splitOnCarriageReturnOrNewline)
+		cursorIndex := 0
 		for scanner.Scan() {
-			line := scanner.Text()
-			line = strings.TrimSpace(line)
-			gc.gitRemotePushOutput = append(gc.gitRemotePushOutput, line)
-			select {
-			case gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE:
-			default:
-			}
+			updatedCursorIndex, updatedGitRemotePushOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitRemotePushOutput)
+			gc.gitRemotePushOutput = updatedGitRemotePushOutput
+			cursorIndex = updatedCursorIndex
+			gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
 		}
 	}()
 
