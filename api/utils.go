@@ -73,7 +73,7 @@ func IsBranchNameValid(branchName string) (string, bool) {
 	var modifiedBranchName string
 
 	modifiedBranchName = branchName
-	modifiedBranchName = strings.ReplaceAll(modifiedBranchName, " ", "-")
+	modifiedBranchName = strings.TrimSpace(strings.ReplaceAll(modifiedBranchName, " ", "-"))
 
 	if modifiedBranchName != branchName {
 		return modifiedBranchName, false

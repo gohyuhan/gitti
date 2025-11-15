@@ -12,6 +12,7 @@ import (
 
 	"gitti/executor"
 	"gitti/i18n"
+	"gitti/utils"
 )
 
 type GitCommit struct {
@@ -400,17 +401,23 @@ func (gc *GitCommit) CheckRemoteExist() bool {
 	remotes := strings.SplitSeq(strings.TrimSpace(string(gitOutput)), "\n")
 	var remoteStruct []GitRemote
 	for remote := range remotes {
-		if !strings.HasSuffix(remote, "(push)") {
-			continue
-		}
 		remoteLinePart := strings.Fields(remote)
 		if len(remoteLinePart) < 2 {
 			continue
 		}
-		remoteStruct = append(remoteStruct, GitRemote{
+
+		r := GitRemote{
 			Name: remoteLinePart[0],
 			Url:  remoteLinePart[1],
-		})
+		}
+
+		if !utils.Contains(remoteStruct, r) {
+			remoteStruct = append(remoteStruct, GitRemote{
+				Name: remoteLinePart[0],
+				Url:  remoteLinePart[1],
+			})
+
+		}
 	}
 	gc.remote = remoteStruct
 	return len(gc.remote) > 0
