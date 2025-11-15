@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"gitti/api/git"
@@ -70,16 +71,76 @@ func InitGitState(updateChannel chan string) *GitState {
 }
 
 func IsBranchNameValid(branchName string) (string, bool) {
-	var modifiedBranchName string
+	// Git-invalid characters anywhere (except space which we replace with "-")
+	// These characters must be removed entirely.
+	invalidChars := regexp.MustCompile(`[~^:?*\[\\]`) // characters removed fully
+	controlChars := regexp.MustCompile(`[\x00-\x1F\x7F]`)
 
-	modifiedBranchName = branchName
-	modifiedBranchName = strings.TrimSpace(strings.ReplaceAll(modifiedBranchName, " ", "-"))
+	modified := strings.TrimSpace(branchName)
+	afterModified := ""
 
-	if modifiedBranchName != branchName {
-		return modifiedBranchName, false
+	for modified != afterModified {
+		afterModified = modified
+		modified = strings.ReplaceAll(modified, " ", "-") // space → dash
+		modified = invalidChars.ReplaceAllString(modified, "")
+		modified = controlChars.ReplaceAllString(modified, "")
+
+		// Remove special disallowed sequences
+		modified = strings.ReplaceAll(modified, "..", "")
+		modified = strings.ReplaceAll(modified, "/./", "/")
+		modified = strings.ReplaceAll(modified, "@{", "")
+		modified = strings.ReplaceAll(modified, "//", "/")
 	}
 
-	return branchName, true
+	// loop check till the prefix and suffix is clean and valid
+	prefixClean := false
+	suffixClean := false
+	for !prefixClean || !suffixClean {
+		// mark the prefix and suffix as clean first
+		prefixClean = true
+		suffixClean = true
+
+		// prefix
+		if strings.HasPrefix(modified, "/") {
+			modified = strings.TrimLeft(modified, "/")
+			prefixClean = false
+		}
+		if strings.HasPrefix(modified, ".") {
+			modified = strings.TrimLeft(modified, ".")
+			prefixClean = false
+		}
+		if strings.HasPrefix(modified, "refs/") {
+			modified = strings.TrimPrefix(modified, "refs/")
+			prefixClean = false
+		}
+		if strings.HasPrefix(modified, "-") {
+			modified = strings.TrimLeft(modified, "-")
+			prefixClean = false
+		}
+
+		//suffix
+		if strings.HasSuffix(modified, "/") {
+			modified = strings.TrimRight(modified, "/")
+			suffixClean = false
+		}
+		if strings.HasSuffix(modified, ".") {
+			modified = strings.TrimRight(modified, ".")
+			suffixClean = false
+		}
+		if strings.HasSuffix(modified, ".lock") {
+			modified = strings.TrimSuffix(modified, ".lock")
+			suffixClean = false
+		}
+	}
+
+	if modified == "@" {
+		modified = ""
+	}
+
+	// Determine if original was already valid
+	isValid := (modified == branchName)
+
+	return modified, isValid
 }
 
 func getGitPathInfo() (GitRepoPath, error) {

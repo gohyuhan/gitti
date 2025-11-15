@@ -392,6 +392,31 @@ func gitPullCancelService(m *GittiModel) {
 
 // ------------------------------------
 //
+//	For create new branch
+//
+// ------------------------------------
+func gitCreateNewBranchService(m *GittiModel, validBranchName string) {
+	go func() {
+		if len(validBranchName) < 1 {
+			return
+		}
+		m.GitState.GitBranch.GitCreateNewBranch(validBranchName)
+	}()
+}
+
+// ------------------------------------
+//
+//	For create new branch and switch
+//
+// ------------------------------------
+func gitCreateNewBranchAndSwitchService(m *GittiModel, validBranchName string) {
+	go func() {
+		m.GitState.GitBranch.GitCreateNewBranchAndSwitch(validBranchName)
+	}()
+}
+
+// ------------------------------------
+//
 //	For Git Individual file stage or unstage
 //
 // ------------------------------------

@@ -168,7 +168,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				popUp.CurrentActiveInputIndex = 1
 				// start a seperate thread commit them and set the value of msg and desc to "" if committed successfully
 				// also do not start any git operation is message is no provided
-				if !popUp.IsProcessing.Load() {
+				if !popUp.IsProcessing.Load() && len(popUp.MessageTextInput.Value()) > 0 {
 					gitCommitService(m, popUp.IsAmendCommit)
 					// Start spinner ticking
 					return m, popUp.Spinner.Tick
@@ -181,7 +181,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				popUp.MessageTextInput.Focus()
 				popUp.DescriptionTextAreaInput.Blur()
 				popUp.CurrentActiveInputIndex = 1
-				if !popUp.IsProcessing.Load() {
+				if !popUp.IsProcessing.Load() && len(popUp.MessageTextInput.Value()) > 0 {
 					gitAmendCommitService(m, popUp.IsAmendCommit)
 					// Start spinner ticking
 					return m, popUp.Spinner.Tick
@@ -197,7 +197,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				popUp.CurrentActiveInputIndex = 1
 				// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
 				// also do not start any git operation is message is no provided
-				if !popUp.IsProcessing.Load() {
+				if !popUp.IsProcessing.Load() && len(popUp.RemoteNameTextInput.Value()) > 0 && len(popUp.RemoteUrlTextInput.Value()) > 0 {
 					gitAddRemoteService(m)
 				}
 			}
@@ -207,16 +207,18 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 			if ok {
 				// we direclty close the pop up and trigger the branch creation operation
 				validBranchName, _ := api.IsBranchNameValid(popUp.NewBranchNameInput.Value())
-				switch popUp.CreateType {
-				case git.NEWBRANCH:
-					m.GitState.GitBranch.GitCreateNewBranch(validBranchName)
-				case git.NEWBRANCHANDSWITCH:
-					m.GitState.GitBranch.GitCreateNewBranchAndSwitch(validBranchName)
+				if len(validBranchName) > 0 {
+					switch popUp.CreateType {
+					case git.NEWBRANCH:
+						gitCreateNewBranchService(m, validBranchName)
+					case git.NEWBRANCHANDSWITCH:
+						gitCreateNewBranchAndSwitchService(m, validBranchName)
+					}
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.NoPopUp
+					m.PopUpModel = nil
 				}
-				m.ShowPopUp.Store(false)
-				m.IsTyping.Store(false)
-				m.PopUpType = constant.NoPopUp
-				m.PopUpModel = nil
 			}
 
 		case constant.GitStashMessagePopUp:
