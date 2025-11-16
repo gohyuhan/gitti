@@ -401,7 +401,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if !m.ShowPopUp.Load() {
 			// first we need to check if there are any push/pull origin origin for this repo
 			// if not we prompt the user to add a new remote origin
-			if !m.GitState.GitCommit.CheckRemoteExist() {
+			if !m.GitState.GitRemote.CheckRemoteExist() {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it
@@ -414,7 +414,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			} else {
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				remotes := m.GitState.GitCommit.Remote()
+				remotes := m.GitState.GitRemote.Remote()
 				if len(remotes) == 1 {
 					m.PopUpType = constant.ChoosePushTypePopUp
 					// if the current pop up model is not commit pop up model, then init it and start git push service
@@ -434,7 +434,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if !m.ShowPopUp.Load() {
 			// first we need to check if there are any push/pull origin for this repo
 			// if not we prompt the user to add a new remote origin
-			if !m.GitState.GitCommit.CheckRemoteExist() {
+			if !m.GitState.GitRemote.CheckRemoteExist() {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it

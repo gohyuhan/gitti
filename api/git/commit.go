@@ -3,16 +3,12 @@ package git
 import (
 	"bufio"
 	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
-	"regexp"
 	"strings"
 	"sync"
 
 	"gitti/executor"
-	"gitti/i18n"
-	"gitti/utils"
 )
 
 type GitCommit struct {
@@ -30,11 +26,6 @@ type GitCommit struct {
 	remote                    []GitRemote
 }
 
-type GitRemote struct {
-	Name string
-	Url  string
-}
-
 type LatestCommitMsgAndDesc struct {
 	Message     string
 	Description string
@@ -49,7 +40,6 @@ func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock) *G
 		gitRemotePushOutput:  []string{},
 		updateChannel:        updateChannel,
 		gitProcessLock:       gitProcessLock,
-		remote:               []GitRemote{},
 	}
 
 	return &gitCommit
@@ -62,15 +52,6 @@ func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock) *G
 // ----------------------------------
 func (gc *GitCommit) GitCommitOutput() []string {
 	return gc.gitCommitOutput
-}
-
-// ----------------------------------
-//
-//	Return remote
-//
-// ----------------------------------
-func (gc *GitCommit) Remote() []GitRemote {
-	return gc.remote
 }
 
 // ----------------------------------
@@ -325,140 +306,4 @@ func (gc *GitCommit) KillGitRemotePushCmd() {
 func (gc *GitCommit) resetGitRemotePushProcesstatus() {
 	gc.gitRemotePushProcess = nil
 	gc.gitProcessLock.ReleaseGitOpsLock()
-}
-
-// ----------------------------------
-//
-//	Related to Git Remote
-//
-// ----------------------------------
-func (gc *GitCommit) GitAddRemote(originName string, url string) ([]string, int) {
-	if !gc.gitProcessLock.CanProceedWithGitOps() {
-		return []string{gc.gitProcessLock.OtherProcessRunningWarning()}, -1
-	}
-	defer func() {
-		gc.gitAddRemoteProcessMutex.Lock()
-		gc.gitAddRemoteProcessReset()
-		gc.gitAddRemoteProcessMutex.Unlock()
-	}()
-
-	if !isValidGitRemoteURL(url) {
-		errMsg := "Invalid remote URL format"
-		if i18n.LANGUAGEMAPPING != nil {
-			errMsg = i18n.LANGUAGEMAPPING.AddRemotePopUpInvalidRemoteUrlFormat
-		}
-		return []string{errMsg}, -1
-	}
-
-	gc.gitAddRemoteProcessMutex.Lock()
-	gitArgs := []string{"remote", "add", originName, url}
-	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	gc.gitAddRemoteProcess = cmd
-
-	// CombinedOutput starts and waits for the command
-	gitOutput, err := cmd.CombinedOutput()
-	gc.gitAddRemoteProcessMutex.Unlock()
-
-	gitAddRemoteOutput := processGeneralGitOpsOutputIntoStringArray(gitOutput)
-	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			status := exitErr.ExitCode()
-			gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT ADD REMOTE ERROR]: %w", err))
-			return gitAddRemoteOutput, status
-		}
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", err))
-		return gitAddRemoteOutput, -1
-
-	}
-	return gitAddRemoteOutput, 0
-}
-
-// KillGitAddRemoteCmd forcefully terminates any running git remote add process.
-// It is safe to call this method even if no process is running.
-// This method is thread-safe and can be called from multiple goroutines.
-// This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
-func (gc *GitCommit) KillGitAddRemoteCmd() {
-	gc.gitAddRemoteProcessMutex.Lock()
-	defer gc.gitAddRemoteProcessMutex.Unlock()
-
-	if gc.gitAddRemoteProcess != nil && gc.gitAddRemoteProcess.Process != nil {
-		_ = gc.gitAddRemoteProcess.Process.Kill()
-	}
-}
-
-func (gc *GitCommit) gitAddRemoteProcessReset() {
-	gc.gitAddRemoteProcess = nil
-	gc.gitProcessLock.ReleaseGitOpsLock()
-}
-
-func (gc *GitCommit) CheckRemoteExist() bool {
-	gitArgs := []string{"remote", "-v"}
-	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	gitOutput, err := cmd.Output()
-	if err != nil {
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
-	}
-	remotes := strings.SplitSeq(strings.TrimSpace(string(gitOutput)), "\n")
-	var remoteStruct []GitRemote
-	for remote := range remotes {
-		remoteLinePart := strings.Fields(remote)
-		if len(remoteLinePart) < 2 {
-			continue
-		}
-
-		r := GitRemote{
-			Name: remoteLinePart[0],
-			Url:  remoteLinePart[1],
-		}
-
-		if !utils.Contains(remoteStruct, r) {
-			remoteStruct = append(remoteStruct, GitRemote{
-				Name: remoteLinePart[0],
-				Url:  remoteLinePart[1],
-			})
-
-		}
-	}
-	gc.remote = remoteStruct
-	return len(gc.remote) > 0
-}
-
-// ----------------------------------
-//
-//	Related to Git Init
-//
-// ----------------------------------
-func GitInit(repoPath string, initBranchName string) {
-	initGitArgs := []string{"init"}
-
-	initCmd := executor.GittiCmdExecutor.RunGitCmd(initGitArgs, false)
-	_, initErr := initCmd.Output()
-	if initErr != nil {
-		fmt.Printf("[GIT INIT ERROR]: %v", initErr)
-		os.Exit(1)
-	}
-
-	// set the branch
-	checkoutBranchGitArgs := []string{"checkout", "-b", initBranchName}
-
-	checkoutBranchCmd := executor.GittiCmdExecutor.RunGitCmd(checkoutBranchGitArgs, false)
-	_, checkoutBranchErr := checkoutBranchCmd.Output()
-	if checkoutBranchErr != nil {
-		fmt.Printf("[GIT INIT ERROR]: %v", checkoutBranchErr)
-		os.Exit(1)
-	}
-}
-
-// check if the format for git remote is correct and valid
-func isValidGitRemoteURL(remote string) bool {
-	// Check HTTPS style
-	if strings.HasPrefix(remote, "https://") || strings.HasPrefix(remote, "http://") {
-		_, err := url.ParseRequestURI(remote)
-		return err == nil
-	}
-
-	// Check SSH style (e.g. git@github.com:user/repo.git)
-	sshPattern := `^[\w.-]+@[\w.-]+:[\w./-]+(\.git)?$`
-	matched, _ := regexp.MatchString(sshPattern, remote)
-	return matched
 }

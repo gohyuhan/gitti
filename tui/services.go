@@ -187,7 +187,7 @@ func gitAddRemoteService(m *GittiModel) {
 		if len(remoteName) < 1 || len(remoteUrl) < 1 {
 			return
 		}
-		gitAddRemoteResult, exitStatusCode := m.GitState.GitCommit.GitAddRemote(remoteName, remoteUrl)
+		gitAddRemoteResult, exitStatusCode := m.GitState.GitRemote.GitAddRemote(remoteName, remoteUrl)
 		popUp, ok = m.PopUpModel.(*AddRemotePromptPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
 			popUp.IsProcessing.Store(false) // update the processing status
@@ -219,7 +219,7 @@ func gitAddRemoteCancelService(m *GittiModel) {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
 	// Clean up git remote add process
-	m.GitState.GitCommit.KillGitAddRemoteCmd() // kill the cmd process if exist
+	m.GitState.GitRemote.KillGitAddRemoteCmd() // kill the cmd process if exist
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode

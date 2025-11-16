@@ -8,6 +8,7 @@ type GitState struct {
 	GitFiles  *git.GitFiles
 	GitPull   *git.GitPull
 	GitStash  *git.GitStash
+	GitRemote *git.GitRemote
 }
 
 type GitRepoPath struct {

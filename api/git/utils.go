@@ -3,7 +3,13 @@ package git
 import (
 	"bufio"
 	"bytes"
+	"fmt"
+	"net/url"
+	"os"
+	"regexp"
 	"strings"
+
+	"gitti/executor"
 )
 
 func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {
@@ -57,4 +63,44 @@ func handleProgressOutputStream(cursorIndex int, scanner *bufio.Scanner, outputA
 	}
 
 	return cursorIndex, outputArray
+}
+
+// check if the format for git remote is correct and valid
+func isValidGitRemoteURL(remote string) bool {
+	// Check HTTPS style
+	if strings.HasPrefix(remote, "https://") || strings.HasPrefix(remote, "http://") {
+		_, err := url.ParseRequestURI(remote)
+		return err == nil
+	}
+
+	// Check SSH style (e.g. git@github.com:user/repo.git)
+	sshPattern := `^[\w.-]+@[\w.-]+:[\w./-]+(\.git)?$`
+	matched, _ := regexp.MatchString(sshPattern, remote)
+	return matched
+}
+
+// ----------------------------------
+//
+//	Related to Git Init
+//
+// ----------------------------------
+func GitInit(repoPath string, initBranchName string) {
+	initGitArgs := []string{"init"}
+
+	initCmd := executor.GittiCmdExecutor.RunGitCmd(initGitArgs, false)
+	_, initErr := initCmd.Output()
+	if initErr != nil {
+		fmt.Printf("[GIT INIT ERROR]: %v", initErr)
+		os.Exit(1)
+	}
+
+	// set the branch
+	checkoutBranchGitArgs := []string{"checkout", "-b", initBranchName}
+
+	checkoutBranchCmd := executor.GittiCmdExecutor.RunGitCmd(checkoutBranchGitArgs, false)
+	_, checkoutBranchErr := checkoutBranchCmd.Output()
+	if checkoutBranchErr != nil {
+		fmt.Printf("[GIT INIT ERROR]: %v", checkoutBranchErr)
+		os.Exit(1)
+	}
 }

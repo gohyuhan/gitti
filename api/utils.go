@@ -68,6 +68,7 @@ func InitGitState(updateChannel chan string) *GitState {
 		GitFiles:  git.InitGitFile(gitProcessLock),
 		GitPull:   git.InitGitPull(updateChannel, gitProcessLock),
 		GitStash:  git.InitGitStash(gitProcessLock),
+		GitRemote: git.InitGitRemote(updateChannel, gitProcessLock),
 	}
 }
 
