@@ -19,14 +19,17 @@ import (
 ) // this was for various components part init or reinit function due to update or newly create
 
 // those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
-// for bubbletea list component, we can't get rid of the "No items." for now as we couldn't access into it or modify it
+// for bubbletea list component, we can't get rid of the "No items." natively for now as we couldn't access into it or modify it
 // see https://github.com/charmbracelet/bubbles/blob/master/list/list.go#L1222
 
 // init the list component for Branch Component
 func initBranchList(m *GittiModel) {
+	currentCheckOut := m.GitState.GitBranch.CurrentCheckOut()
 	latestBranchArray := []list.Item{
-		gitBranchItem(m.GitState.GitBranch.CurrentCheckOut()),
+		gitBranchItem(currentCheckOut),
 	}
+
+	m.CheckOutBranch = currentCheckOut.BranchName
 
 	for _, branch := range m.GitState.GitBranch.AllBranches() {
 		latestBranchArray = append(latestBranchArray, gitBranchItem(branch))

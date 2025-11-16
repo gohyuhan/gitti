@@ -1,5 +1,11 @@
 package i18n
 
+import (
+	"fmt"
+
+	"gitti/constant"
+)
+
 var zH_HANS = LanguageMapping{
 	AboutGitti:                         aboutGittiZhHans,
 	FlagLangCode:                       "设置语言代码，例如: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
@@ -25,7 +31,7 @@ var zH_HANS = LanguageMapping{
 	MinimumTerminalHeight:              "最小要求高度",
 	CurrentTerminalWidth:               "当前宽度",
 	MinimumTerminalWidth:               "最小要求宽度",
-	KeyBindingForGittiStatusComponent: []string{
+	KeyBindingForGitStatusComponent: []string{
 		"[?] 全局快捷键",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
@@ -188,7 +194,8 @@ var zH_HANS = LanguageMapping{
 // for about gitti
 var aboutGittiZhHans = []string{
 	"\n",
-	"Copyright (c) 2025 Yu Han Goh.\n",
+	"Copyright (c) 2025 Yu Han Goh.",
+	fmt.Sprintf(" %s \033[38;2;180;150;255m%s\033[0m\n", constant.APPNAME, constant.APPVERSION),
 	"Gitti 起源于作者在使用 Neovim 工作时的个人需求.",
 	"当时为了进行更直观的 Git 操作, 不得不切换到外部的 Git GU, ",
 	"导致打断工作流程.",

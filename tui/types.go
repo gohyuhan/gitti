@@ -24,6 +24,8 @@ type GittiModel struct {
 	CurrentSelectedComponentIndex     int
 	TotalComponentCount               int
 	RepoPath                          string
+	RepoName                          string
+	CheckOutBranch                    string
 	Width                             int
 	Height                            int
 	WindowLeftPanelWidth              int // this is the left part of the window

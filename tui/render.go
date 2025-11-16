@@ -22,16 +22,16 @@ import (
 //
 // -----------------------------------------------------------------------------
 // render the Gitti Status Panel
-func renderGittiStatusComponentPanel(m *GittiModel) string {
+func renderGitStatusComponentPanel(m *GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.GittiStatusComponent {
+	if m.CurrentSelectedComponent == constant.GitStatusComponent {
 		borderStyle = style.SelectedBorderStyle
 	}
 
 	return borderStyle.
 		Width(m.WindowLeftPanelWidth).
 		Height(1).
-		Render(fmt.Sprintf("%s %s", settings.AppName, settings.AppVersion))
+		Render(fmt.Sprintf("%s -> %s", m.RepoName, m.CheckOutBranch))
 }
 
 // Render the Local Branches panel
@@ -135,8 +135,8 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 		//
 		//-----------------------------
 		switch m.CurrentSelectedComponent {
-		case constant.GittiStatusComponent:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingForGittiStatusComponent
+		case constant.GitStatusComponent:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStatusComponent
 		case constant.LocalBranchComponent:
 			CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 			if CurrentSelectedBranch == nil {
@@ -392,7 +392,7 @@ func tuiWindowSizing(m *GittiModel) {
 func leftPanelDynamicResize(m *GittiModel) {
 	leftPanelRemainingHeight := m.WindowCoreContentHeight - 7 // this is after reserving the height for the gitti version panel and also Padding
 
-	// we minus 2 if GittiStatusComponent is not the one chosen is because GittiStatusComponent
+	// we minus 2 if GitStatusComponent is not the one chosen is because GitStatusComponent
 	// and the one that got selected will not be account in to the dynamic height calculation
 	// ( gitti status component's height is fix at 3, while the selected one will always get 40% )
 	componentWithDynamicHeight := (len(constant.ComponentNavigationList) - 2)
@@ -409,7 +409,7 @@ func leftPanelDynamicResize(m *GittiModel) {
 		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
 	case constant.StashComponent:
 		m.StashComponentPanelHeight = selectedComponentPanelHeight
-	case constant.GittiStatusComponent:
+	case constant.GitStatusComponent:
 		// if it was the Gitti status component panel that got selected (because its height is fix),
 		// the next panel will get the selected height which is the branch component panel
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight

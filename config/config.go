@@ -35,12 +35,11 @@ func SetGlobalInitBranch(branchName string, cwd string) {
 	os.Exit(0)
 }
 
-func InitGitAndAPI(repoPath string, updateChannel chan string) *api.GitState {
+func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitState, api.GitRepoPath) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
 	// check if the user repo is git inited, is not prompt user to init it
 	gitRepoPathInfo := api.IsRepoGitInitialized(repoPath)
-
 	// after we successfully get the gitRepoPathInfo back we need to update the current cmd executor dir
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
@@ -48,7 +47,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) *api.GitState {
 	// git.InitGitCommitLog(false) // not included in v0.1.0
 	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitState)
 
-	return gitState
+	return gitState, gitRepoPathInfo
 
 }
 

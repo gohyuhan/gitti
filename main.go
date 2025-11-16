@@ -65,12 +65,12 @@ func main() {
 		updateChannel := make(chan string)
 
 		// initialization
-		gitState := config.InitGitAndAPI(repoPath, updateChannel)
+		gitState, gitRepoPathInfo := config.InitGitAndAPI(repoPath, updateChannel)
 
 		// start the Git Daemon
 		api.GITDAEMON.Start()
 
-		gittiUiModel := tui.NewGittiModel(repoPath, gitState)
+		gittiUiModel := tui.NewGittiModel(repoPath, gitRepoPathInfo.RepoName, gitState)
 		gitti := tea.NewProgram(
 			gittiUiModel,
 		)

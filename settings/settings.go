@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"gitti/api/git"
+	"gitti/constant"
 )
 
 var GITTICONFIGSETTINGS *GittiConfigSettings
@@ -32,9 +33,6 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	LanguageCode:                    "EN",
 }
 
-const AppName = "gitti"
-const AppVersion = "v0.1.0"
-
 // getConfigPath returns the config.json path (creates directories if needed)
 //
 // *Example on MacOs : /Users/<USER_NAME>/Library/Application Support/gitti/config.json
@@ -43,7 +41,7 @@ func getConfigPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	appDir := filepath.Join(dir, AppName)
+	appDir := filepath.Join(dir, constant.APPNAME)
 	if err := os.MkdirAll(appDir, 0o755); err != nil {
 		return "", err
 	}

@@ -68,7 +68,7 @@ const (
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
 const (
-	GittiStatusComponent   = "C0" // component index 0
+	GitStatusComponent     = "C0" // component index 0
 	LocalBranchComponent   = "C1" // component index 1
 	ModifiedFilesComponent = "C2" // component index 2
 	StashComponent         = "C3" // component index 3
@@ -80,7 +80,7 @@ const (
 
 // will be used by the key binding navigation of going to previous or next component panel
 var ComponentNavigationList = []string{
-	GittiStatusComponent,
+	GitStatusComponent,
 	LocalBranchComponent,
 	ModifiedFilesComponent,
 	StashComponent,

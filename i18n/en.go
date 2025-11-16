@@ -1,5 +1,11 @@
 package i18n
 
+import (
+	"fmt"
+
+	"gitti/constant"
+)
+
 var eN = LanguageMapping{
 	AboutGitti:                         aboutGittiEn,
 	FlagLangCode:                       "set the language code, e.g. 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
@@ -26,7 +32,7 @@ var eN = LanguageMapping{
 	MinimumTerminalHeight:              "Minimum required height",
 	CurrentTerminalWidth:               "Current width",
 	MinimumTerminalWidth:               "Minimum required height",
-	KeyBindingForGittiStatusComponent: []string{
+	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
@@ -189,7 +195,8 @@ var eN = LanguageMapping{
 // for about gitti
 var aboutGittiEn = []string{
 	"\n",
-	"Copyright (c) 2025 Yu Han Goh.\n",
+	"Copyright (c) 2025 Yu Han Goh.",
+	fmt.Sprintf(" %s \033[38;2;180;150;255m%s\033[0m\n", constant.APPNAME, constant.APPVERSION),
 	"Gitti was created out of the author's personal need while working in Neovim,",
 	"where switching to a separate Git GUI for visual operations became disruptive.",
 	"Gitti bridges this gap by providing an intuitive,",

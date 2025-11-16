@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -161,9 +162,12 @@ func getGitPathInfo() (GitRepoPath, error) {
 		return GitRepoPath{}, fmt.Errorf("not git initialized")
 	}
 
+	repoName := filepath.Base(strings.TrimSpace(string(topLevelGitPathOutput)))
+
 	gitRepoPath := GitRepoPath{
 		AbsoluteGitRepoPath: strings.TrimSpace(string(absGitPathOutput)),
 		TopLevelRepoPath:    strings.TrimSpace(string(topLevelGitPathOutput)),
+		RepoName:            repoName,
 	}
 
 	return gitRepoPath, nil

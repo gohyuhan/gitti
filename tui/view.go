@@ -59,14 +59,14 @@ func gittiMainPageView(m *GittiModel) string {
 	}
 
 	// --- Components ---
-	gittiStatusPanel := renderGittiStatusComponentPanel(m)
+	GitStatusPanel := renderGitStatusComponentPanel(m)
 	localBranchesPanel := renderLocalBranchesComponentPanel(m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight, m)
 	modifiedFilesPanel := renderModifiedFilesComponentPanel(m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight, m)
 	stashFilesPanel := renderStashComponentPanel(m.WindowLeftPanelWidth, m.StashComponentPanelHeight, m)
 	detailPanel := renderDetailComponentPanel(m.DetailComponentPanelWidth, m.DetailComponentPanelHeight, m)
 	bottomBar := renderKeyBindingComponentPanel(m.Width, m)
 
-	leftPanel := lipgloss.JoinVertical(lipgloss.Left, gittiStatusPanel, localBranchesPanel, modifiedFilesPanel, stashFilesPanel)
+	leftPanel := lipgloss.JoinVertical(lipgloss.Left, GitStatusPanel, localBranchesPanel, modifiedFilesPanel, stashFilesPanel)
 
 	// Combine panels horizontally with explicit top alignment
 	content := lipgloss.JoinHorizontal(lipgloss.Top, leftPanel, detailPanel)

@@ -55,7 +55,7 @@ type LanguageMapping struct {
 	CurrentTerminalWidth       string
 	MinimumTerminalWidth       string
 	// for Key Bindings
-	KeyBindingForGittiStatusComponent        []string
+	KeyBindingForGitStatusComponent          []string
 	KeyBindingLocalBranchComponentIsCheckOut []string
 	KeyBindingLocalBranchComponentDefault    []string
 	KeyBindingLocalBranchComponentNone       []string

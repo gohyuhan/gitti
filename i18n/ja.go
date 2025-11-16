@@ -1,5 +1,11 @@
 package i18n
 
+import (
+	"fmt"
+
+	"gitti/constant"
+)
+
 var jA = LanguageMapping{
 	AboutGitti:                         aboutGittiJa,
 	FlagLangCode:                       "言語コードを設定します. 例: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
@@ -25,7 +31,7 @@ var jA = LanguageMapping{
 	MinimumTerminalHeight:              "必要な最小の高さ",
 	CurrentTerminalWidth:               "現在の幅",
 	MinimumTerminalWidth:               "必要な最小の幅",
-	KeyBindingForGittiStatusComponent: []string{
+	KeyBindingForGitStatusComponent: []string{
 		"[?] グローバルキー操作",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
@@ -188,7 +194,8 @@ var jA = LanguageMapping{
 // for about gitti
 var aboutGittiJa = []string{
 	"\n",
-	"Copyright (c) 2025 Yu Han Goh.\n",
+	"Copyright (c) 2025 Yu Han Goh.",
+	fmt.Sprintf(" %s \033[38;2;180;150;255m%s\033[0m\n", constant.APPNAME, constant.APPVERSION),
 	"Gitti は, 作者が Neovim で作業している際に, ",
 	"視覚的な操作のために外部の Git GUI に切り替える必要があり, ",
 	"その作業フローが中断されるという個人的な課題から生まれました.",

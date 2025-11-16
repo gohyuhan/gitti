@@ -8,18 +8,18 @@ import (
 )
 
 var (
-	// Base colors
-	ColorPrimary    = lipgloss.Color("#009ACD")
-	ColorSecondary  = lipgloss.Color("#AAAAAA")
-	ColorHighlight  = lipgloss.Color("#FFD700")
-	ColorHighlight2 = lipgloss.Color("#FFEB66")
-	ColorAccent     = lipgloss.Color("#98FB98")
-	ColorError      = lipgloss.Color("#FF6B6B")
-	ColorBasic      = lipgloss.Color("#FFFFFF")
-	ColorFade       = lipgloss.Color("#555555")
-	ColorPrompt     = lipgloss.Color("#DB74ED")
-	ColorTitle      = lipgloss.Color("#FF4500")
-	ColorKeyBinding = lipgloss.Color("#AAF0F0")
+	// Base colors - Stunning gradient-inspired theme
+	ColorPrimary    = lipgloss.Color("#82AAFF") // Soft periwinkle blue (from your reference)
+	ColorSecondary  = lipgloss.Color("#A5B7E8") // Muted lavender-blue for secondary text
+	ColorHighlight  = lipgloss.Color("#F0D278") // Warm golden highlight (from your reference)
+	ColorHighlight2 = lipgloss.Color("#F5E6A3") // Lighter golden yellow for emphasis
+	ColorAccent     = lipgloss.Color("#98FB98") // Keep original - DO NOT MODIFY
+	ColorError      = lipgloss.Color("#FF6B6B") // Keep original - DO NOT MODIFY
+	ColorBasic      = lipgloss.Color("#E8F0FF") // Soft white with blue tint for readability
+	ColorFade       = lipgloss.Color("#6B7A9E") // Muted blue-gray for subtle elements
+	ColorPrompt     = lipgloss.Color("#B496FF") // Beautiful lavender purple (from your reference)
+	ColorTitle      = lipgloss.Color("#9F7AEA") // Rich purple for titles
+	ColorKeyBinding = lipgloss.Color("#7DD3FC") // Sky blue for key bindings
 
 	// lipgloss empty new style
 	NewStyle = lipgloss.NewStyle()
@@ -80,11 +80,17 @@ var (
 func GradientLines(lines []string) []string {
 	colored := make([]string, len(lines))
 
-	// Tunable values
-	startHue := 200.0 // degrees
-	hueStep := 12.0   // per line
-	sat := 0.70       // 0–1
-	light := 0.65     // 0–1
+	// // Tunable values
+	// startHue := 200.0 // degrees
+	// hueStep := 12.0   // per line
+	// sat := 0.70       // 0–1
+	// light := 0.65     // 0–1
+
+	// Enhanced gradient values for stunning visual effect
+	startHue := 220.0 // degrees - start at beautiful blue-purple
+	hueStep := 8.0    // per line - smoother transitions
+	sat := 0.75       // 0–1 - increased saturation for vibrancy
+	light := 0.68     // 0–1 - optimized brightness for both light/dark terminals
 
 	// inline HSL→RGB→HEX conversion
 	hslToHex := func(h, s, l float64) string {

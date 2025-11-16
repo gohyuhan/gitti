@@ -10,7 +10,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea/v2"
 )
 
-func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
+func NewGittiModel(repoPath string, repoName string, gitState *api.GitState) *GittiModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
@@ -21,6 +21,8 @@ func NewGittiModel(repoPath string, gitState *api.GitState) *GittiModel {
 		CurrentSelectedComponentIndex:    2,
 		TotalComponentCount:              4,
 		RepoPath:                         repoPath,
+		RepoName:                         repoName,
+		CheckOutBranch:                   "",
 		Width:                            0,
 		Height:                           0,
 		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
@@ -125,12 +127,6 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	}
-
-	var cmd tea.Cmd
-	m.CurrentRepoBranchesInfoList, cmd = m.CurrentRepoBranchesInfoList.Update(msg)
-	cmds = append(cmds, cmd)
-	m.CurrentRepoModifiedFilesInfoList, cmd = m.CurrentRepoModifiedFilesInfoList.Update(msg)
-	cmds = append(cmds, cmd)
 
 	return m, tea.Batch(cmds...)
 }
