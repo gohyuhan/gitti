@@ -2,7 +2,7 @@ package api
 
 import "gitti/api/git"
 
-type GitState struct {
+type GitOperations struct {
 	GitBranch *git.GitBranch
 	GitCommit *git.GitCommit
 	GitFiles  *git.GitFiles

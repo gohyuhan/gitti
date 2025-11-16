@@ -173,7 +173,7 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 	if ok {
 		popUp.GitCommitOutputViewport.SetWidth(min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		var gitCommitOutputLog string
-		logs := m.GitState.GitCommit.GitCommitOutput()
+		logs := m.GitOperations.GitCommit.GitCommitOutput()
 		for _, line := range logs {
 			logLine := style.NewStyle.Render(line)
 			gitCommitOutputLog += logLine + "\n"
@@ -258,7 +258,7 @@ func updatePopUpAmendCommitOutputViewPort(m *GittiModel) {
 	if ok {
 		popUp.GitAmendCommitOutputViewport.SetWidth(min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		var gitCommitOutputLog string
-		logs := m.GitState.GitCommit.GitCommitOutput()
+		logs := m.GitOperations.GitCommit.GitCommitOutput()
 		for _, line := range logs {
 			logLine := style.NewStyle.Render(line)
 			gitCommitOutputLog += logLine + "\n"
@@ -444,11 +444,11 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 	return ""
 }
 
-func updateGitRemotePushOutputViewport(m *GittiModel) {
+func updatePopUpGitRemotePushOutputViewport(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
 		popUp.GitRemotePushOutputViewport.SetWidth(min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-		logs := m.GitState.GitCommit.GitRemotePushOutput()
+		logs := m.GitOperations.GitCommit.GitRemotePushOutput()
 		var GitPushLog string
 		for _, line := range logs {
 			logLine := style.NewStyle.Render(line)
@@ -652,11 +652,11 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 	return ""
 }
 
-func updateGitPullOutputViewport(m *GittiModel) {
+func updatePopUpGitPullOutputViewport(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
 	if ok {
 		popUp.GitPullOutputViewport.SetWidth(min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-		logs := m.GitState.GitPull.GetGitPullOutput()
+		logs := m.GitOperations.GitPull.GetGitPullOutput()
 		var GitPullLog string
 		for _, line := range logs {
 			logLine := style.NewStyle.Render(line)

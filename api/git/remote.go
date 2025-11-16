@@ -18,11 +18,17 @@ type GitRemote struct {
 	gitAddRemoteProcessMutex sync.Mutex
 	gitProcessLock           *GitProcessLock
 	remote                   []GitRemoteInfo
+	remoteSyncStatus         RemoteSyncStatus
 }
 
 type GitRemoteInfo struct {
 	Name string
 	Url  string
+}
+
+type RemoteSyncStatus struct {
+	Local  string
+	Remote string
 }
 
 func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *GitRemote {
@@ -31,6 +37,7 @@ func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *G
 		updateChannel:       updateChannel,
 		gitProcessLock:      gitProcessLock,
 		remote:              []GitRemoteInfo{},
+		remoteSyncStatus:    RemoteSyncStatus{},
 	}
 
 	return &gitRemote
@@ -43,6 +50,15 @@ func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *G
 // ----------------------------------
 func (gr *GitRemote) Remote() []GitRemoteInfo {
 	return gr.remote
+}
+
+// ----------------------------------
+//
+//	Return remote sync status
+//
+// ----------------------------------
+func (gr *GitRemote) RemoteSyncStatus() RemoteSyncStatus {
+	return gr.remoteSyncStatus
 }
 
 // ----------------------------------
@@ -136,4 +152,31 @@ func (gr *GitRemote) CheckRemoteExist() bool {
 	}
 	gr.remote = remoteStruct
 	return len(gr.remote) > 0
+}
+
+// ----------------------------------
+//
+//	Related to Git Remote sync status, will be call by system
+//
+// ----------------------------------
+func (gr *GitRemote) GetLatestRemoteSyncStatus() {
+	gitArgs := []string{"rev-list", "--left-right", "--count", "HEAD...@{upstream}"}
+
+	remoteSyncStatusCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	remoteSyncStatusOutput, remoteSyncStatusErr := remoteSyncStatusCmd.Output()
+	if remoteSyncStatusErr != nil {
+		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+	}
+
+	parsedOutput := strings.TrimSpace(string(remoteSyncStatusOutput))
+	parts := strings.Fields(parsedOutput)
+
+	if len(parts) < 2 {
+		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+	}
+
+	gr.remoteSyncStatus = RemoteSyncStatus{
+		Local:  parts[0],
+		Remote: parts[1],
+	}
 }

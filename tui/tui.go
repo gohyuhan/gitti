@@ -1,16 +1,19 @@
 package tui
 
 import (
+	"fmt"
+
 	"gitti/api"
 	"gitti/api/git"
 	"gitti/tui/constant"
+	"gitti/tui/style"
 
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/viewport"
 	tea "github.com/charmbracelet/bubbletea/v2"
 )
 
-func NewGittiModel(repoPath string, repoName string, gitState *api.GitState) *GittiModel {
+func NewGittiModel(repoPath string, repoName string, gitOperations *api.GitOperations) *GittiModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
@@ -34,7 +37,7 @@ func NewGittiModel(repoPath string, repoName string, gitState *api.GitState) *Gi
 		ListNavigationIndexPosition:      GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
 		PopUpType:                        constant.NoPopUp,
 		PopUpModel:                       struct{}{},
-		GitState:                         gitState,
+		GitOperations:                    gitOperations,
 		GlobalKeyBindingKeyMapLargestLen: 0,
 	}
 	gitti.IsRenderInit.Store(false)
@@ -82,9 +85,11 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_AMEND_COMMIT_OUTPUT_UPDATE:
 			updatePopUpAmendCommitOutputViewPort(m)
 		case git.GIT_REMOTE_PUSH_OUTPUT_UPDATE:
-			updateGitRemotePushOutputViewport(m)
+			updatePopUpGitRemotePushOutputViewport(m)
 		case git.GIT_PULL_OUTPUT_UPDATE:
-			updateGitPullOutputViewport(m)
+			updatePopUpGitPullOutputViewport(m)
+		case git.GIT_REMOTE_SYNC_STATUS_UPDATE:
+			m.updateGitRemoteStatusSyncLineString()
 		}
 		renderDetailComponentPanelViewPort(m)
 		return m, nil
@@ -137,4 +142,16 @@ func (m *GittiModel) View() tea.View {
 	v.AltScreen = true
 	v.MouseMode = tea.MouseModeCellMotion
 	return v
+}
+
+func (m *GittiModel) updateGitRemoteStatusSyncLineString() {
+	remoteSynsStatusInfo := m.GitOperations.GitRemote.RemoteSyncStatus()
+	if remoteSynsStatusInfo.Local == "" || remoteSynsStatusInfo.Remote == "" {
+		m.RemoteSyncStateLineString = style.ErrorStyle.Render("\uf00d")
+	}
+
+	local := style.LocalStatusStyle.Render(fmt.Sprintf("%s↑", remoteSynsStatusInfo.Local))
+	remote := style.RemoteStatusStyle.Render(fmt.Sprintf("%s↓", remoteSynsStatusInfo.Remote))
+
+	m.RemoteSyncStateLineString = local + " " + remote
 }

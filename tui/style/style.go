@@ -73,8 +73,14 @@ var (
 			Foreground(ColorAccent)
 	UnstagedFileStyle = NewStyle.
 				Foreground(ColorError)
+	LocalStatusStyle = NewStyle.
+				Foreground(ColorAccent)
+	RemoteStatusStyle = NewStyle.
+				Foreground(ColorError)
 	StashIdStyle      = NewStyle.Foreground(ColorHighlight)
 	StashMessageStyle = NewStyle.Foreground(ColorHighlight2)
+	ErrorStyle        = NewStyle.
+				Foreground(ColorError)
 )
 
 func GradientLines(lines []string) []string {

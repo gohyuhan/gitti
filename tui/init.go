@@ -24,14 +24,14 @@ import (
 
 // init the list component for Branch Component
 func initBranchList(m *GittiModel) {
-	currentCheckOut := m.GitState.GitBranch.CurrentCheckOut()
+	currentCheckOut := m.GitOperations.GitBranch.CurrentCheckOut()
 	latestBranchArray := []list.Item{
 		gitBranchItem(currentCheckOut),
 	}
 
 	m.CheckOutBranch = currentCheckOut.BranchName
 
-	for _, branch := range m.GitState.GitBranch.AllBranches() {
+	for _, branch := range m.GitOperations.GitBranch.AllBranches() {
 		latestBranchArray = append(latestBranchArray, gitBranchItem(branch))
 	}
 
@@ -56,7 +56,7 @@ func initBranchList(m *GittiModel) {
 
 // init the list component for Modified Files Component
 func initModifiedFilesList(m *GittiModel) {
-	latestModifiedFilesArray := m.GitState.GitFiles.FilesStatus()
+	latestModifiedFilesArray := m.GitOperations.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))
 	for _, modifiedFile := range latestModifiedFilesArray {
 		items = append(items, gitModifiedFilesItem(modifiedFile))
@@ -102,7 +102,7 @@ func initModifiedFilesList(m *GittiModel) {
 
 // init the list component for Stash info Component
 func initStashList(m *GittiModel) {
-	latestStashArray := m.GitState.GitStash.AllStash()
+	latestStashArray := m.GitOperations.GitStash.AllStash()
 	items := make([]list.Item, 0, len(latestStashArray))
 	for _, stashInfo := range latestStashArray {
 		items = append(items, gitStashItem(stashInfo))
@@ -221,7 +221,7 @@ func initGitCommitPopUpModel(m *GittiModel) {
 
 // init the popup model for git amend commit
 func initGitAmendCommitPopUpModel(m *GittiModel) {
-	commitMsgAndDesc := m.GitState.GitCommit.GetLatestCommitMsgAndDesc()
+	commitMsgAndDesc := m.GitOperations.GitCommit.GetLatestCommitMsgAndDesc()
 	commitMsg := commitMsgAndDesc.Message
 	commitDesc := commitMsgAndDesc.Description
 	commitMsgPlaceholder := i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolderAmendVersion
@@ -340,7 +340,7 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 }
 
 func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string, pushType string) (*GittiModel, tea.Cmd) {
-	m.GitState.GitCommit.ClearGitRemotePushOutput()
+	m.GitOperations.GitCommit.ClearGitRemotePushOutput()
 	if popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
 		initGitRemotePushPopUpModel(m)
 	} else {

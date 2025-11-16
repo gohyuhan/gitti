@@ -16,27 +16,27 @@ import (
 )
 
 type GitDaemon struct {
-	repoPath                       string
-	watcher                        *fsnotify.Watcher
-	debounceDur                    time.Duration
-	gitFilesActiveRefreshDur       time.Duration
-	gitFetchActiveRefreshDur       time.Duration
-	isGitBranchPassiveRunning      atomic.Bool
-	isGitFilesPassiveActiveRunning atomic.Bool
-	isGitStashPassiveRunning       atomic.Bool
-	isGitFetchActiveRunning        atomic.Bool
-	watcherTimer                   *time.Timer
-	gitFilesActiveTimer            *time.Timer
-	gitFetchActiveTimer            *time.Timer
-	stopChannel                    chan struct{}
-	errorLog                       []error
-	updateChannel                  chan string // to communicate back to main thread for an update event
-	gitState                       *GitState
+	repoPath                            string
+	watcher                             *fsnotify.Watcher
+	debounceDur                         time.Duration
+	gitFilesActiveRefreshDur            time.Duration
+	gitRemoteSyncStatusActiveRefreshDur time.Duration
+	isGitBranchPassiveRunning           atomic.Bool
+	isGitFilesPassiveActiveRunning      atomic.Bool
+	isGitStashPassiveRunning            atomic.Bool
+	isGitRemoteSyncStatusActiveRunning  atomic.Bool
+	watcherTimer                        *time.Timer
+	gitFilesActiveTimer                 *time.Timer
+	gitRemoteSyncStatusActiveTimer      *time.Timer
+	stopChannel                         chan struct{}
+	errorLog                            []error
+	updateChannel                       chan string // to communicate back to main thread for an update event
+	gitOperations                       *GitOperations
 }
 
 var GITDAEMON *GitDaemon
 
-func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitState *GitState) {
+func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		return
@@ -44,28 +44,28 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitState *
 
 	debounce := time.Duration(settings.GITTICONFIGSETTINGS.FileWatcherDebounceMS) * time.Millisecond
 	gitFilesActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFilesActiveRefreshDurationMS) * time.Millisecond
-	gitFetchActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFetchDurationMS) * time.Millisecond
+	gitRemoteSyncStatusActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitRemoteSyncStatusDurationMS) * time.Millisecond
 	gd := &GitDaemon{
-		repoPath:                 absoluteGitPath,
-		watcher:                  w,
-		debounceDur:              debounce,
-		gitFilesActiveRefreshDur: gitFilesActiveRefreshDur,
-		gitFetchActiveRefreshDur: gitFetchActiveRefreshDur,
-		watcherTimer:             time.NewTimer(debounce), // milliseconds
-		gitFilesActiveTimer:      time.NewTimer(gitFilesActiveRefreshDur),
-		gitFetchActiveTimer:      time.NewTimer(gitFetchActiveRefreshDur),
-		stopChannel:              make(chan struct{}),
-		errorLog:                 make([]error, 0),
-		updateChannel:            updateChannel,
-		gitState:                 gitState,
+		repoPath:                            absoluteGitPath,
+		watcher:                             w,
+		debounceDur:                         debounce,
+		gitFilesActiveRefreshDur:            gitFilesActiveRefreshDur,
+		gitRemoteSyncStatusActiveRefreshDur: gitRemoteSyncStatusActiveRefreshDur,
+		watcherTimer:                        time.NewTimer(debounce), // milliseconds
+		gitFilesActiveTimer:                 time.NewTimer(gitFilesActiveRefreshDur),
+		gitRemoteSyncStatusActiveTimer:      time.NewTimer(gitRemoteSyncStatusActiveRefreshDur),
+		stopChannel:                         make(chan struct{}),
+		errorLog:                            make([]error, 0),
+		updateChannel:                       updateChannel,
+		gitOperations:                       gitOperations,
 	}
 	gd.isGitFilesPassiveActiveRunning.Store(false)
-	gd.isGitFetchActiveRunning.Store(false)
+	gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 	gd.isGitBranchPassiveRunning.Store(false)
 	gd.isGitStashPassiveRunning.Store(false)
 	gd.watcherTimer.Stop()
 	gd.gitFilesActiveTimer.Stop()
-	gd.gitFetchActiveTimer.Stop()
+	gd.gitRemoteSyncStatusActiveTimer.Stop()
 	gd.watchPath()
 
 	GITDAEMON = gd
@@ -95,7 +95,7 @@ func (gd *GitDaemon) Start() {
 			gd.gitLatestInfoFetch()
 		}
 		gd.gitFilesActiveTimer.Reset(gd.gitFilesActiveRefreshDur)
-		gd.gitFetchActiveTimer.Reset(gd.gitFetchActiveRefreshDur)
+		gd.gitRemoteSyncStatusActiveTimer.Reset(gd.gitRemoteSyncStatusActiveRefreshDur)
 		// loop to stay active
 		for {
 			select {
@@ -116,16 +116,20 @@ func (gd *GitDaemon) Start() {
 						// Mark as running
 						defer gd.isGitFilesPassiveActiveRunning.Store(false)
 
-						gd.gitState.GitFiles.GetGitFilesStatus()
+						gd.gitOperations.GitFiles.GetGitFilesStatus()
 						gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
 					}
 				}()
-			case <-gd.gitFetchActiveTimer.C:
-				// reset immediately; git fetch operation TBD
-				gd.gitFetchActiveTimer.Reset(gd.gitFetchActiveRefreshDur)
-				// go func() {
-
-				// }()
+			case <-gd.gitRemoteSyncStatusActiveTimer.C:
+				// reset immediately; git remote sync status operation
+				gd.gitRemoteSyncStatusActiveTimer.Reset(gd.gitRemoteSyncStatusActiveRefreshDur)
+				go func() {
+					if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
+						defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
+						gd.gitOperations.GitRemote.GetLatestRemoteSyncStatus()
+						gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_UPDATE
+					}
+				}()
 			case <-gd.stopChannel:
 				gd.watcher.Close()
 				return
@@ -148,25 +152,31 @@ func (gd *GitDaemon) gitLatestInfoFetch() {
 	go func() {
 		if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitFilesPassiveActiveRunning.Store(false)
-			gd.gitState.GitFiles.GetGitFilesStatus()
+			gd.gitOperations.GitFiles.GetGitFilesStatus()
 			gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitBranchPassiveRunning.Store(false)
-			gd.gitState.GitBranch.GetLatestBranchesinfo()
+			gd.gitOperations.GitBranch.GetLatestBranchesinfo()
 			gd.updateChannel <- git.GIT_BRANCH_UPDATE
+		}
+	}()
+	go func() {
+		if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
+			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatus()
+			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitStashPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitStashPassiveRunning.Store(false)
-			gd.gitState.GitStash.GetLatestStashInfo()
+			gd.gitOperations.GitStash.GetLatestStashInfo()
 			gd.updateChannel <- git.GIT_STASH_UPDATE
 		}
 	}()
-
 }
 
 func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {

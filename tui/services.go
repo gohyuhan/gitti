@@ -42,7 +42,7 @@ func gitCommitService(m *GittiModel, isAmendCommit bool) {
 			return
 		}
 		// stage the changes based on what was chosen by user and commit it
-		exitStatusCode = m.GitState.GitCommit.GitCommit(message, description, isAmendCommit)
+		exitStatusCode = m.GitOperations.GitCommit.GitCommit(message, description, isAmendCommit)
 
 		popUp, ok = m.PopUpModel.(*GitCommitPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
@@ -71,8 +71,8 @@ func gitCommitCancelService(m *GittiModel) {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
 	// Clean up git processes and state
-	m.GitState.GitCommit.KillGitCommitCmd()     // kill the git stash and commit cmd process if exist
-	m.GitState.GitCommit.ClearGitCommitOutput() // clear the git commit output log
+	m.GitOperations.GitCommit.KillGitCommitCmd()     // kill the git stash and commit cmd process if exist
+	m.GitOperations.GitCommit.ClearGitCommitOutput() // clear the git commit output log
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode
@@ -115,7 +115,7 @@ func gitAmendCommitService(m *GittiModel, isAmendCommit bool) {
 			return
 		}
 		// stage the changes based on what was chosen by user and commit it
-		exitStatusCode = m.GitState.GitCommit.GitCommit(message, description, isAmendCommit)
+		exitStatusCode = m.GitOperations.GitCommit.GitCommit(message, description, isAmendCommit)
 
 		popUp, ok = m.PopUpModel.(*GitAmendCommitPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
@@ -144,8 +144,8 @@ func gitAmendCommitCancelService(m *GittiModel) {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
 	// Clean up git processes and state
-	m.GitState.GitCommit.KillGitCommitCmd()     // kill the git stash and commit cmd process if exist
-	m.GitState.GitCommit.ClearGitCommitOutput() // clear the git commit output log
+	m.GitOperations.GitCommit.KillGitCommitCmd()     // kill the git stash and commit cmd process if exist
+	m.GitOperations.GitCommit.ClearGitCommitOutput() // clear the git commit output log
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode
@@ -187,7 +187,7 @@ func gitAddRemoteService(m *GittiModel) {
 		if len(remoteName) < 1 || len(remoteUrl) < 1 {
 			return
 		}
-		gitAddRemoteResult, exitStatusCode := m.GitState.GitRemote.GitAddRemote(remoteName, remoteUrl)
+		gitAddRemoteResult, exitStatusCode := m.GitOperations.GitRemote.GitAddRemote(remoteName, remoteUrl)
 		popUp, ok = m.PopUpModel.(*AddRemotePromptPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
 			popUp.IsProcessing.Store(false) // update the processing status
@@ -219,7 +219,7 @@ func gitAddRemoteCancelService(m *GittiModel) {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
 	// Clean up git remote add process
-	m.GitState.GitRemote.KillGitAddRemoteCmd() // kill the cmd process if exist
+	m.GitOperations.GitRemote.KillGitAddRemoteCmd() // kill the cmd process if exist
 
 	m.ShowPopUp.Store(false) // close the pop up
 	m.IsTyping.Store(false)  // reset typing mode
@@ -253,7 +253,7 @@ func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 			return
 		}
 
-		exitStatusCode := m.GitState.GitCommit.GitPush(m.GitState.GitBranch.CurrentCheckOut().BranchName, originName, pushType)
+		exitStatusCode := m.GitOperations.GitCommit.GitPush(m.GitOperations.GitBranch.CurrentCheckOut().BranchName, originName, pushType)
 		popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
 			popUp.IsProcessing.Store(false) // update the processing status
@@ -278,10 +278,10 @@ func gitRemotePushCancelService(m *GittiModel) {
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
-	m.GitState.GitCommit.KillGitRemotePushCmd()     // kill the cmd process if exist
-	m.GitState.GitCommit.ClearGitRemotePushOutput() // clear the git commit output log
-	m.ShowPopUp.Store(false)                        // close the pop up
-	m.IsTyping.Store(false)                         // and reset typing mode
+	m.GitOperations.GitCommit.KillGitRemotePushCmd()     // kill the cmd process if exist
+	m.GitOperations.GitCommit.ClearGitRemotePushOutput() // clear the git commit output log
+	m.ShowPopUp.Store(false)                             // close the pop up
+	m.IsTyping.Store(false)                              // and reset typing mode
 	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.GitRemotePushOutputViewport.SetContent("") // set the git commit output viewport to nothing
@@ -312,9 +312,9 @@ func gitSwitchBranchService(m *GittiModel, branchName string, switchType string)
 		var success bool
 		switch switchType {
 		case git.SWITCHBRANCH:
-			gitOpsOutput, success = m.GitState.GitBranch.GitSwitchBranch(branchName)
+			gitOpsOutput, success = m.GitOperations.GitBranch.GitSwitchBranch(branchName)
 		case git.SWITCHBRANCHWITHCHANGES:
-			gitOpsOutput, success = m.GitState.GitBranch.GitSwitchBranchWithChanges(branchName)
+			gitOpsOutput, success = m.GitOperations.GitBranch.GitSwitchBranchWithChanges(branchName)
 		}
 
 		updateSwitchBranchOutputViewPort(m, gitOpsOutput)
@@ -352,7 +352,7 @@ func gitPullService(m *GittiModel, pullType string) {
 			return
 		}
 
-		exitStatusCode := m.GitState.GitPull.GitPull(pullType)
+		exitStatusCode := m.GitOperations.GitPull.GitPull(pullType)
 		popUp, ok = m.PopUpModel.(*GitPullOutputPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
 			popUp.IsProcessing.Store(false) // update the processing status
@@ -377,10 +377,10 @@ func gitPullCancelService(m *GittiModel) {
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
 	}
-	m.GitState.GitPull.ClearGitPullOutput()
-	m.GitState.GitPull.KillGitPullCmd() // kill the cmd process if exist
-	m.ShowPopUp.Store(false)            // close the pop up
-	m.IsTyping.Store(false)             // and reset typing mode
+	m.GitOperations.GitPull.ClearGitPullOutput()
+	m.GitOperations.GitPull.KillGitPullCmd() // kill the cmd process if exist
+	m.ShowPopUp.Store(false)                 // close the pop up
+	m.IsTyping.Store(false)                  // and reset typing mode
 	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.GitPullOutputViewport.SetContent("") // set the git commit output viewport to nothing
@@ -400,7 +400,7 @@ func gitCreateNewBranchService(m *GittiModel, validBranchName string) {
 		if len(validBranchName) < 1 {
 			return
 		}
-		m.GitState.GitBranch.GitCreateNewBranch(validBranchName)
+		m.GitOperations.GitBranch.GitCreateNewBranch(validBranchName)
 	}()
 }
 
@@ -411,7 +411,7 @@ func gitCreateNewBranchService(m *GittiModel, validBranchName string) {
 // ------------------------------------
 func gitCreateNewBranchAndSwitchService(m *GittiModel, validBranchName string) {
 	go func() {
-		m.GitState.GitBranch.GitCreateNewBranchAndSwitch(validBranchName)
+		m.GitOperations.GitBranch.GitCreateNewBranchAndSwitch(validBranchName)
 	}()
 }
 
@@ -422,7 +422,7 @@ func gitCreateNewBranchAndSwitchService(m *GittiModel, validBranchName string) {
 // ------------------------------------
 func gitStageOrUnstageService(m *GittiModel, filePathName string) {
 	go func() {
-		m.GitState.GitFiles.StageOrUnstageFile(filePathName)
+		m.GitOperations.GitFiles.StageOrUnstageFile(filePathName)
 	}()
 }
 
@@ -433,7 +433,7 @@ func gitStageOrUnstageService(m *GittiModel, filePathName string) {
 // ------------------------------------
 func gitStageAllChangesService(m *GittiModel) {
 	go func() {
-		m.GitState.GitFiles.StageAllChanges()
+		m.GitOperations.GitFiles.StageAllChanges()
 	}()
 }
 
@@ -444,7 +444,7 @@ func gitStageAllChangesService(m *GittiModel) {
 // ------------------------------------
 func gitUnstageAllChangesService(m *GittiModel) {
 	go func() {
-		m.GitState.GitFiles.UnstageAllChanges()
+		m.GitOperations.GitFiles.UnstageAllChanges()
 	}()
 }
 
@@ -455,7 +455,7 @@ func gitUnstageAllChangesService(m *GittiModel) {
 // ------------------------------------
 func gitStashAllService(m *GittiModel, msg string) {
 	go func() {
-		m.GitState.GitStash.GitStashAll(msg)
+		m.GitOperations.GitStash.GitStashAll(msg)
 	}()
 }
 
@@ -466,7 +466,7 @@ func gitStashAllService(m *GittiModel, msg string) {
 // ------------------------------------
 func gitStashIndividualFileService(m *GittiModel, filePathName string, msg string) {
 	go func() {
-		m.GitState.GitStash.GitStashFile(filePathName, msg)
+		m.GitOperations.GitStash.GitStashFile(filePathName, msg)
 	}()
 }
 
@@ -477,7 +477,7 @@ func gitStashIndividualFileService(m *GittiModel, filePathName string, msg strin
 // ------------------------------------
 func gitStashApplyService(m *GittiModel, filePathName string) {
 	go func() {
-		m.GitState.GitStash.GitStashApply(filePathName)
+		m.GitOperations.GitStash.GitStashApply(filePathName)
 	}()
 }
 
@@ -488,7 +488,7 @@ func gitStashApplyService(m *GittiModel, filePathName string) {
 // ------------------------------------
 func gitStashPopService(m *GittiModel, filePathName string) {
 	go func() {
-		m.GitState.GitStash.GitStashPop(filePathName)
+		m.GitOperations.GitStash.GitStashPop(filePathName)
 	}()
 }
 
@@ -499,6 +499,6 @@ func gitStashPopService(m *GittiModel, filePathName string) {
 // ------------------------------------
 func gitStashDropService(m *GittiModel, filePathName string) {
 	go func() {
-		m.GitState.GitStash.GitStashDrop(filePathName)
+		m.GitOperations.GitStash.GitStashDrop(filePathName)
 	}()
 }

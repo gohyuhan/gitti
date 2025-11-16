@@ -26,6 +26,7 @@ type GittiModel struct {
 	RepoPath                          string
 	RepoName                          string
 	CheckOutBranch                    string
+	RemoteSyncStateLineString         string
 	Width                             int
 	Height                            int
 	WindowLeftPanelWidth              int // this is the left part of the window
@@ -46,7 +47,7 @@ type GittiModel struct {
 	PopUpType                         string
 	PopUpModel                        interface{}
 	IsTyping                          atomic.Bool
-	GitState                          *api.GitState
+	GitOperations                     *api.GitOperations
 	GlobalKeyBindingKeyMapLargestLen  int // this was use for global key binding pop up styling, we save it once so we don't have to recompute
 }
 

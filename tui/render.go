@@ -31,7 +31,7 @@ func renderGitStatusComponentPanel(m *GittiModel) string {
 	return borderStyle.
 		Width(m.WindowLeftPanelWidth).
 		Height(1).
-		Render(fmt.Sprintf("%s -> %s", m.RepoName, m.CheckOutBranch))
+		Render(fmt.Sprintf("%s %s -> %s", m.RemoteSyncStateLineString, m.RepoName, m.CheckOutBranch))
 }
 
 // Render the Local Branches panel
@@ -230,7 +230,7 @@ func generateModifiedFileDetailPanelContent(m *GittiModel) string {
 	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
 	previousDiffRowNum := 0
 	modifiedDiffRowNum := 0
-	fileDiff := m.GitState.GitFiles.GetFilesDiffInfo(fileStatus)
+	fileDiff := m.GitOperations.GitFiles.GetFilesDiffInfo(fileStatus)
 	if fileDiff == nil {
 		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
 		return vpLine
@@ -277,7 +277,7 @@ func generateStashDetailPanelContent(m *GittiModel) string {
 		style.StashMessageStyle.Render(stash.Message),
 	)
 
-	stashDetail := m.GitState.GitStash.GitStashDetail(stash.Id)
+	stashDetail := m.GitOperations.GitStash.GitStashDetail(stash.Id)
 	if len(stashDetail) < 1 {
 		return ""
 	}

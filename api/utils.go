@@ -60,9 +60,9 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 	}
 }
 
-func InitGitState(updateChannel chan string) *GitState {
+func InitGitOperations(updateChannel chan string) *GitOperations {
 	gitProcessLock := git.InitGitProcessLock()
-	return &GitState{
+	return &GitOperations{
 		GitBranch: git.InitGitBranch(gitProcessLock),
 		GitCommit: git.InitGitCommit(updateChannel, gitProcessLock),
 		GitFiles:  git.InitGitFile(gitProcessLock),

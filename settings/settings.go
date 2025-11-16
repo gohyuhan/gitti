@@ -16,7 +16,7 @@ var GITTICONFIGSETTINGS *GittiConfigSettings
 type GittiConfigSettings struct {
 	FileWatcherDebounceMS           int     `json:"file_watcher_debounce_milli_second"`
 	GitFilesActiveRefreshDurationMS int     `json:"git_files_active_refresh_duration_milli_second"`
-	GitFetchDurationMS              int     `json:"git_fetch_duration_milli_second"`
+	GitRemoteSyncStatusDurationMS   int     `json:"git_fetch_duration_milli_second"`
 	GitInitDefaultBranch            string  `json:"git_init_default_branch"`
 	LeftPanelWidthRatio             float64 `json:"left_panel_width_ratio"`
 	RightPanelWidthRatio            float64 `json:"right_panel_width_ratio"`
@@ -26,7 +26,7 @@ type GittiConfigSettings struct {
 var GittiDefaultConfigSettings = GittiConfigSettings{
 	FileWatcherDebounceMS:           200,
 	GitFilesActiveRefreshDurationMS: 2500,
-	GitFetchDurationMS:              60000,
+	GitRemoteSyncStatusDurationMS:   60000,
 	GitInitDefaultBranch:            "master",
 	LeftPanelWidthRatio:             0.3,
 	RightPanelWidthRatio:            0.7,
