@@ -101,7 +101,7 @@ func (gp *GitPull) GitPull(pullType string) int {
 			updatedCursorIndex, updatedGitPullOutput := handleProgressOutputStream(cursorIndex, scanner, gp.gitPullOutput)
 			gp.gitPullOutput = updatedGitPullOutput
 			cursorIndex = updatedCursorIndex
-			gp.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
+			gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE
 		}
 	}()
 
