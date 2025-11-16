@@ -126,8 +126,8 @@ func (gd *GitDaemon) Start() {
 				go func() {
 					if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 						defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
-						gd.gitOperations.GitRemote.GetLatestRemoteSyncStatus()
-						gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_UPDATE
+						gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream()
+						gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 					}
 				}()
 			case <-gd.stopChannel:
@@ -166,8 +166,8 @@ func (gd *GitDaemon) gitLatestInfoFetch() {
 	go func() {
 		if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
-			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatus()
-			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_UPDATE
+			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream()
+			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 		}
 	}()
 	go func() {

@@ -253,7 +253,7 @@ func gitRemotePushService(m *GittiModel, originName string, pushType string) {
 			return
 		}
 
-		exitStatusCode := m.GitOperations.GitCommit.GitPush(m.GitOperations.GitBranch.CurrentCheckOut().BranchName, originName, pushType)
+		exitStatusCode := m.GitOperations.GitCommit.GitPush(originName, pushType)
 		popUp, ok = m.PopUpModel.(*GitRemotePushPopUpModel)
 		if ok && !popUp.IsCancelled.Load() {
 			popUp.IsProcessing.Store(false) // update the processing status

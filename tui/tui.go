@@ -26,6 +26,8 @@ func NewGittiModel(repoPath string, repoName string, gitOperations *api.GitOpera
 		RepoPath:                         repoPath,
 		RepoName:                         repoName,
 		CheckOutBranch:                   "",
+		RemoteSyncStateLineString:        "",
+		BranchUpStream:                   "",
 		Width:                            0,
 		Height:                           0,
 		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
@@ -88,8 +90,8 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			updatePopUpGitRemotePushOutputViewport(m)
 		case git.GIT_PULL_OUTPUT_UPDATE:
 			updatePopUpGitPullOutputViewport(m)
-		case git.GIT_REMOTE_SYNC_STATUS_UPDATE:
-			m.updateGitRemoteStatusSyncLineString()
+		case git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE:
+			m.updateGitRemoteStatusSyncLineStringAndUpStream()
 		}
 		renderDetailComponentPanelViewPort(m)
 		return m, nil
@@ -144,7 +146,11 @@ func (m *GittiModel) View() tea.View {
 	return v
 }
 
-func (m *GittiModel) updateGitRemoteStatusSyncLineString() {
+func (m *GittiModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
+	// set branch upstream
+	m.BranchUpStream = m.GitOperations.GitRemote.CurrentBranchUpStream()
+
+	// set remote sync status
 	remoteSynsStatusInfo := m.GitOperations.GitRemote.RemoteSyncStatus()
 	if remoteSynsStatusInfo.Local == "" || remoteSynsStatusInfo.Remote == "" {
 		m.RemoteSyncStateLineString = style.ErrorStyle.Render("\uf00d")

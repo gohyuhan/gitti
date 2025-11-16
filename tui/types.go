@@ -27,6 +27,7 @@ type GittiModel struct {
 	RepoName                          string
 	CheckOutBranch                    string
 	RemoteSyncStateLineString         string
+	BranchUpStream                    string
 	Width                             int
 	Height                            int
 	WindowLeftPanelWidth              int // this is the left part of the window

@@ -274,6 +274,9 @@ func initGitAmendCommitPopUpModel(m *GittiModel) {
 // init the popup model for prompting user to add remote origin
 func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 	RemoteNameTextInput := textinput.New()
+	if noInitialRemote {
+		RemoteNameTextInput.SetValue("origin")
+	}
 	RemoteNameTextInput.Placeholder = i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteNamePlaceHolder
 	RemoteNameTextInput.Focus()
 	RemoteNameTextInput.VirtualCursor = true

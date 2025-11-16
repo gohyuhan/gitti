@@ -19,6 +19,7 @@ type GitRemote struct {
 	gitProcessLock           *GitProcessLock
 	remote                   []GitRemoteInfo
 	remoteSyncStatus         RemoteSyncStatus
+	currentBranchUpStream    string
 }
 
 type GitRemoteInfo struct {
@@ -33,11 +34,12 @@ type RemoteSyncStatus struct {
 
 func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *GitRemote {
 	gitRemote := GitRemote{
-		gitAddRemoteProcess: nil,
-		updateChannel:       updateChannel,
-		gitProcessLock:      gitProcessLock,
-		remote:              []GitRemoteInfo{},
-		remoteSyncStatus:    RemoteSyncStatus{},
+		gitAddRemoteProcess:   nil,
+		updateChannel:         updateChannel,
+		gitProcessLock:        gitProcessLock,
+		remote:                []GitRemoteInfo{},
+		remoteSyncStatus:      RemoteSyncStatus{},
+		currentBranchUpStream: "",
 	}
 
 	return &gitRemote
@@ -59,6 +61,15 @@ func (gr *GitRemote) Remote() []GitRemoteInfo {
 // ----------------------------------
 func (gr *GitRemote) RemoteSyncStatus() RemoteSyncStatus {
 	return gr.remoteSyncStatus
+}
+
+// ----------------------------------
+//
+//	Return current branch upstream
+//
+// ----------------------------------
+func (gr *GitRemote) CurrentBranchUpStream() string {
+	return gr.currentBranchUpStream
 }
 
 // ----------------------------------
@@ -156,16 +167,20 @@ func (gr *GitRemote) CheckRemoteExist() bool {
 
 // ----------------------------------
 //
-//	Related to Git Remote sync status, will be call by system
+//	Related to Git Remote sync status and upstream, will be call by system
 //
 // ----------------------------------
-func (gr *GitRemote) GetLatestRemoteSyncStatus() {
+func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream() {
+	upstream, _ := hasUpStream()
+	gr.currentBranchUpStream = upstream
+
 	gitArgs := []string{"rev-list", "--left-right", "--count", "HEAD...@{upstream}"}
 
 	remoteSyncStatusCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	remoteSyncStatusOutput, remoteSyncStatusErr := remoteSyncStatusCmd.Output()
 	if remoteSyncStatusErr != nil {
 		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+		return
 	}
 
 	parsedOutput := strings.TrimSpace(string(remoteSyncStatusOutput))
@@ -173,6 +188,7 @@ func (gr *GitRemote) GetLatestRemoteSyncStatus() {
 
 	if len(parts) < 2 {
 		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+		return
 	}
 
 	gr.remoteSyncStatus = RemoteSyncStatus{

@@ -211,7 +211,7 @@ func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 //	Related to Git Push
 //
 // ----------------------------------
-func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pushType string) int {
+func (gc *GitCommit) GitPush(originName string, pushType string) int {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
@@ -224,14 +224,22 @@ func (gc *GitCommit) GitPush(currentCheckOutBranch string, originName string, pu
 
 	gc.gitRemotePushProcessMutex.Lock()
 	gc.ClearGitRemotePushOutput()
+
+	// check if the checkoutbranch has upstream if not include "-u" flag
+	_, hasUpstream := hasUpStream()
 	var gitArgs []string
+	if !hasUpstream {
+		gitArgs = []string{"push", "-u"}
+	} else {
+		gitArgs = []string{"push"}
+	}
 	switch pushType {
 	case FORCEPUSHSAFE:
-		gitArgs = []string{"push", "--progress", "--force-with-lease", "-u", originName, currentCheckOutBranch}
+		gitArgs = append(gitArgs, []string{"--progress", "--force-with-lease", originName}...)
 	case FORCEPUSHDANGEROUS:
-		gitArgs = []string{"push", "--progress", "--force", "-u", originName, currentCheckOutBranch}
+		gitArgs = append(gitArgs, []string{"--progress", "--force", originName}...)
 	default:
-		gitArgs = []string{"push", "--progress", "-u", originName, currentCheckOutBranch}
+		gitArgs = append(gitArgs, []string{"--progress", originName}...)
 	}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
 	// Disable interactive prompts for credentials

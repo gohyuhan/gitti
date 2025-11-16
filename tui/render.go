@@ -28,10 +28,15 @@ func renderGitStatusComponentPanel(m *GittiModel) string {
 		borderStyle = style.SelectedBorderStyle
 	}
 
+	trackedUpStreamOrBranchName := m.CheckOutBranch
+	if m.BranchUpStream != "" {
+		trackedUpStreamOrBranchName = m.BranchUpStream
+	}
+
 	return borderStyle.
 		Width(m.WindowLeftPanelWidth).
 		Height(1).
-		Render(fmt.Sprintf("%s %s -> %s", m.RemoteSyncStateLineString, m.RepoName, m.CheckOutBranch))
+		Render(fmt.Sprintf("%s %s -> %s", m.RemoteSyncStateLineString, m.RepoName, trackedUpStreamOrBranchName))
 }
 
 // Render the Local Branches panel

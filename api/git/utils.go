@@ -97,10 +97,27 @@ func GitInit(repoPath string, initBranchName string) {
 	// set the branch
 	checkoutBranchGitArgs := []string{"checkout", "-b", initBranchName}
 
-	checkoutBranchCmd := executor.GittiCmdExecutor.RunGitCmd(checkoutBranchGitArgs, false)
-	_, checkoutBranchErr := checkoutBranchCmd.Output()
+	checkoutBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(checkoutBranchGitArgs, false)
+	_, checkoutBranchErr := checkoutBranchCmdExecutor.Output()
 	if checkoutBranchErr != nil {
 		fmt.Printf("[GIT INIT ERROR]: %v", checkoutBranchErr)
 		os.Exit(1)
 	}
+}
+
+// ----------------------------------
+//
+//	Related to Git check upstream existence
+//
+// ----------------------------------
+func hasUpStream() (string, bool) {
+	gitArgs := []string{"rev-parse", "--abbrev-ref", "@{u}"}
+
+	checkUpStreamCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	checkUpStreamOutput, checkUpStreamErr := checkUpStreamCmdExecutor.Output()
+	if checkUpStreamErr != nil {
+		return "", false
+	}
+
+	return strings.TrimSpace(string(checkUpStreamOutput)), true
 }
