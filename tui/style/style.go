@@ -36,10 +36,6 @@ var (
 				Bold(true)
 	BottomKeyBindingStyle = NewStyle.
 				Foreground(ColorKeyBinding)
-	DiffOldLineStyle = NewStyle.
-				Foreground(ColorError)
-	DiffNewLineStyle = NewStyle.
-				Foreground(ColorAccent)
 	PanelBorderStyle = NewStyle.
 				Border(lipgloss.RoundedBorder()).
 				Padding(0).
@@ -60,6 +56,7 @@ var (
 	BranchInvalidWarningStyle = NewStyle.
 					Foreground(ColorSecondary).
 					Faint(true)
+
 	GlobalKeyBindingPopUpStyle = NewStyle.
 					Border(lipgloss.ThickBorder()).
 					Padding(0).
@@ -69,18 +66,27 @@ var (
 					Foreground(ColorPrompt)
 	GlobalKeyBindingKeyMappingLineStyle = NewStyle.
 						Foreground(ColorKeyBinding)
+
+	DiffOldLineStyle = NewStyle.
+				Foreground(ColorError)
+	DiffNewLineStyle = NewStyle.
+				Foreground(ColorAccent)
+
 	StagedFileStyle = NewStyle.
 			Foreground(ColorAccent)
 	UnstagedFileStyle = NewStyle.
 				Foreground(ColorError)
+
 	LocalStatusStyle = NewStyle.
 				Foreground(ColorAccent)
 	RemoteStatusStyle = NewStyle.
 				Foreground(ColorError)
+
 	StashIdStyle      = NewStyle.Foreground(ColorHighlight)
 	StashMessageStyle = NewStyle.Foreground(ColorHighlight2)
-	ErrorStyle        = NewStyle.
-				Foreground(ColorError)
+
+	ErrorStyle = NewStyle.
+			Foreground(ColorError)
 )
 
 func GradientLines(lines []string) []string {

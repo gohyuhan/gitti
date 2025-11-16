@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"time"
 
 	"gitti/api/git"
 	"gitti/constant"
@@ -14,13 +15,14 @@ import (
 var GITTICONFIGSETTINGS *GittiConfigSettings
 
 type GittiConfigSettings struct {
-	FileWatcherDebounceMS           int     `json:"file_watcher_debounce_milli_second"`
-	GitFilesActiveRefreshDurationMS int     `json:"git_files_active_refresh_duration_milli_second"`
-	GitRemoteSyncStatusDurationMS   int     `json:"git_fetch_duration_milli_second"`
-	GitInitDefaultBranch            string  `json:"git_init_default_branch"`
-	LeftPanelWidthRatio             float64 `json:"left_panel_width_ratio"`
-	RightPanelWidthRatio            float64 `json:"right_panel_width_ratio"`
-	LanguageCode                    string  `json:"language_code"`
+	FileWatcherDebounceMS           int       `json:"file_watcher_debounce_milli_second"`
+	GitFilesActiveRefreshDurationMS int       `json:"git_files_active_refresh_duration_milli_second"`
+	GitRemoteSyncStatusDurationMS   int       `json:"git_fetch_duration_milli_second"`
+	GitInitDefaultBranch            string    `json:"git_init_default_branch"`
+	LeftPanelWidthRatio             float64   `json:"left_panel_width_ratio"`
+	RightPanelWidthRatio            float64   `json:"right_panel_width_ratio"`
+	LanguageCode                    string    `json:"language_code"`
+	LastUpdateCheckTime             time.Time `json:"last_update_check_time"`
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
@@ -31,6 +33,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	LeftPanelWidthRatio:             0.3,
 	RightPanelWidthRatio:            0.7,
 	LanguageCode:                    "EN",
+	LastUpdateCheckTime:             time.Now().UTC(),
 }
 
 // getConfigPath returns the config.json path (creates directories if needed)
@@ -168,5 +171,13 @@ func UpdateDefaultBranch(branchName string, applyToGit bool, cwd string) {
 		if applyToGit {
 			git.SetGitInitDefaultBranch(branchName, cwd)
 		}
+	}
+}
+
+func UpdateLastFetchTime() {
+	GITTICONFIGSETTINGS.LastUpdateCheckTime = time.Now().UTC()
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
 	}
 }
