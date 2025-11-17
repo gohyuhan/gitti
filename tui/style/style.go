@@ -9,81 +9,81 @@ import (
 
 var (
 	// Base colors - Stunning gradient-inspired theme
-	ColorPrimary    = lipgloss.Color("#82AAFF") // Soft periwinkle blue (from your reference)
-	ColorSecondary  = lipgloss.Color("#A5B7E8") // Muted lavender-blue for secondary text
-	ColorHighlight  = lipgloss.Color("#F0D278") // Warm golden highlight (from your reference)
-	ColorHighlight2 = lipgloss.Color("#F5E6A3") // Lighter golden yellow for emphasis
-	ColorAccent     = lipgloss.Color("#98FB98") // Keep original - DO NOT MODIFY
-	ColorError      = lipgloss.Color("#FF6B6B") // Keep original - DO NOT MODIFY
-	ColorBasic      = lipgloss.Color("#E8F0FF") // Soft white with blue tint for readability
-	ColorFade       = lipgloss.Color("#6B7A9E") // Muted blue-gray for subtle elements
-	ColorPrompt     = lipgloss.Color("#B496FF") // Beautiful lavender purple (from your reference)
-	ColorTitle      = lipgloss.Color("#9F7AEA") // Rich purple for titles
-	ColorKeyBinding = lipgloss.Color("#7DD3FC") // Sky blue for key bindings
+	ColorBlueSoft      = lipgloss.Color("#82AAFF") // Soft periwinkle blue (from your reference)
+	ColorBlueMuted     = lipgloss.Color("#A5B7E8") // Muted lavender-blue for secondary text
+	ColorYellowWarm    = lipgloss.Color("#F0D278") // Warm golden highlight (from your reference)
+	ColorYellowSoft    = lipgloss.Color("#F5E6A3") // Lighter golden yellow for emphasis
+	ColorGreenSoft     = lipgloss.Color("#98FB98") // Keep original - DO NOT MODIFY
+	ColorError         = lipgloss.Color("#FF6B6B") // Keep original - DO NOT MODIFY
+	ColorBlueVeryLight = lipgloss.Color("#E8F0FF") // Soft white with blue tint for readability
+	ColorBlueGrayMuted = lipgloss.Color("#6B7A9E") // Muted blue-gray for subtle elements
+	ColorPurpleSoft    = lipgloss.Color("#B496FF") // Beautiful lavender purple (from your reference)
+	ColorPurpleVibrant = lipgloss.Color("#9F7AEA") // Rich purple for titles
+	ColorCyanSoft      = lipgloss.Color("#7DD3FC") // Sky blue for key bindings
 
 	// lipgloss empty new style
 	NewStyle = lipgloss.NewStyle()
 
 	// list component style
 	ItemStyle         = NewStyle
-	SelectedItemStyle = NewStyle.Foreground(ColorPrimary)
+	SelectedItemStyle = NewStyle.Foreground(ColorBlueSoft)
 	PaginationStyle   = NewStyle
 
 	// Styles
-	TitleStyle = NewStyle.Foreground(ColorTitle).
+	TitleStyle = NewStyle.Foreground(ColorPurpleVibrant).
 			Bold(true)
-	PromptTitleStyle = NewStyle.Foreground(ColorPrompt).
+	PromptTitleStyle = NewStyle.Foreground(ColorPurpleSoft).
 				Bold(true)
 	BottomKeyBindingStyle = NewStyle.
-				Foreground(ColorKeyBinding)
+				Foreground(ColorCyanSoft)
 	PanelBorderStyle = NewStyle.
 				Border(lipgloss.RoundedBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(ColorFade)
+				BorderForeground(ColorBlueGrayMuted)
 	SelectedBorderStyle = NewStyle.
 				Border(lipgloss.DoubleBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(ColorBasic)
+				BorderForeground(ColorBlueVeryLight)
 	PopUpBorderStyle = NewStyle.
 				Border(lipgloss.ThickBorder()).
 				Padding(0).
 				Margin(0).
-				BorderForeground(ColorBasic)
+				BorderForeground(ColorBlueVeryLight)
 	SpinnerStyle = NewStyle.
-			Foreground(ColorPrimary)
+			Foreground(ColorBlueSoft)
 	BranchInvalidWarningStyle = NewStyle.
-					Foreground(ColorSecondary).
+					Foreground(ColorBlueMuted).
 					Faint(true)
 
 	GlobalKeyBindingPopUpStyle = NewStyle.
 					Border(lipgloss.ThickBorder()).
 					Padding(0).
 					Margin(0).
-					BorderForeground(ColorPrompt)
+					BorderForeground(ColorPurpleSoft)
 	GlobalKeyBindingTitleLineStyle = NewStyle.
-					Foreground(ColorPrompt)
+					Foreground(ColorPurpleSoft)
 	GlobalKeyBindingKeyMappingLineStyle = NewStyle.
-						Foreground(ColorKeyBinding)
+						Foreground(ColorCyanSoft)
 
 	DiffOldLineStyle = NewStyle.
 				Foreground(ColorError)
 	DiffNewLineStyle = NewStyle.
-				Foreground(ColorAccent)
+				Foreground(ColorGreenSoft)
 
 	StagedFileStyle = NewStyle.
-			Foreground(ColorAccent)
+			Foreground(ColorGreenSoft)
 	UnstagedFileStyle = NewStyle.
 				Foreground(ColorError)
 
 	LocalStatusStyle = NewStyle.
-				Foreground(ColorAccent)
+				Foreground(ColorGreenSoft)
 	RemoteStatusStyle = NewStyle.
 				Foreground(ColorError)
 
-	StashIdStyle      = NewStyle.Foreground(ColorHighlight)
-	StashMessageStyle = NewStyle.Foreground(ColorHighlight2)
+	StashIdStyle      = NewStyle.Foreground(ColorYellowWarm)
+	StashMessageStyle = NewStyle.Foreground(ColorYellowSoft)
 
 	ErrorStyle = NewStyle.
 			Foreground(ColorError)

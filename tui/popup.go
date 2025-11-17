@@ -132,7 +132,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 					BorderForeground(style.ColorError)
 			} else if popUp.ProcessSuccess.Load() {
 				logViewPortStyle = style.PanelBorderStyle.
-					BorderForeground(style.ColorAccent)
+					BorderForeground(style.ColorGreenSoft)
 			}
 
 			logViewPort := logViewPortStyle.Render(popUp.GitCommitOutputViewport.View())
@@ -217,7 +217,7 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 					BorderForeground(style.ColorError)
 			} else if popUp.ProcessSuccess.Load() {
 				logViewPortStyle = style.PanelBorderStyle.
-					BorderForeground(style.ColorAccent)
+					BorderForeground(style.ColorGreenSoft)
 			}
 
 			logViewPort := logViewPortStyle.Render(popUp.GitAmendCommitOutputViewport.View())
@@ -315,7 +315,7 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 					BorderForeground(style.ColorError)
 			} else if popUp.ProcessSuccess.Load() {
 				logViewPortStyle = style.PanelBorderStyle.
-					BorderForeground(style.ColorAccent)
+					BorderForeground(style.ColorGreenSoft)
 			}
 
 			logViewPort := logViewPortStyle.Render(popUp.AddRemoteOutputViewport.View())
@@ -416,7 +416,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 				BorderForeground(style.ColorError)
 		} else if popUp.ProcessSuccess.Load() {
 			logViewPortStyle = style.PanelBorderStyle.
-				BorderForeground(style.ColorAccent)
+				BorderForeground(style.ColorGreenSoft)
 		}
 
 		logViewPort := logViewPortStyle.Render(popUp.GitRemotePushOutputViewport.View())
@@ -544,7 +544,7 @@ func renderSwitchBranchOutputPopUp(m *GittiModel) string {
 				BorderForeground(style.ColorError)
 		} else if popUp.ProcessSuccess.Load() {
 			logViewPortStyle = style.PanelBorderStyle.
-				BorderForeground(style.ColorAccent)
+				BorderForeground(style.ColorGreenSoft)
 		}
 
 		logViewPort := logViewPortStyle.Render(popUp.SwitchBranchOutputViewport.View())
@@ -624,7 +624,7 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 				BorderForeground(style.ColorError)
 		} else if popUp.ProcessSuccess.Load() {
 			logViewPortStyle = style.PanelBorderStyle.
-				BorderForeground(style.ColorAccent)
+				BorderForeground(style.ColorGreenSoft)
 		}
 
 		logViewPort := logViewPortStyle.Render(popUp.GitPullOutputViewport.View())

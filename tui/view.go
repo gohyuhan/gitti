@@ -21,7 +21,7 @@ func gittiMainPageView(m *GittiModel) string {
 
 		// Styles for the metric labels and values
 		labelStyle := style.NewStyle
-		passStyle := style.NewStyle.Foreground(style.ColorAccent)
+		passStyle := style.NewStyle.Foreground(style.ColorGreenSoft)
 		failStyle := style.NewStyle.Foreground(style.ColorError)
 
 		// Height

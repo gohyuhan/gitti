@@ -157,7 +157,9 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 
 		}
 
-	case "ctrl+enter":
+	// because textare will use `enter` for line change and it will not be safe to use `enter` for submitting,
+	// so `ctrl+e` will be used for submitting
+	case "ctrl+e":
 		switch m.PopUpType {
 		case constant.CommitPopUp:
 			popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
@@ -187,7 +189,11 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 					return m, popUp.Spinner.Tick
 				}
 			}
+		}
 
+	// because input mostly will no involve `enter` for change line, so `enter` can be safely used for submitting
+	case "enter":
+		switch m.PopUpType {
 		case constant.AddRemotePromptPopUp:
 			popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 			if ok {

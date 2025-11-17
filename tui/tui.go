@@ -154,6 +154,7 @@ func (m *GittiModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
 	remoteSynsStatusInfo := m.GitOperations.GitRemote.RemoteSyncStatus()
 	if remoteSynsStatusInfo.Local == "" || remoteSynsStatusInfo.Remote == "" {
 		m.RemoteSyncStateLineString = style.ErrorStyle.Render("\uf00d")
+		return
 	}
 
 	local := style.LocalStatusStyle.Render(fmt.Sprintf("%s↑", remoteSynsStatusInfo.Local))

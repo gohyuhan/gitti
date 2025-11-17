@@ -82,19 +82,19 @@ var jA = LanguageMapping{
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 次の入力欄に移動",
 		"[shift+tab] 前の入力欄に移動",
-		"[ctrl+enter] 変更をコミット",
+		"[ctrl+e] 変更をコミット",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
 		"[tab] 次の入力欄に移動",
 		"[shift+tab] 前の入力欄に移動",
-		"[ctrl+enter] 更新した変更をコミット",
+		"[ctrl+e] 更新した変更をコミット",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForAddRemotePromptPopUp: []string{
 		"[tab] 次の入力欄へ移動",
 		"[shift+tab] 前の入力欄へ移動",
-		"[ctrl+enter] リモートを追加",
+		"[enter] リモートを追加",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForGitRemotePushPopUp: []string{
@@ -116,7 +116,7 @@ var jA = LanguageMapping{
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForCreateNewBranchPopUp: []string{
-		"[ctrl+enter] ブランチを追加",
+		"[enter] ブランチを追加",
 		"[esc] キャンセルして閉じる",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
@@ -205,8 +205,8 @@ var aboutGittiJa = []string{
 	"\033[38;2;180;150;255mYu Han Goh <ソフトウェアエンジニア>\033[0m",
 	"           <github:   \033[38;2;130;170;255mhttps://github.com/gohyuhan\033[0m>",
 	"           <linkedin: \033[38;2;130;170;255mhttps://my.linkedin.com/in/yu-han-goh-209480200\033[0m>",
-	"\033[38;2;240;210;120m<ctrl+g>\033[0m を押すと作者の GitHub をブラウザで開きます.",
-	"\033[38;2;240;210;120m<ctrl+l>\033[0m を押すと作者の LinkedIn を開きます.\n",
+	"\033[38;2;240;210;120m<ctrl+g>\033[0m を押すと作者の github をブラウザで開きます.",
+	"\033[38;2;240;210;120m<ctrl+l>\033[0m を押すと作者の linkedin を開きます.\n",
 	"Gitti を気に入っていただけたな, ぜひスターをお願いします:",
 	"\033[38;2;130;170;255mhttps://github.com/gohyuhan/gitti\033[0m",
 	"また, プロジェクトをフォークして自分のワークフローに合わせて",

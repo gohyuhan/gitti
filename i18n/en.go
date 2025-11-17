@@ -83,19 +83,19 @@ var eN = LanguageMapping{
 	KeyBindingForCommitPopUp: []string{
 		"[tab] move to next input",
 		"[shift+tab] move to previous input",
-		"[ctrl+enter] commit changes",
+		"[ctrl+e] commit changes",
 		"[esc] cancel / close",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
 		"[tab] move to next input",
 		"[shift+tab] move to previous input",
-		"[ctrl+enter] commit updated changes",
+		"[ctrl+e] commit updated changes",
 		"[esc] cancel / close",
 	},
 	KeyBindingForAddRemotePromptPopUp: []string{
 		"[tab] move to next input",
 		"[shift+tab] move to previous input",
-		"[ctrl+enter] add remote",
+		"[enter] add remote",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGitRemotePushPopUp: []string{
@@ -117,7 +117,7 @@ var eN = LanguageMapping{
 		"[esc] cancel / close",
 	},
 	KeyBindingForCreateNewBranchPopUp: []string{
-		"[ctrl+enter] add branch",
+		"[enter] add branch",
 		"[esc] cancel and close",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
@@ -137,7 +137,7 @@ var eN = LanguageMapping{
 		"[esc] cancel / close",
 	},
 	KeyBindingForGitStashMessagePopUp: []string{
-		"[ctrl+enter] proceed with entered stash message",
+		"[enter] proceed with entered stash message",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{

@@ -82,19 +82,19 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[ctrl+enter] 提交更新的變更",
+		"[ctrl+e] 提交更新的變更",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[ctrl+enter] 提交變更",
+		"[ctrl+e] 提交更新的變更",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForAddRemotePromptPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[ctrl+enter] 新增遠端",
+		"[enter] 新增遠端",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGitRemotePushPopUp: []string{
@@ -116,7 +116,7 @@ var zH_HANT = LanguageMapping{
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForCreateNewBranchPopUp: []string{
-		"[ctrl+enter] 添加分支",
+		"[enter] 添加分支",
 		"[esc] 取消並關閉",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
@@ -136,7 +136,7 @@ var zH_HANT = LanguageMapping{
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGitStashMessagePopUp: []string{
-		"[ctrl+enter] 執行輸入的儲藏訊息",
+		"[enter] 執行輸入的儲藏訊息",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -205,8 +205,8 @@ var aboutGittiZhHant = []string{
 	"\033[38;2;180;150;255mYu Han Goh <軟體工程師>\033[0m",
 	"           <github:   \033[38;2;130;170;255mhttps://github.com/gohyuhan\033[0m>",
 	"           <linkedin: \033[38;2;130;170;255mhttps://my.linkedin.com/in/yu-han-goh-209480200\033[0m>\n",
-	"按下 \033[38;2;240;210;120m<ctrl+g>\033[0m 可在瀏覽器中開啟作者的 GitHub.",
-	"按下 \033[38;2;240;210;120m<ctrl+l>\033[0m 可開啟作者的 LinkedIn.\n",
+	"按下 \033[38;2;240;210;120m<ctrl+g>\033[0m 可在瀏覽器中開啟作者的 github.",
+	"按下 \033[38;2;240;210;120m<ctrl+l>\033[0m 可開啟作者的 linkedin.\n",
 	"如果你喜歡 Gitti, 歡迎在這裡替它點一顆星:",
 	"\033[38;2;130;170;255mhttps://github.com/gohyuhan/gitti\033[0m",
 	"也歡迎你 fork 該專案, 並依照自己的工作流程進行調整.",

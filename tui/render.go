@@ -33,10 +33,15 @@ func renderGitStatusComponentPanel(m *GittiModel) string {
 		trackedUpStreamOrBranchName = m.BranchUpStream
 	}
 
+	repoTrackBranchName := fmt.Sprintf(" %s -> %s", m.RepoName, trackedUpStreamOrBranchName)
+
+	// the max width is the window width - padding - the length of RemoteSyncStateLineString (max of 5)
+	repoTrackBranchName = utils.TruncateString(repoTrackBranchName, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-5)
+
 	return borderStyle.
 		Width(m.WindowLeftPanelWidth).
 		Height(1).
-		Render(fmt.Sprintf("%s %s -> %s", m.RemoteSyncStateLineString, m.RepoName, trackedUpStreamOrBranchName))
+		Render(fmt.Sprintf("%s%s", m.RemoteSyncStateLineString, repoTrackBranchName))
 }
 
 // Render the Local Branches panel
@@ -186,7 +191,7 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 	}
 
 	var keyBindingLine string
-	keyBindingLine = "  " + strings.Join(keys, "  |  ")
+	keyBindingLine = strings.Join(keys, "  |  ")
 	keyBindingLine = utils.TruncateString(keyBindingLine, width)
 
 	return style.BottomKeyBindingStyle.

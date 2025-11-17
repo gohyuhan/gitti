@@ -180,6 +180,7 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream() {
 	remoteSyncStatusOutput, remoteSyncStatusErr := remoteSyncStatusCmd.Output()
 	if remoteSyncStatusErr != nil {
 		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+		gr.remoteSyncStatus = RemoteSyncStatus{}
 		return
 	}
 
@@ -188,6 +189,7 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream() {
 
 	if len(parts) < 2 {
 		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+		gr.remoteSyncStatus = RemoteSyncStatus{}
 		return
 	}
 
