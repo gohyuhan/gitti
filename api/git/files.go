@@ -16,6 +16,12 @@ const (
 	UnModifiedLine = "UNMODIFIEDLINE"
 )
 
+const (
+	DISCARDWHOLE   = "DISCARDWHOLE"
+	DISCARDSTAGED  = "DISCARDSTAGED"
+	DISCARDUNSTAGE = "DISCARDUNSTAGE"
+)
+
 type FileStatus struct {
 	FilePathname string
 	IndexState   string
@@ -60,7 +66,7 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 // ----------------------------------
 //
 //		Retrieve File Status
-//	 * Passive, this should onyl be trigger by system
+//	 * Passive, this should only be trigger by system
 //
 // ----------------------------------
 func (gf *GitFiles) GetGitFilesStatus() {
@@ -210,4 +216,28 @@ func (gf *GitFiles) UnstageAllChanges() {
 	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stageCmdExecutor.Run()
 
+}
+
+// ----------------------------------
+//
+//	Discard File changes
+//
+// ----------------------------------
+func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) {
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
+
+	var gitArgs []string
+	switch discardType {
+	case DISCARDWHOLE:
+		gitArgs = []string{"checkout", "HEAD", "--", filePathName}
+	case DISCARDUNSTAGE:
+		gitArgs = []string{"checkout", "--", filePathName}
+	case DISCARDSTAGED:
+		gitArgs = []string{"reset", "HEAD", filePathName}
+	}
+	changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	changesDiscardCmdExecutor.Run()
 }

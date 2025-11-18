@@ -502,3 +502,14 @@ func gitStashDropService(m *GittiModel, filePathName string) {
 		m.GitOperations.GitStash.GitStashDrop(filePathName)
 	}()
 }
+
+// ------------------------------------
+//
+//	For Git discard file changes
+//
+// ------------------------------------
+func gitDiscardFileChangesService(m *GittiModel, filePathName string, discardType string) {
+	go func() {
+		m.GitOperations.GitFiles.DiscardFileChanges(filePathName, discardType)
+	}()
+}

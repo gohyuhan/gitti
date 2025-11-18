@@ -137,6 +137,10 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashMessagePopUp
 		case constant.GlobalKeyBindingPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGlobalKeyBindingPopUp
+		case constant.GitDiscardTypeOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardTypeOptionPopUp
+		case constant.GitDiscardConfirmPromptPopup:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardConfirmPromptPopup
 		}
 	} else {
 		//-----------------------------
@@ -394,6 +398,12 @@ func tuiWindowSizing(m *GittiModel) {
 			if exist {
 				width := (min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 				popUp.GitPullOutputViewport.SetWidth(width)
+			}
+		case constant.GitDiscardTypeOptionPopUp:
+			popUp, exist := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
+			if exist {
+				width := (min(constant.MaxGitDiscardTypeOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+				popUp.DiscardTypeOptionList.SetWidth(width)
 			}
 		}
 	}

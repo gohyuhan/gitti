@@ -60,6 +60,7 @@ var eN = LanguageMapping{
 		"[space] unstage this change",
 		"[s] stash",
 		"[S] stash all changes",
+		"[d] discard changes",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
@@ -67,6 +68,7 @@ var eN = LanguageMapping{
 		"[space] stage this change",
 		"[s] stash",
 		"[S] stash all changes",
+		"[d] discard changes",
 		"[enter] view modified content",
 		"[?] global key binding",
 	},
@@ -149,6 +151,15 @@ var eN = LanguageMapping{
 		"[enter] proceed with entered stash message",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitDiscardTypeOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select discard option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitDiscardConfirmPromptPopup: []string{
+		"[enter] proceed with discard",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -199,6 +210,16 @@ var eN = LanguageMapping{
 	GitPullProcessing:                                        "Pulling...",
 	GitStashMessageTitle:                                     "Message for git stash",
 	GitStashMessagePlaceholder:                               "Enter a message for stash (* optional)",
+	GitDiscardTypeOptionTitle:                                "Please choose a discard option",
+	GitDiscardWhole:                                          "Discard all changes",
+	GitDiscardStaged:                                         "Discard staged changes",
+	GitDiscardUnstage:                                        "Discard unstaged changes",
+	GitDiscardWholeInfo:                                      "Discard both staged and unstaged changes under file: %s",
+	GitDiscardStagedInfo:                                     "Discard only staged changes under file: %s",
+	GitDiscardUnstageInfo:                                    "Discard only unstaged changes under file: %s",
+	GitDiscardWholeConfirmation:                              "Are you sure you want to discard all changes for [%s] ?",
+	GitDiscardStagedConfirmation:                             "Are you sure you want to discard staged changes for [%s] ?",
+	GitDiscardUnstageConfirmation:                            "Are you sure you want to discard unstage changes for [%s] ?",
 }
 
 // for about gitti

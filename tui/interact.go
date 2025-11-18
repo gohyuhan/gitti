@@ -384,9 +384,28 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		return m, nil
 
 	case "d":
-		if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponent {
-			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
-			gitStashDropService(m, selectedStashId.(gitStashItem).Id)
+		if !m.ShowPopUp.Load() {
+			switch m.CurrentSelectedComponent {
+			case constant.StashComponent:
+				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
+				gitStashDropService(m, selectedStashId.(gitStashItem).Id)
+			case constant.ModifiedFilesComponent:
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				currentSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem().(gitModifiedFilesItem)
+				if currentSelectedFile.IndexState != " " &&
+					currentSelectedFile.IndexState != "?" &&
+					currentSelectedFile.WorkTree != " " &&
+					currentSelectedFile.WorkTree != "?" {
+					// indicating the files have both changes on stage and unstage
+					m.PopUpType = constant.GitDiscardTypeOptionPopUp
+					initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname)
+				} else {
+					m.PopUpType = constant.GitDiscardConfirmPromptPopup
+					initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
+				}
+
+			}
 		}
 		return m, nil
 
@@ -585,6 +604,24 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 						return m, popUp.Spinner.Tick
 					}
 				}
+			case constant.GitDiscardTypeOptionPopUp:
+				popUp, ok := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
+				if ok {
+					m.PopUpType = constant.GitDiscardConfirmPromptPopup
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					selectedOption := popUp.DiscardTypeOptionList.SelectedItem().(gitDiscardTypeOptionItem)
+					initGitDiscardConfirmPromptPopup(m, popUp.FilePathName, selectedOption.DiscardType)
+				}
+			case constant.GitDiscardConfirmPromptPopup:
+				popUp, ok := m.PopUpModel.(*GitDiscardConfirmPromptPopUpModel)
+				if ok {
+					gitDiscardFileChangesService(m, popUp.FilePathName, popUp.DiscardType)
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.NoPopUp
+					m.PopUpModel = nil
+				}
 			}
 		}
 		return m, nil
@@ -666,6 +703,16 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			case constant.ChooseGitPullTypePopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			case constant.GitDiscardTypeOptionPopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			case constant.GitDiscardConfirmPromptPopup:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
@@ -876,6 +923,12 @@ func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea
 		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 		if ok {
 			popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.GitDiscardTypeOptionPopUp:
+		popUp, ok := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
+		if ok {
+			popUp.DiscardTypeOptionList, cmd = popUp.DiscardTypeOptionList.Update(msg)
 			return m, cmd
 		}
 	}

@@ -246,6 +246,28 @@ type GitStashMessagePopUpModel struct {
 
 // ---------------------------------
 //
+// # A pop up to prompt for git discard type for file,
+//
+//	this will only be available when there are both changes in stage and unstage (index and worktree)
+//
+// ---------------------------------
+type GitDiscardTypeOptionPopUpModel struct {
+	DiscardTypeOptionList list.Model
+	FilePathName          string
+}
+
+// ---------------------------------
+//
+// # To prompt user for confirmation
+//
+// ---------------------------------
+type GitDiscardConfirmPromptPopUpModel struct {
+	DiscardType  string
+	FilePathName string
+}
+
+// ---------------------------------
+//
 // to record the current navigation index position
 //
 // ---------------------------------
@@ -377,6 +399,22 @@ type gitPullTypeOptionItem struct {
 }
 
 func (i gitPullTypeOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// ---------------------------------
+//
+// for discard option selection option
+//
+// ---------------------------------
+type gitDiscardTypeOptionDelegate struct{}
+type gitDiscardTypeOptionItem struct {
+	Name        string
+	Info        string
+	DiscardType string
+}
+
+func (i gitDiscardTypeOptionItem) FilterValue() string {
 	return i.Name
 }
 

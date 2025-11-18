@@ -591,3 +591,52 @@ func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType
 
 	m.PopUpModel = popUpModel
 }
+
+// for discard option list popup
+func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string) {
+	discardTypeOption := []gitDiscardTypeOptionItem{
+		{
+			Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeInfo, filePathName),
+			DiscardType: git.DISCARDWHOLE,
+		},
+		{
+			Name:        i18n.LANGUAGEMAPPING.GitDiscardStaged,
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardStagedInfo, filePathName),
+			DiscardType: git.DISCARDSTAGED,
+		},
+		{
+			Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
+			DiscardType: git.DISCARDUNSTAGE,
+		},
+	}
+
+	items := make([]list.Item, 0, len(discardTypeOption))
+	for _, discardOption := range discardTypeOption {
+		items = append(items, gitDiscardTypeOptionItem(discardOption))
+	}
+
+	width := (min(constant.MaxGitDiscardTypeOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	gDTOL := list.New(items, gitDiscardTypeOptionDelegate{}, width, constant.PopUpGitDiscardTypeOptionHeight)
+	gDTOL.SetShowStatusBar(false)
+	gDTOL.SetFilteringEnabled(false)
+	gDTOL.SetShowHelp(false)
+	gDTOL.SetShowTitle(false)
+
+	popUpModel := &GitDiscardTypeOptionPopUpModel{
+		DiscardTypeOptionList: gDTOL,
+		FilePathName:          filePathName,
+	}
+
+	m.PopUpModel = popUpModel
+}
+
+// for discard confirm prompt
+func initGitDiscardConfirmPromptPopup(m *GittiModel, filePathName string, discardType string) {
+	popUpModel := &GitDiscardConfirmPromptPopUpModel{
+		FilePathName: filePathName,
+		DiscardType:  discardType,
+	}
+	m.PopUpModel = popUpModel
+}

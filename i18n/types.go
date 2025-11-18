@@ -65,30 +65,32 @@ type LanguageMapping struct {
 	CurrentTerminalWidth       string
 	MinimumTerminalWidth       string
 	// for Key Bindings
-	KeyBindingForGitStatusComponent          []string
-	KeyBindingLocalBranchComponentIsCheckOut []string
-	KeyBindingLocalBranchComponentDefault    []string
-	KeyBindingLocalBranchComponentNone       []string
-	KeyBindingModifiedFilesComponentIsStaged []string
-	KeyBindingModifiedFilesComponentDefault  []string
-	KeyBindingModifiedFilesComponentNone     []string
-	KeyBindingKeyDetailComponent             []string
-	KeyBindingKeyStashComponent              []string
-	KeyBindingKeyStashComponentNone          []string
-	KeyBindingForCommitPopUp                 []string
-	KeyBindingForAmendCommitPopUp            []string
-	KeyBindingForAddRemotePromptPopUp        []string
-	KeyBindingForGitRemotePushPopUp          []string
-	KeyBindingForChooseRemotePopUp           []string
-	KeyBindingForChoosePushTypePopUp         []string
-	KeyBindingForChooseNewBranchTypePopUp    []string
-	KeyBindingForCreateNewBranchPopUp        []string
-	KeyBindingForChooseSwitchBranchTypePopUp []string
-	KeyBindingForSwitchBranchOutputPopUp     []string
-	KeyBindingForChooseGitPullTypePopUp      []string
-	KeyBindingForGitPullOutputPopUp          []string
-	KeyBindingForGitStashMessagePopUp        []string
-	KeyBindingForGlobalKeyBindingPopUp       []string
+	KeyBindingForGitStatusComponent           []string
+	KeyBindingLocalBranchComponentIsCheckOut  []string
+	KeyBindingLocalBranchComponentDefault     []string
+	KeyBindingLocalBranchComponentNone        []string
+	KeyBindingModifiedFilesComponentIsStaged  []string
+	KeyBindingModifiedFilesComponentDefault   []string
+	KeyBindingModifiedFilesComponentNone      []string
+	KeyBindingKeyDetailComponent              []string
+	KeyBindingKeyStashComponent               []string
+	KeyBindingKeyStashComponentNone           []string
+	KeyBindingForCommitPopUp                  []string
+	KeyBindingForAmendCommitPopUp             []string
+	KeyBindingForAddRemotePromptPopUp         []string
+	KeyBindingForGitRemotePushPopUp           []string
+	KeyBindingForChooseRemotePopUp            []string
+	KeyBindingForChoosePushTypePopUp          []string
+	KeyBindingForChooseNewBranchTypePopUp     []string
+	KeyBindingForCreateNewBranchPopUp         []string
+	KeyBindingForChooseSwitchBranchTypePopUp  []string
+	KeyBindingForSwitchBranchOutputPopUp      []string
+	KeyBindingForChooseGitPullTypePopUp       []string
+	KeyBindingForGitPullOutputPopUp           []string
+	KeyBindingForGitStashMessagePopUp         []string
+	KeyBindingForGitDiscardTypeOptionPopUp    []string
+	KeyBindingForGitDiscardConfirmPromptPopup []string
+	KeyBindingForGlobalKeyBindingPopUp        []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -153,4 +155,16 @@ type LanguageMapping struct {
 	// for stash message prompt
 	GitStashMessageTitle       string
 	GitStashMessagePlaceholder string
+	// for git discard type option list
+	GitDiscardTypeOptionTitle string
+	GitDiscardWhole           string
+	GitDiscardStaged          string
+	GitDiscardUnstage         string
+	GitDiscardWholeInfo       string
+	GitDiscardStagedInfo      string
+	GitDiscardUnstageInfo     string
+	// for discard confirmation prompt
+	GitDiscardWholeConfirmation   string
+	GitDiscardStagedConfirmation  string
+	GitDiscardUnstageConfirmation string
 }

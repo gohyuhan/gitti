@@ -50,6 +50,10 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderGitPullOutputPopUp(m)
 	case constant.GitStashMessagePopUp:
 		popUp = renderGitStashMessagePopUp(m)
+	case constant.GitDiscardTypeOptionPopUp:
+		popUp = renderGitDiscardTypeOptionPopUp(m)
+	case constant.GitDiscardConfirmPromptPopup:
+		popUp = renderGitDiscardConfirmPromptPopup(m)
 	}
 	return popUp
 }
@@ -684,6 +688,49 @@ func renderGitStashMessagePopUp(m *GittiModel) string {
 			title,
 			popUp.StashMessageInput.View(),
 		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Discard file changes type list selection
+//
+// ------------------------------------
+func renderGitDiscardTypeOptionPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitDiscardTypeOptionPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitDiscardTypeOptionTitle)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.DiscardTypeOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Discard file changes confirmation prompt
+//
+// ------------------------------------
+func renderGitDiscardConfirmPromptPopup(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitDiscardConfirmPromptPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitDiscardConfirmPromptPopupWidth, int(float64(m.Width)*0.8))
+		var content string
+		switch popUp.DiscardType {
+		case git.DISCARDWHOLE:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeConfirmation, popUp.FilePathName))
+		case git.DISCARDSTAGED:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardStagedConfirmation, popUp.FilePathName))
+		case git.DISCARDUNSTAGE:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageConfirmation, popUp.FilePathName))
+		}
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""

@@ -59,6 +59,7 @@ var zH_HANS = LanguageMapping{
 		"[space] 取消暂存此更改",
 		"[s] 储藏 (stash)",
 		"[S] 储藏所有更改",
+		"[d] 舍弃更改",
 		"[enter] 查看修改内容",
 		"[?] 全局快捷键",
 	},
@@ -66,6 +67,7 @@ var zH_HANS = LanguageMapping{
 		"[space] 暂存此更改",
 		"[s] 储藏 (stash)",
 		"[S] 储藏所有更改",
+		"[d] 舍弃更改",
 		"[enter] 查看修改内容",
 		"[?] 全局快捷键",
 	},
@@ -148,6 +150,15 @@ var zH_HANS = LanguageMapping{
 		"[enter] 执行输入的储藏信息",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitDiscardTypeOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择丢弃选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForGitDiscardConfirmPromptPopup: []string{
+		"[enter] 继续丢弃",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -198,6 +209,16 @@ var zH_HANS = LanguageMapping{
 	GitPullProcessing:                                        "正在拉取...",
 	GitStashMessageTitle:                                     "Git 储藏信息",
 	GitStashMessagePlaceholder:                               "输入储藏消息（* 可选）",
+	GitDiscardTypeOptionTitle:                                "请选择丢弃选项",
+	GitDiscardWhole:                                          "舍弃所有更改",
+	GitDiscardStaged:                                         "舍弃已暂存的更改",
+	GitDiscardUnstage:                                        "舍弃未暂存的更改",
+	GitDiscardWholeInfo:                                      "舍弃文件 %s 下的所有已暂存和未暂存的更改",
+	GitDiscardStagedInfo:                                     "仅舍弃文件 %s 下已暂存的更改",
+	GitDiscardUnstageInfo:                                    "仅舍弃文件 %s 下未暂存的更改",
+	GitDiscardWholeConfirmation:                              "您确定要丢弃 [%s] 的所有更改吗?",
+	GitDiscardStagedConfirmation:                             "您确定要丢弃 [%s] 的暂存更改吗?",
+	GitDiscardUnstageConfirmation:                            "您确定要丢弃 [%s] 的未暂存更改吗?",
 }
 
 // for about gitti

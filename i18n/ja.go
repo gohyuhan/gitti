@@ -59,6 +59,7 @@ var jA = LanguageMapping{
 		"[space] この変更のステージを解除",
 		"[s] スタッシュ",
 		"[S] すべての変更をスタッシュ",
+		"[d] 変更を破棄",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
@@ -66,6 +67,7 @@ var jA = LanguageMapping{
 		"[space] この変更をステージ",
 		"[s] スタッシュ",
 		"[S] すべての変更をスタッシュ",
+		"[d] 変更を破棄",
 		"[enter] 変更内容を表示",
 		"[?] グローバルキー操作",
 	},
@@ -148,6 +150,15 @@ var jA = LanguageMapping{
 		"[enter] 入力したスタッシュメッセージを実行",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitDiscardTypeOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 破棄オプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitDiscardConfirmPromptPopup: []string{
+		"[enter] 破棄を実行",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -198,6 +209,16 @@ var jA = LanguageMapping{
 	GitPullProcessing:                                        "プル中...",
 	GitStashMessageTitle:                                     "Git スタッシュのメッセージ",
 	GitStashMessagePlaceholder:                               "スタッシュ用のメッセージを入力してください（* 任意）",
+	GitDiscardTypeOptionTitle:                                "破棄オプションを選択してください",
+	GitDiscardWhole:                                          "すべての変更を破棄",
+	GitDiscardStaged:                                         "ステージ済みの変更を破棄",
+	GitDiscardUnstage:                                        "ステージされていない変更を破棄",
+	GitDiscardWholeInfo:                                      "ファイル %s のステージ済みおよび未ステージの変更をすべて破棄します",
+	GitDiscardStagedInfo:                                     "ファイル %s のステージ済みの変更のみを破棄します",
+	GitDiscardUnstageInfo:                                    "ファイル %s の未ステージの変更のみを破棄します",
+	GitDiscardWholeConfirmation:                              "[%s] のすべての変更を破棄してもよろしいですか?",
+	GitDiscardStagedConfirmation:                             "[%s] のステージされた変更を破棄してもよろしいですか?",
+	GitDiscardUnstageConfirmation:                            "[%s] のアンステージされた変更を破棄してもよろしいですか?",
 }
 
 // for about gitti
