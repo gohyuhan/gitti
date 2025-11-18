@@ -21,6 +21,16 @@ type GlobalKeyBindingMappingFormat struct {
 // -------------------------------------------------------
 type LanguageMapping struct {
 	AboutGitti []string
+	// Updater related
+	UpdaterDownloadPrompt               string
+	UpdaterAlreadyLatest                string
+	UpdaterFailToCheckForUpdate         string
+	UpdaterUnSupportedOS                string
+	UpdaterDownloadFail                 string
+	UpdaterBinaryReplaceFail            string
+	UpdaterDownloading                  string
+	UpdaterDownloadUnexpectedStatusCode string
+	UpdaterDownloadSuccess              string
 	// flag expalnation
 	FlagLangCode                string
 	FlagInitDefaultBranch       string

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"gitti/constant"
+	"gitti/i18n"
 	"gitti/settings"
 )
 
@@ -52,6 +53,8 @@ func CheckForUpdates() (string, bool, error) {
 	currentVersion := constant.APPVERSION
 	latestVersion := release.TagName
 	isNewer := compareVersions(currentVersion, latestVersion)
+	// Update the last fetch time after a successful update check
+	SaveUpdateInfo()
 	return latestVersion, isNewer, nil
 }
 
@@ -102,51 +105,54 @@ func SaveUpdateInfo() {
 
 // PromptUserForUpdate prompts the user to download the latest version
 func PromptUserForUpdate(latestVersion string) bool {
-	fmt.Printf("A new version (%s) is available. Do you want to download it? (y/n): ", latestVersion)
+	fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterDownloadPrompt, latestVersion)
 	var response string
 	fmt.Scanln(&response)
 	return response == "y" || response == "Y"
 }
 
 // Update handles the download and replacement of the current TUI application with the latest version
-func Update() error {
+func Update() {
 	// Fetch the latest version information
 	latestVersion, isNewer, err := CheckForUpdates()
 	if err != nil {
-		return fmt.Errorf("failed to check for updates: %v", err)
+		fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterFailToCheckForUpdate, err)
+		os.Exit(1)
 	}
 
 	if !isNewer {
-		fmt.Printf("You are already using the latest version (%s).", constant.APPVERSION)
-		return nil
+		fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterAlreadyLatest, constant.APPVERSION)
+		os.Exit(0)
 	}
 
-	fmt.Printf("Downloading version %s...\n", latestVersion)
+	fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterDownloading, latestVersion)
 	// Determine the correct binary URL based on OS and architecture
 	osName := runtime.GOOS
 	arch := runtime.GOARCH
 	binaryURL := getBinaryURL(osName, arch, latestVersion)
 	if binaryURL == "" {
-		return fmt.Errorf("unsupported OS or architecture: %s/%s", osName, arch)
+		fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterUnSupportedOS, osName, arch)
+		os.Exit(1)
 	}
 
 	// Download the binary
 	tempFile, err := downloadBinary(binaryURL)
 	if err != nil {
-		return fmt.Errorf("failed to download binary: %v", err)
+		fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterDownloadFail, err)
+		os.Exit(1)
 	}
 	defer os.Remove(tempFile) // Clean up temporary file after use
 
 	// Replace the current binary with the downloaded one
 	err = replaceBinary(tempFile)
 	if err != nil {
-		return fmt.Errorf("failed to replace binary: %v", err)
+		fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterBinaryReplaceFail, err)
+		os.Exit(1)
 	}
 
-	fmt.Printf("Successfully updated to version %s.\n", latestVersion)
-	// Update the last fetch time after a successful update
-	SaveUpdateInfo()
-	return nil
+	fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterDownloadSuccess, latestVersion)
+
+	os.Exit(0)
 }
 
 // getBinaryURL constructs the URL for the binary based on OS, architecture, and version
@@ -189,7 +195,7 @@ func downloadBinary(url string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("unexpected status code when downloading binary: %d", resp.StatusCode)
+		return "", fmt.Errorf(i18n.LANGUAGEMAPPING.UpdaterDownloadUnexpectedStatusCode, resp.StatusCode)
 	}
 
 	tempFile, err := os.CreateTemp("", "gitti-update-*.tmp")
