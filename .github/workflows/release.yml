@@ -1,0 +1,36 @@
+name: Release
+
+# Only run when a Git tag is pushed (e.g. v1.2.3 or v2.0.0-rc.1)
+on:
+  push:
+    tags:
+      - "v*.*.*"          # v1.0.0
+      - "v*.*.*-*"        # v1.0.0-rc.1, v2.0.0-beta.3, etc.
+
+permissions:
+  contents: write       # needed to create the GitHub Release + upload assets
+  packages: write       # if you ever publish to GitHub Packages (optional)
+  pull-requests: write  # needed only if you use the announce feature
+
+jobs:
+  goreleaser:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0     # important! GoReleaser needs full history for changelog
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable   # or pin like "1.23"
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: "~> v2"          # locks to latest v2.x
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -54,7 +54,7 @@ changelog:
 
 release:
   github:
-    owner: yuhangoh
+    owner: gohyuhan
     name: gitti
   draft: true
   prerelease: auto
