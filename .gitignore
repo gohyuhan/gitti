@@ -1,6 +1,5 @@
 main
-
 DS_Store
-coverage.out
-coverage.html
-tests/
+
+# add by goreleaser
+dist/

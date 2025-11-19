@@ -1,0 +1,63 @@
+version: 2
+
+project_name: gitti
+
+before:
+  hooks:
+    # optional: you can add go mod tidy, tests, etc. here if you want
+    - go mod tidy
+
+builds:
+  - id: gitti
+    main: ./main.go
+    binary: gitti
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+    ldflags:
+      - -s -w # strip debug symbols (smaller binary)
+      - -X gitti/constant.APPVERSION={{.Version}}
+
+archives:
+  - id: gitti-archives
+    format_overrides:
+      - goos: windows
+        formats: ['zip']
+    files:
+      - LICENSE*
+      - README.md
+    name_template: >-
+      {{- .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}
+
+snapshot:
+  version_template: "{{ .Version }}-SNAPSHOT"
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: desc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+      - "Merge pull request"
+      - "Merge branch"
+      - "^Revert"
+
+release:
+  github:
+    owner: yuhangoh
+    name: gitti
+  draft: true
+  prerelease: auto
+  extra_files:
+    - glob: ./install.sh
+    - glob: ./install.ps1
