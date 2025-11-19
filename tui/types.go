@@ -28,6 +28,7 @@ type GittiModel struct {
 	CheckOutBranch                    string
 	RemoteSyncStateLineString         string
 	BranchUpStream                    string
+	TrackedUpstreamOrBranchIcon       string
 	Width                             int
 	Height                            int
 	WindowLeftPanelWidth              int // this is the left part of the window

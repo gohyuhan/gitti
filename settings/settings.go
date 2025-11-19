@@ -12,6 +12,14 @@ import (
 	"gitti/constant"
 )
 
+const (
+	MAXFILEWATCHERDEBOUNCEMS           = 1000
+	MAXGITFILESACTIVEREFRESHDURATIONMS = 5000
+
+	MAXLEFTPANELWIDTHRATIO = 0.6
+	MINLEFTPANELWIDTHRATIO = 0.2
+)
+
 var GITTICONFIGSETTINGS *GittiConfigSettings
 
 type GittiConfigSettings struct {
@@ -85,8 +93,9 @@ func InitOrReadConfig() {
 		saveConfig(cfgPath, cfg)
 	}
 
+	// limit to be wihtin the defined maximum
 	// this is to ensure that the left panel ratio is within the set area
-	if cfg.LeftPanelWidthRatio > 0.5 || cfg.LeftPanelWidthRatio < 0.3 {
+	if cfg.LeftPanelWidthRatio > MAXLEFTPANELWIDTHRATIO || cfg.LeftPanelWidthRatio < MINLEFTPANELWIDTHRATIO {
 		cfg.LeftPanelWidthRatio = 0.3
 		cfg.RightPanelWidthRatio = 0.7
 		saveConfig(cfgPath, cfg)
@@ -97,6 +106,8 @@ func InitOrReadConfig() {
 			saveConfig(cfgPath, cfg)
 		}
 	}
+	cfg.FileWatcherDebounceMS = min(cfg.FileWatcherDebounceMS, MAXFILEWATCHERDEBOUNCEMS)
+	cfg.GitFilesActiveRefreshDurationMS = min(cfg.GitFilesActiveRefreshDurationMS, MAXGITFILESACTIVEREFRESHDURATIONMS)
 
 	GITTICONFIGSETTINGS = &cfg
 }

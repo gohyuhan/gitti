@@ -36,6 +36,9 @@ func IsRepoGitInitialized(repoPath string) GitRepoPath {
 	if err != nil {
 		// .git does not exist or some other error
 		PromptUserForGitInitConfirmation(repoPath)
+
+		// reassign again if user choose to init the repo after prompt
+		gitPathInfo, err = getGitPathInfo()
 	}
 
 	return gitPathInfo

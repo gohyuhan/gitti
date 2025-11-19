@@ -12,14 +12,16 @@ import (
 )
 
 type GitRemote struct {
-	errorLog                 []error
-	gitAddRemoteProcess      *exec.Cmd
-	updateChannel            chan string
-	gitAddRemoteProcessMutex sync.Mutex
-	gitProcessLock           *GitProcessLock
-	remote                   []GitRemoteInfo
-	remoteSyncStatus         RemoteSyncStatus
-	currentBranchUpStream    string
+	errorLog                      []error
+	gitAddRemoteProcess           *exec.Cmd
+	updateChannel                 chan string
+	gitAddRemoteProcessMutex      sync.Mutex
+	gitProcessLock                *GitProcessLock
+	remote                        []GitRemoteInfo
+	remoteSyncStatus              RemoteSyncStatus
+	upStreamRemoteIcon            string
+	currentBranchUpStream         string
+	currentBranchUpStreamWithIcon string
 }
 
 type GitRemoteInfo struct {
@@ -34,12 +36,14 @@ type RemoteSyncStatus struct {
 
 func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *GitRemote {
 	gitRemote := GitRemote{
-		gitAddRemoteProcess:   nil,
-		updateChannel:         updateChannel,
-		gitProcessLock:        gitProcessLock,
-		remote:                []GitRemoteInfo{},
-		remoteSyncStatus:      RemoteSyncStatus{},
-		currentBranchUpStream: "",
+		gitAddRemoteProcess:           nil,
+		updateChannel:                 updateChannel,
+		gitProcessLock:                gitProcessLock,
+		remote:                        []GitRemoteInfo{},
+		remoteSyncStatus:              RemoteSyncStatus{},
+		upStreamRemoteIcon:            "",
+		currentBranchUpStream:         "",
+		currentBranchUpStreamWithIcon: "",
 	}
 
 	return &gitRemote
@@ -61,6 +65,15 @@ func (gr *GitRemote) Remote() []GitRemoteInfo {
 // ----------------------------------
 func (gr *GitRemote) RemoteSyncStatus() RemoteSyncStatus {
 	return gr.remoteSyncStatus
+}
+
+// ----------------------------------
+//
+//	Return current upstream icon
+//
+// ----------------------------------
+func (gr *GitRemote) UpStreamRemoteIcon() string {
+	return gr.upStreamRemoteIcon
 }
 
 // ----------------------------------
@@ -171,7 +184,8 @@ func (gr *GitRemote) CheckRemoteExist() bool {
 //
 // ----------------------------------
 func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream() {
-	upstream, _ := hasUpStream()
+	upstreamIcon, upstream, _ := hasUpstreamWithIcon()
+	gr.upStreamRemoteIcon = upstreamIcon
 	gr.currentBranchUpStream = upstream
 
 	gitArgs := []string{"rev-list", "--left-right", "--count", "HEAD...@{upstream}"}

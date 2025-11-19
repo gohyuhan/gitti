@@ -33,7 +33,7 @@ func renderGitStatusComponentPanel(m *GittiModel) string {
 		trackedUpStreamOrBranchName = m.BranchUpStream
 	}
 
-	repoTrackBranchName := fmt.Sprintf(" %s -> %s", m.RepoName, trackedUpStreamOrBranchName)
+	repoTrackBranchName := fmt.Sprintf(" %s -> %s %s", m.RepoName, m.TrackedUpstreamOrBranchIcon, trackedUpStreamOrBranchName)
 
 	// the max width is the window width - padding - the length of RemoteSyncStateLineString (max of 5)
 	repoTrackBranchName = utils.TruncateString(repoTrackBranchName, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-5)

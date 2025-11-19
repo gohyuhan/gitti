@@ -77,7 +77,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 
 	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommited branch
-	if len(gitBranches) < 1 {
+	if len(gitBranches) == 1 && gitBranches[0] == "" {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
 		branchCmdExecutor = executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 		gitOutput, err := branchCmdExecutor.Output()
@@ -90,22 +90,22 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 			IsCheckedOut: true,
 		}
 		gb.isRepoUnborn = true
-	}
+	} else {
+		for _, branch := range gitBranches {
+			branch = strings.TrimSpace(branch)
 
-	for _, branch := range gitBranches {
-		branch = strings.TrimSpace(branch)
-
-		if strings.HasPrefix(branch, "*") {
-			branch = strings.TrimSpace(strings.TrimPrefix(branch, "*"))
-			gb.currentCheckOut = BranchInfo{
-				BranchName:   branch,
-				IsCheckedOut: true,
+			if strings.HasPrefix(branch, "*") {
+				branch = strings.TrimSpace(strings.TrimPrefix(branch, "*"))
+				gb.currentCheckOut = BranchInfo{
+					BranchName:   branch,
+					IsCheckedOut: true,
+				}
+			} else {
+				allBranches = append(allBranches, BranchInfo{
+					BranchName:   branch,
+					IsCheckedOut: false,
+				})
 			}
-		} else {
-			allBranches = append(allBranches, BranchInfo{
-				BranchName:   branch,
-				IsCheckedOut: false,
-			})
 		}
 	}
 

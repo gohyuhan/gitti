@@ -211,7 +211,7 @@ func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 //	Related to Git Push
 //
 // ----------------------------------
-func (gc *GitCommit) GitPush(originName string, pushType string) int {
+func (gc *GitCommit) GitPush(originName string, pushType string, currentCheckOutBranch string) int {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
@@ -241,6 +241,12 @@ func (gc *GitCommit) GitPush(originName string, pushType string) int {
 	default:
 		gitArgs = append(gitArgs, []string{"--progress", originName}...)
 	}
+
+	// include the current checkout branch name at the end if there was no upstream so that git know which branch to push
+	if !hasUpstream {
+		gitArgs = append(gitArgs, currentCheckOutBranch)
+	}
+
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")

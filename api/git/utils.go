@@ -121,3 +121,40 @@ func hasUpStream() (string, bool) {
 
 	return strings.TrimSpace(string(checkUpStreamOutput)), true
 }
+
+// ----------------------------------
+//
+//	Related to return upstream with relevant icon
+//
+// ----------------------------------
+func hasUpstreamWithIcon() (string, string, bool) {
+	remoteIcon := "\ue702"
+	upStream, upStreamExist := hasUpStream()
+	if !upStreamExist {
+		return remoteIcon, upStream, upStreamExist
+	}
+
+	upStreamRemoteName := strings.Split(upStream, "/")[0]
+	gitArgs := []string{"remote", "get-url", upStreamRemoteName}
+	getUpStreamUrlCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	getUpStreamUrlOutput, getUpStreamUrlErr := getUpStreamUrlCmdExecutor.Output()
+	if getUpStreamUrlErr != nil {
+		return remoteIcon, upStream, upStreamExist
+	}
+
+	parsedUpstreamUrl := strings.TrimSpace(string(getUpStreamUrlOutput))
+	if strings.Contains(parsedUpstreamUrl, "github.com") {
+		remoteIcon = "\uea84"
+	} else if strings.Contains(parsedUpstreamUrl, "gitlab.com") {
+		remoteIcon = "\ue7eb"
+	} else if strings.Contains(parsedUpstreamUrl, "gitea.com") {
+		remoteIcon = "\ue703"
+	} else if strings.Contains(parsedUpstreamUrl, "bitbucket.org") {
+		remoteIcon = "\uf339"
+	} else if strings.Contains(parsedUpstreamUrl, "source.developers.google.com") {
+		remoteIcon = "\ue7f0"
+	} else if strings.Contains(parsedUpstreamUrl, "dev.azure.com") {
+		remoteIcon = "\uebe8"
+	}
+	return remoteIcon, upStream, upStreamExist
+}

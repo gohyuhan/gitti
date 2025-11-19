@@ -7,13 +7,14 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
 	"gitti/constant"
 	"gitti/i18n"
 	"gitti/settings"
+
+	"golang.org/x/mod/semver"
 )
 
 const GittiRepoURL = "https://api.github.com/repos/gohyuhan/gitti/releases/latest"
@@ -59,30 +60,39 @@ func CheckForUpdates() (string, bool, error) {
 }
 
 // compareVersions compares two version strings to determine if the latest is newer
+//
+//	func compareVersions(current, latest string) (bool, error) {
+//		// Normalize: remove leading 'v' if present
+//		current = strings.TrimPrefix(current, "v")
+//		latest = strings.TrimPrefix(latest, "v")
+//
+//		// Parse using the gold-standard semver library
+//		c, err := semver.NewVersion(current)
+//		if err != nil {
+//			return false, err // invalid current version
+//		}
+//		l, err := semver.NewVersion(latest)
+//		if err != nil {
+//			return false, err // invalid latest version
+//		}
+//
+//		return l.GreaterThan(c), nil
+//	}
 func compareVersions(current, latest string) bool {
-	// Remove 'v' prefix if present
-	current = strings.TrimPrefix(current, "v")
-	latest = strings.TrimPrefix(latest, "v")
-
-	currentParts := strings.Split(current, ".")
-	latestParts := strings.Split(latest, ".")
-
-	for i := 0; i < len(currentParts) && i < len(latestParts); i++ {
-		currentNum, err := strconv.Atoi(currentParts[i])
-		if err != nil {
-			return false
-		}
-		latestNum, err := strconv.Atoi(latestParts[i])
-		if err != nil {
-			return false
-		}
-		if latestNum > currentNum {
-			return true
-		} else if latestNum < currentNum {
-			return false
-		}
+	// Add 'v' prefix if missing (common for GitHub tags)
+	if !strings.HasPrefix(current, "v") {
+		current = "v" + current
 	}
-	return len(latestParts) > len(currentParts)
+	if !strings.HasPrefix(latest, "v") {
+		latest = "v" + latest
+	}
+
+	// Validate both
+	if !semver.IsValid(current) || !semver.IsValid(latest) {
+		return false // or handle error as needed
+	}
+
+	return semver.Compare(latest, current) > 0 // true if latest > current
 }
 
 // ShouldCheckForUpdate determines if an update check is due based on last fetch time
@@ -169,7 +179,6 @@ func getBinaryURL(osName, arch, version string) string {
 		"linux": {
 			"amd64": "gitti-%s-linux-amd64.tar.gz",
 			"arm64": "gitti-%s-linux-arm64.tar.gz",
-			"arm":   "gitti-%s-linux-arm.tar.gz",
 		},
 		"windows": {
 			"amd64": "gitti-%s-windows-amd64.zip",

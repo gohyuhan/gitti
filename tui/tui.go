@@ -28,6 +28,7 @@ func NewGittiModel(repoPath string, repoName string, gitOperations *api.GitOpera
 		CheckOutBranch:                   "",
 		RemoteSyncStateLineString:        "",
 		BranchUpStream:                   "",
+		TrackedUpstreamOrBranchIcon:      "",
 		Width:                            0,
 		Height:                           0,
 		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
@@ -148,6 +149,7 @@ func (m *GittiModel) View() tea.View {
 
 func (m *GittiModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
 	// set branch upstream
+	m.TrackedUpstreamOrBranchIcon = m.GitOperations.GitRemote.UpStreamRemoteIcon()
 	m.BranchUpStream = m.GitOperations.GitRemote.CurrentBranchUpStream()
 
 	// set remote sync status
