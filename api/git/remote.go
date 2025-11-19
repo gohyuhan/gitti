@@ -8,7 +8,6 @@ import (
 
 	"gitti/executor"
 	"gitti/i18n"
-	"gitti/utils"
 )
 
 type GitRemote struct {
@@ -169,9 +168,8 @@ func (gr *GitRemote) CheckRemoteExist() bool {
 			Url:  remoteLinePart[1],
 		}
 
-		if !utils.Contains(remoteStruct, r) {
+		if strings.TrimSpace(remoteLinePart[2]) == "(push)" {
 			remoteStruct = append(remoteStruct, r)
-
 		}
 	}
 	gr.remote = remoteStruct
