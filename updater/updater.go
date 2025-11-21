@@ -1,11 +1,15 @@
 package updater
 
 import (
+	"archive/tar"
+	"archive/zip"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -145,16 +149,24 @@ func Update() {
 		os.Exit(1)
 	}
 
-	// Download the binary
-	tempFile, err := downloadBinary(binaryURL)
+	// Download the archive
+	archivePath, err := downloadBinary(binaryURL)
 	if err != nil {
 		fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterDownloadFail, err)
 		os.Exit(1)
 	}
-	defer os.Remove(tempFile) // Clean up temporary file after use
+	defer os.Remove(archivePath) // Clean up archive file
 
-	// Replace the current binary with the downloaded one
-	err = replaceBinary(tempFile)
+	// Extract the binary
+	binaryPath, err := extractBinary(archivePath, binaryURL)
+	if err != nil {
+		fmt.Printf("Failed to extract binary: %v\n", err)
+		os.Exit(1)
+	}
+	defer os.Remove(binaryPath)
+
+	// Replace the current binary with the extracted one
+	err = replaceBinary(binaryPath)
 	if err != nil {
 		fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterBinaryReplaceFail, err)
 		os.Exit(1)
@@ -258,4 +270,96 @@ func replaceBinary(tempFile string) error {
 	}
 
 	return nil
+}
+
+// extractBinary extracts the binary from the archive based on the URL extension
+func extractBinary(archivePath, url string) (string, error) {
+	if strings.HasSuffix(url, ".zip") {
+		return extractZip(archivePath)
+	} else if strings.HasSuffix(url, ".tar.gz") {
+		return extractTarGz(archivePath)
+	}
+	return "", fmt.Errorf("unsupported archive format")
+}
+
+// extractZip extracts the binary from a zip archive
+func extractZip(archivePath string) (string, error) {
+	r, err := zip.OpenReader(archivePath)
+	if err != nil {
+		return "", err
+	}
+	defer r.Close()
+
+	for _, f := range r.File {
+		if isBinaryFile(f.Name) {
+			rc, err := f.Open()
+			if err != nil {
+				return "", err
+			}
+			defer rc.Close()
+			return saveTempBinary(rc)
+		}
+	}
+	return "", fmt.Errorf("binary not found in archive")
+}
+
+// extractTarGz extracts the binary from a tar.gz archive
+func extractTarGz(archivePath string) (string, error) {
+	f, err := os.Open(archivePath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	gzr, err := gzip.NewReader(f)
+	if err != nil {
+		return "", err
+	}
+	defer gzr.Close()
+
+	tr := tar.NewReader(gzr)
+
+	for {
+		header, err := tr.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return "", err
+		}
+
+		if header.Typeflag == tar.TypeReg && isBinaryFile(header.Name) {
+			return saveTempBinary(tr)
+		}
+	}
+	return "", fmt.Errorf("binary not found in archive")
+}
+
+// isBinaryFile checks if the file name matches the expected binary name
+func isBinaryFile(name string) bool {
+	base := filepath.Base(name)
+	return base == "gitti" || base == "gitti.exe"
+}
+
+// saveTempBinary saves the content from the reader to a temporary file
+func saveTempBinary(r io.Reader) (string, error) {
+	tempFile, err := os.CreateTemp("", "gitti-binary-*.tmp")
+	if err != nil {
+		return "", err
+	}
+	defer tempFile.Close()
+
+	_, err = io.Copy(tempFile, r)
+	if err != nil {
+		return "", err
+	}
+
+	// Make it executable on Unix-like systems
+	if runtime.GOOS != "windows" {
+		if err := os.Chmod(tempFile.Name(), 0755); err != nil {
+			return "", err
+		}
+	}
+
+	return tempFile.Name(), nil
 }

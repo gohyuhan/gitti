@@ -33,6 +33,7 @@ import (
 	"gitti/executor"
 	"gitti/i18n"
 	"gitti/tui"
+	"gitti/updater"
 )
 
 func main() {
@@ -66,6 +67,9 @@ func main() {
 
 		// initialization
 		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, updateChannel)
+
+		// check for update
+		updater.AutoUpdater()
 
 		// start the Git Daemon
 		api.GITDAEMON.Start()

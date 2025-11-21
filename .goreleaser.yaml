@@ -21,7 +21,7 @@ builds:
 
     ldflags:
       - -s -w # strip debug symbols (smaller binary)
-      - -X gitti/constant.APPVERSION={{.Version}}
+      - -X gitti/constant.APPVERSION=v{{.Version}}
 
 archives:
   - id: gitti-archives
@@ -32,10 +32,10 @@ archives:
       - LICENSE*
       - README.md
     name_template: >-
-      {{- .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}
+      {{- .ProjectName }}-v{{ .Version }}-{{ .Os }}-{{ .Arch }}
 
 snapshot:
-  version_template: "{{ .Version }}-SNAPSHOT"
+  version_template: "v{{ .Version }}-SNAPSHOT"
 
 checksum:
   name_template: "checksums.txt"
