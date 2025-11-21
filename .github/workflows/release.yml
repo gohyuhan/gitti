@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0     # important! GoReleaser needs full history for changelog
+          fetch-tags: true
 
       - name: Set up Go
         uses: actions/setup-go@v5

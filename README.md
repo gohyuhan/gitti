@@ -24,16 +24,20 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 
 ## Installation
 
-> 🚧 Installation instructions will be available after the first release.
-
-### From Binary (Coming Soon)
+### Linux & macOS
 ```bash
-# Instructions will be added here
+curl -L https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
 ```
 
-### From Source (Coming Soon)
+### Windows (PowerShell)
+```powershell
+powershell -c "irm https://github.com/gohyuhan/gitti/releases/latest/download/install.ps1 | iex"
+```
+
+### Go Install
+If you have Go installed, you can install Gitti directly:
 ```bash
-# Instructions will be added here
+go install github.com/gohyuhan/gitti@latest
 ```
 
 ## Quick Start
