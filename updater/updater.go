@@ -161,9 +161,6 @@ func Update() {
 
 // getBinaryURL constructs the URL for the binary based on OS, architecture, and version
 func getBinaryURL(osName, arch, version string) string {
-	// Clean version string if needed (remove 'v' prefix if present)
-	version = strings.TrimPrefix(version, "v")
-
 	// Map of OS and architecture to binary suffix
 	binarySuffixes := map[string]map[string]string{
 		"darwin": {
@@ -183,7 +180,7 @@ func getBinaryURL(osName, arch, version string) string {
 	if osMap, ok := binarySuffixes[osName]; ok {
 		if suffix, ok := osMap[arch]; ok {
 			fileName := fmt.Sprintf(suffix, version)
-			return fmt.Sprintf("https://github.com/gohyuhan/gitti/releases/download/v%s/%s", version, fileName)
+			return fmt.Sprintf("https://github.com/gohyuhan/gitti/releases/download/%s/%s", version, fileName)
 		}
 	}
 	return ""

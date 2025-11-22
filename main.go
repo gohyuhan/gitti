@@ -64,7 +64,7 @@ func main() {
 		config.SetGlobalInitBranch(*defaultInitBranch, repoPath)
 	case *defaultInitBranch != "" && !*applyToSystemGit:
 		config.SetInitBranch(*defaultInitBranch)
-	case *autoUpdate == "":
+	case *autoUpdate != "":
 		config.SetAutoUpdate(*autoUpdate)
 	case *updatePrompt:
 		updater.Update()

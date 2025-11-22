@@ -26,19 +26,19 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 
 ### Linux
 ```bash
-curl -L https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
+curl --proto "=https" -sSfL https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
 ```
 
 ### macOS (curl or homebrew)
 ```bash
-curl -L https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
+curl --proto "=https" -sSfL https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
 
 # via homebrew
 # Add the tap (once)
 brew tap gohyuhan/gitti
 
 # Install latest
-brew install gitti
+brew update && brew install gitti
 ```
 
 ### Windows (PowerShell or scoop)
@@ -50,13 +50,91 @@ powershell -c "irm https://github.com/gohyuhan/gitti/releases/latest/download/in
 scoop bucket add gitti https://github.com/gohyuhan/scoop-gitti
 
 # Install latest
-scoop install gitti
+scoop update; scoop install gitti
 ```
 
 ### Go Install
 If you have Go installed, you can install Gitti directly:
 ```bash
 go install github.com/gohyuhan/gitti@latest
+```
+
+## Uninstall & Cleanup
+
+### macOS (Homebrew)
+```bash
+# 1. Uninstall + remove ALL versions
+brew uninstall --force gitti
+
+# 2. Remove the tap
+brew untap gohyuhan/gitti
+
+# 3. Delete the binary directly (in case it's not a symlink or brew missed it)
+rm -f /opt/homebrew/bin/gitti
+rm -f /usr/local/bin/gitti
+
+# 4. Delete the entire Cellar folder for gitti (old kegs)
+rm -rf /opt/homebrew/Cellar/gitti
+rm -rf /usr/local/Cellar/gitti
+
+# 5. Delete any leftover symlinks
+rm -rf /opt/homebrew/opt/gitti
+rm -rf /usr/local/opt/gitti
+
+# 6. Delete all cached downloads for gitti
+rm -rf ~/Library/Caches/Homebrew/gitti*
+rm -rf ~/Library/Caches/Homebrew/downloads/*gitti*
+```
+
+### Windows (Scoop)
+```powershell
+# 1. Uninstall the app (all versions)
+scoop uninstall gitti 2>$null
+
+# 2. Remove the bucket
+scoop bucket rm gitti 2>$null
+
+# 3. Delete the app folder completely (including shims + persist)
+rm -r -force "$env:USERPROFILE\scoop\apps\gitti" 2>$null
+
+# 4. Delete the bucket clone
+rm -r -force "$env:USERPROFILE\scoop\buckets\gitti" 2>$null
+
+# 5. Delete all cached installers for gitti
+scoop cache rm "gitti*" 2>$null
+```
+
+### Manual Installation (curl / powershell)
+
+#### macOS / Linux
+```bash
+# Remove binary (if installed via curl)
+sudo rm -f /usr/local/bin/gitti
+```
+
+#### Windows
+```powershell
+# Remove binary and directory
+Remove-Item -Path "$env:LOCALAPPDATA\gitti" -Recurse -Force
+```
+
+### Configuration Cleanup
+
+To completely remove Gitti's configuration files:
+
+#### macOS
+```bash
+rm -rf "$HOME/Library/Application Support/gitti"
+```
+
+#### Linux
+```bash
+rm -rf "$HOME/.config/gitti"
+```
+
+#### Windows
+```powershell
+Remove-Item -Path "$env:APPDATA\gitti" -Recurse -Force
 ```
 
 ## Quick Start
