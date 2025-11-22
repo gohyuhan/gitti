@@ -52,11 +52,26 @@ changelog:
       - "Merge branch"
       - "^Revert"
 
+scoops:
+  - name: gitti
+    homepage: "https://github.com/gohyuhan/gitti"
+    description: "A lightweight terminal UI for git operations"
+    license: MIT
+    url_template: "https://github.com/gohyuhan/gitti/releases/download/v{{ .Version }}/{{ .ArtifactName }}"
+    skip_upload: true
+
+brews:
+  - name: gitti
+    homepage: "https://github.com/gohyuhan/gitti"
+    description: "A lightweight terminal UI for git operations"
+    license: MIT
+    skip_upload: true
+
 release:
   github:
     owner: gohyuhan
     name: gitti
-  draft: true
+  draft: false
   prerelease: auto
   extra_files:
     - glob: ./install.sh
