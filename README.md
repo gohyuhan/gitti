@@ -24,14 +24,33 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 
 ## Installation
 
-### Linux & macOS
+### Linux
 ```bash
 curl -L https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
 ```
 
-### Windows (PowerShell)
+### macOS (curl or homebrew)
+```bash
+curl -L https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
+
+# via homebrew
+# Add the tap (once)
+brew tap gohyuhan/gitti
+
+# Install latest
+brew install gitti
+```
+
+### Windows (PowerShell or scoop)
 ```powershell
 powershell -c "irm https://github.com/gohyuhan/gitti/releases/latest/download/install.ps1 | iex"
+
+# via scoop
+# Add the bucket (once)
+scoop bucket add gitti https://github.com/gohyuhan/scoop-gitti
+
+# Install latest
+scoop install gitti
 ```
 
 ### Go Install
