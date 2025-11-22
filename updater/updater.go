@@ -64,24 +64,6 @@ func CheckForUpdates() (string, bool, error) {
 }
 
 // compareVersions compares two version strings to determine if the latest is newer
-//
-//	func compareVersions(current, latest string) (bool, error) {
-//		// Normalize: remove leading 'v' if present
-//		current = strings.TrimPrefix(current, "v")
-//		latest = strings.TrimPrefix(latest, "v")
-//
-//		// Parse using the gold-standard semver library
-//		c, err := semver.NewVersion(current)
-//		if err != nil {
-//			return false, err // invalid current version
-//		}
-//		l, err := semver.NewVersion(latest)
-//		if err != nil {
-//			return false, err // invalid latest version
-//		}
-//
-//		return l.GreaterThan(c), nil
-//	}
 func compareVersions(current, latest string) bool {
 	// Add 'v' prefix if missing (common for GitHub tags)
 	if !strings.HasPrefix(current, "v") {

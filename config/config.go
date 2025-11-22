@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"gitti/api"
 	"gitti/executor"
@@ -26,6 +27,22 @@ func SetInitBranch(branchName string) {
 	settings.UpdateDefaultBranch(branchName, false, "")
 	fmt.Printf(i18n.LANGUAGEMAPPING.GittiDefaultBranchSet+"\n", branchName)
 	os.Exit(0)
+}
+
+// set the default git init branch name only for gitti
+func SetAutoUpdate(autoUpdateString string) {
+	if strings.ToLower(autoUpdateString) == "true" {
+		settings.UpdateAutoUpdate(true)
+		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterEnable)
+		os.Exit(0)
+	} else if strings.ToLower(autoUpdateString) == "false" {
+		settings.UpdateAutoUpdate(false)
+		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterDisable)
+		os.Exit(0)
+	} else {
+		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterSetError)
+		os.Exit(1)
+	}
 }
 
 // set the default git init branch name for both gitti and git

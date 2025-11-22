@@ -31,10 +31,15 @@ type LanguageMapping struct {
 	UpdaterDownloading                  string
 	UpdaterDownloadUnexpectedStatusCode string
 	UpdaterDownloadSuccess              string
+	UpdaterAutoUpdaterEnable            string
+	UpdaterAutoUpdaterDisable           string
+	UpdaterAutoUpdaterSetError          string
 	// flag expalnation
 	FlagLangCode                string
 	FlagInitDefaultBranch       string
 	FlagInitStashGitIgnoredFile string
+	FlagAutoUpdate              string
+	FlagUpdate                  string
 	FlagGlobal                  string
 	// Run Error
 	FailToGetCWD                string

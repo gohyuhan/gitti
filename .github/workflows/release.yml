@@ -99,7 +99,7 @@ jobs:
           end
           EOF
 
-          # as latest version
+          # latest version
           cat > homebrew-tap/Formula/gitti.rb <<EOF
           class Gitti < Formula
             desc "A lightweight terminal UI for git operations"
@@ -153,7 +153,7 @@ jobs:
           VERSION_CLEAN=${VERSION#v}
           mkdir -p scoop-bucket/bucket
 
-            # Versioned manifest
+          # Versioned manifest
           cat > scoop-bucket/bucket/gitti@${VERSION_CLEAN}.json <<EOF
           {
             "version": "$VERSION_CLEAN",
@@ -174,7 +174,7 @@ jobs:
           }
           EOF
 
-            # latest manifest
+          # latest manifest
           cat > scoop-bucket/bucket/gitti.json <<EOF
           {
             "version": "$VERSION_CLEAN",

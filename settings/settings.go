@@ -31,6 +31,7 @@ type GittiConfigSettings struct {
 	RightPanelWidthRatio            float64   `json:"right_panel_width_ratio"`
 	LanguageCode                    string    `json:"language_code"`
 	LastUpdateCheckTime             time.Time `json:"last_update_check_time"`
+	AutoUpdate                      bool      `json:"auto_update"`
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
@@ -42,6 +43,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	RightPanelWidthRatio:            0.7,
 	LanguageCode:                    "EN",
 	LastUpdateCheckTime:             time.Now().UTC(),
+	AutoUpdate:                      true,
 }
 
 // getConfigPath returns the config.json path (creates directories if needed)
@@ -191,4 +193,13 @@ func UpdateLastFetchTime() {
 	if err == nil {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
 	}
+}
+
+func UpdateAutoUpdate(autoUpdate bool) {
+	GITTICONFIGSETTINGS.AutoUpdate = autoUpdate
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+
 }
