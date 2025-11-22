@@ -1,37 +1,224 @@
-name: Release
+name: Release & Publish to Homebrew + Scoop
 
-# Only run when a Git tag is pushed (e.g. v1.2.3 or v2.0.0-rc.1)
 on:
   push:
     tags:
-      - "v*.*.*"          # v1.0.0
-      - "v*.*.*-*"        # v1.0.0-rc.1, v2.0.0-beta.3, etc.
+      - "v*.*.*"
+      - "v*.*.*-*"
 
 permissions:
-  contents: write       # needed to create the GitHub Release + upload assets
-  packages: write       # if you ever publish to GitHub Packages (optional)
-  pull-requests: write  # needed only if you use the announce feature
+  contents: write      # for GitHub Release + uploading assets
+  packages: write      # optional, for GitHub Packages
+  pull-requests: write # optional
 
 jobs:
-  goreleaser:
+  release-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      # ── 1. Checkout the actual project (with full history & tags) ─────────────────────
+      - name: Checkout source code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0     # important! GoReleaser needs full history for changelog
+          fetch-depth: 0
           fetch-tags: true
 
+      # ── 2. Set up Go ─────────────────────────────────────────────────────────────────────
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: stable   # or pin like "1.23"
+          go-version: stable
 
+      # ── 3. Run GoReleaser (creates release + artifacts + checksums.txt) ───────────────
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
-          distribution: goreleaser
-          version: "~> v2"          # locks to latest v2.x
+          version: "~> v2"
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── 4. Extract SHA256 checksums ────────────────────────────────────────────────────
+      - name: Extract checksums
+        id: checksums
+        run: |
+          cd dist
+          DARWIN_AMD64=$(grep darwin-amd64 checksums.txt | awk '{print $1}')
+          DARWIN_ARM64=$(grep darwin-arm64 checksums.txt | awk '{print $1}')
+          LINUX_AMD64=$(grep linux-amd64 checksums.txt | awk '{print $1}')
+          LINUX_ARM64=$(grep linux-arm64 checksums.txt | awk '{print $1}')
+          WIN_AMD64=$(grep windows-amd64 checksums.txt | awk '{print $1}')
+          WIN_ARM64=$(grep windows-arm64 checksums.txt | awk '{print $1}')
+
+          echo "darwin_amd64=$DARWIN_AMD64" >> $GITHUB_OUTPUT
+          echo "darwin_arm64=$DARWIN_ARM64" >> $GITHUB_OUTPUT
+          echo "linux_amd64=$LINUX_AMD64" >> $GITHUB_OUTPUT
+          echo "linux_arm64=$LINUX_ARM64" >> $GITHUB_OUTPUT
+          echo "win_amd64=$WIN_AMD64" >> $GITHUB_OUTPUT
+          echo "win_arm64=$WIN_ARM64" >> $GITHUB_OUTPUT
+
+      # ── 5. Update Homebrew tap (gohyuhan/homebrew-gitti) ─────────────────────────────────
+      - name: Checkout Homebrew tap
+        uses: actions/checkout@v4
+        with:
+          repository: gohyuhan/homebrew-gitti
+          token: ${{ secrets.GITTI_PAT }}
+          path: homebrew-tap
+
+      - name: Generate Homebrew formula (Formula/gitti.rb at repo root)
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION_CLEAN=${VERSION#v}
+          mkdir -p homebrew-tap/Formula
+
+          # Versioned formula: gitti@<VERSION_CLEAN>.rb
+          cat > homebrew-tap/Formula/gitti@${VERSION_CLEAN}.rb <<EOF
+          class GittiAT${VERSION_CLEAN//./} < Formula
+            desc "A lightweight terminal UI for git operations (v${VERSION_CLEAN})"
+            homepage "https://github.com/gohyuhan/gitti"
+            license "MIT"
+
+            on_arm do
+              url "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-darwin-arm64.tar.gz"
+              sha256 "${{ steps.checksums.outputs.darwin_arm64 }}"
+            end
+
+            on_intel do
+              url "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-darwin-amd64.tar.gz"
+              sha256 "${{ steps.checksums.outputs.darwin_amd64 }}"
+            end
+
+            version "${VERSION_CLEAN}"
+
+            def install
+              bin.install "gitti"
+            end
+
+            test do
+              system "#{bin}/gitti", "--version"
+            end
+          end
+          EOF
+
+          # as latest version
+          cat > homebrew-tap/Formula/gitti.rb <<EOF
+          class Gitti < Formula
+            desc "A lightweight terminal UI for git operations"
+            homepage "https://github.com/gohyuhan/gitti"
+            license "MIT"
+
+            on_arm do
+              url "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-darwin-arm64.tar.gz"
+              sha256 "${{ steps.checksums.outputs.darwin_arm64 }}"
+            end
+
+            on_intel do
+              url "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-darwin-amd64.tar.gz"
+              sha256 "${{ steps.checksums.outputs.darwin_amd64 }}"
+            end
+
+            version "${VERSION_CLEAN}"
+
+            def install
+              bin.install "gitti"
+            end
+
+            test do
+              system "#{bin}/gitti", "--version"
+            end
+          end
+          EOF
+
+      - name: Commit & push Homebrew formula
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION_CLEAN=${VERSION#v}
+          cd homebrew-tap
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/gitti.rb Formula/gitti@${VERSION_CLEAN}.rb
+          git commit -m "gitti: update to ${VERSION}" || echo "No changes to commit"
+          git push origin main
+
+      # ── 6. Update Scoop bucket (gohyuhan/scoop-gitti) ─────────────────────────────────────
+      - name: Checkout Scoop bucket
+        uses: actions/checkout@v4
+        with:
+          repository: gohyuhan/scoop-gitti
+          token: ${{ secrets.GITTI_PAT }}
+          path: scoop-bucket
+
+      - name: Generate Scoop manifest (bucket/gitti.json at repo root)
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION_CLEAN=${VERSION#v}
+          mkdir -p scoop-bucket/bucket
+
+            # Versioned manifest
+          cat > scoop-bucket/bucket/gitti@${VERSION_CLEAN}.json <<EOF
+          {
+            "version": "$VERSION_CLEAN",
+            "description": "A lightweight terminal UI for git operations (v${VERSION_CLEAN})",
+            "homepage": "https://github.com/gohyuhan/gitti",
+            "license": "MIT",
+            "architecture": {
+              "64bit": {
+                "url": "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-windows-amd64.zip",
+                "hash": "${{ steps.checksums.outputs.win_amd64 }}"
+              },
+              "arm64": {
+                "url": "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-windows-arm64.zip",
+                "hash": "${{ steps.checksums.outputs.win_arm64 }}"
+              }
+            },
+            "bin": "gitti.exe"
+          }
+          EOF
+
+            # latest manifest
+          cat > scoop-bucket/bucket/gitti.json <<EOF
+          {
+            "version": "$VERSION_CLEAN",
+            "description": "A lightweight terminal UI for git operations",
+            "homepage": "https://github.com/gohyuhan/gitti",
+            "license": "MIT",
+            "architecture": {
+              "64bit": {
+                "url": "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-windows-amd64.zip",
+                "hash": "${{ steps.checksums.outputs.win_amd64 }}"
+              },
+              "arm64": {
+                "url": "https://github.com/gohyuhan/gitti/releases/download/${VERSION}/gitti-${VERSION}-windows-arm64.zip",
+                "hash": "${{ steps.checksums.outputs.win_arm64 }}"
+              }
+            },
+            "bin": "gitti.exe",
+            "checkver": "github",
+            "autoupdate": {
+              "architecture": {
+                "64bit": {
+                  "url": "https://github.com/gohyuhan/gitti/releases/download/v\$version/gitti-v\$version-windows-amd64.zip"
+                },
+                "arm64": {
+                  "url": "https://github.com/gohyuhan/gitti/releases/download/v\$version/gitti-v\$version-windows-arm64.zip"
+                }
+              }
+            }
+          }
+          EOF
+
+      - name: Commit & push Scoop manifest
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          VERSION_CLEAN=${VERSION#v}
+          cd scoop-bucket
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add bucket/gitti.json bucket/gitti@${VERSION_CLEAN}.json
+          git commit -m "gitti: update to ${VERSION}" || echo "No changes to commit"
+          git push origin main
+
+      # ── 7. Cleanup temporary checkouts ───────────────────────────────────────────────────
+      - name: Cleanup
+        if: always()
+        run: |
+          rm -rf homebrew-tap scoop-bucket
