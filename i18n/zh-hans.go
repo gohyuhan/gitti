@@ -20,6 +20,7 @@ var zH_HANS = LanguageMapping{
 	UpdaterAutoUpdaterEnable:            "自动更新已启用",
 	UpdaterAutoUpdaterDisable:           "自动更新已禁用",
 	UpdaterAutoUpdaterSetError:          "输入无效，请输入 `true` 以启用自动更新，或输入 `false` 以禁用自动更新",
+	FlagVersion:                         "显示 gitti 的版本",
 	FlagLangCode:                        "设置语言代码，例如: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:               "设置 git init 的默认分支.\n此设置仅影响通过 gitti 执行的 git init.\n若要让 git 自身默认使用此分支名称，请同时添加 '--global' 参数.",
 	FlagAutoUpdate:                      "设置为允许自动检查最新版本",

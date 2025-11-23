@@ -30,6 +30,7 @@ import (
 
 	"gitti/api"
 	"gitti/config"
+	"gitti/constant"
 	"gitti/executor"
 	"gitti/i18n"
 	"gitti/settings"
@@ -46,6 +47,7 @@ func main() {
 
 	// setting and config need to be the first thing to be initialized
 	config.InitGlobalSettingAndLanguage()
+	showVersion := flag.Bool("version", false, i18n.LANGUAGEMAPPING.FlagVersion)
 	langCode := flag.String("language", "", i18n.LANGUAGEMAPPING.FlagLangCode)
 	defaultInitBranch := flag.String("init-dbranch", "", i18n.LANGUAGEMAPPING.FlagInitDefaultBranch)
 	autoUpdate := flag.String("auto-update", "", i18n.LANGUAGEMAPPING.FlagAutoUpdate)
@@ -58,6 +60,8 @@ func main() {
 	executor.InitCmdExecutor(repoPath)
 
 	switch {
+	case *showVersion:
+		fmt.Println(constant.APPVERSION)
 	case *langCode != "":
 		config.SetLanguage(*langCode)
 	case *defaultInitBranch != "" && *applyToSystemGit:

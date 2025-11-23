@@ -20,6 +20,7 @@ var eN = LanguageMapping{
 	UpdaterAutoUpdaterEnable:            "Auto Updater has been enabled",
 	UpdaterAutoUpdaterDisable:           "Auto Updater has been disabled",
 	UpdaterAutoUpdaterSetError:          "Invalid input, please enter `true` to enable auto updater or `false` to disable auto updater",
+	FlagVersion:                         "Display version of gitti",
 	FlagLangCode:                        "set the language code, e.g. 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:               "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
 	FlagInitStashGitIgnoredFile:         "set stash behaviour for ignore file, by gitti system default, it will respect .gitignore and will not stash it",
