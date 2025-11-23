@@ -19,7 +19,7 @@ var jA = LanguageMapping{
 	UpdaterDownloadSuccess:              "バージョン %s へのアップデートが完了しました。\n",
 	UpdaterAutoUpdaterEnable:            "自動更新が有効になりました",
 	UpdaterAutoUpdaterDisable:           "自動更新が無効になりました",
-	UpdaterAutoUpdaterSetError:          "無効な入力です。自動更新を有効にするには `true` を、無効にするには `false` を入力してください",
+	UpdaterAutoUpdaterSetError:          "無効な入力です. 自動更新を有効にするには `true`, 無効にするには `false` を入力してください",
 	FlagVersion:                         "gittiバージョンを表示する",
 	FlagLangCode:                        "言語コードを設定します. 例: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
 	FlagInitDefaultBranch:               "git init のデフォルトブランチを設定します.\nこれは gitti を通して行われる git init にのみ影響します.\ngit 自体のデフォルトブランチ名を変更するには、'--global' フラグも追加してください.",
