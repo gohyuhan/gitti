@@ -17,6 +17,7 @@ var eN = LanguageMapping{
 	UpdaterDownloading:                  "Downloading version %s... \n",
 	UpdaterDownloadUnexpectedStatusCode: "unexpected status code when downloading binary: %d \n",
 	UpdaterDownloadSuccess:              "Successfully updated to version %s. \n",
+	UpdaterRequiresSudo:                 "Elevated permissions required to update. You may be prompted for your password.\n",
 	UpdaterAutoUpdaterEnable:            "Auto Updater has been enabled",
 	UpdaterAutoUpdaterDisable:           "Auto Updater has been disabled",
 	UpdaterAutoUpdaterSetError:          "Invalid input, please enter `true` to enable auto updater or `false` to disable auto updater",

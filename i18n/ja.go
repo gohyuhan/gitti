@@ -17,6 +17,7 @@ var jA = LanguageMapping{
 	UpdaterDownloading:                  "バージョン %s をダウンロードしています...\n",
 	UpdaterDownloadUnexpectedStatusCode: "バイナリのダウンロード中に予期しないステータスコードを受信しました: %d \n",
 	UpdaterDownloadSuccess:              "バージョン %s へのアップデートが完了しました。\n",
+	UpdaterRequiresSudo:                 "更新には管理者権限が必要です。パスワードの入力を求められる場合があります。\n",
 	UpdaterAutoUpdaterEnable:            "自動更新が有効になりました",
 	UpdaterAutoUpdaterDisable:           "自動更新が無効になりました",
 	UpdaterAutoUpdaterSetError:          "無効な入力です. 自動更新を有効にするには `true`, 無効にするには `false` を入力してください",

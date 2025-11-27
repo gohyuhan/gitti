@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -222,33 +223,96 @@ func replaceBinary(tempFile string) error {
 
 	// Handle different OS behaviors
 	if runtime.GOOS == "windows" {
-		// On Windows, we can't replace a running executable, so rename the old one and move the new one
-		backupPath := execPath + ".old"
-		err = os.Rename(execPath, backupPath)
-		if err != nil {
-			return err
-		}
-		err = os.Rename(tempFile, execPath)
-		if err != nil {
-			// Try to restore the original if rename fails
-			os.Rename(backupPath, execPath)
-			return err
-		}
-		os.Remove(backupPath) // Clean up backup if successful
-	} else {
-		// On Unix-like systems, we can replace the executable directly
-		err = os.Rename(tempFile, execPath)
-		if err != nil {
-			return err
-		}
-		// Set executable permissions
-		err = os.Chmod(execPath, 0755)
-		if err != nil {
-			return err
-		}
+		return replaceBinaryWindows(tempFile, execPath)
 	}
 
+	// Unix-like systems (Linux, macOS)
+	return replaceBinaryUnix(tempFile, execPath)
+}
+
+// replaceBinaryWindows handles binary replacement on Windows
+func replaceBinaryWindows(tempFile, execPath string) error {
+	// On Windows, we can't replace a running executable, so rename the old one and move the new one
+	backupPath := execPath + ".old"
+	err := os.Rename(execPath, backupPath)
+	if err != nil {
+		return err
+	}
+	err = os.Rename(tempFile, execPath)
+	if err != nil {
+		// Try to restore the original if rename fails
+		os.Rename(backupPath, execPath)
+		return err
+	}
+	os.Remove(backupPath) // Clean up backup if successful
 	return nil
+}
+
+// replaceBinaryUnix handles binary replacement on Unix-like systems with automatic sudo fallback
+func replaceBinaryUnix(tempFile, execPath string) error {
+	// First, try to replace the binary directly (works for user-owned binaries)
+	err := os.Rename(tempFile, execPath)
+	if err == nil {
+		// Successfully replaced, set executable permissions
+		return os.Chmod(execPath, 0755)
+	}
+
+	// If we got a permission error, try using sudo
+	if os.IsPermission(err) {
+		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterRequiresSudo)
+		return replaceBinaryWithSudo(tempFile, execPath)
+	}
+
+	return err
+}
+
+// replaceBinaryWithSudo uses sudo to replace the binary when permission is denied
+func replaceBinaryWithSudo(tempFile, execPath string) error {
+	// Import needed for running commands
+	// Note: We're using os/exec which needs to be imported at the top
+
+	// Copy the temp file to a predictable location that sudo can access
+	sudoTempPath := "/tmp/gitti-update.tmp"
+
+	// Copy tempFile to sudoTempPath
+	srcFile, err := os.Open(tempFile)
+	if err != nil {
+		return err
+	}
+	defer srcFile.Close()
+
+	dstFile, err := os.Create(sudoTempPath)
+	if err != nil {
+		return err
+	}
+	defer dstFile.Close()
+
+	_, err = io.Copy(dstFile, srcFile)
+	if err != nil {
+		return err
+	}
+	dstFile.Close()
+
+	// Set executable permissions on the temp file
+	if err := os.Chmod(sudoTempPath, 0755); err != nil {
+		return err
+	}
+
+	// Use sudo to move the file and set permissions
+	// We need to import os/exec for this
+	cmd := fmt.Sprintf("sudo mv %s %s && sudo chmod 755 %s", sudoTempPath, execPath, execPath)
+
+	// Execute the command using sh -c to handle the command chain
+	return runCommand("sh", "-c", cmd)
+}
+
+// runCommand executes a command and waits for it to complete
+func runCommand(name string, args ...string) error {
+	cmd := exec.Command(name, args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }
 
 // extractBinary extracts the binary from the archive based on the URL extension

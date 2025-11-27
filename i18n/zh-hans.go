@@ -17,6 +17,7 @@ var zH_HANS = LanguageMapping{
 	UpdaterDownloading:                  "正在下载版本 %s ...\n",
 	UpdaterDownloadUnexpectedStatusCode: "下载程序文件时返回了异常的状态码：%d \n",
 	UpdaterDownloadSuccess:              "已成功更新到版本 %s。\n",
+	UpdaterRequiresSudo:                 "更新需要提升权限，您可能需要输入密码。\n",
 	UpdaterAutoUpdaterEnable:            "自动更新已启用",
 	UpdaterAutoUpdaterDisable:           "自动更新已禁用",
 	UpdaterAutoUpdaterSetError:          "输入无效，请输入 `true` 以启用自动更新，或输入 `false` 以禁用自动更新",

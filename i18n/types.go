@@ -31,6 +31,7 @@ type LanguageMapping struct {
 	UpdaterDownloading                  string
 	UpdaterDownloadUnexpectedStatusCode string
 	UpdaterDownloadSuccess              string
+	UpdaterRequiresSudo                 string
 	UpdaterAutoUpdaterEnable            string
 	UpdaterAutoUpdaterDisable           string
 	UpdaterAutoUpdaterSetError          string

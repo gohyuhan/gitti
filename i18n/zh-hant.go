@@ -17,6 +17,7 @@ var zH_HANT = LanguageMapping{
 	UpdaterDownloading:                  "正在下載版本 %s ...\n",
 	UpdaterDownloadUnexpectedStatusCode: "下載程式檔時收到異常的狀態碼：%d \n",
 	UpdaterDownloadSuccess:              "已成功更新至版本 %s。\n",
+	UpdaterRequiresSudo:                 "更新需要提升權限，您可能需要輸入密碼。\n",
 	UpdaterAutoUpdaterEnable:            "自動更新已啟用",
 	UpdaterAutoUpdaterDisable:           "自動更新已停用",
 	UpdaterAutoUpdaterSetError:          "輸入無效，請輸入 `true` 以啟用自動更新，或輸入 `false` 以停用自動更新",

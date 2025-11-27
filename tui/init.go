@@ -386,12 +386,12 @@ func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
 		},
 		{
 			Name:     i18n.LANGUAGEMAPPING.ForcePushSafe,
-			Info:     "git push --force",
+			Info:     "git push --force-with-lease",
 			pushType: git.FORCEPUSHSAFE,
 		},
 		{
 			Name:     i18n.LANGUAGEMAPPING.ForcePushDangerous,
-			Info:     "git push --force-with-lease",
+			Info:     "git push --force",
 			pushType: git.FORCEPUSHDANGEROUS,
 		},
 	}
