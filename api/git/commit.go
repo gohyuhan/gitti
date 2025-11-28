@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitti/executor"
+	"github.com/gohyuhan/gitti/executor"
 )
 
 type GitCommit struct {

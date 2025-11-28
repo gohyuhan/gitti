@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitti/executor"
+	"github.com/gohyuhan/gitti/executor"
 
 	"github.com/google/uuid"
 )

@@ -5,9 +5,9 @@ import (
 	"io"
 	"strings"
 
-	"gitti/tui/constant"
-	"gitti/tui/style"
-	"gitti/tui/utils"
+	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/utils"
 
 	"github.com/charmbracelet/bubbles/v2/list"
 	tea "github.com/charmbracelet/bubbletea/v2"

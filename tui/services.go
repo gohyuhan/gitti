@@ -5,9 +5,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"gitti/api/git"
-	"gitti/i18n"
-	"gitti/tui/constant"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/tui/constant"
 )
 
 // service.go was to bridge api and the needs of the terminal interface logic so that it can be compatible and feels smooth and not cluncy

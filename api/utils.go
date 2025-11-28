@@ -9,10 +9,10 @@ import (
 	"regexp"
 	"strings"
 
-	"gitti/api/git"
-	"gitti/executor"
-	"gitti/i18n"
-	"gitti/settings"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/settings"
 )
 
 func IsGitInstalled(repoPath string) {

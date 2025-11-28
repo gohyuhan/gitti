@@ -3,7 +3,7 @@ package tui
 import (
 	"sync/atomic"
 
-	"gitti/api"
+	"github.com/gohyuhan/gitti/api"
 
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/spinner"

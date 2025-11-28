@@ -3,7 +3,7 @@ package i18n
 import (
 	"strings"
 
-	"gitti/utils"
+	"github.com/gohyuhan/gitti/utils"
 )
 
 // we are using ISO 639-1 as our default for the language,

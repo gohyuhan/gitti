@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"gitti/api/git"
-	"gitti/i18n"
-	"gitti/settings"
-	"gitti/tui/constant"
-	"gitti/tui/style"
-	"gitti/tui/utils"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/settings"
+	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // for bubbletea list component, we can't get rid of the "No items." natively for now as there was no exposed api

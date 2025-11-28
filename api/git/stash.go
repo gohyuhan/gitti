@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"gitti/executor"
+	"github.com/gohyuhan/gitti/executor"
 )
 
 type StashInfo struct {

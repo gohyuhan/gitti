@@ -1,4 +1,4 @@
-module gitti
+module github.com/gohyuhan/gitti
 
 go 1.24.5
 

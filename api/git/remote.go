@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
-	"gitti/executor"
-	"gitti/i18n"
+	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/i18n"
 )
 
 type GitRemote struct {

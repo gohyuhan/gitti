@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"sync"
 
-	"gitti/executor"
+	"github.com/gohyuhan/gitti/executor"
 )
 
 type GitPull struct {

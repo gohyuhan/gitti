@@ -5,10 +5,10 @@ import (
 	"os"
 	"strings"
 
-	"gitti/api"
-	"gitti/executor"
-	"gitti/i18n"
-	"gitti/settings"
+	"github.com/gohyuhan/gitti/api"
+	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/settings"
 )
 
 func SetLanguage(langCode string) {

@@ -3,10 +3,10 @@ package tui
 import (
 	"fmt"
 
-	"gitti/api"
-	"gitti/api/git"
-	"gitti/tui/constant"
-	"gitti/tui/style"
+	"github.com/gohyuhan/gitti/api"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
 
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/viewport"

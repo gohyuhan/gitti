@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"gitti/executor"
+	"github.com/gohyuhan/gitti/executor"
 )
 
 func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {

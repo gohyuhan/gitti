@@ -17,7 +17,7 @@ package main
 //    `---`
 
 // By Yu Han Goh <software engineer>
-//               <site:     https://yh.boredui.com>
+//               <site:     https://yuhangoh.com>
 //               <github:   https://github.com/gohyuhan>
 //               <linkedin: https://my.linkedin.com/in/yu-han-goh-209480200>
 
@@ -28,14 +28,14 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea/v2"
 
-	"gitti/api"
-	"gitti/config"
-	"gitti/constant"
-	"gitti/executor"
-	"gitti/i18n"
-	"gitti/settings"
-	"gitti/tui"
-	"gitti/updater"
+	"github.com/gohyuhan/gitti/api"
+	"github.com/gohyuhan/gitti/config"
+	"github.com/gohyuhan/gitti/constant"
+	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/settings"
+	"github.com/gohyuhan/gitti/tui"
+	"github.com/gohyuhan/gitti/updater"
 )
 
 func main() {

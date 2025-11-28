@@ -1,6 +1,6 @@
 package api
 
-import "gitti/api/git"
+import "github.com/gohyuhan/gitti/api/git"
 
 type GitOperations struct {
 	GitBranch *git.GitBranch

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"gitti/api/git"
-	"gitti/constant"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/constant"
 )
 
 const (

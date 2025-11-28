@@ -11,8 +11,8 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 
-	"gitti/api/git"
-	"gitti/settings"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/settings"
 )
 
 type GitDaemon struct {

@@ -15,9 +15,9 @@ import (
 	"strings"
 	"time"
 
-	"gitti/constant"
-	"gitti/i18n"
-	"gitti/settings"
+	"github.com/gohyuhan/gitti/constant"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/settings"
 
 	"golang.org/x/mod/semver"
 )

@@ -3,7 +3,7 @@ package i18n
 import (
 	"fmt"
 
-	"gitti/constant"
+	"github.com/gohyuhan/gitti/constant"
 )
 
 var jA = LanguageMapping{

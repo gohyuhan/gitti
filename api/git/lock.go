@@ -3,7 +3,7 @@ package git
 import (
 	"sync/atomic"
 
-	"gitti/i18n"
+	"github.com/gohyuhan/gitti/i18n"
 )
 
 // this basically act as the universal lock so that any function that will exec git operation

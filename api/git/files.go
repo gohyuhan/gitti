@@ -7,7 +7,7 @@ import (
 	"strings"
 	"sync"
 
-	"gitti/executor"
+	"github.com/gohyuhan/gitti/executor"
 )
 
 const (

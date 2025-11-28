@@ -1,10 +1,10 @@
 package tui
 
 import (
-	"gitti/api"
-	"gitti/api/git"
-	"gitti/tui/constant"
-	"gitti/utils"
+	"github.com/gohyuhan/gitti/api"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/utils"
 
 	tea "github.com/charmbracelet/bubbletea/v2"
 	"github.com/google/uuid"

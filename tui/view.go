@@ -5,9 +5,9 @@ import (
 
 	"github.com/charmbracelet/lipgloss/v2"
 
-	"gitti/i18n"
-	"gitti/tui/constant"
-	"gitti/tui/style"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
 )
 
 // -----------------------------------------------------------------------------

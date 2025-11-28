@@ -3,11 +3,11 @@ package tui
 import (
 	"fmt"
 
-	"gitti/api/git"
-	"gitti/i18n"
-	"gitti/tui/constant"
-	"gitti/tui/style"
-	"gitti/tui/utils"
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/utils"
 
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/spinner"
