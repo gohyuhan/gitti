@@ -67,6 +67,8 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 	gitArgs := []string{"branch"}
 	allBranches := []BranchInfo{}
 
+	gb.isRepoUnborn = false
+
 	branchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := branchCmdExecutor.Output()
 	if err != nil {
@@ -137,6 +139,10 @@ func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 
 	gitArgs := []string{"branch", branchName}
 
+	if gb.isRepoUnborn {
+		gitArgs = []string{"branch", "-M", branchName}
+	}
+
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	_, err := cmdExecutor.CombinedOutput()
 	if err != nil {
@@ -155,28 +161,38 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	}
 	defer gb.gitProcessLock.ReleaseGitOpsLock()
 
-	stashChangesGitArgs := []string{"stash", "push", "--all"}
-	stashChangesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(stashChangesGitArgs, false)
-	_, stashChangesErr := stashChangesCmdExecutor.CombinedOutput()
-	if stashChangesErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
-		return
-	}
+	if gb.isRepoUnborn {
+		createBranchGitArgs := []string{"checkout", "-b", branchName}
+		createBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(createBranchGitArgs, false)
+		_, createBranchErr := createBranchCmdExecutor.CombinedOutput()
+		if createBranchErr != nil {
+			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE AND SWITCH BRANCH ERROR]: %w", createBranchErr))
+			return
+		}
+	} else {
+		stashChangesGitArgs := []string{"stash", "push", "--all"}
+		stashChangesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(stashChangesGitArgs, false)
+		_, stashChangesErr := stashChangesCmdExecutor.CombinedOutput()
+		if stashChangesErr != nil {
+			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
+			return
+		}
 
-	createBranchGitArgs := []string{"checkout", "-b", branchName}
-	createBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(createBranchGitArgs, false)
-	_, createBranchErr := createBranchCmdExecutor.CombinedOutput()
-	if createBranchErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE AND SWITCH BRANCH ERROR]: %w", createBranchErr))
-		return
-	}
+		createBranchGitArgs := []string{"checkout", "-b", branchName}
+		createBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(createBranchGitArgs, false)
+		_, createBranchErr := createBranchCmdExecutor.CombinedOutput()
+		if createBranchErr != nil {
+			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE AND SWITCH BRANCH ERROR]: %w", createBranchErr))
+			return
+		}
 
-	unstashChangesGitArgs := []string{"stash", "pop"}
-	unstashChangesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(unstashChangesGitArgs, false)
-	_, unstashChangesErr := unstashChangesCmdExecutor.CombinedOutput()
-	if unstashChangesErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH CHANGE ERROR]: %w", unstashChangesErr))
-		return
+		unstashChangesGitArgs := []string{"stash", "pop"}
+		unstashChangesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(unstashChangesGitArgs, false)
+		_, unstashChangesErr := unstashChangesCmdExecutor.CombinedOutput()
+		if unstashChangesErr != nil {
+			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT UNSTASH CHANGE ERROR]: %w", unstashChangesErr))
+			return
+		}
 	}
 }
 
