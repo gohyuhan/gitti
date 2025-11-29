@@ -18,6 +18,7 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 🔍 **Diff Viewer** - Review changes with syntax-aware diff display
 - 💬 **Commit Interface** - Write commits with a dedicated UI
 - 🚀 **Push/Pull Operations** - Manage remote operations seamlessly
+- 💿 **Changes Stash Operations** - Manage stash operations seamlessly
 - 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
 - 🌍 **Multi-language Support** - English, Japanese, 简体中文, 繁體中文
 - ⚡ **Real-time Updates** - File system monitoring for instant status updates
@@ -172,7 +173,8 @@ gitti --init-dbranch main --global
 - Branch management and switching
 - Interactive file staging
 - Diff viewer
-- Commit and push operations
+- Commit, pull and push operations
+- Changes stash operation
 - Multi-language support (en, ja, zh-hans, zh-hant)
 - Real-time file system monitoring
 - Configuration management

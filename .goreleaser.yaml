@@ -41,7 +41,7 @@ checksum:
   name_template: "checksums.txt"
 
 changelog:
-  sort: desc
+  sort: asc
   filters:
     exclude:
       - "^docs:"
@@ -51,6 +51,31 @@ changelog:
       - "Merge pull request"
       - "Merge branch"
       - "^Revert"
+  groups:
+    # 1. Features (The Catch-All)
+    # Display Order: 0 (Top)
+    # Logic: Any commit that does NOT match Fixes or Optimization falls here.
+    - title: '🚀 Features'
+      order: 0
+
+    # 2. Bug Fixes
+    # Display Order: 1
+    # Regex: Case insensitive (?i). Matches 'fix', 'fixes', 'hotfix', 'bug'...
+    - title: '🐛 Bug Fixes'
+      regexp: "(?i)^.*(fix|hotfix|bug)"
+      order: 1
+
+    # 3. Optimization
+    # Display Order: 2
+    # Regex: Case insensitive (?i).
+    # Matches:
+    #  - 'opt' (covers 'opt:', 'optimize:', 'Optimization:', 'Optimisation:')
+    #  - 'refactor' (covers 'refactor:', 'Refactoring:')
+    #  - 'perf' (covers 'perf:', 'Performance:')
+    #  - 'style'
+    - title: '♻️ Optimization'
+      regexp: "(?i)^.*(refactor|opt|perf|style)"
+      order: 2
 
 release:
   github:
