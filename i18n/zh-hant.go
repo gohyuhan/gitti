@@ -226,6 +226,8 @@ var zH_HANT = LanguageMapping{
 	GitDiscardWholeConfirmation:                              "您確定要捨棄 [%s] 的所有變更嗎?",
 	GitDiscardStagedConfirmation:                             "您確定要捨棄 [%s] 的暫存變更嗎?",
 	GitDiscardUnstageConfirmation:                            "您確定要捨棄 [%s] 的未暫存變更嗎?",
+	GitDiscardUntrackedConfirmation:                          "確定要捨棄 [%s] 的未追蹤變更嗎？",
+	GitDiscardNewlyAddedConfirmation:                         "確定要捨棄 [%s] 的新追蹤變更嗎？ \n * 這也將移除未追蹤的變更",
 }
 
 // for about gitti

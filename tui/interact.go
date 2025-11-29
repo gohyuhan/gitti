@@ -393,14 +393,24 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
 				currentSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem().(gitModifiedFilesItem)
-				if currentSelectedFile.IndexState != " " &&
-					currentSelectedFile.IndexState != "?" &&
-					currentSelectedFile.WorkTree != " " &&
-					currentSelectedFile.WorkTree != "?" {
-					// indicating the files have both changes on stage and unstage
+				if currentSelectedFile.IndexState == "A" && (currentSelectedFile.WorkTree == "M" || currentSelectedFile.WorkTree == "D") {
+					// indicating the files is a newly added tracked file with unstage modification (modified or delete )
 					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname)
+					initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, true)
+				} else if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
+					// newly added untracked file
+					m.PopUpType = constant.GitDiscardConfirmPromptPopup
+					initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
+				} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
+					// tracked file with both staged and unstaged modification
+					m.PopUpType = constant.GitDiscardTypeOptionPopUp
+					initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false)
+				} else if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " " {
+					// newly added tracked file
+					m.PopUpType = constant.GitDiscardConfirmPromptPopup
+					initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDED)
 				} else {
+					// tracked file with only unstaged modification
 					m.PopUpType = constant.GitDiscardConfirmPromptPopup
 					initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
 				}

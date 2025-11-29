@@ -29,7 +29,9 @@ func InitGitStash(gitProcessLock *GitProcessLock) *GitStash {
 }
 
 func (gs *GitStash) AllStash() []StashInfo {
-	return gs.allStash
+	copied := make([]StashInfo, len(gs.allStash))
+	copy(copied, gs.allStash)
+	return copied
 }
 
 // ----------------------------------

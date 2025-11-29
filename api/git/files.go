@@ -5,7 +5,6 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
-	"sync"
 
 	"github.com/gohyuhan/gitti/executor"
 )
@@ -17,9 +16,11 @@ const (
 )
 
 const (
-	DISCARDWHOLE   = "DISCARDWHOLE"
-	DISCARDSTAGED  = "DISCARDSTAGED"
-	DISCARDUNSTAGE = "DISCARDUNSTAGE"
+	DISCARDWHOLE      = "DISCARDWHOLE"
+	DISCARDSTAGED     = "DISCARDSTAGED"
+	DISCARDUNSTAGE    = "DISCARDUNSTAGE"
+	DISCARDUNTRACKED  = "DISCARDUNTRACKED"
+	DISCARDNEWLYADDED = "DISCARDNEWLYADDED"
 )
 
 type FileStatus struct {
@@ -37,14 +38,15 @@ type GitFiles struct {
 	filesStatus    []FileStatus
 	filesPosition  map[string]int
 	errorLog       []error
-	gitFilesMutex  sync.Mutex
 	gitProcessLock *GitProcessLock
+	updateChannel  chan string
 }
 
-func InitGitFile(gitProcessLock *GitProcessLock) *GitFiles {
+func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock) *GitFiles {
 	gitFiles := GitFiles{
 		filesStatus:    make([]FileStatus, 0),
 		gitProcessLock: gitProcessLock,
+		updateChannel:  updateChannel,
 	}
 	return &gitFiles
 }
@@ -55,9 +57,6 @@ func InitGitFile(gitProcessLock *GitProcessLock) *GitFiles {
 //
 // ----------------------------------
 func (gf *GitFiles) FilesStatus() []FileStatus {
-	gf.gitFilesMutex.Lock()
-	defer gf.gitFilesMutex.Unlock()
-
 	copied := make([]FileStatus, len(gf.filesStatus))
 	copy(copied, gf.filesStatus)
 	return copied
@@ -83,7 +82,6 @@ func (gf *GitFiles) GetGitFilesStatus() {
 	modifiedFilesStatus := []FileStatus{}
 	modifiedFilesPositionHashmap := make(map[string]int)
 
-	gf.gitFilesMutex.Lock()
 	for index, file := range files {
 		if len(file) < 3 {
 			continue
@@ -103,7 +101,6 @@ func (gf *GitFiles) GetGitFilesStatus() {
 
 	gf.filesPosition = modifiedFilesPositionHashmap
 	gf.filesStatus = modifiedFilesStatus
-	gf.gitFilesMutex.Unlock()
 }
 
 // get the file diff content
@@ -229,6 +226,7 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 	}
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
+	needFilesStatusRefetch := false
 	var gitArgs []string
 	switch discardType {
 	case DISCARDWHOLE:
@@ -237,7 +235,22 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 		gitArgs = []string{"checkout", "--", filePathName}
 	case DISCARDSTAGED:
 		gitArgs = []string{"reset", "HEAD", filePathName}
+	case DISCARDUNTRACKED:
+		gitArgs = []string{"clean", "-f", "--", filePathName}
+		// we are refetching it actively here is because the clean doesn't trigger any write in .git folder
+		// and therefore will not trigger the watcher event driven fetch for file status, so we trigger a fetch here
+		// to prevent a "lag" in the UI
+		needFilesStatusRefetch = true
+	case DISCARDNEWLYADDED:
+		gitArgs = []string{"rm", "-f", filePathName}
 	}
 	changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	changesDiscardCmdExecutor.Run()
+
+	if needFilesStatusRefetch {
+		go func() {
+			gf.GetGitFilesStatus()
+			gf.updateChannel <- GIT_FILES_STATUS_UPDATE
+		}()
+	}
 }

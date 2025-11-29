@@ -227,6 +227,8 @@ var eN = LanguageMapping{
 	GitDiscardWholeConfirmation:                              "Are you sure you want to discard all changes for [%s] ?",
 	GitDiscardStagedConfirmation:                             "Are you sure you want to discard staged changes for [%s] ?",
 	GitDiscardUnstageConfirmation:                            "Are you sure you want to discard unstage changes for [%s] ?",
+	GitDiscardUntrackedConfirmation:                          "Are you sure you want to discard untracked changes for [%s] ?",
+	GitDiscardNewlyAddedConfirmation:                         "Are you sure you want to discard newly tracked changes for [%s] ? \n * This will remove untracked changes also",
 }
 
 // for about gitti

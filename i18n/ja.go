@@ -226,6 +226,8 @@ var jA = LanguageMapping{
 	GitDiscardWholeConfirmation:                              "[%s] のすべての変更を破棄してもよろしいですか?",
 	GitDiscardStagedConfirmation:                             "[%s] のステージされた変更を破棄してもよろしいですか?",
 	GitDiscardUnstageConfirmation:                            "[%s] のアンステージされた変更を破棄してもよろしいですか?",
+	GitDiscardUntrackedConfirmation:                          "[%s] の追跡対象外の変更を破棄してもよろしいですか？",
+	GitDiscardNewlyAddedConfirmation:                         "[%s] の新規追加された変更を破棄してもよろしいですか？ \n * これにより, 追跡対象外の変更も削除されます",
 }
 
 // for about gitti

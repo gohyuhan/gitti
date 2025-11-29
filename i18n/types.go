@@ -171,7 +171,9 @@ type LanguageMapping struct {
 	GitDiscardStagedInfo      string
 	GitDiscardUnstageInfo     string
 	// for discard confirmation prompt
-	GitDiscardWholeConfirmation   string
-	GitDiscardStagedConfirmation  string
-	GitDiscardUnstageConfirmation string
+	GitDiscardWholeConfirmation      string
+	GitDiscardStagedConfirmation     string
+	GitDiscardUnstageConfirmation    string
+	GitDiscardUntrackedConfirmation  string
+	GitDiscardNewlyAddedConfirmation string
 }

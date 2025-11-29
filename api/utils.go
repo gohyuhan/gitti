@@ -68,7 +68,7 @@ func InitGitOperations(updateChannel chan string) *GitOperations {
 	return &GitOperations{
 		GitBranch: git.InitGitBranch(gitProcessLock),
 		GitCommit: git.InitGitCommit(updateChannel, gitProcessLock),
-		GitFiles:  git.InitGitFile(gitProcessLock),
+		GitFiles:  git.InitGitFile(updateChannel, gitProcessLock),
 		GitPull:   git.InitGitPull(updateChannel, gitProcessLock),
 		GitStash:  git.InitGitStash(gitProcessLock),
 		GitRemote: git.InitGitRemote(updateChannel, gitProcessLock),

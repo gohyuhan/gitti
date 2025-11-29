@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/utils"
 
+	"github.com/charmbracelet/bubbles/v2/key"
 	"github.com/charmbracelet/bubbles/v2/list"
 	"github.com/charmbracelet/bubbles/v2/spinner"
 	"github.com/charmbracelet/bubbles/v2/textarea"
@@ -39,12 +40,30 @@ func initBranchList(m *GittiModel) {
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowFilter(false)
-	m.CurrentRepoBranchesInfoList.SetShowHelp(false)
 	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
 	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf418 %s:", i18n.LANGUAGEMAPPING.Branches), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
 	m.CurrentRepoBranchesInfoList.Styles.TitleBar = style.NewStyle
+
+	// Custom Help Model for Count Display
+	m.CurrentRepoBranchesInfoList.SetShowHelp(true)
+	m.CurrentRepoBranchesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = func() []key.Binding {
+		currentIndex := m.CurrentRepoBranchesInfoList.Index() + 1
+		totalCount := len(m.CurrentRepoBranchesInfoList.Items())
+		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
+		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+		if totalCount == 0 {
+			countStr = "0/0"
+		}
+		return []key.Binding{
+			key.NewBinding(
+				key.WithKeys(countStr),
+				key.WithHelp(countStr, ""),
+			),
+		}
+	}
 
 	if m.ListNavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
 		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)
@@ -77,11 +96,29 @@ func initModifiedFilesList(m *GittiModel) {
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowFilter(false)
-	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
 	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[2] \ueae9 %s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoModifiedFilesInfoList.Styles.TitleBar = style.NewStyle
+
+	// Custom Help Model for Count Display
+	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(true)
+	m.CurrentRepoModifiedFilesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	m.CurrentRepoModifiedFilesInfoList.AdditionalShortHelpKeys = func() []key.Binding {
+		currentIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
+		totalCount := len(m.CurrentRepoModifiedFilesInfoList.Items())
+		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
+		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+		if totalCount == 0 {
+			countStr = "0/0"
+		}
+		return []key.Binding{
+			key.NewBinding(
+				key.WithKeys(countStr),
+				key.WithHelp(countStr, ""),
+			),
+		}
+	}
 
 	if len(items) < 1 {
 		return
@@ -123,11 +160,29 @@ func initStashList(m *GittiModel) {
 	m.CurrentRepoStashInfoList.SetShowStatusBar(false)
 	m.CurrentRepoStashInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoStashInfoList.SetShowFilter(false)
-	m.CurrentRepoStashInfoList.SetShowHelp(false)
 	m.CurrentRepoStashInfoList.SetShowPagination(false)
 	m.CurrentRepoStashInfoList.Title = utils.TruncateString(fmt.Sprintf("[3] \ueaf7 %s:", i18n.LANGUAGEMAPPING.Stash), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoStashInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoStashInfoList.Styles.TitleBar = style.NewStyle
+
+	// Custom Help Model for Count Display
+	m.CurrentRepoStashInfoList.SetShowHelp(true)
+	m.CurrentRepoStashInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	m.CurrentRepoStashInfoList.AdditionalShortHelpKeys = func() []key.Binding {
+		currentIndex := m.CurrentRepoStashInfoList.Index() + 1
+		totalCount := len(m.CurrentRepoStashInfoList.Items())
+		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
+		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+		if totalCount == 0 {
+			countStr = "0/0"
+		}
+		return []key.Binding{
+			key.NewBinding(
+				key.WithKeys(countStr),
+				key.WithHelp(countStr, ""),
+			),
+		}
+	}
 
 	if len(items) < 1 {
 		return
@@ -593,7 +648,7 @@ func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType
 }
 
 // for discard option list popup
-func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string) {
+func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAddedFile bool) {
 	discardTypeOption := []gitDiscardTypeOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
@@ -610,6 +665,21 @@ func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string) {
 			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
 			DiscardType: git.DISCARDUNSTAGE,
 		},
+	}
+
+	if newlyAddedFile {
+		discardTypeOption = []gitDiscardTypeOptionItem{
+			{
+				Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeInfo, filePathName),
+				DiscardType: git.DISCARDNEWLYADDED,
+			},
+			{
+				Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
+				DiscardType: git.DISCARDUNSTAGE,
+			},
+		}
 	}
 
 	items := make([]list.Item, 0, len(discardTypeOption))
