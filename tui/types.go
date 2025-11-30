@@ -5,11 +5,11 @@ import (
 
 	"github.com/gohyuhan/gitti/api"
 
-	"github.com/charmbracelet/bubbles/v2/list"
-	"github.com/charmbracelet/bubbles/v2/spinner"
-	"github.com/charmbracelet/bubbles/v2/textarea"
-	"github.com/charmbracelet/bubbles/v2/textinput"
-	"github.com/charmbracelet/bubbles/v2/viewport"
+	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/spinner"
+	"charm.land/bubbles/v2/textarea"
+	"charm.land/bubbles/v2/textinput"
+	"charm.land/bubbles/v2/viewport"
 	"github.com/google/uuid"
 )
 

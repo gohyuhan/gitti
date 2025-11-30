@@ -26,7 +26,7 @@ import (
 	"fmt"
 	"os"
 
-	tea "github.com/charmbracelet/bubbletea/v2"
+	tea "charm.land/bubbletea/v2"
 
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/config"

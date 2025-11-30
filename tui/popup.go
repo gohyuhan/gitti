@@ -9,7 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 
-	"github.com/charmbracelet/lipgloss/v2"
+	"charm.land/lipgloss/v2"
 )
 
 // -----------------------------------------------------------------------------
@@ -183,7 +183,7 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 			gitCommitOutputLog += logLine + "\n"
 		}
 		popUp.GitCommitOutputViewport.SetContent(gitCommitOutputLog)
-		popUp.GitCommitOutputViewport.ViewDown()
+		popUp.GitCommitOutputViewport.PageDown()
 	}
 }
 
@@ -268,7 +268,7 @@ func updatePopUpAmendCommitOutputViewPort(m *GittiModel) {
 			gitCommitOutputLog += logLine + "\n"
 		}
 		popUp.GitAmendCommitOutputViewport.SetContent(gitCommitOutputLog)
-		popUp.GitAmendCommitOutputViewport.ViewDown()
+		popUp.GitAmendCommitOutputViewport.PageDown()
 	}
 }
 
@@ -358,7 +358,7 @@ func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
 			addRemoteLog += logLine + "\n"
 		}
 		popUp.AddRemoteOutputViewport.SetContent(addRemoteLog)
-		popUp.AddRemoteOutputViewport.ViewDown()
+		popUp.AddRemoteOutputViewport.PageDown()
 	}
 }
 
@@ -459,7 +459,7 @@ func updatePopUpGitRemotePushOutputViewport(m *GittiModel) {
 			GitPushLog += logLine + "\n"
 		}
 		popUp.GitRemotePushOutputViewport.SetContent(GitPushLog)
-		popUp.GitRemotePushOutputViewport.ViewDown()
+		popUp.GitRemotePushOutputViewport.PageDown()
 	}
 }
 
@@ -504,7 +504,6 @@ func renderCreateNewBranchPopUp(m *GittiModel) string {
 				popUp.NewBranchNameInput.View(),
 				style.BranchInvalidWarningStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.NewBranchInvalidWarning, modifiedBranchName)),
 			)
-
 		}
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
@@ -588,7 +587,7 @@ func updateSwitchBranchOutputViewPort(m *GittiModel, gitOpsOutput []string) {
 			logLine := style.NewStyle.Render(line)
 			gitOpsOutputLogs += logLine + "\n"
 			popUp.SwitchBranchOutputViewport.SetContent(gitOpsOutputLogs)
-			popUp.SwitchBranchOutputViewport.ViewDown()
+			popUp.SwitchBranchOutputViewport.PageDown()
 		}
 	}
 }
@@ -667,7 +666,7 @@ func updatePopUpGitPullOutputViewport(m *GittiModel) {
 			GitPullLog += logLine + "\n"
 		}
 		popUp.GitPullOutputViewport.SetContent(GitPullLog)
-		popUp.GitPullOutputViewport.ViewDown()
+		popUp.GitPullOutputViewport.PageDown()
 	}
 }
 

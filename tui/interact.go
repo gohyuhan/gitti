@@ -6,7 +6,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/utils"
 
-	tea "github.com/charmbracelet/bubbletea/v2"
+	tea "charm.land/bubbletea/v2"
 	"github.com/google/uuid"
 )
 
@@ -808,7 +808,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "left", "h":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.MoveLeft(1)
+			m.DetailPanelViewport.Update(msg)
 		} else {
 			switch m.PopUpType {
 			case constant.CommitPopUp:
@@ -822,7 +822,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "right", "l":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.MoveRight(1)
+			m.DetailPanelViewport.Update(msg)
 		} else {
 			switch m.PopUpType {
 			case constant.CommitPopUp:
@@ -842,12 +842,12 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 	switch msg.String() {
 	case "wheelleft":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.MoveLeft(1)
+			m.DetailPanelViewport.Update(msg)
 		}
 
 	case "wheelright":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.MoveRight(1)
+			m.DetailPanelViewport.Update(msg)
 		}
 
 	case "wheelup":
