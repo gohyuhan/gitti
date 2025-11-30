@@ -725,8 +725,6 @@ func renderGitDiscardConfirmPromptPopup(m *GittiModel) string {
 		switch popUp.DiscardType {
 		case git.DISCARDWHOLE:
 			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeConfirmation, popUp.FilePathName))
-		case git.DISCARDSTAGED:
-			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardStagedConfirmation, popUp.FilePathName))
 		case git.DISCARDUNSTAGE:
 			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageConfirmation, popUp.FilePathName))
 		case git.DISCARDUNTRACKED:

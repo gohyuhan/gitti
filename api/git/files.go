@@ -17,7 +17,6 @@ const (
 
 const (
 	DISCARDWHOLE      = "DISCARDWHOLE"
-	DISCARDSTAGED     = "DISCARDSTAGED"
 	DISCARDUNSTAGE    = "DISCARDUNSTAGE"
 	DISCARDUNTRACKED  = "DISCARDUNTRACKED"
 	DISCARDNEWLYADDED = "DISCARDNEWLYADDED"
@@ -107,7 +106,7 @@ func (gf *GitFiles) GetGitFilesStatus() {
 func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 	gitArgs := []string{"diff", "HEAD", "--diff-filter=ADM", "-U99999", "--", fileStatus.FilePathname}
 	// the file is untracked
-	if fileStatus.WorkTree == "?" || fileStatus.IndexState == "?" {
+	if fileStatus.WorkTree == "?" || fileStatus.IndexState == "?" || fileStatus.IndexState == "A" {
 		// empty file for git diff --no-index to compares two arbitrary files outside the Git index.
 		nullFile := "/dev/null"
 		if runtime.GOOS == "windows" {
@@ -177,7 +176,7 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree == " " {
 			// staged and no latest modification, so we need to unstage it or revert back
-			gitArgs = []string{"reset", "HEAD", "--", filePathName}
+			gitArgs = []string{"reset", "--", filePathName}
 			if file.IndexState == "A" {
 				gitArgs = []string{"rm", "--cached", "--force", "--", filePathName}
 			}
@@ -209,7 +208,7 @@ func (gf *GitFiles) UnstageAllChanges() {
 	}
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
-	gitArgs := []string{"reset", "HEAD"}
+	gitArgs := []string{"reset"}
 	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stageCmdExecutor.Run()
 
@@ -233,8 +232,6 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 		gitArgs = []string{"checkout", "HEAD", "--", filePathName}
 	case DISCARDUNSTAGE:
 		gitArgs = []string{"checkout", "--", filePathName}
-	case DISCARDSTAGED:
-		gitArgs = []string{"reset", "HEAD", filePathName}
 	case DISCARDUNTRACKED:
 		gitArgs = []string{"clean", "-f", "--", filePathName}
 		// we are refetching it actively here is because the clean doesn't trigger any write in .git folder
