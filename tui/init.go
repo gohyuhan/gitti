@@ -201,7 +201,7 @@ func initStashList(m *GittiModel) {
 	}
 }
 
-// reinit and render diff file viewport
+// reinit and render detail component panel viewport
 func reinitAndRenderDetailComponentPanelViewPort(m *GittiModel) {
 	m.DetailPanelViewportOffset = 0
 	m.DetailPanelViewport.SetXOffset(0)

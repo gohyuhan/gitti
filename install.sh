@@ -9,32 +9,38 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 log_info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+  echo -e "${BLUE}[INFO]${NC} $1"
 }
 
 log_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+  echo -e "${GREEN}[SUCCESS]${NC} $1"
 }
 
 log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+  echo -e "${RED}[ERROR]${NC} $1"
 }
 
 # Detect OS
 OS="$(uname -s)"
 case "${OS}" in
-    Linux*)     OS_TYPE=linux;;
-    Darwin*)    OS_TYPE=darwin;;
-    *)          log_error "Unsupported operating system: ${OS}"; exit 1;;
+Linux*) OS_TYPE=linux ;;
+Darwin*) OS_TYPE=darwin ;;
+*)
+  log_error "Unsupported operating system: ${OS}"
+  exit 1
+  ;;
 esac
 
 # Detect Architecture
 ARCH="$(uname -m)"
 case "${ARCH}" in
-    x86_64)    ARCH_TYPE=amd64;;
-    arm64)     ARCH_TYPE=arm64;;
-    aarch64)   ARCH_TYPE=arm64;;
-    *)         log_error "Unsupported architecture: ${ARCH}"; exit 1;;
+x86_64) ARCH_TYPE=amd64 ;;
+arm64) ARCH_TYPE=arm64 ;;
+aarch64) ARCH_TYPE=arm64 ;;
+*)
+  log_error "Unsupported architecture: ${ARCH}"
+  exit 1
+  ;;
 esac
 
 log_info "Detected OS: ${OS_TYPE}, Architecture: ${ARCH_TYPE}"
@@ -67,14 +73,14 @@ tar -xzf "${TMP_DIR}/${FILENAME}" -C "${TMP_DIR}"
 # Find binary
 BINARY_PATH="${TMP_DIR}/gitti"
 if [ ! -f "${BINARY_PATH}" ]; then
-    # Try to find it if it was in a subdirectory or named differently?
-    # Based on goreleaser, it should be at root of archive usually, or we can find it.
-    BINARY_PATH=$(find "${TMP_DIR}" -type f -name "gitti" | head -n 1)
+  # Try to find it if it was in a subdirectory or named differently?
+  # Based on goreleaser, it should be at root of archive usually, or we can find it.
+  BINARY_PATH=$(find "${TMP_DIR}" -type f -name "gitti" | head -n 1)
 fi
 
 if [ ! -f "${BINARY_PATH}" ]; then
-    log_error "Binary 'gitti' not found in extracted archive."
-    exit 1
+  log_error "Binary 'gitti' not found in extracted archive."
+  exit 1
 fi
 
 # Install
@@ -84,10 +90,10 @@ TARGET_PATH="${INSTALL_DIR}/gitti"
 log_info "Installing to ${TARGET_PATH}..."
 
 if [ -w "${INSTALL_DIR}" ]; then
-    mv "${BINARY_PATH}" "${TARGET_PATH}"
+  mv "${BINARY_PATH}" "${TARGET_PATH}"
 else
-    log_info "Requires sudo to install to ${INSTALL_DIR}"
-    sudo mv "${BINARY_PATH}" "${TARGET_PATH}"
+  log_info "Requires sudo to install to ${INSTALL_DIR}"
+  sudo mv "${BINARY_PATH}" "${TARGET_PATH}"
 fi
 
 sudo chmod +x "${TARGET_PATH}"

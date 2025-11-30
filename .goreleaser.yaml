@@ -27,7 +27,7 @@ archives:
   - id: gitti-archives
     format_overrides:
       - goos: windows
-        formats: ['zip']
+        formats: ["zip"]
     files:
       - LICENSE*
       - README.md
@@ -55,13 +55,14 @@ changelog:
     # 1. Features (The Catch-All)
     # Display Order: 0 (Top)
     # Logic: Any commit that does NOT match Fixes or Optimization falls here.
-    - title: '🚀 Features'
+    - title: "🚀 Features"
+      regexp: "(?i)^.*(feature|feat|new|add|impl)"
       order: 0
 
     # 2. Bug Fixes
     # Display Order: 1
     # Regex: Case insensitive (?i). Matches 'fix', 'fixes', 'hotfix', 'bug'...
-    - title: '🐛 Bug Fixes'
+    - title: "🐛 Bug Fixes"
       regexp: "(?i)^.*(fix|hotfix|bug)"
       order: 1
 
@@ -73,7 +74,7 @@ changelog:
     #  - 'refactor' (covers 'refactor:', 'Refactoring:')
     #  - 'perf' (covers 'perf:', 'Performance:')
     #  - 'style'
-    - title: '♻️ Optimization'
+    - title: "♻️ Optimization"
       regexp: "(?i)^.*(refactor|opt|perf|style)"
       order: 2
 
@@ -81,6 +82,7 @@ release:
   github:
     owner: gohyuhan
     name: gitti
+  mode: append
   draft: false
   prerelease: auto
   extra_files:

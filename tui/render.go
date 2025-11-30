@@ -68,9 +68,8 @@ func renderModifiedFilesComponentPanel(width int, height int, m *GittiModel) str
 		Render(strings.ReplaceAll(m.CurrentRepoModifiedFilesInfoList.View(), "No items.", ""))
 }
 
-// Render the detial component part at the right of the window,
+// Render the detail component part at the right of the window,
 // however the content within it will be dynamic based on the current selected component
-// ( will be implemented after v0.1.0 alpha, as of now it will always be the file diff view )
 func renderDetailComponentPanel(width int, height int, m *GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.DetailComponent {
@@ -297,7 +296,8 @@ func generateStashDetailPanelContent(m *GittiModel) string {
 	}
 
 	for _, Line := range stashDetail {
-		vpLine += Line + "\n"
+		line := style.NewStyle.Render(Line)
+		vpLine += line + "\n"
 	}
 	return vpLine
 }
