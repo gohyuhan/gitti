@@ -388,33 +388,37 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			switch m.CurrentSelectedComponent {
 			case constant.StashComponent:
 				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
-				gitStashDropService(m, selectedStashId.(gitStashItem).Id)
-			case constant.ModifiedFilesComponent:
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(false)
-				currentSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem().(gitModifiedFilesItem)
-				if currentSelectedFile.IndexState == "A" && (currentSelectedFile.WorkTree == "M" || currentSelectedFile.WorkTree == "D") {
-					// indicating the files is a newly added tracked file with unstage modification (modified or delete )
-					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, true)
-				} else if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
-					// newly added untracked file
-					m.PopUpType = constant.GitDiscardConfirmPromptPopup
-					initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
-				} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
-					// tracked file with both staged and unstaged modification
-					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false)
-				} else if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " " {
-					// newly added tracked file
-					m.PopUpType = constant.GitDiscardConfirmPromptPopup
-					initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDED)
-				} else {
-					// tracked file with only unstaged modification
-					m.PopUpType = constant.GitDiscardConfirmPromptPopup
-					initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
+				if selectedStashId != nil {
+					gitStashDropService(m, selectedStashId.(gitStashItem).Id)
 				}
-
+			case constant.ModifiedFilesComponent:
+				currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+				if currentSelectedFileItem != nil {
+					currentSelectedFile := currentSelectedFileItem.(gitModifiedFilesItem)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					if currentSelectedFile.IndexState == "A" && (currentSelectedFile.WorkTree == "M" || currentSelectedFile.WorkTree == "D") {
+						// indicating the files is a newly added tracked file with unstage modification (modified or delete )
+						m.PopUpType = constant.GitDiscardTypeOptionPopUp
+						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, true)
+					} else if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
+						// newly added untracked file
+						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
+					} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
+						// tracked file with both staged and unstaged modification
+						m.PopUpType = constant.GitDiscardTypeOptionPopUp
+						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false)
+					} else if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " " {
+						// newly added tracked file
+						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDED)
+					} else {
+						// tracked file with only unstaged modification
+						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
+					}
+				}
 			}
 		}
 		return m, nil
@@ -526,7 +530,9 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	case "backspace":
 		if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponent {
 			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
-			gitStashPopService(m, selectedStashId.(gitStashItem).Id)
+			if selectedStashId != nil {
+				gitStashPopService(m, selectedStashId.(gitStashItem).Id)
+			}
 		}
 		return m, nil
 
@@ -670,7 +676,9 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 			case constant.StashComponent:
 				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
-				gitStashApplyService(m, selectedStashId.(gitStashItem).Id)
+				if selectedStashId != nil {
+					gitStashApplyService(m, selectedStashId.(gitStashItem).Id)
+				}
 			}
 		}
 		return m, nil
