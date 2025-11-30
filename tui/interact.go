@@ -842,12 +842,12 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 	switch msg.String() {
 	case "wheelleft":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.Update(msg)
+			m.DetailPanelViewport.ScrollLeft(1)
 		}
 
 	case "wheelright":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.Update(msg)
+			m.DetailPanelViewport.ScrollRight(1)
 		}
 
 	case "wheelup":
