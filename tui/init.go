@@ -656,11 +656,6 @@ func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAdde
 			DiscardType: git.DISCARDWHOLE,
 		},
 		{
-			Name:        i18n.LANGUAGEMAPPING.GitDiscardStaged,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardStagedInfo, filePathName),
-			DiscardType: git.DISCARDSTAGED,
-		},
-		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,
 			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
 			DiscardType: git.DISCARDUNSTAGE,
