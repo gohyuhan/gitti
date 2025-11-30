@@ -9,13 +9,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/utils"
 
-	"github.com/charmbracelet/bubbles/v2/key"
-	"github.com/charmbracelet/bubbles/v2/list"
-	"github.com/charmbracelet/bubbles/v2/spinner"
-	"github.com/charmbracelet/bubbles/v2/textarea"
-	"github.com/charmbracelet/bubbles/v2/textinput"
-	"github.com/charmbracelet/bubbles/v2/viewport"
-	tea "github.com/charmbracelet/bubbletea/v2"
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/spinner"
+	"charm.land/bubbles/v2/textarea"
+	"charm.land/bubbles/v2/textinput"
+	"charm.land/bubbles/v2/viewport"
+	tea "charm.land/bubbletea/v2"
 	"github.com/google/uuid"
 ) // this was for various components part init or reinit function due to update or newly create
 
@@ -234,7 +234,7 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	CommitMessageTextInput.SetValue(commitMsg)
 	CommitMessageTextInput.Placeholder = commitMsgPlaceholder
 	CommitMessageTextInput.Focus()
-	CommitMessageTextInput.VirtualCursor = true
+	CommitMessageTextInput.SetVirtualCursor(true)
 
 	CommitDescriptionTextAreaInput := textarea.New()
 	CommitDescriptionTextAreaInput.SetValue(commitDesc)
@@ -286,7 +286,7 @@ func initGitAmendCommitPopUpModel(m *GittiModel) {
 	CommitMessageTextInput.SetValue(commitMsg)
 	CommitMessageTextInput.Placeholder = commitMsgPlaceholder
 	CommitMessageTextInput.Focus()
-	CommitMessageTextInput.VirtualCursor = true
+	CommitMessageTextInput.SetVirtualCursor(true)
 
 	CommitDescriptionTextAreaInput := textarea.New()
 	CommitDescriptionTextAreaInput.SetValue(commitDesc)
@@ -334,12 +334,12 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 	}
 	RemoteNameTextInput.Placeholder = i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteNamePlaceHolder
 	RemoteNameTextInput.Focus()
-	RemoteNameTextInput.VirtualCursor = true
+	RemoteNameTextInput.SetVirtualCursor(true)
 
 	RemoteUrlTextInput := textinput.New()
 	RemoteUrlTextInput.Placeholder = i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteUrlPlaceHolder
 	RemoteUrlTextInput.Blur()
-	RemoteUrlTextInput.VirtualCursor = true
+	RemoteUrlTextInput.SetVirtualCursor(true)
 
 	// for git add remote output viewport, we will not have any interaction for it as usually it will be a one line for error log or also for our custom success message
 	vp := viewport.New()
@@ -473,7 +473,7 @@ func initCreateNewBranchPopUpModel(m *GittiModel, createType string) {
 	NewBranchNameInput := textinput.New()
 	NewBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.CreateNewBranchPrompt
 	NewBranchNameInput.Focus()
-	NewBranchNameInput.VirtualCursor = true
+	NewBranchNameInput.SetVirtualCursor(true)
 
 	m.PopUpModel = &CreateNewBranchPopUpModel{
 		NewBranchNameInput: NewBranchNameInput,
@@ -636,7 +636,7 @@ func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType
 	stashMessageTextInput := textinput.New()
 	stashMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.GitStashMessagePlaceholder
 	stashMessageTextInput.Focus()
-	stashMessageTextInput.VirtualCursor = true
+	stashMessageTextInput.SetVirtualCursor(true)
 
 	popUpModel := &GitStashMessagePopUpModel{
 		StashMessageInput: stashMessageTextInput,

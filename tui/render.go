@@ -328,11 +328,11 @@ func tuiWindowSizing(m *GittiModel) {
 	leftPanelDynamicResize(m)
 
 	// update viewport
-	m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight) //some margin
+	m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight) // some margin
 	m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
 	m.DetailPanelViewportOffset = max(0, int(m.DetailPanelViewport.HorizontalScrollPercent()*float64(m.DetailPanelViewportOffset))-1)
 	m.DetailPanelViewport.SetXOffset(m.DetailPanelViewportOffset)
-	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset)
+	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset())
 
 	// update list of viewport component width within pop up
 	if m.ShowPopUp.Load() {
