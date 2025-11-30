@@ -167,6 +167,11 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.1.1]
+- refactor: refactor bubble, bubble tea, lip gloss to be compatible for its upcoming v2 release
+- Fix: Remove discard selection option
+- Fix: Fix unstage all api to be compatible for unborn repo
+
 ### [v0.1.0]
 - Initial release in development
 - Core TUI implementation
