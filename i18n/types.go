@@ -163,17 +163,20 @@ type LanguageMapping struct {
 	GitStashMessageTitle       string
 	GitStashMessagePlaceholder string
 	// for git discard type option list
-	GitDiscardTypeOptionTitle string
-	GitDiscardWhole           string
-	GitDiscardStaged          string
-	GitDiscardUnstage         string
-	GitDiscardWholeInfo       string
-	GitDiscardStagedInfo      string
-	GitDiscardUnstageInfo     string
+	GitDiscardTypeOptionTitle     string
+	GitDiscardWhole               string
+	GitDiscardStaged              string
+	GitDiscardUnstage             string
+	GitDiscardAndRevertRename     string
+	GitDiscardWholeInfo           string
+	GitDiscardStagedInfo          string
+	GitDiscardUnstageInfo         string
+	GitDiscardAndRevertRenameInfo string
 	// for discard confirmation prompt
-	GitDiscardWholeConfirmation      string
-	GitDiscardStagedConfirmation     string
-	GitDiscardUnstageConfirmation    string
-	GitDiscardUntrackedConfirmation  string
-	GitDiscardNewlyAddedConfirmation string
+	GitDiscardWholeConfirmation           string
+	GitDiscardStagedConfirmation          string
+	GitDiscardUnstageConfirmation         string
+	GitDiscardUntrackedConfirmation       string
+	GitDiscardNewlyAddedConfirmation      string
+	GitDiscardAndRevertRenameConfirmation string
 }

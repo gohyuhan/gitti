@@ -648,7 +648,7 @@ func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType
 }
 
 // for discard option list popup
-func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAddedFile bool) {
+func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAddedFile bool, renameFile bool) {
 	discardTypeOption := []gitDiscardTypeOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
@@ -668,6 +668,21 @@ func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAdde
 				Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
 				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeInfo, filePathName),
 				DiscardType: git.DISCARDNEWLYADDED,
+			},
+			{
+				Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
+				DiscardType: git.DISCARDUNSTAGE,
+			},
+		}
+	}
+
+	if renameFile {
+		discardTypeOption = []gitDiscardTypeOptionItem{
+			{
+				Name:        i18n.LANGUAGEMAPPING.GitDiscardAndRevertRename,
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardAndRevertRenameInfo, filePathName),
+				DiscardType: git.DISCARDANDREVERTRENAME,
 			},
 			{
 				Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,

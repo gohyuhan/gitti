@@ -222,10 +222,13 @@ var eN = LanguageMapping{
 	GitDiscardUnstage:                                        "Discard unstaged changes",
 	GitDiscardWholeInfo:                                      "Discard both staged and unstaged changes under file: %s",
 	GitDiscardUnstageInfo:                                    "Discard only unstaged changes under file: %s",
+	GitDiscardAndRevertRename:                                "Discard changes and revert rename",
+	GitDiscardAndRevertRenameInfo:                            "Discard changes and revert rename for file: %s",
 	GitDiscardWholeConfirmation:                              "Are you sure you want to discard all changes for [%s] ?",
 	GitDiscardUnstageConfirmation:                            "Are you sure you want to discard unstage changes for [%s] ?",
 	GitDiscardUntrackedConfirmation:                          "Are you sure you want to discard untracked changes for [%s] ?",
 	GitDiscardNewlyAddedConfirmation:                         "Are you sure you want to discard newly tracked changes for [%s] ? \n * This will remove untracked changes also",
+	GitDiscardAndRevertRenameConfirmation:                    "Are you sure you want to discard changes and revert rename for [%s] ?",
 }
 
 // for about gitti

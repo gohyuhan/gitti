@@ -397,22 +397,30 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					currentSelectedFile := currentSelectedFileItem.(gitModifiedFilesItem)
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
-					if currentSelectedFile.IndexState == "A" && (currentSelectedFile.WorkTree == "M" || currentSelectedFile.WorkTree == "D") {
+					if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree != " " {
 						// indicating the files is a newly added tracked file with unstage modification (modified or delete )
 						m.PopUpType = constant.GitDiscardTypeOptionPopUp
-						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, true)
+						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, true, false)
+					} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree != " " {
+						// a staged rename with unstaged modification
+						m.PopUpType = constant.GitDiscardTypeOptionPopUp
+						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false, true)
 					} else if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
 						// newly added untracked file
 						m.PopUpType = constant.GitDiscardConfirmPromptPopup
 						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
-					} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
+					} else if currentSelectedFile.IndexState != "A" && currentSelectedFile.IndexState != "R" && currentSelectedFile.IndexState != "?" && currentSelectedFile.WorkTree != " " {
 						// tracked file with both staged and unstaged modification
 						m.PopUpType = constant.GitDiscardTypeOptionPopUp
-						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false)
+						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false, false)
 					} else if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " " {
 						// newly added tracked file
 						m.PopUpType = constant.GitDiscardConfirmPromptPopup
 						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDED)
+					} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree == " " {
+						// a staged rename
+						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDANDREVERTRENAME)
 					} else {
 						// tracked file with only unstaged modification
 						m.PopUpType = constant.GitDiscardConfirmPromptPopup

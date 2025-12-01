@@ -221,10 +221,13 @@ var jA = LanguageMapping{
 	GitDiscardUnstage:                                        "ステージされていない変更を破棄",
 	GitDiscardWholeInfo:                                      "ファイル %s のステージ済みおよび未ステージの変更をすべて破棄します",
 	GitDiscardUnstageInfo:                                    "ファイル %s の未ステージの変更のみを破棄します",
+	GitDiscardAndRevertRename:                                "変更を破棄して名前変更を取り消す",
+	GitDiscardAndRevertRenameInfo:                            "ファイル %s の変更を破棄し、名前変更を取り消します",
 	GitDiscardWholeConfirmation:                              "[%s] のすべての変更を破棄してもよろしいですか?",
 	GitDiscardUnstageConfirmation:                            "[%s] のアンステージされた変更を破棄してもよろしいですか?",
 	GitDiscardUntrackedConfirmation:                          "[%s] の追跡対象外の変更を破棄してもよろしいですか？",
 	GitDiscardNewlyAddedConfirmation:                         "[%s] の新規追加された変更を破棄してもよろしいですか？ \n * これにより, 追跡対象外の変更も削除されます",
+	GitDiscardAndRevertRenameConfirmation:                    "ファイル [%s] の変更を破棄し、名前変更を取り消してもよろしいですか？",
 }
 
 // for about gitti

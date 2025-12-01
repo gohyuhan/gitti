@@ -221,10 +221,13 @@ var zH_HANS = LanguageMapping{
 	GitDiscardUnstage:                                        "舍弃未暂存的更改",
 	GitDiscardWholeInfo:                                      "舍弃文件 %s 下的所有已暂存和未暂存的更改",
 	GitDiscardUnstageInfo:                                    "仅舍弃文件 %s 下未暂存的更改",
+	GitDiscardAndRevertRename:                                "舍弃更改并撤销重命名",
+	GitDiscardAndRevertRenameInfo:                            "舍弃文件 %s 的更改并撤销重命名",
 	GitDiscardWholeConfirmation:                              "您确定要丢弃 [%s] 的所有更改吗?",
 	GitDiscardUnstageConfirmation:                            "您确定要丢弃 [%s] 的未暂存更改吗?",
 	GitDiscardUntrackedConfirmation:                          "确定要丢弃 [%s] 的未跟踪更改吗？",
 	GitDiscardNewlyAddedConfirmation:                         "确定要丢弃 [%s] 的新跟踪更改吗？ \n * 这也将移除未跟踪的更改",
+	GitDiscardAndRevertRenameConfirmation:                    "您确定要放弃 [%s] 的更改并撤销重命名吗？",
 }
 
 // for about gitti

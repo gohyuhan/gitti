@@ -221,10 +221,13 @@ var zH_HANT = LanguageMapping{
 	GitDiscardUnstage:                                        "捨棄未暫存的變更",
 	GitDiscardWholeInfo:                                      "捨棄檔案 %s 下所有已暫存與未暫存的變更",
 	GitDiscardUnstageInfo:                                    "僅捨棄檔案 %s 下未暫存的變更",
+	GitDiscardAndRevertRename:                                "捨棄變更並復原重新命名",
+	GitDiscardAndRevertRenameInfo:                            "捨棄檔案 %s 的變更並復原重新命名",
 	GitDiscardWholeConfirmation:                              "您確定要捨棄 [%s] 的所有變更嗎?",
 	GitDiscardUnstageConfirmation:                            "您確定要捨棄 [%s] 的未暫存變更嗎?",
 	GitDiscardUntrackedConfirmation:                          "確定要捨棄 [%s] 的未追蹤變更嗎？",
 	GitDiscardNewlyAddedConfirmation:                         "確定要捨棄 [%s] 的新追蹤變更嗎？ \n * 這也將移除未追蹤的變更",
+	GitDiscardAndRevertRenameConfirmation:                    "您確定要放棄 [%s] 的變更並復原重新命名嗎？",
 }
 
 // for about gitti

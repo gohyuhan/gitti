@@ -731,6 +731,8 @@ func renderGitDiscardConfirmPromptPopup(m *GittiModel) string {
 			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUntrackedConfirmation, popUp.FilePathName))
 		case git.DISCARDNEWLYADDED:
 			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardNewlyAddedConfirmation, popUp.FilePathName))
+		case git.DISCARDANDREVERTRENAME:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardAndRevertRenameConfirmation, popUp.FilePathName))
 		}
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}

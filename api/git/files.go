@@ -16,10 +16,11 @@ const (
 )
 
 const (
-	DISCARDWHOLE      = "DISCARDWHOLE"
-	DISCARDUNSTAGE    = "DISCARDUNSTAGE"
-	DISCARDUNTRACKED  = "DISCARDUNTRACKED"
-	DISCARDNEWLYADDED = "DISCARDNEWLYADDED"
+	DISCARDWHOLE           = "DISCARDWHOLE"
+	DISCARDUNSTAGE         = "DISCARDUNSTAGE"
+	DISCARDUNTRACKED       = "DISCARDUNTRACKED"
+	DISCARDNEWLYADDED      = "DISCARDNEWLYADDED"
+	DISCARDANDREVERTRENAME = "DISCARDANDREVERTRENAME"
 )
 
 type FileStatus struct {
@@ -150,11 +151,17 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree != " " {
 			// staged but have modification later
+			if file.IndexState == "R" {
+				filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+			}
 			gitArgs = []string{"add", "--", filePathName}
 			stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree == " " {
 			// staged and no latest modification, so we need to unstage it or revert back
+			if file.IndexState == "R" {
+				filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+			}
 			gitArgs = []string{"reset", "--", filePathName}
 			if file.IndexState == "A" {
 				gitArgs = []string{"rm", "--cached", "--force", "--", filePathName}
@@ -205,28 +212,65 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
 	needFilesStatusRefetch := false
+	needToRunExecutor := true
 	var gitArgs []string
-	switch discardType {
-	case DISCARDWHOLE:
-		gitArgs = []string{"checkout", "HEAD", "--", filePathName}
-	case DISCARDUNSTAGE:
-		gitArgs = []string{"checkout", "--", filePathName}
-	case DISCARDUNTRACKED:
-		gitArgs = []string{"clean", "-f", "--", filePathName}
-		// we are refetching it actively here is because the clean doesn't trigger any write in .git folder
-		// and therefore will not trigger the watcher event driven fetch for file status, so we trigger a fetch here
-		// to prevent a "lag" in the UI
-		needFilesStatusRefetch = true
-	case DISCARDNEWLYADDED:
-		gitArgs = []string{"rm", "-f", filePathName}
-	}
-	changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	changesDiscardCmdExecutor.Run()
 
-	if needFilesStatusRefetch {
-		go func() {
-			gf.GetGitFilesStatus()
-			gf.updateChannel <- GIT_FILES_STATUS_UPDATE
-		}()
+	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	if fileIndexExist {
+		file := gf.filesStatus[fileIndex]
+		filePathName = file.FilePathname
+		switch discardType {
+		case DISCARDWHOLE:
+			gitArgs = []string{"checkout", "HEAD", "--", filePathName}
+		case DISCARDUNSTAGE:
+			if file.IndexState == "R" {
+				filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+			}
+			gitArgs = []string{"checkout", "--", filePathName}
+		case DISCARDUNTRACKED:
+			gitArgs = []string{"clean", "-f", "--", filePathName}
+			// we are refetching it actively here is because the clean doesn't trigger any write in .git folder
+			// and therefore will not trigger the watcher event driven fetch for file status, so we trigger a fetch here
+			// to prevent a "lag" in the UI
+			needFilesStatusRefetch = true
+		case DISCARDNEWLYADDED:
+			gitArgs = []string{"rm", "-f", filePathName}
+		case DISCARDANDREVERTRENAME:
+			needToRunExecutor = false
+			oldFilePathName := strings.TrimSpace(strings.Split(filePathName, "->")[0])
+			newFilePathName := strings.TrimSpace(strings.Split(filePathName, "->")[1])
+
+			// retrieve back the original file
+			gitArgs = []string{"reset", "--", oldFilePathName}
+			oldFileResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+			oldFileResetCmdExecutor.Run()
+
+			gitArgs = []string{"checkout", "--", oldFilePathName}
+			oldFileRevertCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+			oldFileRevertCmdExecutor.Run()
+
+			// revert and remove the "newly named" file
+			gitArgs = []string{"reset", "--", newFilePathName}
+			newFileResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+			newFileResetCmdExecutor.Run()
+
+			gitArgs = []string{"clean", "-f", "--", newFilePathName}
+			newFileDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+			newFileDiscardCmdExecutor.Run()
+
+			needFilesStatusRefetch = true
+		}
+
+		if needToRunExecutor {
+			changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+			changesDiscardCmdExecutor.Run()
+		}
+
+		if needFilesStatusRefetch {
+			go func() {
+				gf.GetGitFilesStatus()
+				gf.updateChannel <- GIT_FILES_STATUS_UPDATE
+			}()
+		}
 	}
 }
