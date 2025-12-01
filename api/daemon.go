@@ -78,6 +78,9 @@ func (gd *GitDaemon) watchPath() {
 	}
 	err = filepath.WalkDir(gd.repoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
+			if d.IsDir() && d.Name() == "objects" {
+				return fs.SkipDir
+			}
 			gd.watcher.Add(path)
 		}
 		return nil
@@ -197,6 +200,9 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 		if err == nil && fi.IsDir() {
 			filepath.WalkDir(event.Name, func(path string, d fs.DirEntry, err error) error {
 				if err == nil && d.IsDir() {
+					if d.IsDir() && d.Name() == "objects" {
+						return fs.SkipDir
+					}
 					_ = gd.watcher.Add(path)
 				}
 				return nil
@@ -206,7 +212,7 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 	}
 
 	// Trigger only for relevant ops
-	if event.Op&(fsnotify.Write|fsnotify.Remove|fsnotify.Rename) != 0 {
+	if event.Op&(fsnotify.Write|fsnotify.Remove|fsnotify.Rename|fsnotify.Chmod) != 0 {
 		return true
 	}
 

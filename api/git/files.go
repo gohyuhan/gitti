@@ -28,11 +28,6 @@ type FileStatus struct {
 	WorkTree     string
 }
 
-type FileDiffLine struct {
-	Line string
-	Type string
-}
-
 type GitFiles struct {
 	filesStatus    []FileStatus
 	filesPosition  map[string]int
@@ -68,7 +63,7 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 //
 // ----------------------------------
 func (gf *GitFiles) GetGitFilesStatus() {
-	gitArgs := []string{"status", "--porcelain", "-uall"}
+	gitArgs := []string{"status", "--porcelain", "--untracked-files=all"}
 
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmdExecutor.Output()
@@ -103,8 +98,12 @@ func (gf *GitFiles) GetGitFilesStatus() {
 }
 
 // get the file diff content
-func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
-	gitArgs := []string{"diff", "HEAD", "--diff-filter=ADM", "-U99999", "--", fileStatus.FilePathname}
+func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []string {
+	filePathName := fileStatus.FilePathname
+	if fileStatus.IndexState == "R" {
+		filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+	}
+	gitArgs := []string{"diff", "HEAD", "--", filePathName}
 	// the file is untracked
 	if fileStatus.WorkTree == "?" || fileStatus.IndexState == "?" || fileStatus.IndexState == "A" {
 		// empty file for git diff --no-index to compares two arbitrary files outside the Git index.
@@ -112,10 +111,10 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 		if runtime.GOOS == "windows" {
 			nullFile = "NUL"
 		}
-		gitArgs = []string{"diff", "--no-index", "-U99999", nullFile, "--", fileStatus.FilePathname}
+		gitArgs = []string{"diff", "--no-index", nullFile, "--", filePathName}
 	}
 
-	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
 	gitOutput, err := cmdExecutor.Output()
 	if err != nil {
 		exitError, ok := err.(*exec.ExitError)
@@ -130,28 +129,8 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []FileDiffLine {
 		}
 	}
 
-	fileDiffOneLineString := strings.SplitN(string(gitOutput), "@@", 3)
-	if len(fileDiffOneLineString) < 3 {
-		gf.errorLog = append(gf.errorLog, fmt.Errorf("There is no diff for the selected file or the file format is not supported for preview"))
-		return nil
-	}
-	fileDiffLines := strings.SplitSeq(strings.TrimSpace(fileDiffOneLineString[2]), "\n")
-	fileDiff := []FileDiffLine{}
-
-	for Line := range fileDiffLines {
-		fileDiffLine := FileDiffLine{
-			Line: Line,
-			Type: UnModifiedLine,
-		}
-		if strings.HasPrefix(Line, "-") {
-			fileDiffLine.Type = RemoveLine
-		} else if strings.HasPrefix(Line, "+") {
-			fileDiffLine.Type = AddLine
-		}
-
-		fileDiff = append(fileDiff, fileDiffLine)
-	}
-	return fileDiff
+	fileDiffLines := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
+	return fileDiffLines
 }
 
 func (gf *GitFiles) StageOrUnstageFile(filePathName string) {

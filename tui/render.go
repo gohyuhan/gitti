@@ -241,35 +241,14 @@ func generateModifiedFileDetailPanelContent(m *GittiModel) string {
 	}
 
 	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
-	previousDiffRowNum := 0
-	modifiedDiffRowNum := 0
-	fileDiff := m.GitOperations.GitFiles.GetFilesDiffInfo(fileStatus)
-	if fileDiff == nil {
+	fileDiffLines := m.GitOperations.GitFiles.GetFilesDiffInfo(fileStatus)
+	if fileDiffLines == nil {
 		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
 		return vpLine
 	}
-	diffDigitLength := len(fmt.Sprintf("%d", len(fileDiff))) + 1
-	for _, Line := range fileDiff {
-		var diffLine string
-		var rowNum string
-		lineStyle := style.NewStyle
-		switch Line.Type {
-		case git.AddLine:
-			lineStyle = style.DiffNewLineStyle
-			modifiedDiffRowNum += 1
-			rowNum = fmt.Sprintf("|%*s|%*v|  ", diffDigitLength, "", diffDigitLength, modifiedDiffRowNum)
-		case git.RemoveLine:
-			lineStyle = style.DiffOldLineStyle
-			previousDiffRowNum += 1
-			rowNum = fmt.Sprintf("|%*v|%*s|  ", diffDigitLength, previousDiffRowNum, diffDigitLength, "")
-		default:
-			previousDiffRowNum += 1
-			modifiedDiffRowNum += 1
-			rowNum = fmt.Sprintf("|%*v|%*v|  ", diffDigitLength, previousDiffRowNum, diffDigitLength, modifiedDiffRowNum)
-		}
-
-		diffLine = lineStyle.Render(Line.Line)
-		vpLine += rowNum + diffLine + "\n"
+	for _, line := range fileDiffLines {
+		line = style.NewStyle.Render(line)
+		vpLine += line + "\n"
 	}
 	return vpLine
 }
