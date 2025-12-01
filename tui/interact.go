@@ -326,7 +326,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.CurrentSelectedComponent = constant.LocalBranchComponent
 				m.CurrentSelectedComponentIndex = 1
 				leftPanelDynamicResize(m)
-				renderDetailComponentPanelViewPort(m)
+				fetchDetailComponentPanelInfoService(m)
 			}
 		}
 		return m, nil
@@ -337,7 +337,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.CurrentSelectedComponent = constant.ModifiedFilesComponent
 				m.CurrentSelectedComponentIndex = 2
 				leftPanelDynamicResize(m)
-				renderDetailComponentPanelViewPort(m)
+				fetchDetailComponentPanelInfoService(m)
 			}
 		}
 		return m, nil
@@ -348,7 +348,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.CurrentSelectedComponent = constant.StashComponent
 				m.CurrentSelectedComponentIndex = 3
 				leftPanelDynamicResize(m)
-				renderDetailComponentPanelViewPort(m)
+				fetchDetailComponentPanelInfoService(m)
 			}
 		}
 		return m, nil
@@ -655,7 +655,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			m.CurrentSelectedComponentIndex = nextNavigation
 			m.CurrentSelectedComponent = constant.ComponentNavigationList[nextNavigation]
 			leftPanelDynamicResize(m)
-			renderDetailComponentPanelViewPort(m)
+			fetchDetailComponentPanelInfoService(m)
 		}
 		return m, nil
 	case "shift+tab":
@@ -665,7 +665,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			m.CurrentSelectedComponentIndex = previousNavigation
 			m.CurrentSelectedComponent = constant.ComponentNavigationList[previousNavigation]
 			leftPanelDynamicResize(m)
-			renderDetailComponentPanelViewPort(m)
+			fetchDetailComponentPanelInfoService(m)
 		}
 		return m, nil
 
@@ -761,21 +761,23 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() - 1
 					m.CurrentRepoBranchesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.LocalBranchComponent = latestIndex
+					fetchDetailComponentPanelInfoService(m)
 				}
 			case constant.ModifiedFilesComponent:
-				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
+				// we don't use the list native Update() because we need to also track the current selected index
 				if m.CurrentRepoModifiedFilesInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() - 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
-					reinitAndRenderDetailComponentPanelViewPort(m)
+					fetchDetailComponentPanelInfoService(m)
 				}
 			case constant.StashComponent:
-				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
+				// we don't use the list native Update() because we need to also track the current selected index
 				if m.CurrentRepoStashInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoStashInfoList.Index() - 1
 					m.CurrentRepoStashInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.StashComponent = latestIndex
+					fetchDetailComponentPanelInfoService(m)
 				}
 			case constant.DetailComponent:
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
@@ -795,21 +797,23 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() + 1
 					m.CurrentRepoBranchesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.LocalBranchComponent = latestIndex
+					fetchDetailComponentPanelInfoService(m)
 				}
 			case constant.ModifiedFilesComponent:
-				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
+				// we don't use the list native Update() because we need to also track the current selected index
 				if m.CurrentRepoModifiedFilesInfoList.Index() < len(m.CurrentRepoModifiedFilesInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
 					m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
-					reinitAndRenderDetailComponentPanelViewPort(m)
+					fetchDetailComponentPanelInfoService(m)
 				}
 			case constant.StashComponent:
-				// we don't use the list native Update() because we need to also render the diff view as well as track the current selected index
+				// we don't use the list native Update() because we need to also track the current selected index
 				if m.CurrentRepoStashInfoList.Index() < len(m.CurrentRepoStashInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoStashInfoList.Index() + 1
 					m.CurrentRepoStashInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.StashComponent = latestIndex
+					fetchDetailComponentPanelInfoService(m)
 				}
 			case constant.DetailComponent:
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)

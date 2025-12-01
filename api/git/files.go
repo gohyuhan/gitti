@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"runtime"
@@ -99,7 +100,7 @@ func (gf *GitFiles) GetGitFilesStatus() {
 }
 
 // get the file diff content
-func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []string {
+func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus) []string {
 	filePathName := fileStatus.FilePathname
 	if fileStatus.IndexState == "R" {
 		filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
@@ -115,9 +116,14 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []string {
 		gitArgs = []string{"diff", "--no-index", nullFile, "--", filePathName}
 	}
 
-	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	gitOutput, err := cmdExecutor.Output()
 	if err != nil {
+		if ctx.Err() != nil {
+			// This catches context.Canceled
+			gf.errorLog = append(gf.errorLog, fmt.Errorf("[FILE DIFF OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+			return nil
+		}
 		exitError, ok := err.(*exec.ExitError)
 		if ok {
 			if exitError.ExitCode() != 1 {

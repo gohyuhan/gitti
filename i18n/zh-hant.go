@@ -47,6 +47,7 @@ var zH_HANT = LanguageMapping{
 	MinimumTerminalHeight:               "最小需求高度",
 	CurrentTerminalWidth:                "目前寬度",
 	MinimumTerminalWidth:                "最小需求寬度",
+	Loading:                             "載入中...",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全域快捷鍵",
 	},

@@ -47,6 +47,7 @@ var jA = LanguageMapping{
 	MinimumTerminalHeight:               "必要な最小の高さ",
 	CurrentTerminalWidth:                "現在の幅",
 	MinimumTerminalWidth:                "必要な最小の幅",
+	Loading:                             "読み込み中...",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] グローバルキー操作",
 	},

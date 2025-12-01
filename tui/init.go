@@ -200,14 +200,6 @@ func initStashList(m *GittiModel) {
 	}
 }
 
-// reinit and render detail component panel viewport
-func reinitAndRenderDetailComponentPanelViewPort(m *GittiModel) {
-	m.DetailPanelViewportOffset = 0
-	m.DetailPanelViewport.SetXOffset(0)
-	m.DetailPanelViewport.SetYOffset(0)
-	renderDetailComponentPanelViewPort(m)
-}
-
 // init the viewport pop up for showing info of global key binding
 func initGlobalKeyBindingPopUpModel(m *GittiModel) {
 	vp := viewport.New()

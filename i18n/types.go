@@ -71,6 +71,7 @@ type LanguageMapping struct {
 	MinimumTerminalHeight      string
 	CurrentTerminalWidth       string
 	MinimumTerminalWidth       string
+	Loading                    string
 	// for Key Bindings
 	KeyBindingForGitStatusComponent           []string
 	KeyBindingLocalBranchComponentIsCheckOut  []string

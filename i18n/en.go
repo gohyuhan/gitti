@@ -48,6 +48,7 @@ var eN = LanguageMapping{
 	MinimumTerminalHeight:               "Minimum required height",
 	CurrentTerminalWidth:                "Current width",
 	MinimumTerminalWidth:                "Minimum required height",
+	Loading:                             "Loading...",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},

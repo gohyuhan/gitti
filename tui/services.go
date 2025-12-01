@@ -7,10 +7,10 @@ import (
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
 )
 
-// service.go was to bridge api and the needs of the terminal interface logic so that it can be compatible and feels smooth and not cluncy
-
+// service.go was to bridge api and the needs of the terminal interface logic so that it can be compatible and feels smooth and not clunky
 // ------------------------------------
 //
 //	For Git Commit
@@ -531,4 +531,106 @@ func gitDiscardFileChangesService(m *GittiModel, filePathName string, discardTyp
 	go func() {
 		m.GitOperations.GitFiles.DiscardFileChanges(filePathName, discardType)
 	}()
+}
+
+// ------------------------------------
+//
+//		For fetching detail component panel info
+//	  * it can be for stash info, commit info etc
+//
+// ------------------------------------
+func fetchDetailComponentPanelInfoService(m *GittiModel) {
+	if m.DetailComponentPanelInfoFetchCancelFunc != nil {
+		m.DetailComponentPanelInfoFetchCancelFunc()
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	m.DetailComponentPanelInfoFetchCancelFunc = cancel
+	go func(ctx context.Context) {
+		defer cancel()
+
+		var contentLine string
+		var theCurrentSelectedComponent string
+		// reinit and render detail component panel viewport
+		m.DetailPanelViewportOffset = 0
+		m.DetailPanelViewport.SetXOffset(0)
+		m.DetailPanelViewport.SetYOffset(0)
+		m.DetailPanelViewport.SetContent(style.NewStyle.Render(i18n.LANGUAGEMAPPING.Loading))
+		if m.CurrentSelectedComponent == constant.DetailComponent {
+			// if the current selected one is the detail component itself, the current selected one will be its parent (the component that led into the detail component)
+			theCurrentSelectedComponent = m.DetailPanelParentComponent
+		} else {
+			theCurrentSelectedComponent = m.CurrentSelectedComponent
+		}
+		switch theCurrentSelectedComponent {
+		case constant.ModifiedFilesComponent:
+			contentLine = generateModifiedFileDetailPanelContent(ctx, m)
+		case constant.StashComponent:
+			contentLine = generateStashDetailPanelContent(ctx, m)
+		default:
+			contentLine = generateAboutGittiContent()
+		}
+
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			if contentLine == "" {
+				// if the content will be empty, render about gitti for detail panel
+				contentLine = generateAboutGittiContent()
+			}
+
+			m.DetailPanelViewport.SetContent(contentLine)
+		}
+	}(ctx)
+}
+
+// for modified file detail panel view
+func generateModifiedFileDetailPanelContent(ctx context.Context, m *GittiModel) string {
+	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+	var fileStatus git.FileStatus
+	if currentSelectedModifiedFile != nil {
+		fileStatus = git.FileStatus(currentSelectedModifiedFile.(gitModifiedFilesItem))
+	} else {
+		return ""
+	}
+
+	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
+	fileDiffLines := m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus)
+	if fileDiffLines == nil {
+		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
+		return vpLine
+	}
+	for _, line := range fileDiffLines {
+		line = style.NewStyle.Render(line)
+		vpLine += line + "\n"
+	}
+	return vpLine
+}
+
+// for stash detail panel view
+func generateStashDetailPanelContent(ctx context.Context, m *GittiModel) string {
+	currentSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
+	var stash gitStashItem
+	if currentSelectedStash != nil {
+		stash = currentSelectedStash.(gitStashItem)
+	} else {
+		return ""
+	}
+
+	vpLine := fmt.Sprintf(
+		"[%s]\n[%s]\n\n",
+		style.StashIdStyle.Render(stash.Id),
+		style.StashMessageStyle.Render(stash.Message),
+	)
+
+	stashDetail := m.GitOperations.GitStash.GitStashDetail(ctx, stash.Id)
+	if len(stashDetail) < 1 {
+		return ""
+	}
+
+	for _, Line := range stashDetail {
+		line := style.NewStyle.Render(Line)
+		vpLine += line + "\n"
+	}
+	return vpLine
 }

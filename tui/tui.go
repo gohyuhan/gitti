@@ -94,7 +94,6 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE:
 			m.updateGitRemoteStatusSyncLineStringAndUpStream()
 		}
-		renderDetailComponentPanelViewPort(m)
 		return m, nil
 	case tea.MouseMsg:
 		return GittiMouseInteraction(msg, m)

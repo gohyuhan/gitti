@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -174,16 +175,21 @@ func (gs *GitStash) GitStashDrop(stashId string) {
 
 // ----------------------------------
 //
-// # Git stash see deatil
+// # Git stash detail
 //
 // ----------------------------------
-func (gs *GitStash) GitStashDetail(stashId string) []string {
+func (gs *GitStash) GitStashDetail(ctx context.Context, stashId string) []string {
 	var parsedDetail []string
-	gitArgs := []string{"stash", "show", "-p", "-u", stashId}
+	gitArgs := []string{"stash", "show", "-u", stashId}
 
-	detailCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
+	detailCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	stashDetailOutput, detailCmdErr := detailCmdExecutor.Output()
 	if detailCmdErr != nil {
+		if ctx.Err() != nil {
+			// This catches context.Canceled
+			gs.errorLog = append(gs.errorLog, fmt.Errorf("[STASH DETAIL OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+			return parsedDetail
+		}
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DETAIL ERROR]: %w", detailCmdErr))
 		return parsedDetail
 	}

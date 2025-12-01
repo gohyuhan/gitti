@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -203,97 +202,6 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 		Render(keyBindingLine)
 }
 
-// for the current selected modified file preview viewport
-func renderDetailComponentPanelViewPort(m *GittiModel) {
-	var contentLine string
-	var theCurrentSelectedComponent string
-	if m.CurrentSelectedComponent == constant.DetailComponent {
-		// if the current selected one is the detail component itself, the current selected one will be its parent (the component that led into the detail component)
-		theCurrentSelectedComponent = m.DetailPanelParentComponent
-	} else {
-		theCurrentSelectedComponent = m.CurrentSelectedComponent
-	}
-	switch theCurrentSelectedComponent {
-	case constant.ModifiedFilesComponent:
-		contentLine = generateModifiedFileDetailPanelContent(m)
-	case constant.StashComponent:
-		contentLine = generateStashDetailPanelContent(m)
-	default:
-		contentLine = generateAboutGittiContent()
-	}
-
-	if contentLine == "" {
-		// if the content will be empty, render about gitti for detail panel
-		contentLine = generateAboutGittiContent()
-	}
-
-	m.DetailPanelViewport.SetContent(contentLine)
-}
-
-// for modified file detail panel view
-func generateModifiedFileDetailPanelContent(m *GittiModel) string {
-	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-	var fileStatus git.FileStatus
-	if currentSelectedModifiedFile != nil {
-		fileStatus = git.FileStatus(currentSelectedModifiedFile.(gitModifiedFilesItem))
-	} else {
-		return ""
-	}
-
-	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
-	fileDiffLines := m.GitOperations.GitFiles.GetFilesDiffInfo(fileStatus)
-	if fileDiffLines == nil {
-		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
-		return vpLine
-	}
-	for _, line := range fileDiffLines {
-		line = style.NewStyle.Render(line)
-		vpLine += line + "\n"
-	}
-	return vpLine
-}
-
-// for stash detail panel view
-func generateStashDetailPanelContent(m *GittiModel) string {
-	currentSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
-	var stash gitStashItem
-	if currentSelectedStash != nil {
-		stash = currentSelectedStash.(gitStashItem)
-	} else {
-		return ""
-	}
-
-	vpLine := fmt.Sprintf(
-		"[%s]\n[%s]\n\n",
-		style.StashIdStyle.Render(stash.Id),
-		style.StashMessageStyle.Render(stash.Message),
-	)
-
-	stashDetail := m.GitOperations.GitStash.GitStashDetail(stash.Id)
-	if len(stashDetail) < 1 {
-		return ""
-	}
-
-	for _, Line := range stashDetail {
-		line := style.NewStyle.Render(Line)
-		vpLine += line + "\n"
-	}
-	return vpLine
-}
-
-// for about gitti content
-func generateAboutGittiContent() string {
-	var vpLine string
-
-	logoLineArray := style.GradientLines(gittiAsciiArtLogo)
-	aboutLines := i18n.LANGUAGEMAPPING.AboutGitti
-
-	vpLine += strings.Join(logoLineArray, "\n") + "\n"
-	vpLine += strings.Join(aboutLines, "\n")
-
-	return vpLine
-}
-
 // to update the width and height of all components
 func tuiWindowSizing(m *GittiModel) {
 	// Compute panel widths
@@ -422,4 +330,17 @@ func leftPanelDynamicResize(m *GittiModel) {
 
 	m.CurrentRepoStashInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)
+}
+
+// for about gitti content
+func generateAboutGittiContent() string {
+	var vpLine string
+
+	logoLineArray := style.GradientLines(gittiAsciiArtLogo)
+	aboutLines := i18n.LANGUAGEMAPPING.AboutGitti
+
+	vpLine += strings.Join(logoLineArray, "\n") + "\n"
+	vpLine += strings.Join(aboutLines, "\n")
+
+	return vpLine
 }
