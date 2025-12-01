@@ -187,6 +187,6 @@ func (gs *GitStash) GitStashDetail(stashId string) []string {
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DETAIL ERROR]: %w", detailCmdErr))
 		return parsedDetail
 	}
-	parsedDetail = strings.Split(strings.TrimSpace(string(stashDetailOutput)), "\n")
+	parsedDetail = processGeneralGitOpsOutputIntoStringArray(stashDetailOutput)
 	return parsedDetail
 }

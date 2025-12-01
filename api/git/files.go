@@ -130,7 +130,7 @@ func (gf *GitFiles) GetFilesDiffInfo(fileStatus FileStatus) []string {
 		}
 	}
 
-	fileDiffLines := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
+	fileDiffLines := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 	return fileDiffLines
 }
 

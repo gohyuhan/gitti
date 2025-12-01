@@ -7,7 +7,6 @@ import (
 	"github.com/gohyuhan/gitti/utils"
 
 	tea "charm.land/bubbletea/v2"
-	"github.com/google/uuid"
 )
 
 const (
@@ -377,7 +376,6 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				initGitCommitPopUpModel(m)
 			} else {
 				popUp.GitCommitOutputViewport.SetContent("")
-				popUp.SessionID = uuid.New()
 			}
 			m.IsTyping.Store(true)
 		}

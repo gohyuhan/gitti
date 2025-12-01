@@ -162,7 +162,7 @@ func (gd *GitDaemon) gitLatestInfoFetch() {
 	go func() {
 		if gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitBranchPassiveRunning.Store(false)
-			gd.gitOperations.GitBranch.GetLatestBranchesinfo()
+			gd.gitOperations.GitBranch.GetLatestBranchesInfo()
 			gd.updateChannel <- git.GIT_BRANCH_UPDATE
 		}
 	}()

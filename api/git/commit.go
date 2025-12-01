@@ -2,6 +2,7 @@ package git
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -79,7 +80,7 @@ func (gc *GitCommit) GitFetch() {
 //	Related to Git Commit
 //
 // ----------------------------------
-func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) int {
+func (gc *GitCommit) GitCommit(ctx context.Context, message, description string, isAmendCommit bool) int {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
@@ -102,7 +103,7 @@ func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) 
 		gitArgs = append(gitArgs, "-m", description)
 	}
 
-	commitCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
+	commitCmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	gc.gitCommitProcess = commitCmd
 
 	// Combine stderr into stdout
@@ -133,13 +134,18 @@ func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) 
 		scanner.Split(splitOnCarriageReturnOrNewline)
 		cursorIndex := 0
 		for scanner.Scan() {
-			updatedCursorIndex, updatedGitCommitOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitCommitOutput)
-			gc.gitCommitOutput = updatedGitCommitOutput
-			cursorIndex = updatedCursorIndex
-			if isAmendCommit {
-				gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE
-			} else {
-				gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE
+			select {
+			case <-ctx.Done():
+				return // Stop immediately on cancel
+			default:
+				updatedCursorIndex, updatedGitCommitOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitCommitOutput)
+				gc.gitCommitOutput = updatedGitCommitOutput
+				cursorIndex = updatedCursorIndex
+				if isAmendCommit {
+					gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE
+				} else {
+					gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE
+				}
 			}
 		}
 	}()
@@ -162,16 +168,6 @@ func (gc *GitCommit) GitCommit(message, description string, isAmendCommit bool) 
 
 func (gc *GitCommit) ClearGitCommitOutput() {
 	gc.gitCommitOutput = []string{}
-}
-
-// This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
-func (gc *GitCommit) KillGitCommitCmd() {
-	gc.gitCommitProcessMutex.Lock()
-	defer gc.gitCommitProcessMutex.Unlock()
-
-	if gc.gitCommitProcess != nil && gc.gitCommitProcess.Process != nil {
-		_ = gc.gitCommitProcess.Process.Kill()
-	}
 }
 
 func (gc *GitCommit) gitCommitProcessReset() {
@@ -211,7 +207,7 @@ func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 //	Related to Git Push
 //
 // ----------------------------------
-func (gc *GitCommit) GitPush(originName string, pushType string, currentCheckOutBranch string) int {
+func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType string, currentCheckOutBranch string) int {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
@@ -247,7 +243,7 @@ func (gc *GitCommit) GitPush(originName string, pushType string, currentCheckOut
 		gitArgs = append(gitArgs, currentCheckOutBranch)
 	}
 
-	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
+	cmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
@@ -281,10 +277,15 @@ func (gc *GitCommit) GitPush(originName string, pushType string, currentCheckOut
 		scanner.Split(splitOnCarriageReturnOrNewline)
 		cursorIndex := 0
 		for scanner.Scan() {
-			updatedCursorIndex, updatedGitRemotePushOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitRemotePushOutput)
-			gc.gitRemotePushOutput = updatedGitRemotePushOutput
-			cursorIndex = updatedCursorIndex
-			gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
+			select {
+			case <-ctx.Done():
+				return // Stop immediately on cancel
+			default:
+				updatedCursorIndex, updatedGitRemotePushOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitRemotePushOutput)
+				gc.gitRemotePushOutput = updatedGitRemotePushOutput
+				cursorIndex = updatedCursorIndex
+				gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
+			}
 		}
 	}()
 
@@ -305,16 +306,6 @@ func (gc *GitCommit) GitPush(originName string, pushType string, currentCheckOut
 
 func (gc *GitCommit) ClearGitRemotePushOutput() {
 	gc.gitRemotePushOutput = []string{}
-}
-
-// This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
-func (gc *GitCommit) KillGitRemotePushCmd() {
-	gc.gitRemotePushProcessMutex.Lock()
-	defer gc.gitRemotePushProcessMutex.Unlock()
-
-	if gc.gitRemotePushProcess != nil && gc.gitRemotePushProcess.Process != nil {
-		_ = gc.gitRemotePushProcess.Process.Kill()
-	}
 }
 
 func (gc *GitCommit) resetGitRemotePushProcesstatus() {

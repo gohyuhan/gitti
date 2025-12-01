@@ -63,7 +63,7 @@ func (gb *GitBranch) IsRepoUnborn() bool {
 //	 * Passive, this should only be trigger by system
 //
 // ----------------------------------
-func (gb *GitBranch) GetLatestBranchesinfo() {
+func (gb *GitBranch) GetLatestBranchesInfo() {
 	gitArgs := []string{"branch"}
 	allBranches := []BranchInfo{}
 
@@ -75,7 +75,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
 	}
 
-	gitBranches := strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
+	gitBranches := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 
 	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommited branch
@@ -86,7 +86,7 @@ func (gb *GitBranch) GetLatestBranchesinfo() {
 		if err != nil {
 			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
 		}
-		gitBranches = strings.Split(strings.TrimSpace(string(gitOutput)), "\n")
+		gitBranches = processGeneralGitOpsOutputIntoStringArray(gitOutput)
 		gb.currentCheckOut = BranchInfo{
 			BranchName:   gitBranches[0],
 			IsCheckedOut: true,

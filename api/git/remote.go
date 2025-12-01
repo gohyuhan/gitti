@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -89,7 +90,7 @@ func (gr *GitRemote) CurrentBranchUpStream() string {
 //	Related to Git Remote
 //
 // ----------------------------------
-func (gr *GitRemote) GitAddRemote(originName string, url string) ([]string, int) {
+func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url string) ([]string, int) {
 	if !gr.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gr.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
@@ -109,7 +110,7 @@ func (gr *GitRemote) GitAddRemote(originName string, url string) ([]string, int)
 
 	gr.gitAddRemoteProcessMutex.Lock()
 	gitArgs := []string{"remote", "add", originName, url}
-	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	cmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
 	gr.gitAddRemoteProcess = cmd
 
 	// CombinedOutput starts and waits for the command
@@ -128,19 +129,6 @@ func (gr *GitRemote) GitAddRemote(originName string, url string) ([]string, int)
 
 	}
 	return gitAddRemoteOutput, 0
-}
-
-// KillGitAddRemoteCmd forcefully terminates any running git remote add process.
-// It is safe to call this method even if no process is running.
-// This method is thread-safe and can be called from multiple goroutines.
-// This method will not be responsible to set the process state but will be the function that trigger the action will be responsible to reset the status with defer
-func (gr *GitRemote) KillGitAddRemoteCmd() {
-	gr.gitAddRemoteProcessMutex.Lock()
-	defer gr.gitAddRemoteProcessMutex.Unlock()
-
-	if gr.gitAddRemoteProcess != nil && gr.gitAddRemoteProcess.Process != nil {
-		_ = gr.gitAddRemoteProcess.Process.Kill()
-	}
 }
 
 func (gr *GitRemote) gitAddRemoteProcessReset() {

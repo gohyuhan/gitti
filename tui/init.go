@@ -16,7 +16,6 @@ import (
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
-	"github.com/google/uuid"
 ) // this was for various components part init or reinit function due to update or newly create
 
 // those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
@@ -254,9 +253,6 @@ func initGitCommitPopUpModel(m *GittiModel) {
 	s.Spinner = spinner.Dot
 	s.Style = style.SpinnerStyle
 
-	// Generate a unique UUID for this popup session
-	newSessionID := uuid.New()
-
 	popUpModel := &GitCommitPopUpModel{
 		IsAmendCommit:            false,
 		MessageTextInput:         CommitMessageTextInput,
@@ -265,7 +261,6 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		CurrentActiveInputIndex:  1,
 		GitCommitOutputViewport:  vp,
 		Spinner:                  s,
-		SessionID:                newSessionID,
 	}
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)
@@ -306,9 +301,6 @@ func initGitAmendCommitPopUpModel(m *GittiModel) {
 	s.Spinner = spinner.Dot
 	s.Style = style.SpinnerStyle
 
-	// Generate a unique UUID for this popup session
-	newSessionID := uuid.New()
-
 	popUpModel := &GitAmendCommitPopUpModel{
 		IsAmendCommit:                true,
 		MessageTextInput:             CommitMessageTextInput,
@@ -317,7 +309,6 @@ func initGitAmendCommitPopUpModel(m *GittiModel) {
 		CurrentActiveInputIndex:      1,
 		GitAmendCommitOutputViewport: vp,
 		Spinner:                      s,
-		SessionID:                    newSessionID,
 	}
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)
@@ -349,9 +340,6 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 	vp.SetHeight(constant.PopUpAddRemoteOutputViewPortHeight)
 	vp.SetWidth(min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
-	// Generate a unique UUID for this popup session
-	newSessionID := uuid.New()
-
 	popUpModel := &AddRemotePromptPopUpModel{
 		RemoteNameTextInput:     RemoteNameTextInput,
 		RemoteUrlTextInput:      RemoteUrlTextInput,
@@ -359,7 +347,6 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 		CurrentActiveInputIndex: 1,
 		AddRemoteOutputViewport: vp,
 		NoInitialRemote:         noInitialRemote,
-		SessionID:               newSessionID,
 	}
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)
@@ -382,13 +369,9 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 	s.Spinner = spinner.Dot
 	s.Style = style.SpinnerStyle
 
-	// Generate a unique UUID for this popup session
-	newSessionID := uuid.New()
-
 	popUpModel := &GitRemotePushPopUpModel{
 		GitRemotePushOutputViewport: vp,
 		Spinner:                     s,
-		SessionID:                   newSessionID,
 	}
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)

@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"context"
 	"sync/atomic"
 
 	"github.com/gohyuhan/gitti/api"
@@ -10,7 +11,6 @@ import (
 	"charm.land/bubbles/v2/textarea"
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
-	"github.com/google/uuid"
 )
 
 // ---------------------------------
@@ -79,9 +79,8 @@ type GitCommitPopUpModel struct {
 	HasError                 atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess           atomic.Bool     // has the process sucessfuly executed
 	IsCancelled              atomic.Bool     // flag to indicate if the operation was cancelled by user
-	// SessionID is a unique UUID for each popup instance to prevent
-	// stale goroutines from affecting new popups
-	SessionID uuid.UUID
+	// CancelFunc is used to cancel the git commit operation
+	CancelFunc context.CancelFunc
 }
 
 // ---------------------------------
@@ -101,9 +100,8 @@ type GitAmendCommitPopUpModel struct {
 	HasError                     atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess               atomic.Bool     // has the process sucessfuly executed
 	IsCancelled                  atomic.Bool     // flag to indicate if the operation was cancelled by user
-	// SessionID is a unique UUID for each popup instance to prevent
-	// stale goroutines from affecting new popups
-	SessionID uuid.UUID
+	// CancelFunc is used to cancel the git amend commit operation
+	CancelFunc context.CancelFunc
 }
 
 // ---------------------------------
@@ -122,9 +120,8 @@ type AddRemotePromptPopUpModel struct {
 	ProcessSuccess          atomic.Bool     // has the process sucessfuly executed
 	NoInitialRemote         bool            // indicate if this repo has no remote yet or user just wanted to add more remote
 	IsCancelled             atomic.Bool     // flag to indicate if the operation was cancelled by user
-	// SessionID is a unique UUID for each popup instance to prevent
-	// stale goroutines from affecting new popups
-	SessionID uuid.UUID
+	// CancelFunc is used to cancel the git remote add operation
+	CancelFunc context.CancelFunc
 }
 
 // ---------------------------------
@@ -139,9 +136,8 @@ type GitRemotePushPopUpModel struct {
 	HasError                    atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess              atomic.Bool    // has the process sucessfuly executed
 	IsCancelled                 atomic.Bool    // flag to indicate if the operation was cancelled by user
-	// SessionID is a unique UUID for each popup instance to prevent
-	// stale goroutines from affecting new popups
-	SessionID uuid.UUID
+	// CancelFunc is used to cancel the git push operation
+	CancelFunc context.CancelFunc
 }
 
 // ---------------------------------
@@ -229,9 +225,8 @@ type GitPullOutputPopUpModel struct {
 	HasError              atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess        atomic.Bool    // has the process sucessfuly executed
 	IsCancelled           atomic.Bool    // flag to indicate if the operation was cancelled by user
-	// SessionID is a unique UUID for each popup instance to prevent
-	// stale goroutines from affecting new popups
-	SessionID uuid.UUID
+	// CancelFunc is used to cancel the git pull operation
+	CancelFunc context.CancelFunc
 }
 
 // ---------------------------------

@@ -2,6 +2,7 @@ package git
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os/exec"
 	"sync"
@@ -44,7 +45,7 @@ func (gp *GitPull) GetGitPullOutput() []string {
 // # Git Pull and will operate differently based on the user selection type
 //
 // --------------------------------
-func (gp *GitPull) GitPull(pullType string) int {
+func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 	if !gp.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
@@ -66,7 +67,7 @@ func (gp *GitPull) GitPull(pullType string) int {
 		gitPullArgs = []string{"pull", "--progress", "--no-rebase", "--no-edit"}
 	}
 
-	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitPullArgs, true)
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitPullArgs, true)
 
 	gp.gitPullProcessCmd = cmdExecutor
 
@@ -98,10 +99,15 @@ func (gp *GitPull) GitPull(pullType string) int {
 		scanner.Split(splitOnCarriageReturnOrNewline)
 		cursorIndex := 0
 		for scanner.Scan() {
-			updatedCursorIndex, updatedGitPullOutput := handleProgressOutputStream(cursorIndex, scanner, gp.gitPullOutput)
-			gp.gitPullOutput = updatedGitPullOutput
-			cursorIndex = updatedCursorIndex
-			gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE
+			select {
+			case <-ctx.Done():
+				return // Stop immediately on cancel
+			default:
+				updatedCursorIndex, updatedGitPullOutput := handleProgressOutputStream(cursorIndex, scanner, gp.gitPullOutput)
+				gp.gitPullOutput = updatedGitPullOutput
+				cursorIndex = updatedCursorIndex
+				gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE
+			}
 		}
 	}()
 
@@ -127,20 +133,6 @@ func (gp *GitPull) GitPull(pullType string) int {
 // --------------------------------
 func (gp *GitPull) ClearGitPullOutput() {
 	gp.gitPullOutput = []string{}
-}
-
-// --------------------------------
-//
-// # Kill the git pull process
-//
-// --------------------------------
-func (gp *GitPull) KillGitPullCmd() {
-	gp.gitPullProcessMutex.Lock()
-	defer gp.gitPullProcessMutex.Unlock()
-
-	if gp.gitPullProcessCmd != nil && gp.gitPullProcessCmd.Process != nil {
-		_ = gp.gitPullProcessCmd.Process.Kill()
-	}
 }
 
 // --------------------------------
