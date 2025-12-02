@@ -1,5 +1,8 @@
 main
 *.DS_Store
 
+# for profiling
+lag.prof
+
 # add by goreleaser
 dist/

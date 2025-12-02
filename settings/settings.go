@@ -201,5 +201,4 @@ func UpdateAutoUpdate(autoUpdate bool) {
 	if err == nil {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
 	}
-
 }

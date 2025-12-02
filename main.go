@@ -74,25 +74,27 @@ func main() {
 		updater.Update()
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
-		updateChannel := make(chan string)
+		gitUpdateChannel := make(chan string)
+		tuiUpdateChannel := make(chan string)
 
 		// initialization
-		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, updateChannel)
+		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, gitUpdateChannel)
 
 		// check for update if user allows it
 		if settings.GITTICONFIGSETTINGS.AutoUpdate {
 			updater.AutoUpdater()
 		}
 
-		// start the Git Daemon
-		api.GITDAEMON.Start()
-
-		gittiUiModel := tui.NewGittiModel(repoPath, gitRepoPathInfo.RepoName, gitOperations)
+		gittiUiModel := tui.NewGittiModel(tuiUpdateChannel, repoPath, gitRepoPathInfo.RepoName, gitOperations)
 		gitti := tea.NewProgram(
 			gittiUiModel,
 		)
 
-		tui.StartGitUpdateListener(gitti, updateChannel)
+		tui.StartGitUpdateListener(gitti, gitUpdateChannel)
+		tui.StartTuiUpdateListener(gitti, tuiUpdateChannel)
+
+		// start the Git Daemon
+		api.GITDAEMON.Start()
 
 		if _, err := gitti.Run(); err != nil {
 			api.GITDAEMON.Stop()

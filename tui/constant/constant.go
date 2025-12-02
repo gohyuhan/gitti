@@ -90,3 +90,5 @@ var ComponentNavigationList = []string{
 	ModifiedFilesComponent,
 	StashComponent,
 }
+
+const DETAIL_COMPONENT_PANEL_UPDATED = "DETAIL_COMPONENT_PANEL_UPDATED"

@@ -36,10 +36,10 @@ func initBranchList(m *GittiModel) {
 	}
 
 	m.CurrentRepoBranchesInfoList = list.New(latestBranchArray, gitBranchItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
+	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowFilter(false)
-	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
 	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf418 %s:", i18n.LANGUAGEMAPPING.Branches), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
@@ -92,10 +92,10 @@ func initModifiedFilesList(m *GittiModel) {
 	}
 
 	m.CurrentRepoModifiedFilesInfoList = list.New(items, gitModifiedFilesItemDelegate{}, m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight)
+	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowFilter(false)
-	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
 	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[2] \ueae9 %s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoModifiedFilesInfoList.Styles.TitleBar = style.NewStyle
@@ -156,10 +156,10 @@ func initStashList(m *GittiModel) {
 	}
 
 	m.CurrentRepoStashInfoList = list.New(items, gitStashItemDelegate{}, m.WindowLeftPanelWidth, m.StashComponentPanelHeight)
+	m.CurrentRepoStashInfoList.SetShowPagination(false)
 	m.CurrentRepoStashInfoList.SetShowStatusBar(false)
 	m.CurrentRepoStashInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoStashInfoList.SetShowFilter(false)
-	m.CurrentRepoStashInfoList.SetShowPagination(false)
 	m.CurrentRepoStashInfoList.Title = utils.TruncateString(fmt.Sprintf("[3] \ueaf7 %s:", i18n.LANGUAGEMAPPING.Stash), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoStashInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoStashInfoList.Styles.TitleBar = style.NewStyle
@@ -396,6 +396,7 @@ func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.Git
 	}
 	width := (min(constant.MaxChooseRemotePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 	rL := list.New(items, gitRemoteItemDelegate{}, width, constant.PopUpChooseRemoteHeight)
+	rL.SetShowPagination(false)
 	rL.SetShowStatusBar(false)
 	rL.SetFilteringEnabled(false)
 	rL.SetShowHelp(false)
@@ -432,6 +433,7 @@ func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
 	}
 	width := (min(constant.MaxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 	pOL := list.New(items, gitPushOptionDelegate{}, width, constant.PopUpChoosePushTypeHeight)
+	pOL.SetShowPagination(false)
 	pOL.SetShowStatusBar(false)
 	pOL.SetFilteringEnabled(false)
 	pOL.SetShowHelp(false)
@@ -477,6 +479,7 @@ func initChooseNewBranchTypePopUpModel(m *GittiModel) {
 	}
 	width := (min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 	nBTOL := list.New(items, gitNewBranchTypeOptionDelegate{}, width, constant.PopUpChooseNewBranchTypeHeight)
+	nBTOL.SetShowPagination(false)
 	nBTOL.SetShowStatusBar(false)
 	nBTOL.SetFilteringEnabled(false)
 	nBTOL.SetShowHelp(false)
@@ -509,6 +512,7 @@ func initChooseSwitchBranchTypePopUpModel(m *GittiModel, branchName string) {
 
 	width := (min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 	sBTOL := list.New(items, gitSwitchBranchTypeOptionDelegate{}, width, constant.PopUpChooseSwitchBranchTypeHeight)
+	sBTOL.SetShowPagination(false)
 	sBTOL.SetShowStatusBar(false)
 	sBTOL.SetFilteringEnabled(false)
 	sBTOL.SetShowHelp(false)
@@ -571,6 +575,7 @@ func initChooseGitPullTypePopUp(m *GittiModel) {
 
 	width := (min(constant.MaxChooseGitPullTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 	cGPOL := list.New(items, gitPullTypeOptionDelegate{}, width, constant.PopUpChooseGitPullTypeHeight)
+	cGPOL.SetShowPagination(false)
 	cGPOL.SetShowStatusBar(false)
 	cGPOL.SetFilteringEnabled(false)
 	cGPOL.SetShowHelp(false)
@@ -674,6 +679,7 @@ func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAdde
 
 	width := (min(constant.MaxGitDiscardTypeOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 	gDTOL := list.New(items, gitDiscardTypeOptionDelegate{}, width, constant.PopUpGitDiscardTypeOptionHeight)
+	gDTOL.SetShowPagination(false)
 	gDTOL.SetShowStatusBar(false)
 	gDTOL.SetFilteringEnabled(false)
 	gDTOL.SetShowHelp(false)

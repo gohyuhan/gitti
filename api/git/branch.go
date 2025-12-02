@@ -183,7 +183,7 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 
 	var gitOpsOutput []string
 
-	stashChangesGitArgs := []string{"stash", "push", "--include-untracked"}
+	stashChangesGitArgs := []string{"stash", "push", "-u"}
 	stashChangesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(stashChangesGitArgs, false)
 	stashChangesOutput, stashChangesErr := stashChangesCmdExecutor.CombinedOutput()
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(stashChangesOutput)...)

@@ -539,7 +539,7 @@ func gitDiscardFileChangesService(m *GittiModel, filePathName string, discardTyp
 //	  * it can be for stash info, commit info etc
 //
 // ------------------------------------
-func fetchDetailComponentPanelInfoService(m *GittiModel) {
+func fetchDetailComponentPanelInfoService(m *GittiModel, reinit bool) {
 	if m.DetailComponentPanelInfoFetchCancelFunc != nil {
 		m.DetailComponentPanelInfoFetchCancelFunc()
 	}
@@ -551,10 +551,12 @@ func fetchDetailComponentPanelInfoService(m *GittiModel) {
 		var contentLine string
 		var theCurrentSelectedComponent string
 		// reinit and render detail component panel viewport
-		m.DetailPanelViewportOffset = 0
-		m.DetailPanelViewport.SetXOffset(0)
-		m.DetailPanelViewport.SetYOffset(0)
-		m.DetailPanelViewport.SetContent(style.NewStyle.Render(i18n.LANGUAGEMAPPING.Loading))
+		if reinit {
+			m.DetailPanelViewport.SetContent(style.NewStyle.Render(i18n.LANGUAGEMAPPING.Loading))
+			m.DetailPanelViewportOffset = 0
+			m.DetailPanelViewport.SetXOffset(0)
+			m.DetailPanelViewport.SetYOffset(0)
+		}
 		if m.CurrentSelectedComponent == constant.DetailComponent {
 			// if the current selected one is the detail component itself, the current selected one will be its parent (the component that led into the detail component)
 			theCurrentSelectedComponent = m.DetailPanelParentComponent
@@ -580,6 +582,7 @@ func fetchDetailComponentPanelInfoService(m *GittiModel) {
 			}
 
 			m.DetailPanelViewport.SetContent(contentLine)
+			m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
 		}
 	}(ctx)
 }

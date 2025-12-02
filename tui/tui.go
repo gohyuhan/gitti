@@ -13,13 +13,14 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
-func NewGittiModel(repoPath string, repoName string, gitOperations *api.GitOperations) *GittiModel {
+func NewGittiModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations) *GittiModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
 	vp.SetHorizontalStep(1)
 	vp.MouseWheelDelta = 1
 	gitti := &GittiModel{
+		TuiUpdateChannel:                 tuiUpdateChannel,
 		CurrentSelectedComponent:         constant.ModifiedFilesComponent,
 		CurrentSelectedComponentIndex:    2,
 		TotalComponentCount:              4,
@@ -67,6 +68,9 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Height = msg.Height
 		// recompute layout instantly
 		tuiWindowSizing(m)
+		// Initialize list components once, immediately after the first window resize.
+		// Valid dimensions are required to calculate item layouts (specifically text truncation);
+		// initializing earlier would cause the UI layout to break.
 		if m.IsRenderInit.CompareAndSwap(false, true) {
 			initBranchList(m)
 			initModifiedFilesList(m)
@@ -77,12 +81,23 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case GitUpdateMsg:
 		updateEvent := string(msg)
 		switch updateEvent {
+		case constant.DETAIL_COMPONENT_PANEL_UPDATED:
+			return m, nil
 		case git.GIT_BRANCH_UPDATE:
 			initBranchList(m)
+			if m.CurrentSelectedComponent == constant.LocalBranchComponent {
+				fetchDetailComponentPanelInfoService(m, false)
+			}
 		case git.GIT_FILES_STATUS_UPDATE:
 			initModifiedFilesList(m)
+			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+				fetchDetailComponentPanelInfoService(m, false)
+			}
 		case git.GIT_STASH_UPDATE:
 			initStashList(m)
+			if m.CurrentSelectedComponent == constant.StashComponent {
+				fetchDetailComponentPanelInfoService(m, false)
+			}
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
 			updatePopUpCommitOutputViewPort(m)
 		case git.GIT_AMEND_COMMIT_OUTPUT_UPDATE:

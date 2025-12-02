@@ -20,6 +20,7 @@ import (
 // ---------------------------------
 type GittiModel struct {
 	IsRenderInit                            atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
+	TuiUpdateChannel                        chan string
 	CurrentSelectedComponent                string
 	CurrentSelectedComponentIndex           int
 	TotalComponentCount                     int
