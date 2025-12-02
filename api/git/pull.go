@@ -11,12 +11,10 @@ import (
 )
 
 type GitPull struct {
-	errorLog            []error
-	gitPullOutput       []string
-	gitPullProcessMutex sync.Mutex
-	gitPullProcessCmd   *exec.Cmd
-	gitProcessLock      *GitProcessLock
-	updateChannel       chan string
+	errorLog       []error
+	gitPullOutput  []string
+	gitProcessLock *GitProcessLock
+	updateChannel  chan string
 }
 
 func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock) *GitPull {
@@ -26,7 +24,6 @@ func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock) *Git
 		updateChannel:  updateChannel,
 		gitProcessLock: gitProcessLock,
 	}
-	gitPull.gitPullProcessCmd = nil
 
 	return gitPull
 }
@@ -50,12 +47,9 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 		return -1
 	}
 	defer func() {
-		gp.gitPullProcessMutex.Lock()
-		gp.gitPullProcessReset()
-		gp.gitPullProcessMutex.Unlock()
+		gp.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	gp.gitPullProcessMutex.Lock()
 	gp.ClearGitPullOutput()
 	var gitPullArgs []string
 	switch pullType {
@@ -69,26 +63,19 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitPullArgs, true)
 
-	gp.gitPullProcessCmd = cmdExecutor
-
 	// Combine stderr into stdout
 	stdout, err := cmdExecutor.StdoutPipe()
 	if err != nil {
-		gp.gitPullProcessMutex.Unlock()
 		gp.errorLog = append(gp.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
 	cmdExecutor.Stderr = cmdExecutor.Stdout
 
-	// Start the process while still holding the mutex
+	// Start the process
 	if err := cmdExecutor.Start(); err != nil {
-		gp.gitPullProcessMutex.Unlock()
 		gp.errorLog = append(gp.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
-
-	// Process is now started and can be killed safely
-	gp.gitPullProcessMutex.Unlock()
 
 	// Stream combined output
 	var wg sync.WaitGroup
@@ -133,14 +120,4 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 // --------------------------------
 func (gp *GitPull) ClearGitPullOutput() {
 	gp.gitPullOutput = []string{}
-}
-
-// --------------------------------
-//
-// # Reset the git pull process after done
-//
-// --------------------------------
-func (gp *GitPull) gitPullProcessReset() {
-	gp.gitPullProcessCmd = nil
-	gp.gitProcessLock.ReleaseGitOpsLock()
 }

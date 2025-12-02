@@ -47,6 +47,7 @@ func NewGittiModel(tuiUpdateChannel chan string, repoPath string, repoName strin
 	gitti.IsRenderInit.Store(false)
 	gitti.ShowPopUp.Store(false)
 	gitti.IsTyping.Store(false)
+	gitti.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 
 	return gitti
 }
@@ -89,14 +90,15 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fetchDetailComponentPanelInfoService(m, false)
 			}
 		case git.GIT_FILES_STATUS_UPDATE:
-			initModifiedFilesList(m)
+			needReinit := initModifiedFilesList(m)
 			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
-				fetchDetailComponentPanelInfoService(m, false)
+				fetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_STASH_UPDATE:
 			initStashList(m)
+			needReinit := initStashList(m)
 			if m.CurrentSelectedComponent == constant.StashComponent {
-				fetchDetailComponentPanelInfoService(m, false)
+				fetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
 			updatePopUpCommitOutputViewPort(m)

@@ -93,6 +93,7 @@ var zH_HANT = LanguageMapping{
 		"[space] 套用",
 		"[backspace] 彈出",
 		"[d] 丟棄",
+		"[enter] 查看儲藏內容",
 		"[?] 全域按鍵綁定",
 	},
 	KeyBindingKeyStashComponentNone: []string{

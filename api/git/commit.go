@@ -13,18 +13,12 @@ import (
 )
 
 type GitCommit struct {
-	errorLog                  []error
-	gitCommitProcess          *exec.Cmd
-	gitRemotePushProcess      *exec.Cmd
-	gitAddRemoteProcess       *exec.Cmd
-	gitCommitOutput           []string
-	gitRemotePushOutput       []string
-	updateChannel             chan string
-	gitCommitProcessMutex     sync.Mutex
-	gitRemotePushProcessMutex sync.Mutex
-	gitAddRemoteProcessMutex  sync.Mutex
-	gitProcessLock            *GitProcessLock
-	remote                    []GitRemote
+	errorLog            []error
+	gitCommitOutput     []string
+	gitRemotePushOutput []string
+	updateChannel       chan string
+	gitProcessLock      *GitProcessLock
+	remote              []GitRemote
 }
 
 type LatestCommitMsgAndDesc struct {
@@ -34,13 +28,10 @@ type LatestCommitMsgAndDesc struct {
 
 func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock) *GitCommit {
 	gitCommit := GitCommit{
-		gitCommitProcess:     nil,
-		gitRemotePushProcess: nil,
-		gitAddRemoteProcess:  nil,
-		gitCommitOutput:      []string{},
-		gitRemotePushOutput:  []string{},
-		updateChannel:        updateChannel,
-		gitProcessLock:       gitProcessLock,
+		gitCommitOutput:     []string{},
+		gitRemotePushOutput: []string{},
+		updateChannel:       updateChannel,
+		gitProcessLock:      gitProcessLock,
 	}
 
 	return &gitCommit
@@ -86,13 +77,8 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 	}
 
 	defer func() {
-		// ensure cleanup even if Start or Wait fails
-		gc.gitCommitProcessMutex.Lock()
-		gc.gitCommitProcessReset()
-		gc.gitCommitProcessMutex.Unlock()
+		gc.gitProcessLock.ReleaseGitOpsLock()
 	}()
-
-	gc.gitCommitProcessMutex.Lock()
 
 	gc.ClearGitCommitOutput()
 	gitArgs := []string{"commit", "-m", message}
@@ -104,26 +90,20 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 	}
 
 	commitCmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
-	gc.gitCommitProcess = commitCmd
 
 	// Combine stderr into stdout
 	stdout, err := commitCmd.StdoutPipe()
 	if err != nil {
-		gc.gitCommitProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
 	commitCmd.Stderr = commitCmd.Stdout
 
-	// Start the process while still holding the mutex
+	// Start the process
 	if err := commitCmd.Start(); err != nil {
-		gc.gitCommitProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
-
-	// Process is now started and can be killed safely
-	gc.gitCommitProcessMutex.Unlock()
 
 	// Stream combined output
 	var wg sync.WaitGroup
@@ -170,11 +150,6 @@ func (gc *GitCommit) ClearGitCommitOutput() {
 	gc.gitCommitOutput = []string{}
 }
 
-func (gc *GitCommit) gitCommitProcessReset() {
-	gc.gitCommitProcess = nil
-	gc.gitProcessLock.ReleaseGitOpsLock()
-}
-
 // ----------------------------------
 //
 //	Related to Git Commit (Amend)
@@ -212,13 +187,9 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 		return -1
 	}
 	defer func() {
-		// ensure cleanup even if Start or Wait fails
-		gc.gitRemotePushProcessMutex.Lock()
-		gc.resetGitRemotePushProcesstatus()
-		gc.gitRemotePushProcessMutex.Unlock()
+		gc.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	gc.gitRemotePushProcessMutex.Lock()
 	gc.ClearGitRemotePushOutput()
 
 	// check if the checkoutbranch has upstream if not include "-u" flag
@@ -247,26 +218,19 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	// Disable interactive prompts for credentials
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
-	gc.gitRemotePushProcess = cmd
-
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		gc.gitRemotePushProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
 		return -1
 	}
 	cmd.Stderr = cmd.Stdout
 
-	// Start the process while still holding the mutex
+	// Start the process
 	if err := cmd.Start(); err != nil {
-		gc.gitRemotePushProcessMutex.Unlock()
 		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
 		return -1
 	}
-
-	// Process is now started and can be killed safely
-	gc.gitRemotePushProcessMutex.Unlock()
 
 	// Stream combined output
 	var wg sync.WaitGroup
@@ -306,9 +270,4 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 
 func (gc *GitCommit) ClearGitRemotePushOutput() {
 	gc.gitRemotePushOutput = []string{}
-}
-
-func (gc *GitCommit) resetGitRemotePushProcesstatus() {
-	gc.gitRemotePushProcess = nil
-	gc.gitProcessLock.ReleaseGitOpsLock()
 }

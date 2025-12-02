@@ -93,6 +93,7 @@ var jA = LanguageMapping{
 		"[space] 適用",
 		"[backspace] ポップ",
 		"[d] 破棄",
+		"[enter] スタッシュ内容を表示",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingKeyStashComponentNone: []string{

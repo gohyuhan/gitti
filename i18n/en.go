@@ -94,6 +94,7 @@ var eN = LanguageMapping{
 		"[space] apply",
 		"[backspace] pop",
 		"[d] discard",
+		"[enter] view stash content",
 		"[?] global key binding",
 	},
 	KeyBindingKeyStashComponentNone: []string{

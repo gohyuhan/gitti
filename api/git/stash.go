@@ -1,6 +1,7 @@
 package git
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"strings"
@@ -180,7 +181,19 @@ func (gs *GitStash) GitStashDrop(stashId string) {
 // ----------------------------------
 func (gs *GitStash) GitStashDetail(ctx context.Context, stashId string) []string {
 	var parsedDetail []string
-	gitArgs := []string{"stash", "show", "-u", stashId}
+
+	// Use -p flag for small stashes to show patch details
+	var gitArgs []string
+	isSmall, err := gs.isStashSmall(ctx, stashId)
+	if err != nil {
+		gs.errorLog = append(gs.errorLog, fmt.Errorf("[STASH DETAIL OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+		return parsedDetail
+	}
+	if isSmall {
+		gitArgs = []string{"stash", "show", "-p", "-u", stashId}
+	} else {
+		gitArgs = []string{"stash", "show", "-u", stashId}
+	}
 
 	detailCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	stashDetailOutput, detailCmdErr := detailCmdExecutor.Output()
@@ -195,4 +208,50 @@ func (gs *GitStash) GitStashDetail(ctx context.Context, stashId string) []string
 	}
 	parsedDetail = processGeneralGitOpsOutputIntoStringArray(stashDetailOutput)
 	return parsedDetail
+}
+
+// ----------------------------------
+//
+// # Helper to determine if stash is small
+//
+// ----------------------------------
+func (gs *GitStash) isStashSmall(ctx context.Context, stashId string) (bool, error) {
+	// Fast early-exit: use numstat which shows all files (tracked + untracked)
+	// Stop reading after threshold to avoid processing millions of files
+	const fileThreshold = 25
+	fileCount := 0
+
+	gitArgs := []string{"stash", "show", "-u", "--name-only", stashId}
+	showCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	showOutput, showErr := showCmdExecutor.StdoutPipe()
+
+	if showErr != nil {
+		if ctx.Err() != nil {
+			// This catches context.Canceled
+			gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASHOPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+			return false, ctx.Err()
+		}
+		return false, showErr
+	}
+
+	// Start the process
+	if err := showCmdExecutor.Start(); err != nil {
+		gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASH SIZESTART ERROR]: %w", err))
+		return false, err
+	}
+
+	scanner := bufio.NewScanner(showOutput)
+	for scanner.Scan() {
+		select {
+		case <-ctx.Done():
+			return false, fmt.Errorf("[DETERMINE STASHOPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err())
+		default:
+			fileCount++
+			if fileCount > fileThreshold {
+				return false, nil
+			}
+		}
+	}
+
+	return true, nil
 }

@@ -73,7 +73,8 @@ func initBranchList(m *GittiModel) {
 }
 
 // init the list component for Modified Files Component
-func initModifiedFilesList(m *GittiModel) {
+// return bool was to tell if we need to reinit the detail component panel or not
+func initModifiedFilesList(m *GittiModel) bool {
 	latestModifiedFilesArray := m.GitOperations.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))
 	for _, modifiedFile := range latestModifiedFilesArray {
@@ -120,7 +121,7 @@ func initModifiedFilesList(m *GittiModel) {
 	}
 
 	if len(items) < 1 {
-		return
+		return true
 	}
 
 	if selectedFilesPosition >= 0 {
@@ -134,10 +135,16 @@ func initModifiedFilesList(m *GittiModel) {
 			m.CurrentRepoModifiedFilesInfoList.Select(m.ListNavigationIndexPosition.ModifiedFilesComponent)
 		}
 	}
+
+	if previousSelectedFile == m.CurrentRepoModifiedFilesInfoList.SelectedItem() {
+		return false
+	}
+	return true
 }
 
 // init the list component for Stash info Component
-func initStashList(m *GittiModel) {
+// return bool was to tell if we need to reinit the detail component panel or not
+func initStashList(m *GittiModel) bool {
 	latestStashArray := m.GitOperations.GitStash.AllStash()
 	items := make([]list.Item, 0, len(latestStashArray))
 	for _, stashInfo := range latestStashArray {
@@ -145,11 +152,11 @@ func initStashList(m *GittiModel) {
 	}
 
 	// get the previous selected file and see if it was within the new list if yes get the latest position of the previous selected file
-	previousSelectedFile := m.CurrentRepoStashInfoList.SelectedItem()
+	previousSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
 	selectedFilesPosition := -1
 
 	for index, item := range items {
-		if item == previousSelectedFile {
+		if item == previousSelectedStash {
 			selectedFilesPosition = index
 			break
 		}
@@ -184,7 +191,7 @@ func initStashList(m *GittiModel) {
 	}
 
 	if len(items) < 1 {
-		return
+		return true
 	}
 
 	if selectedFilesPosition >= 0 {
@@ -198,6 +205,11 @@ func initStashList(m *GittiModel) {
 			m.CurrentRepoStashInfoList.Select(m.ListNavigationIndexPosition.StashComponent)
 		}
 	}
+
+	if previousSelectedStash == m.CurrentRepoStashInfoList.SelectedItem() {
+		return false
+	}
+	return true
 }
 
 // init the viewport pop up for showing info of global key binding

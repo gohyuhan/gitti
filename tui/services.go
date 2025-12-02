@@ -540,13 +540,37 @@ func gitDiscardFileChangesService(m *GittiModel, filePathName string, discardTyp
 //
 // ------------------------------------
 func fetchDetailComponentPanelInfoService(m *GittiModel, reinit bool) {
+	// For non-reinit calls (refreshing current view), abort if already processing.
+	// This avoids looping a cancel and execution cycle which would end up blocking
+	// a slightly longer processing process.
+	//
+	// If not processing, we proceed to fetch to ensure we capture any updates (e.g., file changes,
+	// amends), as we lack specific context on whether the underlying data has changed.
+	//
+	// If `reinit` is true (context switch), we bypass this check to cancel the active fetch
+	// and start the new one immediately.
+	if !reinit && m.IsDetailComponentPanelInfoFetchProcessing.Load() {
+		return
+	}
+
+	// Cancel any existing operation first
 	if m.DetailComponentPanelInfoFetchCancelFunc != nil {
 		m.DetailComponentPanelInfoFetchCancelFunc()
 	}
+
+	// Wait for the previous goroutine to finish (its defer will set processing to false),
+	// then atomically set it to true before starting a new one.
+	for !m.IsDetailComponentPanelInfoFetchProcessing.CompareAndSwap(false, true) {
+		// The previous goroutine is still running, wait a tiny bit
+	}
+
 	ctx, cancel := context.WithCancel(context.Background())
 	m.DetailComponentPanelInfoFetchCancelFunc = cancel
 	go func(ctx context.Context) {
-		defer cancel()
+		defer func() {
+			m.IsDetailComponentPanelInfoFetchProcessing.Store(false)
+			cancel()
+		}()
 
 		var contentLine string
 		var theCurrentSelectedComponent string
@@ -583,6 +607,7 @@ func fetchDetailComponentPanelInfoService(m *GittiModel, reinit bool) {
 
 			m.DetailPanelViewport.SetContent(contentLine)
 			m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
+			return
 		}
 	}(ctx)
 }

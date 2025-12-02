@@ -550,6 +550,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					m.CurrentSelectedComponent = constant.DetailComponent
 					m.DetailPanelParentComponent = constant.ModifiedFilesComponent
 				}
+			case constant.StashComponent:
+				if len(m.CurrentRepoStashInfoList.Items()) > 0 {
+					m.CurrentSelectedComponent = constant.DetailComponent
+					m.DetailPanelParentComponent = constant.StashComponent
+				}
 			case constant.LocalBranchComponent:
 				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(gitBranchItem)
 				// only proceed if the local branch selected is not current checkedout branch

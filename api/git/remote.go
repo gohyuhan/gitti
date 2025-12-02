@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
-	"sync"
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
@@ -13,9 +12,7 @@ import (
 
 type GitRemote struct {
 	errorLog                      []error
-	gitAddRemoteProcess           *exec.Cmd
 	updateChannel                 chan string
-	gitAddRemoteProcessMutex      sync.Mutex
 	gitProcessLock                *GitProcessLock
 	remote                        []GitRemoteInfo
 	remoteSyncStatus              RemoteSyncStatus
@@ -36,7 +33,6 @@ type RemoteSyncStatus struct {
 
 func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *GitRemote {
 	gitRemote := GitRemote{
-		gitAddRemoteProcess:           nil,
 		updateChannel:                 updateChannel,
 		gitProcessLock:                gitProcessLock,
 		remote:                        []GitRemoteInfo{},
@@ -95,9 +91,7 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 		return []string{gr.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
 	defer func() {
-		gr.gitAddRemoteProcessMutex.Lock()
-		gr.gitAddRemoteProcessReset()
-		gr.gitAddRemoteProcessMutex.Unlock()
+		gr.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
 	if !isValidGitRemoteURL(url) {
@@ -108,14 +102,11 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 		return []string{errMsg}, -1
 	}
 
-	gr.gitAddRemoteProcessMutex.Lock()
 	gitArgs := []string{"remote", "add", originName, url}
 	cmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
-	gr.gitAddRemoteProcess = cmd
 
 	// CombinedOutput starts and waits for the command
 	gitOutput, err := cmd.CombinedOutput()
-	gr.gitAddRemoteProcessMutex.Unlock()
 
 	gitAddRemoteOutput := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 	if err != nil {
@@ -129,11 +120,6 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 
 	}
 	return gitAddRemoteOutput, 0
-}
-
-func (gr *GitRemote) gitAddRemoteProcessReset() {
-	gr.gitAddRemoteProcess = nil
-	gr.gitProcessLock.ReleaseGitOpsLock()
 }
 
 func (gr *GitRemote) CheckRemoteExist() bool {
