@@ -10,19 +10,11 @@ import (
 	"github.com/gohyuhan/gitti/executor"
 )
 
-const (
-	AddLine        = "ADDLINE"
-	RemoveLine     = "REMOVELINE"
-	UnModifiedLine = "UNMODIFIEDLINE"
-)
-
-const (
-	DISCARDWHOLE           = "DISCARDWHOLE"
-	DISCARDUNSTAGE         = "DISCARDUNSTAGE"
-	DISCARDUNTRACKED       = "DISCARDUNTRACKED"
-	DISCARDNEWLYADDED      = "DISCARDNEWLYADDED"
-	DISCARDANDREVERTRENAME = "DISCARDANDREVERTRENAME"
-)
+// const (
+// 	AddLine        = "ADDLINE"
+// 	RemoveLine     = "REMOVELINE"
+// 	UnModifiedLine = "UNMODIFIEDLINE"
+// )
 
 type FileStatus struct {
 	FilePathname string
@@ -203,7 +195,6 @@ func (gf *GitFiles) UnstageAllChanges() {
 	gitArgs := []string{"reset"}
 	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stageCmdExecutor.Run()
-
 }
 
 // ----------------------------------

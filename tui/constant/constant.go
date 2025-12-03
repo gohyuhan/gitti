@@ -22,7 +22,9 @@ const (
 	GitPullOutputPopUp           = "GitPullOutputPopUp"           // IsTyping will be false
 	GitStashMessagePopUp         = "GitStashMessagePopUp"         // IsTyping will be true
 	GitDiscardTypeOptionPopUp    = "GitDiscardTypeOptionPopUp"    // IsTyping will be false
-	GitDiscardConfirmPromptPopup = "GitDiscardConfirmPromptPopup" // IsTyping will be false
+	GitDiscardConfirmPromptPopUp = "GitDiscardConfirmPromptPopUp" // IsTyping will be false
+	GitStashOperationOutputPopUp = "GitStashOperationOutputPopUp" // IsTyping will be false
+	GitStashConfirmPromptPopUp   = "GitStashConfirmPromptPopUp"   // IsTyping will be false
 )
 
 const AUTOCLOSEINTERVAL = 500
@@ -55,20 +57,23 @@ const (
 	MaxGitStashMessagePopUpWidth         = 150
 	MaxGitDiscardTypeOptionPopUpWidth    = 150
 	MaxGitDiscardConfirmPromptPopupWidth = 150
+	MaxGitStashOperationOutputPopUpWidth = 150
+	MaxGitStashConfirmPromptPopUpWidth   = 150
 
-	PopUpGlobalKeyBindingViewPortHeight     = 30
-	PopUpGitCommitOutputViewPortHeight      = 10
-	PopUpGitAmendCommitOutputViewPortHeight = 10
-	PopUpAddRemoteOutputViewPortHeight      = 2
-	PopUpGitRemotePushOutputViewportHeight  = 10
-	PopUpChooseRemoteHeight                 = 10
-	PopUpChoosePushTypeHeight               = 6
-	PopUpChooseNewBranchTypeHeight          = 6
-	PopUpChooseSwitchBranchTypeHeight       = 6
-	PopUpSwitchBranchOutputViewPortHeight   = 10
-	PopUpChooseGitPullTypeHeight            = 6
-	PopUpGitPullOutputViewportHeight        = 16
-	PopUpGitDiscardTypeOptionHeight         = 6
+	PopUpGlobalKeyBindingViewPortHeight        = 30
+	PopUpGitCommitOutputViewPortHeight         = 10
+	PopUpGitAmendCommitOutputViewPortHeight    = 10
+	PopUpAddRemoteOutputViewPortHeight         = 2
+	PopUpGitRemotePushOutputViewportHeight     = 10
+	PopUpChooseRemoteHeight                    = 10
+	PopUpChoosePushTypeHeight                  = 6
+	PopUpChooseNewBranchTypeHeight             = 6
+	PopUpChooseSwitchBranchTypeHeight          = 6
+	PopUpSwitchBranchOutputViewPortHeight      = 10
+	PopUpChooseGitPullTypeHeight               = 6
+	PopUpGitPullOutputViewportHeight           = 16
+	PopUpGitDiscardTypeOptionHeight            = 6
+	PopUpGitStashOperationOutputViewPortHeight = 10
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

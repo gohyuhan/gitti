@@ -97,7 +97,9 @@ type LanguageMapping struct {
 	KeyBindingForGitPullOutputPopUp           []string
 	KeyBindingForGitStashMessagePopUp         []string
 	KeyBindingForGitDiscardTypeOptionPopUp    []string
-	KeyBindingForGitDiscardConfirmPromptPopup []string
+	KeyBindingForGitDiscardConfirmPromptPopUp []string
+	KeyBindingForGitStashOperationOutputPopUp []string
+	KeyBindingForGitStashConfirmPromptPopUp   []string
 	KeyBindingForGlobalKeyBindingPopUp        []string
 	// -----------------
 	//  For Pop Up
@@ -180,4 +182,22 @@ type LanguageMapping struct {
 	GitDiscardUntrackedConfirmation       string
 	GitDiscardNewlyAddedConfirmation      string
 	GitDiscardAndRevertRenameConfirmation string
+	// for stash operation title (used in output pop up)
+	GitStashAllTitle   string
+	GitStashFileTitle  string
+	GitStashApplyTitle string
+	GitStashDropTitle  string
+	GitStashPopTitle   string
+	// for stash operation processing (used in output pop up)
+	GitStashAllProcessing   string
+	GitStashFileProcessing  string
+	GitStashApplyProcessing string
+	GitStashDropProcessing  string
+	GitStashPopProcessing   string
+	// for stash operation confirm prompt
+	GitStashAllConfirmation   string
+	GitStashFileConfirmation  string
+	GitApplyStashConfirmation string
+	GitDropStashConfirmation  string
+	GitPopStashConfirmation   string
 }

@@ -149,6 +149,12 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
+		case constant.GitStashOperationOutputPopUp:
+			if stashPopup, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel); ok && stashPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				stashPopup.Spinner, cmd = stashPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
 		}
 	}
 

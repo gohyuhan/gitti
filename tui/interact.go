@@ -232,14 +232,13 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				msg := popUp.StashMessageInput.Value()
 				switch popUp.StashType {
 				case git.STASHALL:
-					gitStashAllService(m, msg)
-				case git.STASHINDIVIDUAL:
-					gitStashIndividualFileService(m, popUp.FilePathName, msg)
+					initGitStashConfirmPromptPopUpModel(m, git.STASHALL, "", "", msg)
+				case git.STASHFILE:
+					initGitStashConfirmPromptPopUpModel(m, git.STASHFILE, popUp.FilePathName, "", msg)
 				}
-				m.ShowPopUp.Store(false)
+				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				m.PopUpType = constant.NoPopUp
-				m.PopUpModel = nil
+				m.PopUpType = constant.GitStashConfirmPromptPopUp
 			}
 		}
 		return m, nil
@@ -367,16 +366,15 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "c":
 		if !m.ShowPopUp.Load() {
-			m.ShowPopUp.Store(true)
-			m.PopUpType = constant.CommitPopUp
 			m.GitOperations.GitCommit.ClearGitCommitOutput()
-
 			// if the current pop up model is not commit pop up model, then init it
 			if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
 				initGitCommitPopUpModel(m)
 			} else {
 				popUp.GitCommitOutputViewport.SetContent("")
 			}
+			m.PopUpType = constant.CommitPopUp
+			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(true)
 		}
 		return m, nil
@@ -387,7 +385,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case constant.StashComponent:
 				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 				if selectedStashId != nil {
-					gitStashDropService(m, selectedStashId.(gitStashItem).Id)
+					initGitStashConfirmPromptPopUpModel(m, git.DROPSTASH, "", selectedStashId.(gitStashItem).Id, selectedStashId.(gitStashItem).Message)
+					m.PopUpType = constant.GitStashConfirmPromptPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
 				}
 			case constant.ModifiedFilesComponent:
 				currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -405,7 +406,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false, true)
 					} else if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
 						// newly added untracked file
-						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
 					} else if currentSelectedFile.IndexState != "A" && currentSelectedFile.IndexState != "R" && currentSelectedFile.IndexState != "?" && currentSelectedFile.WorkTree != " " {
 						// tracked file with both staged and unstaged modification
@@ -413,15 +414,15 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false, false)
 					} else if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " " {
 						// newly added tracked file
-						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDED)
 					} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree == " " {
 						// a staged rename
-						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDANDREVERTRENAME)
 					} else {
 						// tracked file with only unstaged modification
-						m.PopUpType = constant.GitDiscardConfirmPromptPopup
+						m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
 					}
 				}
@@ -447,7 +448,6 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			// first we need to check if there are any push/pull origin origin for this repo
 			// if not we prompt the user to add a new remote origin
 			if !m.GitOperations.GitRemote.CheckRemoteExist() {
-				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it
 				if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
@@ -455,6 +455,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				} else {
 					popUp.AddRemoteOutputViewport.SetContent("")
 				}
+				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(true)
 			} else {
 				m.ShowPopUp.Store(true)
@@ -480,7 +481,6 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			// first we need to check if there are any push/pull origin for this repo
 			// if not we prompt the user to add a new remote origin
 			if !m.GitOperations.GitRemote.CheckRemoteExist() {
-				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.AddRemotePromptPopUp
 				// if the current pop up model is not commit pop up model, then init it
 				if popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel); !ok {
@@ -488,6 +488,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				} else {
 					popUp.AddRemoteOutputViewport.SetContent("")
 				}
+				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(true)
 			} else {
 				m.ShowPopUp.Store(true)
@@ -505,8 +506,8 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			if currentSelectedModifiedFile != nil {
 				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
 				m.PopUpType = constant.GitStashMessagePopUp
+				initGitStashMessagePopUpModel(m, filePathName, git.STASHFILE)
 				m.ShowPopUp.Store(true)
-				initGitStashMessagePopUpModel(m, filePathName, git.STASHINDIVIDUAL)
 				m.IsTyping.Store(true)
 			}
 		}
@@ -519,8 +520,8 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			if currentSelectedModifiedFile != nil {
 				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
 				m.PopUpType = constant.GitStashMessagePopUp
-				m.ShowPopUp.Store(true)
 				initGitStashMessagePopUpModel(m, filePathName, git.STASHALL)
+				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(true)
 			}
 		}
@@ -537,7 +538,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponent {
 			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 			if selectedStashId != nil {
-				gitStashPopService(m, selectedStashId.(gitStashItem).Id)
+				initGitStashConfirmPromptPopUpModel(m, git.POPSTASH, "", selectedStashId.(gitStashItem).Id, selectedStashId.(gitStashItem).Message)
+				m.PopUpType = constant.GitStashConfirmPromptPopUp
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
 			}
 		}
 		return m, nil
@@ -634,13 +638,13 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case constant.GitDiscardTypeOptionPopUp:
 				popUp, ok := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
 				if ok {
-					m.PopUpType = constant.GitDiscardConfirmPromptPopup
+					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
 					selectedOption := popUp.DiscardTypeOptionList.SelectedItem().(gitDiscardTypeOptionItem)
 					initGitDiscardConfirmPromptPopup(m, popUp.FilePathName, selectedOption.DiscardType)
 				}
-			case constant.GitDiscardConfirmPromptPopup:
+			case constant.GitDiscardConfirmPromptPopUp:
 				popUp, ok := m.PopUpModel.(*GitDiscardConfirmPromptPopUpModel)
 				if ok {
 					gitDiscardFileChangesService(m, popUp.FilePathName, popUp.DiscardType)
@@ -648,6 +652,19 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					m.IsTyping.Store(false)
 					m.PopUpType = constant.NoPopUp
 					m.PopUpModel = nil
+				}
+			case constant.GitStashConfirmPromptPopUp:
+				popUp, ok := m.PopUpModel.(*GitStashConfirmPromptPopUpModel)
+				if ok {
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.GitStashOperationOutputPopUp
+					initGitStashOperationOutputPopUpModel(m, popUp.StashOperationType)
+					outputPopUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
+					if ok {
+						gitStashOperationService(m, popUp.FilePathName, popUp.StashId, popUp.StashMessage)
+						return m, outputPopUp.Spinner.Tick
+					}
 				}
 			}
 		}
@@ -688,7 +705,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			case constant.StashComponent:
 				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 				if selectedStashId != nil {
-					gitStashApplyService(m, selectedStashId.(gitStashItem).Id)
+					initGitStashConfirmPromptPopUpModel(m, git.APPLYSTASH, "", selectedStashId.(gitStashItem).Id, selectedStashId.(gitStashItem).Message)
+					m.PopUpType = constant.GitStashConfirmPromptPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
 				}
 			}
 		}
@@ -727,10 +747,15 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			case constant.SwitchBranchOutputPopUp:
-				m.ShowPopUp.Store(false)
-				m.IsTyping.Store(false)
-				m.PopUpType = constant.NoPopUp
-				m.PopUpModel = nil
+				// Block ESC during branch switching - operation must complete
+				popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+				if ok && !popUp.IsProcessing.Load() {
+					// only close when done processing
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.NoPopUp
+					m.PopUpModel = nil
+				}
 			case constant.ChooseGitPullTypePopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
@@ -741,7 +766,22 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
-			case constant.GitDiscardConfirmPromptPopup:
+			case constant.GitDiscardConfirmPromptPopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			case constant.GitStashOperationOutputPopUp:
+				// Block ESC during stash operation - operation must complete
+				popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
+				if ok && !popUp.IsProcessing.Load() {
+					// only close when done processing
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.NoPopUp
+					m.PopUpModel = nil
+				}
+			case constant.GitStashConfirmPromptPopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
@@ -831,7 +871,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "left", "h":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.Update(msg)
+			m.DetailPanelViewport.ScrollLeft(1)
 		} else {
 			switch m.PopUpType {
 			case constant.CommitPopUp:
@@ -845,7 +885,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 
 	case "right", "l":
 		if !m.ShowPopUp.Load() {
-			m.DetailPanelViewport.Update(msg)
+			m.DetailPanelViewport.ScrollRight(1)
 		} else {
 			switch m.PopUpType {
 			case constant.CommitPopUp:
@@ -897,12 +937,6 @@ func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea
 	// for within pop up component
 	switch m.PopUpType {
 	// following is for list component
-	case constant.GlobalKeyBindingPopUp:
-		popUp, ok := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
-		if ok {
-			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
-			return m, cmd
-		}
 	case constant.ChooseRemotePopUp:
 		popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
 		if ok {
@@ -933,11 +967,29 @@ func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea
 			popUp.PullTypeOptionList, cmd = popUp.PullTypeOptionList.Update(msg)
 			return m, cmd
 		}
+	case constant.GitDiscardTypeOptionPopUp:
+		popUp, ok := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
+		if ok {
+			popUp.DiscardTypeOptionList, cmd = popUp.DiscardTypeOptionList.Update(msg)
+			return m, cmd
+		}
 	// following is for viewport
+	case constant.GlobalKeyBindingPopUp:
+		popUp, ok := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
+		if ok {
+			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
+			return m, cmd
+		}
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 		if ok {
 			popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.AmendCommitPopUp:
+		popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
+		if ok {
+			popUp.GitAmendCommitOutputViewport, cmd = popUp.GitAmendCommitOutputViewport.Update(msg)
 			return m, cmd
 		}
 	case constant.GitRemotePushPopUp:
@@ -952,16 +1004,22 @@ func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea
 			popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
 			return m, cmd
 		}
+	case constant.SwitchBranchOutputPopUp:
+		popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+		if ok {
+			popUp.SwitchBranchOutputViewport, cmd = popUp.SwitchBranchOutputViewport.Update(msg)
+			return m, cmd
+		}
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 		if ok {
 			popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
 			return m, cmd
 		}
-	case constant.GitDiscardTypeOptionPopUp:
-		popUp, ok := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
+	case constant.GitStashOperationOutputPopUp:
+		popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
 		if ok {
-			popUp.DiscardTypeOptionList, cmd = popUp.DiscardTypeOptionList.Update(msg)
+			popUp.GitStashOperationOutputViewport, cmd = popUp.GitStashOperationOutputViewport.Update(msg)
 			return m, cmd
 		}
 	}
@@ -978,10 +1036,17 @@ func upDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *GittiModel) (*GittiModel,
 			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
 			return m, cmd
 		}
+
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 		if ok {
 			popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.AmendCommitPopUp:
+		popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
+		if ok {
+			popUp.GitAmendCommitOutputViewport, cmd = popUp.GitAmendCommitOutputViewport.Update(msg)
 			return m, cmd
 		}
 	case constant.GitRemotePushPopUp:
@@ -996,10 +1061,22 @@ func upDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *GittiModel) (*GittiModel,
 			popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
 			return m, cmd
 		}
+	case constant.SwitchBranchOutputPopUp:
+		popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
+		if ok {
+			popUp.SwitchBranchOutputViewport, cmd = popUp.SwitchBranchOutputViewport.Update(msg)
+			return m, cmd
+		}
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 		if ok {
 			popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.GitStashOperationOutputPopUp:
+		popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
+		if ok {
+			popUp.GitStashOperationOutputViewport, cmd = popUp.GitStashOperationOutputViewport.Update(msg)
 			return m, cmd
 		}
 	}

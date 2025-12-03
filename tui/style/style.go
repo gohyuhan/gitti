@@ -82,8 +82,9 @@ var (
 	RemoteStatusStyle = NewStyle.
 				Foreground(ColorError)
 
-	StashIdStyle      = NewStyle.Foreground(ColorYellowWarm)
-	StashMessageStyle = NewStyle.Foreground(ColorYellowSoft)
+	StashIdStyle       = NewStyle.Foreground(ColorYellowWarm)
+	StashMessageStyle  = NewStyle.Foreground(ColorYellowSoft)
+	StashFilePathStyle = NewStyle.Foreground(ColorCyanSoft)
 
 	ErrorStyle = NewStyle.
 			Foreground(ColorError)

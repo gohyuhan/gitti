@@ -464,6 +464,7 @@ func initCreateNewBranchPopUpModel(m *GittiModel, createType string) {
 	NewBranchNameInput.Focus()
 	NewBranchNameInput.SetVirtualCursor(true)
 
+	NewBranchNameInput.SetWidth(min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 	m.PopUpModel = &CreateNewBranchPopUpModel{
 		NewBranchNameInput: NewBranchNameInput,
 		CreateType:         createType,
@@ -629,6 +630,7 @@ func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType
 	stashMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.GitStashMessagePlaceholder
 	stashMessageTextInput.Focus()
 	stashMessageTextInput.SetVirtualCursor(true)
+	stashMessageTextInput.SetWidth(min(constant.MaxGitStashMessagePopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
 	popUpModel := &GitStashMessagePopUpModel{
 		StashMessageInput: stashMessageTextInput,
@@ -710,6 +712,41 @@ func initGitDiscardConfirmPromptPopup(m *GittiModel, filePathName string, discar
 	popUpModel := &GitDiscardConfirmPromptPopUpModel{
 		FilePathName: filePathName,
 		DiscardType:  discardType,
+	}
+	m.PopUpModel = popUpModel
+}
+
+// for git stash output popup
+func initGitStashOperationOutputPopUpModel(m *GittiModel, stashOperationType string) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpGitStashOperationOutputViewPortHeight)
+	vp.SetWidth(min(constant.MaxGitStashOperationOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &GitStashOperationOutputPopUpModel{
+		StashOperationType:              stashOperationType,
+		GitStashOperationOutputViewport: vp,
+		Spinner:                         s,
+	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	m.PopUpModel = popUpModel
+}
+
+// for git stash operation confirm prompt
+func initGitStashConfirmPromptPopUpModel(m *GittiModel, stashOperationType string, filePathName string, stashId string, stashMessage string) {
+	popUpModel := &GitStashConfirmPromptPopUpModel{
+		StashOperationType: stashOperationType,
+		FilePathName:       filePathName,
+		StashId:            stashId,
+		StashMessage:       stashMessage,
 	}
 	m.PopUpModel = popUpModel
 }

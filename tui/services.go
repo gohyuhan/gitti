@@ -469,56 +469,51 @@ func gitUnstageAllChangesService(m *GittiModel) {
 
 // ------------------------------------
 //
-//	For Git stash all
+//	For Git stash operation
+//	* Stash operations are not cancellable in Gitti, because interrupting
+//	  the process mid-operation could leave the repository in a partial or
+//	  inconsistent state (stash applied only halfway).
 //
 // ------------------------------------
-func gitStashAllService(m *GittiModel, msg string) {
+func gitStashOperationService(m *GittiModel, filePathName string, stashId string, stashMessage string) {
 	go func() {
-		m.GitOperations.GitStash.GitStashAll(msg)
-	}()
-}
+		popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
+		if ok {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+		} else {
+			return
+		}
 
-// ------------------------------------
-//
-//	For Git stash individual file
-//
-// ------------------------------------
-func gitStashIndividualFileService(m *GittiModel, filePathName string, msg string) {
-	go func() {
-		m.GitOperations.GitStash.GitStashFile(filePathName, msg)
-	}()
-}
+		var exitStatusCode int
+		var resultOutput []string
 
-// ------------------------------------
-//
-//	For Git stash Apply
-//
-// ------------------------------------
-func gitStashApplyService(m *GittiModel, filePathName string) {
-	go func() {
-		m.GitOperations.GitStash.GitStashApply(filePathName)
-	}()
-}
+		switch popUp.StashOperationType {
+		case git.STASHALL:
+			resultOutput, exitStatusCode = m.GitOperations.GitStash.GitStashAll(stashMessage)
+		case git.STASHFILE:
+			resultOutput, exitStatusCode = m.GitOperations.GitStash.GitStashFile(filePathName, stashMessage)
+		case git.APPLYSTASH:
+			resultOutput, exitStatusCode = m.GitOperations.GitStash.GitStashApply(stashId)
+		case git.POPSTASH:
+			resultOutput, exitStatusCode = m.GitOperations.GitStash.GitStashPop(stashId)
+		case git.DROPSTASH:
+			resultOutput, exitStatusCode = m.GitOperations.GitStash.GitStashDrop(stashId)
+		}
 
-// ------------------------------------
-//
-//	For Git stash Pop
-//
-// ------------------------------------
-func gitStashPopService(m *GittiModel, filePathName string) {
-	go func() {
-		m.GitOperations.GitStash.GitStashPop(filePathName)
-	}()
-}
-
-// ------------------------------------
-//
-//	For Git stash drop
-//
-// ------------------------------------
-func gitStashDropService(m *GittiModel, filePathName string) {
-	go func() {
-		m.GitOperations.GitStash.GitStashDrop(filePathName)
+		popUp, ok = m.PopUpModel.(*GitStashOperationOutputPopUpModel)
+		if ok {
+			popUp.IsProcessing.Store(false) // update the processing status
+			// if sucessful exitcode will be 0
+			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(true)
+				popUp.HasError.Store(false)
+			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
+				popUp.HasError.Store(true)
+			}
+			popUp.GitStashOperationOutputViewport.SetContentLines(resultOutput)
+		}
 	}()
 }
 

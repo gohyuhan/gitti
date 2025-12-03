@@ -165,8 +165,15 @@ var eN = LanguageMapping{
 		"[enter] select discard option",
 		"[esc] cancel / close",
 	},
-	KeyBindingForGitDiscardConfirmPromptPopup: []string{
+	KeyBindingForGitDiscardConfirmPromptPopUp: []string{
 		"[enter] proceed with discard",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitStashOperationOutputPopUp: []string{
+		"[esc] close",
+	},
+	KeyBindingForGitStashConfirmPromptPopUp: []string{
+		"[enter] proceed",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -231,6 +238,21 @@ var eN = LanguageMapping{
 	GitDiscardUntrackedConfirmation:                          "Are you sure you want to discard untracked changes for [%s] ?",
 	GitDiscardNewlyAddedConfirmation:                         "Are you sure you want to discard newly tracked changes for [%s] ? \n * This will remove untracked changes also",
 	GitDiscardAndRevertRenameConfirmation:                    "Are you sure you want to discard changes and revert rename for [%s] ?",
+	GitStashAllTitle:                                         "Stash All File(s)",
+	GitStashFileTitle:                                        "Stash File",
+	GitStashApplyTitle:                                       "Apply Stash",
+	GitStashDropTitle:                                        "Drop Stash",
+	GitStashPopTitle:                                         "Pop Stash",
+	GitStashAllProcessing:                                    "Stashing all changes...",
+	GitStashFileProcessing:                                   "Stashing file...",
+	GitStashApplyProcessing:                                  "Applying stash...",
+	GitStashDropProcessing:                                   "Dropping stash...",
+	GitStashPopProcessing:                                    "Popping stash...",
+	GitStashAllConfirmation:                                  "Are you sure you want to stash all changes",
+	GitStashFileConfirmation:                                 "Are you sure you want to stash changes for \n[ %s ]",
+	GitApplyStashConfirmation:                                "Are you sure you want to apply stash for \n[ %s ]\nId: [ %s ]",
+	GitDropStashConfirmation:                                 "Are you sure you want to drop stash for \n[ %s ]\nId: [ %s ]",
+	GitPopStashConfirmation:                                  "Are you sure you want to pop stash for \n[ %s ]\nId: [ %s ]",
 }
 
 // for about gitti

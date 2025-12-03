@@ -164,8 +164,15 @@ var zH_HANT = LanguageMapping{
 		"[enter] 選擇捨棄選項",
 		"[esc] 取消 / 關閉",
 	},
-	KeyBindingForGitDiscardConfirmPromptPopup: []string{
+	KeyBindingForGitDiscardConfirmPromptPopUp: []string{
 		"[enter] 繼續捨棄",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForGitStashOperationOutputPopUp: []string{
+		"[esc] 關閉",
+	},
+	KeyBindingForGitStashConfirmPromptPopUp: []string{
+		"[enter] 繼續",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -230,6 +237,21 @@ var zH_HANT = LanguageMapping{
 	GitDiscardUntrackedConfirmation:                          "確定要捨棄 [%s] 的未追蹤變更嗎？",
 	GitDiscardNewlyAddedConfirmation:                         "確定要捨棄 [%s] 的新追蹤變更嗎？ \n * 這也將移除未追蹤的變更",
 	GitDiscardAndRevertRenameConfirmation:                    "您確定要放棄 [%s] 的變更並復原重新命名嗎？",
+	GitStashAllTitle:                                         "儲藏所有檔案",
+	GitStashFileTitle:                                        "儲藏檔案",
+	GitStashApplyTitle:                                       "套用儲藏",
+	GitStashDropTitle:                                        "丟棄儲藏",
+	GitStashPopTitle:                                         "彈出儲藏",
+	GitStashAllProcessing:                                    "正在儲藏所有變更...",
+	GitStashFileProcessing:                                   "正在儲藏檔案...",
+	GitStashApplyProcessing:                                  "正在套用儲藏...",
+	GitStashDropProcessing:                                   "正在丟棄儲藏...",
+	GitStashPopProcessing:                                    "正在彈出儲藏...",
+	GitStashAllConfirmation:                                  "您確定要暫存所有變更嗎",
+	GitStashFileConfirmation:                                 "您確定要暫存以下的變更嗎\n[%s]",
+	GitApplyStashConfirmation:                                "您確定要套用以下的暫存嗎\n[%s]\nId: [ %s]",
+	GitDropStashConfirmation:                                 "您確定要丟棄以下的暫存嗎\n[%s]\nId: [ %s]",
+	GitPopStashConfirmation:                                  "您確定要彈出以下的暫存嗎\n[%s]\nId: [ %s]",
 }
 
 // for about gitti

@@ -52,8 +52,12 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderGitStashMessagePopUp(m)
 	case constant.GitDiscardTypeOptionPopUp:
 		popUp = renderGitDiscardTypeOptionPopUp(m)
-	case constant.GitDiscardConfirmPromptPopup:
+	case constant.GitDiscardConfirmPromptPopUp:
 		popUp = renderGitDiscardConfirmPromptPopup(m)
+	case constant.GitStashOperationOutputPopUp:
+		popUp = renderGitStashOperationOutputPopUp(m)
+	case constant.GitStashConfirmPromptPopUp:
+		popUp = renderGitStashConfirmPromptPopUp(m)
 	}
 	return popUp
 }
@@ -96,6 +100,10 @@ func renderGlobalKeyBindingPopUp(m *GittiModel) string {
 					"\n"
 			}
 		}
+		height := min(constant.PopUpGlobalKeyBindingViewPortHeight, int(float64(m.Height)*0.8))
+		width := min(constant.MaxGlobalKeyBindingPopUpWidth, int(float64(m.Width)*0.8)-4)
+		popUp.GlobalKeyBindingViewport.SetWidth(width)
+		popUp.GlobalKeyBindingViewport.SetHeight(height)
 		popUp.GlobalKeyBindingViewport.SetContent(keyBindingLine)
 		return style.GlobalKeyBindingPopUpStyle.Render(popUp.GlobalKeyBindingViewport.View())
 	}
@@ -138,7 +146,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 				logViewPortStyle = style.PanelBorderStyle.
 					BorderForeground(style.ColorGreenSoft)
 			}
-
+			popUp.GitCommitOutputViewport.SetWidth(popUpWidth - 4)
 			logViewPort := logViewPortStyle.Render(popUp.GitCommitOutputViewport.View())
 
 			// Show spinner above viewport when processing
@@ -223,7 +231,7 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 				logViewPortStyle = style.PanelBorderStyle.
 					BorderForeground(style.ColorGreenSoft)
 			}
-
+			popUp.GitAmendCommitOutputViewport.SetWidth(popUpWidth - 4)
 			logViewPort := logViewPortStyle.Render(popUp.GitAmendCommitOutputViewport.View())
 
 			// Show spinner above viewport when processing
@@ -321,7 +329,7 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 				logViewPortStyle = style.PanelBorderStyle.
 					BorderForeground(style.ColorGreenSoft)
 			}
-
+			popUp.AddRemoteOutputViewport.SetWidth(popUpWidth - 4)
 			logViewPort := logViewPortStyle.Render(popUp.AddRemoteOutputViewport.View())
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
@@ -372,6 +380,7 @@ func renderChooseRemotePopUp(m *GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxChooseRemotePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChooseRemoteTitle)
+		popUp.RemoteList.SetWidth(popUpWidth - 4)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -392,6 +401,7 @@ func renderChoosePushTypePopUp(m *GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Width(popUpWidth).Render(i18n.LANGUAGEMAPPING.GitRemotePushOptionTitle)
+		popUp.PushOptionList.SetWidth(popUpWidth - 4)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -422,7 +432,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 			logViewPortStyle = style.PanelBorderStyle.
 				BorderForeground(style.ColorGreenSoft)
 		}
-
+		popUp.GitRemotePushOutputViewport.SetWidth(popUpWidth - 4)
 		logViewPort := logViewPortStyle.Render(popUp.GitRemotePushOutputViewport.View())
 
 		var content string
@@ -474,6 +484,7 @@ func renderChooseNewBranchTypePopUp(m *GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChooseNewBranchTypeTitle)
+		popUp.NewBranchTypeOptionList.SetWidth(popUpWidth - 4)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -521,6 +532,7 @@ func renderChooseSwitchBranchTypePopUp(m *GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.ChooseSwitchBranchTypeTitle, popUp.BranchName))
+		popUp.SwitchTypeOptionList.SetWidth(popUpWidth - 4)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -549,7 +561,7 @@ func renderSwitchBranchOutputPopUp(m *GittiModel) string {
 			logViewPortStyle = style.PanelBorderStyle.
 				BorderForeground(style.ColorGreenSoft)
 		}
-
+		popUp.SwitchBranchOutputViewport.SetWidth(popUpWidth - 4)
 		logViewPort := logViewPortStyle.Render(popUp.SwitchBranchOutputViewport.View())
 
 		var content string
@@ -603,6 +615,7 @@ func renderChooseGitPullTypePopUp(m *GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxChooseGitPullTypePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChoosePullOptionPrompt)
+		popUp.PullTypeOptionList.SetWidth(popUpWidth - 4)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -629,7 +642,7 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 			logViewPortStyle = style.PanelBorderStyle.
 				BorderForeground(style.ColorGreenSoft)
 		}
-
+		popUp.GitPullOutputViewport.SetWidth(popUpWidth - 4)
 		logViewPort := logViewPortStyle.Render(popUp.GitPullOutputViewport.View())
 
 		var content string
@@ -681,7 +694,6 @@ func renderGitStashMessagePopUp(m *GittiModel) string {
 		popUpWidth := min(constant.MaxGitStashMessagePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashMessageTitle)
 		popUp.StashMessageInput.SetWidth(popUpWidth - 4)
-
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -702,6 +714,7 @@ func renderGitDiscardTypeOptionPopUp(m *GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxGitDiscardTypeOptionPopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitDiscardTypeOptionTitle)
+		popUp.DiscardTypeOptionList.SetWidth(popUpWidth - 4)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -733,6 +746,101 @@ func renderGitDiscardConfirmPromptPopup(m *GittiModel) string {
 			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardNewlyAddedConfirmation, popUp.FilePathName))
 		case git.DISCARDANDREVERTRENAME:
 			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardAndRevertRenameConfirmation, popUp.FilePathName))
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For stash operation output
+//
+// ------------------------------------
+func renderGitStashOperationOutputPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitStashOperationOutputPopUpWidth, int(float64(m.Width)*0.8))
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpGitStashOperationOutputViewPortHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.GitStashOperationOutputViewport.SetWidth(popUpWidth - 4)
+		logViewPort := logViewPortStyle.Render(popUp.GitStashOperationOutputViewport.View())
+
+		var title string
+		var processingText string
+
+		switch popUp.StashOperationType {
+		case git.STASHALL:
+			title = style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashAllTitle)
+			processingText = style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitStashAllProcessing)
+		case git.STASHFILE:
+			title = style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashFileTitle)
+			processingText = style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitStashFileProcessing)
+		case git.APPLYSTASH:
+			title = style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashApplyTitle)
+			processingText = style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitStashApplyProcessing)
+		case git.DROPSTASH:
+			title = style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashDropTitle)
+			processingText = style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitStashDropProcessing)
+		case git.POPSTASH:
+			title = style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashPopTitle)
+			processingText = style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.GitStashPopProcessing)
+		}
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For stash operation confirmation prompt
+//
+// ------------------------------------
+func renderGitStashConfirmPromptPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitStashConfirmPromptPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitStashConfirmPromptPopUpWidth, int(float64(m.Width)*0.8))
+		var content string
+		fpn := style.StashFilePathStyle.Render(popUp.FilePathName)
+		msg := style.StashMessageStyle.Render(popUp.StashMessage)
+		id := style.StashIdStyle.Render(popUp.StashId)
+		switch popUp.StashOperationType {
+		case git.STASHALL:
+			content = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitStashAllConfirmation)
+		case git.STASHFILE:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitStashFileConfirmation, fpn))
+		case git.APPLYSTASH:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitApplyStashConfirmation, msg, id))
+		case git.DROPSTASH:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDropStashConfirmation, msg, id))
+		case git.POPSTASH:
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitPopStashConfirmation, msg, id))
 		}
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}

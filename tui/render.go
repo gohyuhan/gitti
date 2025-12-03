@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	gitticonst "github.com/gohyuhan/gitti/constant"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -137,8 +138,18 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGlobalKeyBindingPopUp
 		case constant.GitDiscardTypeOptionPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardTypeOptionPopUp
-		case constant.GitDiscardConfirmPromptPopup:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardConfirmPromptPopup
+		case constant.GitDiscardConfirmPromptPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardConfirmPromptPopUp
+		case constant.GitStashOperationOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashOperationOutputPopUp
+			popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
+			if ok {
+				if popUp.IsProcessing.Load() {
+					keys = []string{"..."} // nothing can be done during stash operation, only force quit gitti is possible
+				}
+			}
+		case constant.GitStashConfirmPromptPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashConfirmPromptPopUp
 		}
 	} else {
 		//-----------------------------
@@ -194,12 +205,15 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 
 	var keyBindingLine string
 	keyBindingLine = strings.Join(keys, "  |  ")
-	keyBindingLine = utils.TruncateString(keyBindingLine, width)
+	processedWidth := width - len(gitticonst.APPVERSION) - 3
+	keyBindingLine = utils.TruncateString(keyBindingLine, processedWidth)
+	versionLine := style.NewStyle.Foreground(style.ColorYellowWarm).Render(gitticonst.APPVERSION)
+	content := fmt.Sprintf("%-*s  %s", processedWidth, keyBindingLine, versionLine)
 
 	return style.BottomKeyBindingStyle.
 		Width(width).
 		Height(constant.MainPageKeyBindingLayoutPanelHeight).
-		Render(keyBindingLine)
+		Render(content)
 }
 
 // to update the width and height of all components
@@ -220,80 +234,6 @@ func tuiWindowSizing(m *GittiModel) {
 	m.DetailPanelViewportOffset = max(0, int(m.DetailPanelViewport.HorizontalScrollPercent()*float64(m.DetailPanelViewportOffset))-1)
 	m.DetailPanelViewport.SetXOffset(m.DetailPanelViewportOffset)
 	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset())
-
-	// update list of viewport component width within pop up
-	if m.ShowPopUp.Load() {
-		switch m.PopUpType {
-		case constant.GlobalKeyBindingPopUp:
-			popUp, exist := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
-			if exist {
-				height := min(constant.PopUpGlobalKeyBindingViewPortHeight, int(float64(m.Height)*0.8))
-				width := min(constant.MaxGlobalKeyBindingPopUpWidth, int(float64(m.Width)*0.8)-4)
-				popUp.GlobalKeyBindingViewport.SetWidth(width)
-				popUp.GlobalKeyBindingViewport.SetHeight(height)
-			}
-		case constant.CommitPopUp:
-			popUp, exist := m.PopUpModel.(*GitCommitPopUpModel)
-			if exist {
-				width := (min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.GitCommitOutputViewport.SetWidth(width)
-			}
-		case constant.AmendCommitPopUp:
-			popUp, exist := m.PopUpModel.(*GitAmendCommitPopUpModel)
-			if exist {
-				width := (min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.GitAmendCommitOutputViewport.SetWidth(width)
-			}
-		case constant.GitRemotePushPopUp:
-			popUp, exist := m.PopUpModel.(*GitRemotePushPopUpModel)
-			if exist {
-				width := (min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.GitRemotePushOutputViewport.SetWidth(width)
-			}
-		case constant.ChoosePushTypePopUp:
-			popUp, exist := m.PopUpModel.(*ChoosePushTypePopUpModel)
-			if exist {
-				width := (min(constant.MaxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.PushOptionList.SetWidth(width)
-			}
-		case constant.ChooseRemotePopUp:
-			popUp, exist := m.PopUpModel.(*ChooseRemotePopUpModel)
-			if exist {
-				width := (min(constant.MaxChooseRemotePopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.RemoteList.SetWidth(width)
-			}
-		case constant.ChooseNewBranchTypePopUp:
-			popUp, exist := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
-			if exist {
-				width := (min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.NewBranchTypeOptionList.SetWidth(width)
-			}
-		case constant.ChooseSwitchBranchTypePopUp:
-			popUp, exist := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
-			if exist {
-				width := (min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.SwitchTypeOptionList.SetWidth(width)
-			}
-		case constant.ChooseGitPullTypePopUp:
-			popUp, exist := m.PopUpModel.(*ChooseGitPullTypePopUpModel)
-			if exist {
-				width := (min(constant.MaxChooseGitPullTypePopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.PullTypeOptionList.SetWidth(width)
-			}
-		case constant.GitPullOutputPopUp:
-			popUp, exist := m.PopUpModel.(*GitPullOutputPopUpModel)
-			if exist {
-				width := (min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.GitPullOutputViewport.SetWidth(width)
-			}
-		case constant.GitDiscardTypeOptionPopUp:
-			popUp, exist := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
-			if exist {
-				width := (min(constant.MaxGitDiscardTypeOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-				popUp.DiscardTypeOptionList.SetWidth(width)
-			}
-		}
-	}
 }
 
 func leftPanelDynamicResize(m *GittiModel) {

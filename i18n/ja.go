@@ -164,8 +164,15 @@ var jA = LanguageMapping{
 		"[enter] 破棄オプションを選択",
 		"[esc] キャンセル / 閉じる",
 	},
-	KeyBindingForGitDiscardConfirmPromptPopup: []string{
+	KeyBindingForGitDiscardConfirmPromptPopUp: []string{
 		"[enter] 破棄を実行",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitStashOperationOutputPopUp: []string{
+		"[esc] 閉じる",
+	},
+	KeyBindingForGitStashConfirmPromptPopUp: []string{
+		"[enter] 実行",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -230,6 +237,21 @@ var jA = LanguageMapping{
 	GitDiscardUntrackedConfirmation:                          "[%s] の追跡対象外の変更を破棄してもよろしいですか？",
 	GitDiscardNewlyAddedConfirmation:                         "[%s] の新規追加された変更を破棄してもよろしいですか？ \n * これにより, 追跡対象外の変更も削除されます",
 	GitDiscardAndRevertRenameConfirmation:                    "ファイル [%s] の変更を破棄し、名前変更を取り消してもよろしいですか？",
+	GitStashAllTitle:                                         "すべてのファイルをスタッシュ",
+	GitStashFileTitle:                                        "ファイルをスタッシュ",
+	GitStashApplyTitle:                                       "スタッシュを適用",
+	GitStashDropTitle:                                        "スタッシュを削除",
+	GitStashPopTitle:                                         "スタッシュをポップ",
+	GitStashAllProcessing:                                    "すべての変更をスタッシュ中...",
+	GitStashFileProcessing:                                   "ファイルをスタッシュ中...",
+	GitStashApplyProcessing:                                  "スタッシュを適用中...",
+	GitStashDropProcessing:                                   "スタッシュを削除中...",
+	GitStashPopProcessing:                                    "スタッシュをポップ中...",
+	GitStashAllConfirmation:                                  "すべての変更をスタッシュしてもよろしいですか",
+	GitStashFileConfirmation:                                 "この変更をスタッシュしてもよろしいですか \n [ %s ]",
+	GitApplyStashConfirmation:                                "このスタッシュを適用してもよろしいですか \n[ %s ]\nId: [ %s ]",
+	GitDropStashConfirmation:                                 "このスタッシュを削除してもよろしいですか \n[ %s ]\nId: [ %s ]",
+	GitPopStashConfirmation:                                  "このスタッシュをポップしてもよろしいですか \n[ %s ]\nId: [ %s ]",
 }
 
 // for about gitti

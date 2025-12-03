@@ -267,6 +267,33 @@ type GitDiscardConfirmPromptPopUpModel struct {
 
 // ---------------------------------
 //
+// for stash operation pop up with viewport (for showing the result of stash operation)
+//
+// ---------------------------------
+type GitStashOperationOutputPopUpModel struct {
+	StashOperationType              string
+	GitStashOperationOutputViewport viewport.Model // to log out the output from git operation
+	Spinner                         spinner.Model  // spinner for showing processing state
+	IsProcessing                    atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                        atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess                  atomic.Bool    // has the process sucessfuly executed
+}
+
+// ---------------------------------
+//
+// for stash operation confirm prompt pop up (for prompting user for confirmation)
+//   - for stash, stash all, drop, apply, discard
+//
+// ---------------------------------
+type GitStashConfirmPromptPopUpModel struct {
+	StashOperationType string
+	FilePathName       string
+	StashMessage       string
+	StashId            string
+}
+
+// ---------------------------------
+//
 // to record the current navigation index position
 //
 // ---------------------------------
@@ -281,11 +308,13 @@ type GittiComponentsCurrentListNavigationIndexPosition struct {
 // for list component of git branch
 //
 // ---------------------------------
-type gitBranchItemDelegate struct{}
-type gitBranchItem struct {
-	BranchName   string
-	IsCheckedOut bool
-}
+type (
+	gitBranchItemDelegate struct{}
+	gitBranchItem         struct {
+		BranchName   string
+		IsCheckedOut bool
+	}
+)
 
 func (i gitBranchItem) FilterValue() string {
 	return i.BranchName
@@ -296,12 +325,14 @@ func (i gitBranchItem) FilterValue() string {
 // for list component of git modified files
 //
 // ---------------------------------
-type gitModifiedFilesItemDelegate struct{}
-type gitModifiedFilesItem struct {
-	FilePathname string
-	IndexState   string
-	WorkTree     string
-}
+type (
+	gitModifiedFilesItemDelegate struct{}
+	gitModifiedFilesItem         struct {
+		FilePathname string
+		IndexState   string
+		WorkTree     string
+	}
+)
 
 func (i gitModifiedFilesItem) FilterValue() string {
 	return i.FilePathname
@@ -312,11 +343,13 @@ func (i gitModifiedFilesItem) FilterValue() string {
 // for list component of git stashed files
 //
 // ---------------------------------
-type gitStashItemDelegate struct{}
-type gitStashItem struct {
-	Id      string
-	Message string
-}
+type (
+	gitStashItemDelegate struct{}
+	gitStashItem         struct {
+		Id      string
+		Message string
+	}
+)
 
 func (i gitStashItem) FilterValue() string {
 	return i.Message
@@ -327,11 +360,13 @@ func (i gitStashItem) FilterValue() string {
 // for list component of git remote
 //
 // ---------------------------------
-type gitRemoteItemDelegate struct{}
-type gitRemoteItem struct {
-	Name string
-	Url  string
-}
+type (
+	gitRemoteItemDelegate struct{}
+	gitRemoteItem         struct {
+		Name string
+		Url  string
+	}
+)
 
 func (i gitRemoteItem) FilterValue() string {
 	return i.Name
@@ -342,12 +377,14 @@ func (i gitRemoteItem) FilterValue() string {
 // for push selection option
 //
 // ---------------------------------
-type gitPushOptionDelegate struct{}
-type gitPushOptionItem struct {
-	Name     string
-	Info     string
-	pushType string
-}
+type (
+	gitPushOptionDelegate struct{}
+	gitPushOptionItem     struct {
+		Name     string
+		Info     string
+		pushType string
+	}
+)
 
 func (i gitPushOptionItem) FilterValue() string {
 	return i.Name
@@ -358,12 +395,14 @@ func (i gitPushOptionItem) FilterValue() string {
 // for new branch option selection option
 //
 // ---------------------------------
-type gitNewBranchTypeOptionDelegate struct{}
-type gitNewBranchTypeOptionItem struct {
-	Name          string
-	Info          string
-	newBranchType string
-}
+type (
+	gitNewBranchTypeOptionDelegate struct{}
+	gitNewBranchTypeOptionItem     struct {
+		Name          string
+		Info          string
+		newBranchType string
+	}
+)
 
 func (i gitNewBranchTypeOptionItem) FilterValue() string {
 	return i.Name
@@ -374,12 +413,14 @@ func (i gitNewBranchTypeOptionItem) FilterValue() string {
 // for switch branch option selection option
 //
 // ---------------------------------
-type gitSwitchBranchTypeOptionDelegate struct{}
-type gitSwitchBranchTypeOptionItem struct {
-	Name             string
-	Info             string
-	switchBranchType string
-}
+type (
+	gitSwitchBranchTypeOptionDelegate struct{}
+	gitSwitchBranchTypeOptionItem     struct {
+		Name             string
+		Info             string
+		switchBranchType string
+	}
+)
 
 func (i gitSwitchBranchTypeOptionItem) FilterValue() string {
 	return i.Name
@@ -390,12 +431,14 @@ func (i gitSwitchBranchTypeOptionItem) FilterValue() string {
 // for pull option selection option
 //
 // ---------------------------------
-type gitPullTypeOptionDelegate struct{}
-type gitPullTypeOptionItem struct {
-	Name     string
-	Info     string
-	PullType string
-}
+type (
+	gitPullTypeOptionDelegate struct{}
+	gitPullTypeOptionItem     struct {
+		Name     string
+		Info     string
+		PullType string
+	}
+)
 
 func (i gitPullTypeOptionItem) FilterValue() string {
 	return i.Name
@@ -406,12 +449,14 @@ func (i gitPullTypeOptionItem) FilterValue() string {
 // for discard option selection option
 //
 // ---------------------------------
-type gitDiscardTypeOptionDelegate struct{}
-type gitDiscardTypeOptionItem struct {
-	Name        string
-	Info        string
-	DiscardType string
-}
+type (
+	gitDiscardTypeOptionDelegate struct{}
+	gitDiscardTypeOptionItem     struct {
+		Name        string
+		Info        string
+		DiscardType string
+	}
+)
 
 func (i gitDiscardTypeOptionItem) FilterValue() string {
 	return i.Name

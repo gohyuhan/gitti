@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"os/exec"
 	"strings"
 
 	"github.com/gohyuhan/gitti/executor"
@@ -71,22 +72,30 @@ func (gs *GitStash) GetLatestStashInfo() {
 
 // ----------------------------------
 //
-//	Related to Git Stash including untracked ( except ignored )
+//	Related to Git Stash All including untracked ( both index and worktree except ignored )
 //
 // ----------------------------------
-func (gs *GitStash) GitStashAll(message string) {
+func (gs *GitStash) GitStashAll(message string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
-		return
+		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
 	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"stash", "push", "-u", "-m", message}
 
 	stashAllCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_, stashAllErr := stashAllCmdExecutor.CombinedOutput()
+	stashAllOutput, stashAllErr := stashAllCmdExecutor.CombinedOutput()
+	stashAllOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashAllOutput)
 	if stashAllErr != nil {
+		if exitErr, ok := stashAllErr.(*exec.ExitError); ok {
+			status := exitErr.ExitCode()
+			return stashAllOutputStringArray, status
+		}
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ALL ERROR]: %w", stashAllErr))
+		return stashAllOutputStringArray, -1
 	}
+
+	return stashAllOutputStringArray, 0
 }
 
 // ----------------------------------
@@ -94,9 +103,9 @@ func (gs *GitStash) GitStashAll(message string) {
 // # Stash File changes
 //
 // ----------------------------------
-func (gs *GitStash) GitStashFile(filePathName string, message string) {
+func (gs *GitStash) GitStashFile(filePathName string, message string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
-		return
+		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
 	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
@@ -108,10 +117,18 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) {
 	}
 
 	stashCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_, stashErr := stashCmdExecutor.CombinedOutput()
+	stashOutput, stashErr := stashCmdExecutor.CombinedOutput()
+	stashOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashOutput)
 	if stashErr != nil {
+		if exitErr, ok := stashErr.(*exec.ExitError); ok {
+			status := exitErr.ExitCode()
+			return stashOutputStringArray, status
+		}
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ERROR]: %w", stashErr))
+		return stashOutputStringArray, -1
 	}
+
+	return stashOutputStringArray, 0
 }
 
 // ----------------------------------
@@ -119,19 +136,27 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) {
 // # Git stash apply
 //
 // ----------------------------------
-func (gs *GitStash) GitStashApply(stashId string) {
+func (gs *GitStash) GitStashApply(stashId string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
-		return
+		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
 	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"stash", "apply", stashId}
 
 	stashApplyCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_, stashApplyErr := stashApplyCmdExecutor.CombinedOutput()
+	stashApplyOutput, stashApplyErr := stashApplyCmdExecutor.CombinedOutput()
+	stashApplyOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashApplyOutput)
 	if stashApplyErr != nil {
+		if exitErr, ok := stashApplyErr.(*exec.ExitError); ok {
+			status := exitErr.ExitCode()
+			return stashApplyOutputStringArray, status
+		}
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH APPLY ERROR]: %w", stashApplyErr))
+		return stashApplyOutputStringArray, -1
 	}
+
+	return stashApplyOutputStringArray, 0
 }
 
 // ----------------------------------
@@ -139,19 +164,27 @@ func (gs *GitStash) GitStashApply(stashId string) {
 // # Git stash pop
 //
 // ----------------------------------
-func (gs *GitStash) GitStashPop(stashId string) {
+func (gs *GitStash) GitStashPop(stashId string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
-		return
+		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
 	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"stash", "pop", stashId}
 
 	stashPopCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_, stashPopErr := stashPopCmdExecutor.CombinedOutput()
+	stashPopOutput, stashPopErr := stashPopCmdExecutor.CombinedOutput()
+	stashPopOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashPopOutput)
 	if stashPopErr != nil {
+		if exitErr, ok := stashPopErr.(*exec.ExitError); ok {
+			status := exitErr.ExitCode()
+			return stashPopOutputStringArray, status
+		}
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH POP ERROR]: %w", stashPopErr))
+		return stashPopOutputStringArray, -1
 	}
+
+	return stashPopOutputStringArray, 0
 }
 
 // ----------------------------------
@@ -159,19 +192,27 @@ func (gs *GitStash) GitStashPop(stashId string) {
 // # Git stash drop
 //
 // ----------------------------------
-func (gs *GitStash) GitStashDrop(stashId string) {
+func (gs *GitStash) GitStashDrop(stashId string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
-		return
+		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
 	}
 	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"stash", "drop", stashId}
 
 	stashDropCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_, stashDropErr := stashDropCmdExecutor.CombinedOutput()
+	stashDropOutput, stashDropErr := stashDropCmdExecutor.CombinedOutput()
+	stashDropOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashDropOutput)
 	if stashDropErr != nil {
+		if exitErr, ok := stashDropErr.(*exec.ExitError); ok {
+			status := exitErr.ExitCode()
+			return stashDropOutputStringArray, status
+		}
 		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DROP ERROR]: %w", stashDropErr))
+		return stashDropOutputStringArray, -1
 	}
+
+	return stashDropOutputStringArray, 0
 }
 
 // ----------------------------------
