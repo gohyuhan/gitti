@@ -19,7 +19,9 @@ func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 	// global key binding
 	switch msg.String() {
 	case "ctrl+c":
-		api.GITDAEMON.Stop()
+		if api.GITDAEMON != nil {
+			api.GITDAEMON.Stop()
+		}
 		return m, tea.Quit
 	case "ctrl+s":
 		gitStageAllChangesService(m)
@@ -396,8 +398,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					currentSelectedFile := currentSelectedFileItem.(gitModifiedFilesItem)
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
-					if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree != " " {
-						// indicating the files is a newly added tracked file with unstage modification (modified or delete )
+
+					// determine the pop up state
+					if (currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree != " ") || (currentSelectedFile.IndexState == "C" && currentSelectedFile.WorkTree != " ") {
+						// indicating the files is a newly added tracked / copied file with unstage modification (modified or delete )
 						m.PopUpType = constant.GitDiscardTypeOptionPopUp
 						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, true, false)
 					} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree != " " {
@@ -408,14 +412,14 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 						// newly added untracked file
 						m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
-					} else if currentSelectedFile.IndexState != "A" && currentSelectedFile.IndexState != "R" && currentSelectedFile.IndexState != "?" && currentSelectedFile.WorkTree != " " {
-						// tracked file with both staged and unstaged modification
+					} else if currentSelectedFile.IndexState != "A" && currentSelectedFile.IndexState != "C" && currentSelectedFile.IndexState != "R" && currentSelectedFile.IndexState != "?" && currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
+						// tracked file with both staged and unstaged modification (beside A, C and  )
 						m.PopUpType = constant.GitDiscardTypeOptionPopUp
 						initGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false, false)
-					} else if currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " " {
-						// newly added tracked file
+					} else if (currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " ") || (currentSelectedFile.IndexState == "C" && currentSelectedFile.WorkTree == " ") {
+						// newly added tracked / copied file
 						m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDED)
+						initGitDiscardConfirmPromptPopup(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDEDORCOPIED)
 					} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree == " " {
 						// a staged rename
 						m.PopUpType = constant.GitDiscardConfirmPromptPopUp
@@ -530,7 +534,9 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	case "q", "Q":
 		// only work when there is no pop up
 		if !m.ShowPopUp.Load() {
-			api.GITDAEMON.Stop()
+			if api.GITDAEMON != nil {
+				api.GITDAEMON.Stop()
+			}
 			return m, tea.Quit
 		}
 

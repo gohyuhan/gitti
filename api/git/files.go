@@ -94,12 +94,22 @@ func (gf *GitFiles) GetGitFilesStatus() {
 // get the file diff content
 func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus) []string {
 	filePathName := fileStatus.FilePathname
-	if fileStatus.IndexState == "R" {
-		filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+	if fileStatus.IndexState == "R" || fileStatus.IndexState == "C" {
+		if strings.Contains(filePathName, "->") {
+			parts := strings.Split(filePathName, "->")
+			if len(parts) >= 2 {
+				filePathName = strings.TrimSpace(parts[1])
+			}
+		}
 	}
 	gitArgs := []string{"diff", "HEAD", "--", filePathName}
 	// the file is untracked
-	if fileStatus.WorkTree == "?" || fileStatus.IndexState == "?" || fileStatus.IndexState == "A" {
+	isNewFile := fileStatus.WorkTree == "?" ||
+		fileStatus.IndexState == "?" ||
+		fileStatus.IndexState == "A" ||
+		(fileStatus.IndexState == "U" && fileStatus.WorkTree == "A")
+
+	if isNewFile {
 		// empty file for git diff --no-index to compares two arbitrary files outside the Git index.
 		nullFile := "/dev/null"
 		if runtime.GOOS == "windows" {
@@ -141,6 +151,13 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
+		// "old -> new" format for both Renamed (R) and Copied (C)
+		// This covers IndexState R/C and the rare WorkTree R/C
+		if strings.Contains(filePathName, "->") &&
+			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
+			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+		}
+
 		var gitArgs []string
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
@@ -149,17 +166,11 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree != " " {
 			// staged but have modification later
-			if file.IndexState == "R" {
-				filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
-			}
 			gitArgs = []string{"add", "--", filePathName}
 			stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree == " " {
 			// staged and no latest modification, so we need to unstage it or revert back
-			if file.IndexState == "R" {
-				filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
-			}
 			gitArgs = []string{"reset", "--", filePathName}
 			if file.IndexState == "A" {
 				gitArgs = []string{"rm", "--cached", "--force", "--", filePathName}
@@ -216,26 +227,37 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
 		filePathName = file.FilePathname
+		// Store the full name (e.g. "old -> new") for the rename logic later
+		fullFilePathName := file.FilePathname
+
+		// "old -> new" format for both Renamed (R) and Copied (C)
+		// This covers IndexState R/C and the rare WorkTree R/C
+		if strings.Contains(filePathName, "->") &&
+			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
+			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+		}
+
 		switch discardType {
 		case DISCARDWHOLE:
 			gitArgs = []string{"checkout", "HEAD", "--", filePathName}
 		case DISCARDUNSTAGE:
-			if file.IndexState == "R" {
-				filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
-			}
 			gitArgs = []string{"checkout", "--", filePathName}
 		case DISCARDUNTRACKED:
 			gitArgs = []string{"clean", "-f", "--", filePathName}
+			// although they are in worktree, they are actually tracked, therefore we need to use git rm -f <filename>
+			if file.WorkTree == "A" || file.WorkTree == "C" || file.WorkTree == "R" {
+				gitArgs = []string{"rm", "-f", filePathName}
+			}
 			// we are refetching it actively here is because the clean doesn't trigger any write in .git folder
 			// and therefore will not trigger the watcher event driven fetch for file status, so we trigger a fetch here
 			// to prevent a "lag" in the UI
 			needFilesStatusRefetch = true
-		case DISCARDNEWLYADDED:
+		case DISCARDNEWLYADDEDORCOPIED:
 			gitArgs = []string{"rm", "-f", filePathName}
 		case DISCARDANDREVERTRENAME:
 			needToRunExecutor = false
-			oldFilePathName := strings.TrimSpace(strings.Split(filePathName, "->")[0])
-			newFilePathName := strings.TrimSpace(strings.Split(filePathName, "->")[1])
+			oldFilePathName := strings.TrimSpace(strings.Split(fullFilePathName, "->")[0])
+			newFilePathName := strings.TrimSpace(strings.Split(fullFilePathName, "->")[1])
 
 			// retrieve back the original file
 			gitArgs = []string{"reset", "--", oldFilePathName}

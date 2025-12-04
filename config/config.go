@@ -61,7 +61,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperatio
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
 	gitOperations := api.InitGitOperations(updateChannel)
-	// git.InitGitCommitLog(false) // not included in v0.1.0
+	// git.InitGitCommitLog(false) // not included in v0.1.x
 	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations)
 
 	return gitOperations, gitRepoPathInfo

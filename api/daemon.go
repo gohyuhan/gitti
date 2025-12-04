@@ -39,7 +39,11 @@ var GITDAEMON *GitDaemon
 func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
-		return
+		// Log the critical error - this means file watching won't work
+		// Set a nil daemon to prevent crashes when accessed
+		fmt.Printf("CRITICAL: Failed to initialize Git file watcher: %v\n", err)
+		GITDAEMON = nil
+		os.Exit(1)
 	}
 
 	debounce := time.Duration(settings.GITTICONFIGSETTINGS.FileWatcherDebounceMS) * time.Millisecond

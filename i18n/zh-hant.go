@@ -235,7 +235,7 @@ var zH_HANT = LanguageMapping{
 	GitDiscardWholeConfirmation:                              "您確定要捨棄 [%s] 的所有變更嗎?",
 	GitDiscardUnstageConfirmation:                            "您確定要捨棄 [%s] 的未暫存變更嗎?",
 	GitDiscardUntrackedConfirmation:                          "確定要捨棄 [%s] 的未追蹤變更嗎？",
-	GitDiscardNewlyAddedConfirmation:                         "確定要捨棄 [%s] 的新追蹤變更嗎？ \n * 這也將移除未追蹤的變更",
+	GitDiscardNewlyAddedorCopyConfirmation:                   "確定要捨棄 [%s] 的新追蹤或複製變更嗎？ \n * 這也將移除未追蹤的變更",
 	GitDiscardAndRevertRenameConfirmation:                    "您確定要放棄 [%s] 的變更並復原重新命名嗎？",
 	GitStashAllTitle:                                         "儲藏所有檔案",
 	GitStashFileTitle:                                        "儲藏檔案",

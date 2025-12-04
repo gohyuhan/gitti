@@ -168,20 +168,17 @@ type LanguageMapping struct {
 	// for git discard type option list
 	GitDiscardTypeOptionTitle     string
 	GitDiscardWhole               string
-	GitDiscardStaged              string
 	GitDiscardUnstage             string
 	GitDiscardAndRevertRename     string
 	GitDiscardWholeInfo           string
-	GitDiscardStagedInfo          string
 	GitDiscardUnstageInfo         string
 	GitDiscardAndRevertRenameInfo string
 	// for discard confirmation prompt
-	GitDiscardWholeConfirmation           string
-	GitDiscardStagedConfirmation          string
-	GitDiscardUnstageConfirmation         string
-	GitDiscardUntrackedConfirmation       string
-	GitDiscardNewlyAddedConfirmation      string
-	GitDiscardAndRevertRenameConfirmation string
+	GitDiscardWholeConfirmation            string
+	GitDiscardUnstageConfirmation          string
+	GitDiscardUntrackedConfirmation        string
+	GitDiscardNewlyAddedorCopyConfirmation string
+	GitDiscardAndRevertRenameConfirmation  string
 	// for stash operation title (used in output pop up)
 	GitStashAllTitle   string
 	GitStashFileTitle  string

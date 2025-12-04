@@ -94,10 +94,14 @@ func main() {
 		tui.StartTuiUpdateListener(gitti, tuiUpdateChannel)
 
 		// start the Git Daemon
-		api.GITDAEMON.Start()
+		if api.GITDAEMON != nil {
+			api.GITDAEMON.Start()
+		}
 
 		if _, err := gitti.Run(); err != nil {
-			api.GITDAEMON.Stop()
+			if api.GITDAEMON != nil {
+				api.GITDAEMON.Stop()
+			}
 			fmt.Printf("%s: %v", i18n.LANGUAGEMAPPING.TuiRunFail, err)
 			os.Exit(1)
 		}
