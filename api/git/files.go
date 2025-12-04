@@ -10,16 +10,11 @@ import (
 	"github.com/gohyuhan/gitti/executor"
 )
 
-// const (
-// 	AddLine        = "ADDLINE"
-// 	RemoveLine     = "REMOVELINE"
-// 	UnModifiedLine = "UNMODIFIEDLINE"
-// )
-
 type FileStatus struct {
 	FilePathname string
 	IndexState   string
 	WorkTree     string
+	HasConflict  bool
 }
 
 type GitFiles struct {
@@ -78,11 +73,13 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		indexState := string(file[0])
 		worktree := string(file[1])
 		filePathName := strings.TrimSpace(file[3:])
+		hasConflict := isFilesInConflictState(indexState, worktree)
 
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
 			FilePathname: filePathName,
 			IndexState:   indexState,
 			WorkTree:     worktree,
+			HasConflict:  hasConflict,
 		})
 		modifiedFilesPositionHashmap[filePathName] = index
 	}
@@ -226,6 +223,9 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
+		if file.HasConflict {
+			return
+		}
 		filePathName = file.FilePathname
 		// Store the full name (e.g. "old -> new") for the rename logic later
 		fullFilePathName := file.FilePathname
@@ -291,5 +291,33 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 				gf.updateChannel <- GIT_FILES_STATUS_UPDATE
 			}()
 		}
+	}
+}
+
+func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) {
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
+
+	var gitArgs []string
+
+	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	if fileIndexExist {
+		file := gf.filesStatus[fileIndex]
+		if !file.HasConflict {
+			return
+		}
+		filePathName = file.FilePathname
+		switch resolveType {
+		case RESETCONFLICT:
+			gitArgs = []string{"checkout", "-m", "--", filePathName}
+		case CONFLICTACCEPTLOCALCHANGES:
+			gitArgs = []string{"checkout", "--ours", "--", filePathName}
+		case CONFLICTACCEPTINCOMINGCHANGES:
+			gitArgs = []string{"checkout", "--theirs", "--", filePathName}
+		}
+		changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+		changesDiscardCmdExecutor.Run()
 	}
 }

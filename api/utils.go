@@ -123,7 +123,7 @@ func IsBranchNameValid(branchName string) (string, bool) {
 			prefixClean = false
 		}
 
-		//suffix
+		// suffix
 		if strings.HasSuffix(modified, "/") {
 			modified = strings.TrimRight(modified, "/")
 			suffixClean = false

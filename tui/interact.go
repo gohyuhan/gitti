@@ -396,6 +396,10 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 				currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				if currentSelectedFileItem != nil {
 					currentSelectedFile := currentSelectedFileItem.(gitModifiedFilesItem)
+					// return early if the file has conflict (we should not allow discard on conflict files but resolve option instead)
+					if currentSelectedFile.HasConflict {
+						return m, nil
+					}
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
 
@@ -503,12 +507,37 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 		}
 		return m, nil
 
+	case "r":
+		if !m.ShowPopUp.Load() {
+			switch m.CurrentSelectedComponent {
+			case constant.ModifiedFilesComponent:
+				currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+				if currentSelectedFileItem != nil {
+					currentSelectedFile := currentSelectedFileItem.(gitModifiedFilesItem)
+					// return early if the file has no conflict
+					if !currentSelectedFile.HasConflict {
+						return m, nil
+					}
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.GitResolveConflictOptionPopUp
+					initGitResolveConflictOptionPopUpModel(m, currentSelectedFile.FilePathname)
+				}
+			}
+		}
+		return m, nil
+
 	case "s":
 		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			var filePathName string
 			if currentSelectedModifiedFile != nil {
-				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+				selectedFile := currentSelectedModifiedFile.(gitModifiedFilesItem)
+				// return early if the file is in a conflict status
+				if selectedFile.HasConflict {
+					return m, nil
+				}
+				filePathName = selectedFile.FilePathname
 				m.PopUpType = constant.GitStashMessagePopUp
 				initGitStashMessagePopUpModel(m, filePathName, git.STASHFILE)
 				m.ShowPopUp.Store(true)
@@ -672,6 +701,14 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 						return m, outputPopUp.Spinner.Tick
 					}
 				}
+			case constant.GitResolveConflictOptionPopUp:
+				popUp, ok := m.PopUpModel.(*GitResolveConflictOptionPopUpModel)
+				if ok {
+					selectedResolveType := popUp.ResolveConflictOptionList.SelectedItem().(gitResolveConflictOptionItem)
+					gitResolveConflictService(m, popUp.FilePathName, selectedResolveType.ResolveType)
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+				}
 			}
 		}
 		return m, nil
@@ -788,6 +825,11 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					m.PopUpModel = nil
 				}
 			case constant.GitStashConfirmPromptPopUp:
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			case constant.GitResolveConflictOptionPopUp:
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
@@ -979,6 +1021,13 @@ func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea
 			popUp.DiscardTypeOptionList, cmd = popUp.DiscardTypeOptionList.Update(msg)
 			return m, cmd
 		}
+	case constant.GitResolveConflictOptionPopUp:
+		popUp, ok := m.PopUpModel.(*GitResolveConflictOptionPopUpModel)
+		if ok {
+			popUp.ResolveConflictOptionList, cmd = popUp.ResolveConflictOptionList.Update(msg)
+			return m, cmd
+		}
+
 	// following is for viewport
 	case constant.GlobalKeyBindingPopUp:
 		popUp, ok := m.PopUpModel.(*GlobalKeyBindingPopUpModel)

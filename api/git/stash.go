@@ -286,9 +286,18 @@ func (gs *GitStash) isStashSmall(ctx context.Context, stashId string) (bool, err
 
 	// Start the process
 	if err := showCmdExecutor.Start(); err != nil {
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASH SIZESTART ERROR]: %w", err))
+		gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASH SIZE START ERROR]: %w", err))
 		return false, err
 	}
+
+	defer func() {
+		if err := showCmdExecutor.Wait(); err != nil {
+			// Only log if it's not a context cancellation
+			if ctx.Err() == nil {
+				gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASH SIZE WAIT ERROR]: %w", err))
+			}
+		}
+	}()
 
 	scanner := bufio.NewScanner(showOutput)
 	for scanner.Scan() {
@@ -301,6 +310,14 @@ func (gs *GitStash) isStashSmall(ctx context.Context, stashId string) (bool, err
 				return false, nil
 			}
 		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		if ctx.Err() != nil {
+			return false, ctx.Err()
+		}
+		gs.errorLog = append(gs.errorLog, fmt.Errorf("[SCANNER ERROR]: %w", err))
+		return false, err
 	}
 
 	return true, nil

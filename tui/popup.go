@@ -58,6 +58,8 @@ func renderPopUpComponent(m *GittiModel) string {
 		popUp = renderGitStashOperationOutputPopUp(m)
 	case constant.GitStashConfirmPromptPopUp:
 		popUp = renderGitStashConfirmPromptPopUp(m)
+	case constant.GitResolveConflictOptionPopUp:
+		popUp = renderGitResolveConflictOptionPopUp(m)
 	}
 	return popUp
 }
@@ -842,6 +844,28 @@ func renderGitStashConfirmPromptPopUp(m *GittiModel) string {
 		case git.POPSTASH:
 			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitPopStashConfirmation, msg, id))
 		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For resolve conflict option list
+//
+// ------------------------------------
+func renderGitResolveConflictOptionPopUp(m *GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitResolveConflictOptionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitResolveConflictOptionPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitResolveConflictOptionTitle)
+
+		popUp.ResolveConflictOptionList.SetWidth(popUpWidth - 4)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.ResolveConflictOptionList.View(),
+		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""

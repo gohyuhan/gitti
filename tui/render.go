@@ -178,18 +178,22 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentNone
 			} else {
 				file := CurrentSelectedFile.(gitModifiedFilesItem)
-				if file.IndexState == "?" && file.WorkTree == "?" {
-					// not tracked
-					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
-				} else if file.IndexState != " " && file.WorkTree != " " {
-					// staged but have modification later
-					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
-				} else if file.IndexState != " " && file.WorkTree == " " {
-					// staged and no latest modification
-					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentIsStaged
-				} else if file.IndexState == " " && file.WorkTree != " " {
-					// tracked but not staged
-					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
+				if file.HasConflict {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentConflict
+				} else {
+					if file.IndexState == "?" && file.WorkTree == "?" {
+						// not tracked
+						keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
+					} else if file.IndexState != " " && file.WorkTree != " " {
+						// staged but have modification later
+						keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
+					} else if file.IndexState != " " && file.WorkTree == " " {
+						// staged and no latest modification
+						keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentIsStaged
+					} else if file.IndexState == " " && file.WorkTree != " " {
+						// tracked but not staged
+						keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
+					}
 				}
 			}
 		case constant.DetailComponent:

@@ -77,6 +77,7 @@ type LanguageMapping struct {
 	KeyBindingLocalBranchComponentIsCheckOut  []string
 	KeyBindingLocalBranchComponentDefault     []string
 	KeyBindingLocalBranchComponentNone        []string
+	KeyBindingModifiedFilesComponentConflict  []string
 	KeyBindingModifiedFilesComponentIsStaged  []string
 	KeyBindingModifiedFilesComponentDefault   []string
 	KeyBindingModifiedFilesComponentNone      []string
@@ -197,4 +198,12 @@ type LanguageMapping struct {
 	GitApplyStashConfirmation string
 	GitDropStashConfirmation  string
 	GitPopStashConfirmation   string
+	// for resolve conflict option list
+	GitResolveConflictOptionTitle               string
+	GitResolveConflictReset                     string
+	GitResolveConflictAcceptLocalChanges        string
+	GitResolveConflictAcceptIncomingChanges     string
+	GitResolveConflictResetInfo                 string
+	GitResolveConflictAcceptLocalChangesInfo    string
+	GitResolveConflictAcceptIncomingChangesInfo string
 }

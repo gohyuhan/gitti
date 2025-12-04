@@ -63,6 +63,12 @@ var zH_HANS = LanguageMapping{
 	KeyBindingLocalBranchComponentNone: []string{
 		"[?] 全局快捷键",
 	},
+	KeyBindingModifiedFilesComponentConflict: []string{
+		"[space] 暂存此更改",
+		"[r] 解决冲突",
+		"[enter] 查看修改内容",
+		"[?] 全局快捷键",
+	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] 取消暂存此更改",
 		"[s] 储藏 (stash)",
@@ -252,6 +258,13 @@ var zH_HANS = LanguageMapping{
 	GitApplyStashConfirmation:                                "您确定要应用以下的暂存吗\n[%s]\nId: [ %s]",
 	GitDropStashConfirmation:                                 "您确定要丢弃以下的暂存吗\n[%s]\nId: [ %s]",
 	GitPopStashConfirmation:                                  "您确定要弹出以下的暂存吗\n[%s]\nId: [ %s]",
+	GitResolveConflictOptionTitle:                            "解决冲突",
+	GitResolveConflictReset:                                  "重新开始文件的合并",
+	GitResolveConflictAcceptLocalChanges:                     "接受本地更改（ours）",
+	GitResolveConflictAcceptIncomingChanges:                  "接受传入更改（theirs）",
+	GitResolveConflictResetInfo:                              "恢复 %s 中的冲突标记（将丢弃已暂存的更改）",
+	GitResolveConflictAcceptLocalChangesInfo:                 "接受冲突文件 %s 的本地更改",
+	GitResolveConflictAcceptIncomingChangesInfo:              "接受冲突文件 %s 的传入更改",
 }
 
 // for about gitti

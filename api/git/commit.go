@@ -13,12 +13,14 @@ import (
 )
 
 type GitCommit struct {
-	errorLog            []error
-	gitCommitOutput     []string
-	gitRemotePushOutput []string
-	updateChannel       chan string
-	gitProcessLock      *GitProcessLock
-	remote              []GitRemote
+	errorLog              []error
+	gitCommitOutput       []string
+	gitCommitOutputMu     sync.RWMutex
+	gitRemotePushOutput   []string
+	gitRemotePushOutputMu sync.RWMutex
+	updateChannel         chan string
+	gitProcessLock        *GitProcessLock
+	remote                []GitRemote
 }
 
 type LatestCommitMsgAndDesc struct {
@@ -43,7 +45,12 @@ func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock) *G
 //
 // ----------------------------------
 func (gc *GitCommit) GitCommitOutput() []string {
-	return gc.gitCommitOutput
+	gc.gitCommitOutputMu.RLock()
+	defer gc.gitCommitOutputMu.RUnlock()
+
+	copied := make([]string, len(gc.gitCommitOutput))
+	copy(copied, gc.gitCommitOutput)
+	return copied
 }
 
 // ----------------------------------
@@ -52,18 +59,12 @@ func (gc *GitCommit) GitCommitOutput() []string {
 //
 // ----------------------------------
 func (gc *GitCommit) GitRemotePushOutput() []string {
-	return gc.gitRemotePushOutput
-}
+	gc.gitRemotePushOutputMu.RLock()
+	defer gc.gitRemotePushOutputMu.RUnlock()
 
-func (gc *GitCommit) GitFetch() {
-	gitArgs := []string{"fetch"}
-	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	// Disable interactive prompts for credentials
-	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
-	_, err := cmd.Output()
-	if err != nil {
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", err))
-	}
+	copied := make([]string, len(gc.gitRemotePushOutput))
+	copy(copied, gc.gitRemotePushOutput)
+	return copied
 }
 
 // ----------------------------------
@@ -118,9 +119,11 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 			case <-ctx.Done():
 				return // Stop immediately on cancel
 			default:
+				gc.gitCommitOutputMu.Lock()
 				updatedCursorIndex, updatedGitCommitOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitCommitOutput)
 				gc.gitCommitOutput = updatedGitCommitOutput
 				cursorIndex = updatedCursorIndex
+				gc.gitCommitOutputMu.Unlock()
 				if isAmendCommit {
 					gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE
 				} else {
@@ -147,6 +150,8 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 }
 
 func (gc *GitCommit) ClearGitCommitOutput() {
+	gc.gitCommitOutputMu.Lock()
+	defer gc.gitCommitOutputMu.Unlock()
 	gc.gitCommitOutput = []string{}
 }
 
@@ -245,9 +250,11 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 			case <-ctx.Done():
 				return // Stop immediately on cancel
 			default:
+				gc.gitRemotePushOutputMu.Lock()
 				updatedCursorIndex, updatedGitRemotePushOutput := handleProgressOutputStream(cursorIndex, scanner, gc.gitRemotePushOutput)
 				gc.gitRemotePushOutput = updatedGitRemotePushOutput
 				cursorIndex = updatedCursorIndex
+				gc.gitRemotePushOutputMu.Unlock()
 				gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
 			}
 		}
@@ -269,5 +276,7 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 }
 
 func (gc *GitCommit) ClearGitRemotePushOutput() {
+	gc.gitRemotePushOutputMu.Lock()
+	defer gc.gitRemotePushOutputMu.Unlock()
 	gc.gitRemotePushOutput = []string{}
 }

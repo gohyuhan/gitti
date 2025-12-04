@@ -63,6 +63,12 @@ var jA = LanguageMapping{
 	KeyBindingLocalBranchComponentNone: []string{
 		"[?] グローバルキー操作",
 	},
+	KeyBindingModifiedFilesComponentConflict: []string{
+		"[space] この変更をステージ",
+		"[r] 競合を解決",
+		"[enter] 変更内容を表示",
+		"[?] グローバルキー操作",
+	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] この変更のステージを解除",
 		"[s] スタッシュ",
@@ -252,6 +258,13 @@ var jA = LanguageMapping{
 	GitApplyStashConfirmation:                                "このスタッシュを適用してもよろしいですか \n[ %s ]\nId: [ %s ]",
 	GitDropStashConfirmation:                                 "このスタッシュを削除してもよろしいですか \n[ %s ]\nId: [ %s ]",
 	GitPopStashConfirmation:                                  "このスタッシュをポップしてもよろしいですか \n[ %s ]\nId: [ %s ]",
+	GitResolveConflictOptionTitle:                            "競合を解決",
+	GitResolveConflictReset:                                  "ファイルのマージを再開",
+	GitResolveConflictAcceptLocalChanges:                     "ローカルの変更を採用（ours）",
+	GitResolveConflictAcceptIncomingChanges:                  "取り込む変更を採用（theirs）",
+	GitResolveConflictResetInfo:                              "%s の競合マーカーを復元します（ステージされた変更は破棄されます）",
+	GitResolveConflictAcceptLocalChangesInfo:                 "競合しているファイル %s でローカルの変更を採用します",
+	GitResolveConflictAcceptIncomingChangesInfo:              "競合しているファイル %s で取り込む側の変更を採用します",
 }
 
 // for about gitti

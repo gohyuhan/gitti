@@ -530,6 +530,17 @@ func gitDiscardFileChangesService(m *GittiModel, filePathName string, discardTyp
 
 // ------------------------------------
 //
+//	For resolving git file conflict
+//
+// ------------------------------------
+func gitResolveConflictService(m *GittiModel, filePathName string, resolveType string) {
+	go func() {
+		m.GitOperations.GitFiles.GitResolveConflict(filePathName, resolveType)
+	}()
+}
+
+// ------------------------------------
+//
 //		For fetching detail component panel info
 //	  * it can be for stash info, commit info etc
 //

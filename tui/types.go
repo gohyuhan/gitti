@@ -294,6 +294,16 @@ type GitStashConfirmPromptPopUpModel struct {
 
 // ---------------------------------
 //
+// for resolve conflict option pop up
+//
+// ---------------------------------
+type GitResolveConflictOptionPopUpModel struct {
+	FilePathName              string
+	ResolveConflictOptionList list.Model
+}
+
+// ---------------------------------
+//
 // to record the current navigation index position
 //
 // ---------------------------------
@@ -331,6 +341,7 @@ type (
 		FilePathname string
 		IndexState   string
 		WorkTree     string
+		HasConflict  bool
 	}
 )
 
@@ -459,6 +470,24 @@ type (
 )
 
 func (i gitDiscardTypeOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// ---------------------------------
+//
+// for resolve conflict option selection option
+//
+// ---------------------------------
+type (
+	gitResolveConflictOptionDelegate struct{}
+	gitResolveConflictOptionItem     struct {
+		Name        string
+		Info        string
+		ResolveType string
+	}
+)
+
+func (i gitResolveConflictOptionItem) FilterValue() string {
 	return i.Name
 }
 

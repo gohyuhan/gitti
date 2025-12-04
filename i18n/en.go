@@ -64,6 +64,12 @@ var eN = LanguageMapping{
 	KeyBindingLocalBranchComponentNone: []string{
 		"[?] global key binding",
 	},
+	KeyBindingModifiedFilesComponentConflict: []string{
+		"[space] stage this change",
+		"[r] resolve conflict",
+		"[enter] view modified content",
+		"[?] global key binding",
+	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] unstage this change",
 		"[s] stash",
@@ -253,6 +259,13 @@ var eN = LanguageMapping{
 	GitApplyStashConfirmation:                                "Are you sure you want to apply stash for \n[ %s ]\nId: [ %s ]",
 	GitDropStashConfirmation:                                 "Are you sure you want to drop stash for \n[ %s ]\nId: [ %s ]",
 	GitPopStashConfirmation:                                  "Are you sure you want to pop stash for \n[ %s ]\nId: [ %s ]",
+	GitResolveConflictOptionTitle:                            "Resolve Conflict",
+	GitResolveConflictReset:                                  "Restart merge for file",
+	GitResolveConflictAcceptLocalChanges:                     "Accept local changes (ours)",
+	GitResolveConflictAcceptIncomingChanges:                  "Accept incoming changes (theirs)",
+	GitResolveConflictResetInfo:                              "Restores conflict markers in: %s (discards staged changes)",
+	GitResolveConflictAcceptLocalChangesInfo:                 "Accept local changes for conflicted file: %s",
+	GitResolveConflictAcceptIncomingChangesInfo:              "Accept incoming changes for conflicted file: %s",
 }
 
 // for about gitti

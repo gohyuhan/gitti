@@ -11,10 +11,11 @@ import (
 )
 
 type GitPull struct {
-	errorLog       []error
-	gitPullOutput  []string
-	gitProcessLock *GitProcessLock
-	updateChannel  chan string
+	errorLog        []error
+	gitPullOutput   []string
+	gitPullOutputMu sync.RWMutex
+	gitProcessLock  *GitProcessLock
+	updateChannel   chan string
 }
 
 func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock) *GitPull {
@@ -34,7 +35,12 @@ func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock) *Git
 //
 // --------------------------------
 func (gp *GitPull) GetGitPullOutput() []string {
-	return gp.gitPullOutput
+	gp.gitPullOutputMu.RLock()
+	defer gp.gitPullOutputMu.RUnlock()
+
+	copied := make([]string, len(gp.gitPullOutput))
+	copy(copied, gp.gitPullOutput)
+	return copied
 }
 
 // --------------------------------
@@ -90,9 +96,11 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 			case <-ctx.Done():
 				return // Stop immediately on cancel
 			default:
+				gp.gitPullOutputMu.Lock()
 				updatedCursorIndex, updatedGitPullOutput := handleProgressOutputStream(cursorIndex, scanner, gp.gitPullOutput)
 				gp.gitPullOutput = updatedGitPullOutput
 				cursorIndex = updatedCursorIndex
+				gp.gitPullOutputMu.Unlock()
 				gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE
 			}
 		}
@@ -119,5 +127,7 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 //
 // --------------------------------
 func (gp *GitPull) ClearGitPullOutput() {
+	gp.gitPullOutputMu.Lock()
+	defer gp.gitPullOutputMu.Unlock()
 	gp.gitPullOutput = []string{}
 }

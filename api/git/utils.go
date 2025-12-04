@@ -158,3 +158,18 @@ func hasUpstreamWithIcon() (string, string, bool) {
 	}
 	return remoteIcon, upStream, upStreamExist
 }
+
+// check if a file is in a conflict state
+func isFilesInConflictState(indexState string, workTree string) bool {
+	combinedState := indexState + workTree
+	if combinedState == "UU" ||
+		combinedState == "AA" ||
+		combinedState == "DD" ||
+		combinedState == "UD" ||
+		combinedState == "DU" ||
+		combinedState == "AU" ||
+		combinedState == "UA" {
+		return true
+	}
+	return false
+}

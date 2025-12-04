@@ -95,7 +95,6 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_STASH_UPDATE:
-			initStashList(m)
 			needReinit := initStashList(m)
 			if m.CurrentSelectedComponent == constant.StashComponent {
 				fetchDetailComponentPanelInfoService(m, needReinit)
