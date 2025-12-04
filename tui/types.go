@@ -78,6 +78,7 @@ type GitCommitPopUpModel struct {
 	CurrentActiveInputIndex  int             // to tell us which input should be shown as highlighted/focus and be updated
 	GitCommitOutputViewport  viewport.Model  // to log out the output from git operation
 	Spinner                  spinner.Model   // spinner for showing processing state
+	InitialCommitStarted     atomic.Bool     // indicated that this pop up session has start the first commit action
 	IsProcessing             atomic.Bool     // indicator to prevent multiple thread spawning reacting to the key binding trigger
 	HasError                 atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess           atomic.Bool     // has the process sucessfuly executed
@@ -99,6 +100,7 @@ type GitAmendCommitPopUpModel struct {
 	CurrentActiveInputIndex      int             // to tell us which input should be shown as highlighted/focus and be updated
 	GitAmendCommitOutputViewport viewport.Model  // to log out the output from git operation
 	Spinner                      spinner.Model   // spinner for showing processing state
+	InitialCommitStarted         atomic.Bool     // indicated that this pop up session has start the first commit action
 	IsProcessing                 atomic.Bool     // indicator to prevent multiple thread spawning reacting to the key binding trigger
 	HasError                     atomic.Bool     // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess               atomic.Bool     // has the process sucessfuly executed

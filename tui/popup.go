@@ -105,6 +105,7 @@ func renderGlobalKeyBindingPopUp(m *GittiModel) string {
 		height := min(constant.PopUpGlobalKeyBindingViewPortHeight, int(float64(m.Height)*0.8))
 		width := min(constant.MaxGlobalKeyBindingPopUpWidth, int(float64(m.Width)*0.8)-4)
 		popUp.GlobalKeyBindingViewport.SetWidth(width)
+		popUp.GlobalKeyBindingViewport.SetYOffset(popUp.GlobalKeyBindingViewport.YOffset())
 		popUp.GlobalKeyBindingViewport.SetHeight(height)
 		popUp.GlobalKeyBindingViewport.SetContent(keyBindingLine)
 		return style.GlobalKeyBindingPopUpStyle.Render(popUp.GlobalKeyBindingViewport.View())
@@ -137,7 +138,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 			descLabel,
 			descView,
 		)
-		if popUp.GitCommitOutputViewport.GetContent() != "" {
+		if popUp.InitialCommitStarted.Load() {
 			logViewPortStyle := style.PanelBorderStyle.
 				Width(popUpWidth - 2).
 				Height(constant.PopUpGitCommitOutputViewPortHeight + 2)
@@ -149,6 +150,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 					BorderForeground(style.ColorGreenSoft)
 			}
 			popUp.GitCommitOutputViewport.SetWidth(popUpWidth - 4)
+			popUp.GitCommitOutputViewport.SetYOffset(popUp.GitCommitOutputViewport.YOffset())
 			logViewPort := logViewPortStyle.Render(popUp.GitCommitOutputViewport.View())
 
 			// Show spinner above viewport when processing
@@ -186,6 +188,7 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
 		popUp.GitCommitOutputViewport.SetWidth(min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.GitCommitOutputViewport.SetYOffset(popUp.GitCommitOutputViewport.YOffset())
 		var gitCommitOutputLog string
 		logs := m.GitOperations.GitCommit.GitCommitOutput()
 		for _, line := range logs {
@@ -222,7 +225,7 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 			descLabel,
 			descView,
 		)
-		if popUp.GitAmendCommitOutputViewport.GetContent() != "" {
+		if popUp.InitialCommitStarted.Load() {
 			logViewPortStyle := style.PanelBorderStyle.
 				Width(popUpWidth - 2).
 				Height(constant.PopUpGitCommitOutputViewPortHeight + 2)
@@ -234,6 +237,7 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 					BorderForeground(style.ColorGreenSoft)
 			}
 			popUp.GitAmendCommitOutputViewport.SetWidth(popUpWidth - 4)
+			popUp.GitAmendCommitOutputViewport.SetYOffset(popUp.GitAmendCommitOutputViewport.YOffset())
 			logViewPort := logViewPortStyle.Render(popUp.GitAmendCommitOutputViewport.View())
 
 			// Show spinner above viewport when processing
@@ -271,6 +275,7 @@ func updatePopUpAmendCommitOutputViewPort(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 	if ok {
 		popUp.GitAmendCommitOutputViewport.SetWidth(min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.GitAmendCommitOutputViewport.SetYOffset(popUp.GitAmendCommitOutputViewport.YOffset())
 		var gitCommitOutputLog string
 		logs := m.GitOperations.GitCommit.GitCommitOutput()
 		for _, line := range logs {
@@ -332,6 +337,7 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 					BorderForeground(style.ColorGreenSoft)
 			}
 			popUp.AddRemoteOutputViewport.SetWidth(popUpWidth - 4)
+			popUp.AddRemoteOutputViewport.SetYOffset(popUp.AddRemoteOutputViewport.YOffset())
 			logViewPort := logViewPortStyle.Render(popUp.AddRemoteOutputViewport.View())
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
@@ -362,6 +368,7 @@ func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if ok {
 		popUp.AddRemoteOutputViewport.SetWidth(min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.AddRemoteOutputViewport.SetYOffset(popUp.AddRemoteOutputViewport.YOffset())
 		var addRemoteLog string
 		for _, line := range outputLog {
 			logLine := style.NewStyle.Render(line)
@@ -435,6 +442,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 				BorderForeground(style.ColorGreenSoft)
 		}
 		popUp.GitRemotePushOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.GitRemotePushOutputViewport.SetYOffset(popUp.GitRemotePushOutputViewport.YOffset())
 		logViewPort := logViewPortStyle.Render(popUp.GitRemotePushOutputViewport.View())
 
 		var content string
@@ -464,6 +472,7 @@ func updatePopUpGitRemotePushOutputViewport(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
 		popUp.GitRemotePushOutputViewport.SetWidth(min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.GitRemotePushOutputViewport.SetYOffset(popUp.GitRemotePushOutputViewport.YOffset())
 		logs := m.GitOperations.GitCommit.GitRemotePushOutput()
 		var GitPushLog string
 		for _, line := range logs {
@@ -564,6 +573,7 @@ func renderSwitchBranchOutputPopUp(m *GittiModel) string {
 				BorderForeground(style.ColorGreenSoft)
 		}
 		popUp.SwitchBranchOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.SwitchBranchOutputViewport.SetYOffset(popUp.SwitchBranchOutputViewport.YOffset())
 		logViewPort := logViewPortStyle.Render(popUp.SwitchBranchOutputViewport.View())
 
 		var content string
@@ -596,6 +606,7 @@ func updateSwitchBranchOutputViewPort(m *GittiModel, gitOpsOutput []string) {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {
 		popUp.SwitchBranchOutputViewport.SetWidth(min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.SwitchBranchOutputViewport.SetYOffset(popUp.SwitchBranchOutputViewport.YOffset())
 		var gitOpsOutputLogs string
 		for _, line := range gitOpsOutput {
 			logLine := style.NewStyle.Render(line)
@@ -645,6 +656,7 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 				BorderForeground(style.ColorGreenSoft)
 		}
 		popUp.GitPullOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.GitPullOutputViewport.SetYOffset(popUp.GitPullOutputViewport.YOffset())
 		logViewPort := logViewPortStyle.Render(popUp.GitPullOutputViewport.View())
 
 		var content string
@@ -674,6 +686,7 @@ func updatePopUpGitPullOutputViewport(m *GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
 	if ok {
 		popUp.GitPullOutputViewport.SetWidth(min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.GitPullOutputViewport.SetYOffset(popUp.GitPullOutputViewport.YOffset())
 		logs := m.GitOperations.GitPull.GetGitPullOutput()
 		var GitPullLog string
 		for _, line := range logs {
@@ -774,6 +787,7 @@ func renderGitStashOperationOutputPopUp(m *GittiModel) string {
 				BorderForeground(style.ColorGreenSoft)
 		}
 		popUp.GitStashOperationOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.GitStashOperationOutputViewport.SetYOffset(popUp.GitStashOperationOutputViewport.YOffset())
 		logViewPort := logViewPortStyle.Render(popUp.GitStashOperationOutputViewport.View())
 
 		var title string

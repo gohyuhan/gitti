@@ -266,6 +266,7 @@ func initGitCommitPopUpModel(m *GittiModel) {
 		GitCommitOutputViewport:  vp,
 		Spinner:                  s,
 	}
+	popUpModel.InitialCommitStarted.Store(false)
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)
 	popUpModel.ProcessSuccess.Store(false)
@@ -314,6 +315,7 @@ func initGitAmendCommitPopUpModel(m *GittiModel) {
 		GitAmendCommitOutputViewport: vp,
 		Spinner:                      s,
 	}
+	popUpModel.InitialCommitStarted.Store(false)
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)
 	popUpModel.ProcessSuccess.Store(false)

@@ -173,6 +173,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				// also do not start any git operation is message is no provided
 				if !popUp.IsProcessing.Load() && len(popUp.MessageTextInput.Value()) > 0 {
 					gitCommitService(m, popUp.IsAmendCommit)
+					popUp.InitialCommitStarted.Store(true)
 					// Start spinner ticking
 					return m, popUp.Spinner.Tick
 				}
@@ -186,6 +187,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 				popUp.CurrentActiveInputIndex = 1
 				if !popUp.IsProcessing.Load() && len(popUp.MessageTextInput.Value()) > 0 {
 					gitAmendCommitService(m, popUp.IsAmendCommit)
+					popUp.InitialCommitStarted.Store(true)
 					// Start spinner ticking
 					return m, popUp.Spinner.Tick
 				}
@@ -373,6 +375,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 			if popUp, ok := m.PopUpModel.(*GitCommitPopUpModel); !ok {
 				initGitCommitPopUpModel(m)
 			} else {
+				popUp.InitialCommitStarted.Store(false)
 				popUp.GitCommitOutputViewport.SetContent("")
 			}
 			m.PopUpType = constant.CommitPopUp
