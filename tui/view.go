@@ -8,12 +8,13 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/types"
 )
 
 // -----------------------------------------------------------------------------
 // Gitti Main Page View
 // -----------------------------------------------------------------------------
-func gittiMainPageView(m *GittiModel) string {
+func gittiMainPageView(m *types.GittiModel) string {
 	if m.Width < constant.MinWidth || m.Height < constant.MinHeight {
 		title := style.NewStyle.
 			Bold(true).

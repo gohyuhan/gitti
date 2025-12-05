@@ -8,6 +8,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/types"
 )
 
 // service.go was to bridge api and the needs of the terminal interface logic so that it can be compatible and feels smooth and not clunky
@@ -16,7 +17,7 @@ import (
 //	For Git Commit
 //
 // ------------------------------------
-func gitCommitService(m *GittiModel, isAmendCommit bool) {
+func gitCommitService(m *types.GittiModel, isAmendCommit bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
@@ -67,7 +68,7 @@ func gitCommitService(m *GittiModel, isAmendCommit bool) {
 	}(ctx)
 }
 
-func gitCommitCancelService(m *GittiModel) {
+func gitCommitCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
@@ -93,7 +94,7 @@ func gitCommitCancelService(m *GittiModel) {
 //	For Git Amend Commit
 //
 // ------------------------------------
-func gitAmendCommitService(m *GittiModel, isAmendCommit bool) {
+func gitAmendCommitService(m *types.GittiModel, isAmendCommit bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
@@ -144,7 +145,7 @@ func gitAmendCommitService(m *GittiModel, isAmendCommit bool) {
 	}(ctx)
 }
 
-func gitAmendCommitCancelService(m *GittiModel) {
+func gitAmendCommitCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
@@ -170,7 +171,7 @@ func gitAmendCommitCancelService(m *GittiModel) {
 //	For Adding Git Remote
 //
 // ------------------------------------
-func gitAddRemoteService(m *GittiModel) {
+func gitAddRemoteService(m *types.GittiModel) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
@@ -223,7 +224,7 @@ func gitAddRemoteService(m *GittiModel) {
 	}(ctx)
 }
 
-func gitAddRemoteCancelService(m *GittiModel) {
+func gitAddRemoteCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
@@ -248,7 +249,7 @@ func gitAddRemoteCancelService(m *GittiModel) {
 //	For Git Remote Push
 //
 // ------------------------------------
-func gitRemotePushService(m *GittiModel, remoteName string, pushType string) {
+func gitRemotePushService(m *types.GittiModel, remoteName string, pushType string) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
@@ -286,7 +287,7 @@ func gitRemotePushService(m *GittiModel, remoteName string, pushType string) {
 	}(ctx)
 }
 
-func gitRemotePushCancelService(m *GittiModel) {
+func gitRemotePushCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
@@ -311,7 +312,7 @@ func gitRemotePushCancelService(m *GittiModel) {
 //	For Git Switching brnach ( only switch or switch while bringing changes )
 //
 // ------------------------------------
-func gitSwitchBranchService(m *GittiModel, branchName string, switchType string) {
+func gitSwitchBranchService(m *types.GittiModel, branchName string, switchType string) {
 	go func() {
 		popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 
@@ -351,7 +352,7 @@ func gitSwitchBranchService(m *GittiModel, branchName string, switchType string)
 //	For Git Pull
 //
 // ------------------------------------
-func gitPullService(m *GittiModel, pullType string) {
+func gitPullService(m *types.GittiModel, pullType string) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
@@ -389,7 +390,7 @@ func gitPullService(m *GittiModel, pullType string) {
 	}(ctx)
 }
 
-func gitPullCancelService(m *GittiModel) {
+func gitPullCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
 	if ok {
 		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
@@ -414,7 +415,7 @@ func gitPullCancelService(m *GittiModel) {
 //	For create new branch
 //
 // ------------------------------------
-func gitCreateNewBranchService(m *GittiModel, validBranchName string) {
+func gitCreateNewBranchService(m *types.GittiModel, validBranchName string) {
 	go func() {
 		if len(validBranchName) < 1 {
 			return
@@ -428,7 +429,7 @@ func gitCreateNewBranchService(m *GittiModel, validBranchName string) {
 //	For create new branch and switch
 //
 // ------------------------------------
-func gitCreateNewBranchAndSwitchService(m *GittiModel, validBranchName string) {
+func gitCreateNewBranchAndSwitchService(m *types.GittiModel, validBranchName string) {
 	go func() {
 		m.GitOperations.GitBranch.GitCreateNewBranchAndSwitch(validBranchName)
 	}()
@@ -439,7 +440,7 @@ func gitCreateNewBranchAndSwitchService(m *GittiModel, validBranchName string) {
 //	For Git Individual file stage or unstage
 //
 // ------------------------------------
-func gitStageOrUnstageService(m *GittiModel, filePathName string) {
+func gitStageOrUnstageService(m *types.GittiModel, filePathName string) {
 	go func() {
 		m.GitOperations.GitFiles.StageOrUnstageFile(filePathName)
 	}()
@@ -450,7 +451,7 @@ func gitStageOrUnstageService(m *GittiModel, filePathName string) {
 //	For Git Stage All
 //
 // ------------------------------------
-func gitStageAllChangesService(m *GittiModel) {
+func gitStageAllChangesService(m *types.GittiModel) {
 	go func() {
 		m.GitOperations.GitFiles.StageAllChanges()
 	}()
@@ -461,7 +462,7 @@ func gitStageAllChangesService(m *GittiModel) {
 //	For Git Unstage All
 //
 // ------------------------------------
-func gitUnstageAllChangesService(m *GittiModel) {
+func gitUnstageAllChangesService(m *types.GittiModel) {
 	go func() {
 		m.GitOperations.GitFiles.UnstageAllChanges()
 	}()
@@ -475,7 +476,7 @@ func gitUnstageAllChangesService(m *GittiModel) {
 //	  inconsistent state (stash applied only halfway).
 //
 // ------------------------------------
-func gitStashOperationService(m *GittiModel, filePathName string, stashId string, stashMessage string) {
+func gitStashOperationService(m *types.GittiModel, filePathName string, stashId string, stashMessage string) {
 	go func() {
 		popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
 		if ok {
@@ -522,7 +523,7 @@ func gitStashOperationService(m *GittiModel, filePathName string, stashId string
 //	For Git discard file changes
 //
 // ------------------------------------
-func gitDiscardFileChangesService(m *GittiModel, filePathName string, discardType string) {
+func gitDiscardFileChangesService(m *types.GittiModel, filePathName string, discardType string) {
 	go func() {
 		m.GitOperations.GitFiles.DiscardFileChanges(filePathName, discardType)
 	}()
@@ -533,7 +534,7 @@ func gitDiscardFileChangesService(m *GittiModel, filePathName string, discardTyp
 //	For resolving git file conflict
 //
 // ------------------------------------
-func gitResolveConflictService(m *GittiModel, filePathName string, resolveType string) {
+func gitResolveConflictService(m *types.GittiModel, filePathName string, resolveType string) {
 	go func() {
 		m.GitOperations.GitFiles.GitResolveConflict(filePathName, resolveType)
 	}()
@@ -545,7 +546,7 @@ func gitResolveConflictService(m *GittiModel, filePathName string, resolveType s
 //	  * it can be for stash info, commit info etc
 //
 // ------------------------------------
-func fetchDetailComponentPanelInfoService(m *GittiModel, reinit bool) {
+func fetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 	// For non-reinit calls (refreshing current view), abort if already processing.
 	// This avoids looping a cancel and execution cycle which would end up blocking
 	// a slightly longer processing process.
@@ -619,7 +620,7 @@ func fetchDetailComponentPanelInfoService(m *GittiModel, reinit bool) {
 }
 
 // for modified file detail panel view
-func generateModifiedFileDetailPanelContent(ctx context.Context, m *GittiModel) string {
+func generateModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
@@ -642,7 +643,7 @@ func generateModifiedFileDetailPanelContent(ctx context.Context, m *GittiModel) 
 }
 
 // for stash detail panel view
-func generateStashDetailPanelContent(ctx context.Context, m *GittiModel) string {
+func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
 	var stash gitStashItem
 	if currentSelectedStash != nil {

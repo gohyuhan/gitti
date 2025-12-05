@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync/atomic"
 
-	"github.com/gohyuhan/gitti/api"
+	"github.com/gohyuhan/gitti/tui/types"
 
 	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/spinner"
@@ -18,42 +18,8 @@ import (
 // # Main Model for TUI
 //
 // ---------------------------------
-type GittiModel struct {
-	IsRenderInit                              atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
-	TuiUpdateChannel                          chan string
-	CurrentSelectedComponent                  string
-	CurrentSelectedComponentIndex             int
-	TotalComponentCount                       int
-	RepoPath                                  string
-	RepoName                                  string
-	CheckOutBranch                            string
-	RemoteSyncStateLineString                 string
-	BranchUpStream                            string
-	TrackedUpstreamOrBranchIcon               string
-	Width                                     int
-	Height                                    int
-	WindowLeftPanelWidth                      int // this is the left part of the window
-	DetailComponentPanelWidth                 int // this is the right part of the window, will always be for detail component panel only
-	WindowCoreContentHeight                   int // this is the height of the part where key binding panel is not included
-	DetailComponentPanelHeight                int
-	LocalBranchesComponentPanelHeight         int
-	ModifiedFilesComponentPanelHeight         int
-	StashComponentPanelHeight                 int
-	CurrentRepoBranchesInfoList               list.Model
-	CurrentRepoModifiedFilesInfoList          list.Model
-	CurrentRepoStashInfoList                  list.Model
-	DetailPanelParentComponent                string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
-	DetailPanelViewport                       viewport.Model
-	DetailPanelViewportOffset                 int
-	ListNavigationIndexPosition               GittiComponentsCurrentListNavigationIndexPosition
-	ShowPopUp                                 atomic.Bool
-	PopUpType                                 string
-	PopUpModel                                interface{}
-	IsTyping                                  atomic.Bool
-	GitOperations                             *api.GitOperations
-	GlobalKeyBindingKeyMapLargestLen          int                // this was use for global key binding pop up styling, we save it once so we don't have to recompute
-	DetailComponentPanelInfoFetchCancelFunc   context.CancelFunc // this was to cancel the fetch detail oepration
-	IsDetailComponentPanelInfoFetchProcessing atomic.Bool
+type GittiAppModel struct {
+	model *types.GittiModel
 }
 
 // ---------------------------------
@@ -304,33 +270,33 @@ type GitResolveConflictOptionPopUpModel struct {
 	ResolveConflictOptionList list.Model
 }
 
-// ---------------------------------
-//
-// to record the current navigation index position
-//
-// ---------------------------------
-type GittiComponentsCurrentListNavigationIndexPosition struct {
-	LocalBranchComponent   int
-	ModifiedFilesComponent int
-	StashComponent         int
-}
+// // ---------------------------------
+// //
+// // to record the current navigation index position
+// //
+// // ---------------------------------
+// type GittiComponentsCurrentListNavigationIndexPosition struct {
+// 	LocalBranchComponent   int
+// 	ModifiedFilesComponent int
+// 	StashComponent         int
+// }
 
-// ---------------------------------
-//
-// for list component of git branch
-//
-// ---------------------------------
-type (
-	gitBranchItemDelegate struct{}
-	gitBranchItem         struct {
-		BranchName   string
-		IsCheckedOut bool
-	}
-)
+// // ---------------------------------
+// //
+// // for list component of git branch
+// //
+// // ---------------------------------
+// type (
+// 	gitBranchItemDelegate struct{}
+// 	gitBranchItem         struct {
+// 		BranchName   string
+// 		IsCheckedOut bool
+// 	}
+// )
 
-func (i gitBranchItem) FilterValue() string {
-	return i.BranchName
-}
+// func (i gitBranchItem) FilterValue() string {
+// 	return i.BranchName
+// }
 
 // ---------------------------------
 //

@@ -5,21 +5,23 @@ import (
 
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/types"
 
 	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 )
 
-func NewGittiModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations) *GittiModel {
+func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations) *GittiAppModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
 	vp.SetHorizontalStep(1)
 	vp.MouseWheelDelta = 1
-	gitti := &GittiModel{
+	gittiModel := &types.GittiModel{
 		TuiUpdateChannel:                 tuiUpdateChannel,
 		CurrentSelectedComponent:         constant.ModifiedFilesComponent,
 		CurrentSelectedComponentIndex:    2,
@@ -32,37 +34,37 @@ func NewGittiModel(tuiUpdateChannel chan string, repoPath string, repoName strin
 		TrackedUpstreamOrBranchIcon:      "",
 		Width:                            0,
 		Height:                           0,
-		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, gitBranchItemDelegate{}, 0, 0),
+		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, branch.GitBranchItemDelegate{}, 0, 0),
 		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
 		CurrentRepoStashInfoList:         list.New([]list.Item{}, gitStashItemDelegate{}, 0, 0),
 		DetailPanelParentComponent:       "",
 		DetailPanelViewport:              vp,
 		DetailPanelViewportOffset:        0,
-		ListNavigationIndexPosition:      GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
+		ListNavigationIndexPosition:      types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
 		PopUpType:                        constant.NoPopUp,
 		PopUpModel:                       struct{}{},
 		GitOperations:                    gitOperations,
 		GlobalKeyBindingKeyMapLargestLen: 0,
 	}
-	gitti.IsRenderInit.Store(false)
-	gitti.ShowPopUp.Store(false)
-	gitti.IsTyping.Store(false)
-	gitti.IsDetailComponentPanelInfoFetchProcessing.Store(false)
+	gittiModel.IsRenderInit.Store(false)
+	gittiModel.ShowPopUp.Store(false)
+	gittiModel.IsTyping.Store(false)
+	gittiModel.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 
-	return gitti
+	return &GittiAppModel{model: gittiModel}
 }
 
 // -----------------------------------------------------------------------------
 // Bubble Tea standard functions
 // -----------------------------------------------------------------------------
 
-func (m *GittiModel) Init() tea.Cmd {
+func (gAM *GittiAppModel) Init() tea.Cmd {
 	return nil
 }
 
-func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
-
+	m := gAM.model
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.Width = msg.Width
@@ -73,19 +75,21 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// Valid dimensions are required to calculate item layouts (specifically text truncation);
 		// initializing earlier would cause the UI layout to break.
 		if m.IsRenderInit.CompareAndSwap(false, true) {
-			initBranchList(m)
+			branch.InitBranchList(m)
 			initModifiedFilesList(m)
 			initStashList(m)
 		}
 	case tea.KeyMsg:
-		return gittiKeyInteraction(msg, m)
+		model, cmd := gittiKeyInteraction(msg, m)
+		gAM.model = model
+		return gAM, cmd
 	case GitUpdateMsg:
 		updateEvent := string(msg)
 		switch updateEvent {
 		case constant.DETAIL_COMPONENT_PANEL_UPDATED:
-			return m, nil
+			return gAM, nil
 		case git.GIT_BRANCH_UPDATE:
-			initBranchList(m)
+			branch.InitBranchList(m)
 			if m.CurrentSelectedComponent == constant.LocalBranchComponent {
 				fetchDetailComponentPanelInfoService(m, false)
 			}
@@ -108,11 +112,13 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_PULL_OUTPUT_UPDATE:
 			updatePopUpGitPullOutputViewport(m)
 		case git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE:
-			m.updateGitRemoteStatusSyncLineStringAndUpStream()
+			gAM.updateGitRemoteStatusSyncLineStringAndUpStream()
 		}
-		return m, nil
+		return gAM, nil
 	case tea.MouseMsg:
-		return GittiMouseInteraction(msg, m)
+		model, cmd := GittiMouseInteraction(msg, m)
+		gAM.model = model
+		return gAM, cmd
 	}
 
 	// Update spinners in popups when they are processing
@@ -156,19 +162,19 @@ func (m *GittiModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	}
-
-	return m, tea.Batch(cmds...)
+	return gAM, tea.Batch(cmds...)
 }
 
-func (m *GittiModel) View() tea.View {
+func (gAM *GittiAppModel) View() tea.View {
 	var v tea.View
-	v.SetContent(gittiMainPageView(m))
+	v.SetContent(gittiMainPageView(gAM.model))
 	v.AltScreen = true
 	v.MouseMode = tea.MouseModeCellMotion
 	return v
 }
 
-func (m *GittiModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
+func (gAM *GittiAppModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
+	m := gAM.model
 	// set branch upstream
 	m.TrackedUpstreamOrBranchIcon = m.GitOperations.GitRemote.UpStreamRemoteIcon()
 	m.BranchUpStream = m.GitOperations.GitRemote.CurrentBranchUpStream()

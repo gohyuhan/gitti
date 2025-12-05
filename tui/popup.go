@@ -8,6 +8,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/types"
 
 	"charm.land/lipgloss/v2"
 )
@@ -18,7 +19,7 @@ import (
 //
 // -----------------------------------------------------------------------------
 // render the PopUp and the content within it will be a determine dynamically
-func renderPopUpComponent(m *GittiModel) string {
+func renderPopUpComponent(m *types.GittiModel) string {
 	var popUp string
 
 	switch m.PopUpType {
@@ -69,7 +70,7 @@ func renderPopUpComponent(m *GittiModel) string {
 //	For Global Key binding pop up
 //
 // ------------------------------------
-func renderGlobalKeyBindingPopUp(m *GittiModel) string {
+func renderGlobalKeyBindingPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GlobalKeyBindingPopUpModel)
 	if ok {
 		keyBindingLine := "\n"
@@ -118,7 +119,7 @@ func renderGlobalKeyBindingPopUp(m *GittiModel) string {
 //	For Git Commit
 //
 // ------------------------------------
-func renderGitCommitPopUp(m *GittiModel) string {
+func renderGitCommitPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8))
@@ -184,7 +185,7 @@ func renderGitCommitPopUp(m *GittiModel) string {
 
 // to update the commit output log for git commit
 // this also take care of log by pre commit and post commit
-func updatePopUpCommitOutputViewPort(m *GittiModel) {
+func updatePopUpCommitOutputViewPort(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
 		popUp.GitCommitOutputViewport.SetWidth(min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
@@ -205,7 +206,7 @@ func updatePopUpCommitOutputViewPort(m *GittiModel) {
 //	For Git Commit (Amend)
 //
 // ------------------------------------
-func renderGitAmendCommitPopUp(m *GittiModel) string {
+func renderGitAmendCommitPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8))
@@ -271,7 +272,7 @@ func renderGitAmendCommitPopUp(m *GittiModel) string {
 
 // to update the amend commit output log for git amend commit
 // this also take care of log by pre commit and post commit
-func updatePopUpAmendCommitOutputViewPort(m *GittiModel) {
+func updatePopUpAmendCommitOutputViewPort(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 	if ok {
 		popUp.GitAmendCommitOutputViewport.SetWidth(min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8)) - 4)
@@ -292,7 +293,7 @@ func updatePopUpAmendCommitOutputViewPort(m *GittiModel) {
 //	For Adding Git Remote
 //
 // ------------------------------------
-func renderAddRemotePromptPopUp(m *GittiModel) string {
+func renderAddRemotePromptPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8))
@@ -364,7 +365,7 @@ func renderAddRemotePromptPopUp(m *GittiModel) string {
 	return ""
 }
 
-func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
+func updateAddRemoteOutputViewport(m *types.GittiModel, outputLog []string) {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if ok {
 		popUp.AddRemoteOutputViewport.SetWidth(min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
@@ -384,7 +385,7 @@ func updateAddRemoteOutputViewport(m *GittiModel, outputLog []string) {
 //	For Choosing a Remote for git push if there is more than 1
 //
 // ------------------------------------
-func renderChooseRemotePopUp(m *GittiModel) string {
+func renderChooseRemotePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseRemotePopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxChooseRemotePopUpWidth, int(float64(m.Width)*0.8))
@@ -405,7 +406,7 @@ func renderChooseRemotePopUp(m *GittiModel) string {
 //	For Choosing a push option
 //
 // ------------------------------------
-func renderChoosePushTypePopUp(m *GittiModel) string {
+func renderChoosePushTypePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChoosePushTypePopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxChoosePushTypePopUpWidth, int(float64(m.Width)*0.8))
@@ -426,7 +427,7 @@ func renderChoosePushTypePopUp(m *GittiModel) string {
 //	For Git Push
 //
 // ------------------------------------
-func renderGitRemotePushPopUp(m *GittiModel) string {
+func renderGitRemotePushPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8))
@@ -468,7 +469,7 @@ func renderGitRemotePushPopUp(m *GittiModel) string {
 	return ""
 }
 
-func updatePopUpGitRemotePushOutputViewport(m *GittiModel) {
+func updatePopUpGitRemotePushOutputViewport(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
 		popUp.GitRemotePushOutputViewport.SetWidth(min(constant.MaxGitRemotePushPopUpWidth, int(float64(m.Width)*0.8)) - 4)
@@ -490,7 +491,7 @@ func updatePopUpGitRemotePushOutputViewport(m *GittiModel) {
 //
 // ------------------------------------
 // pop up that confirm the option for creating a new branch, just create or create and move everything to the new branch
-func renderChooseNewBranchTypePopUp(m *GittiModel) string {
+func renderChooseNewBranchTypePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxChooseNewBranchTypePopUpWidth, int(float64(m.Width)*0.8))
@@ -507,7 +508,7 @@ func renderChooseNewBranchTypePopUp(m *GittiModel) string {
 }
 
 // to prompt user for new branch name and then proceed to trigger the creation of branch and optionally move changes
-func renderCreateNewBranchPopUp(m *GittiModel) string {
+func renderCreateNewBranchPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8))
@@ -538,7 +539,7 @@ func renderCreateNewBranchPopUp(m *GittiModel) string {
 //
 // ------------------------------------
 // pop up that confirm the option for switching a branch, just switch or switch to the branch while bringing all the changes
-func renderChooseSwitchBranchTypePopUp(m *GittiModel) string {
+func renderChooseSwitchBranchTypePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxChooseSwitchBranchTypePopUpWidth, int(float64(m.Width)*0.8))
@@ -557,7 +558,7 @@ func renderChooseSwitchBranchTypePopUp(m *GittiModel) string {
 // pop up to render the output of the switch branch operation
 // because we allow switching with bring changes over, there is conflict possiblities there fore we need to show the output
 // so that the user is aware of it
-func renderSwitchBranchOutputPopUp(m *GittiModel) string {
+func renderSwitchBranchOutputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8))
@@ -602,7 +603,7 @@ func renderSwitchBranchOutputPopUp(m *GittiModel) string {
 	return ""
 }
 
-func updateSwitchBranchOutputViewPort(m *GittiModel, gitOpsOutput []string) {
+func updateSwitchBranchOutputViewPort(m *types.GittiModel, gitOpsOutput []string) {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {
 		popUp.SwitchBranchOutputViewport.SetWidth(min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
@@ -623,7 +624,7 @@ func updateSwitchBranchOutputViewPort(m *GittiModel, gitOpsOutput []string) {
 //
 // ------------------------------------
 // choose git pull option
-func renderChooseGitPullTypePopUp(m *GittiModel) string {
+func renderChooseGitPullTypePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseGitPullTypePopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxChooseGitPullTypePopUpWidth, int(float64(m.Width)*0.8))
@@ -640,7 +641,7 @@ func renderChooseGitPullTypePopUp(m *GittiModel) string {
 }
 
 // for git pull output
-func renderGitPullOutputPopUp(m *GittiModel) string {
+func renderGitPullOutputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8))
@@ -682,7 +683,7 @@ func renderGitPullOutputPopUp(m *GittiModel) string {
 	return ""
 }
 
-func updatePopUpGitPullOutputViewport(m *GittiModel) {
+func updatePopUpGitPullOutputViewport(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
 	if ok {
 		popUp.GitPullOutputViewport.SetWidth(min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
@@ -703,7 +704,7 @@ func updatePopUpGitPullOutputViewport(m *GittiModel) {
 //	For Git Stash to prompt for stash message
 //
 // ------------------------------------
-func renderGitStashMessagePopUp(m *GittiModel) string {
+func renderGitStashMessagePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitStashMessagePopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitStashMessagePopUpWidth, int(float64(m.Width)*0.8))
@@ -724,7 +725,7 @@ func renderGitStashMessagePopUp(m *GittiModel) string {
 //	For Discard file changes type list selection
 //
 // ------------------------------------
-func renderGitDiscardTypeOptionPopUp(m *GittiModel) string {
+func renderGitDiscardTypeOptionPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitDiscardTypeOptionPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitDiscardTypeOptionPopUpWidth, int(float64(m.Width)*0.8))
@@ -745,7 +746,7 @@ func renderGitDiscardTypeOptionPopUp(m *GittiModel) string {
 //	For Discard file changes confirmation prompt
 //
 // ------------------------------------
-func renderGitDiscardConfirmPromptPopup(m *GittiModel) string {
+func renderGitDiscardConfirmPromptPopup(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitDiscardConfirmPromptPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitDiscardConfirmPromptPopupWidth, int(float64(m.Width)*0.8))
@@ -772,7 +773,7 @@ func renderGitDiscardConfirmPromptPopup(m *GittiModel) string {
 //	For stash operation output
 //
 // ------------------------------------
-func renderGitStashOperationOutputPopUp(m *GittiModel) string {
+func renderGitStashOperationOutputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitStashOperationOutputPopUpWidth, int(float64(m.Width)*0.8))
@@ -838,7 +839,7 @@ func renderGitStashOperationOutputPopUp(m *GittiModel) string {
 //	For stash operation confirmation prompt
 //
 // ------------------------------------
-func renderGitStashConfirmPromptPopUp(m *GittiModel) string {
+func renderGitStashConfirmPromptPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitStashConfirmPromptPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitStashConfirmPromptPopUpWidth, int(float64(m.Width)*0.8))
@@ -868,7 +869,7 @@ func renderGitStashConfirmPromptPopUp(m *GittiModel) string {
 //	For resolve conflict option list
 //
 // ------------------------------------
-func renderGitResolveConflictOptionPopUp(m *GittiModel) string {
+func renderGitResolveConflictOptionPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitResolveConflictOptionPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitResolveConflictOptionPopUpWidth, int(float64(m.Width)*0.8))

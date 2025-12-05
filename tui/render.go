@@ -7,8 +7,10 @@ import (
 	gitticonst "github.com/gohyuhan/gitti/constant"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/settings"
+	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
@@ -22,7 +24,7 @@ import (
 //
 // -----------------------------------------------------------------------------
 // render the Gitti Status Panel
-func renderGitStatusComponentPanel(m *GittiModel) string {
+func renderGitStatusComponentPanel(m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.GitStatusComponent {
 		borderStyle = style.SelectedBorderStyle
@@ -45,7 +47,7 @@ func renderGitStatusComponentPanel(m *GittiModel) string {
 }
 
 // Render the Local Branches panel
-func renderLocalBranchesComponentPanel(width int, height int, m *GittiModel) string {
+func renderLocalBranchesComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.LocalBranchComponent {
 		borderStyle = style.SelectedBorderStyle
@@ -57,7 +59,7 @@ func renderLocalBranchesComponentPanel(width int, height int, m *GittiModel) str
 }
 
 // Render the Changed Files panel
-func renderModifiedFilesComponentPanel(width int, height int, m *GittiModel) string {
+func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 		borderStyle = style.SelectedBorderStyle
@@ -70,7 +72,7 @@ func renderModifiedFilesComponentPanel(width int, height int, m *GittiModel) str
 
 // Render the detail component part at the right of the window,
 // however the content within it will be dynamic based on the current selected component
-func renderDetailComponentPanel(width int, height int, m *GittiModel) string {
+func renderDetailComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.DetailComponent {
 		borderStyle = style.SelectedBorderStyle
@@ -81,7 +83,7 @@ func renderDetailComponentPanel(width int, height int, m *GittiModel) string {
 		Render(m.DetailPanelViewport.View())
 }
 
-func renderStashComponentPanel(width int, height int, m *GittiModel) string {
+func renderStashComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.StashComponent {
 		borderStyle = style.SelectedBorderStyle
@@ -92,7 +94,7 @@ func renderStashComponentPanel(width int, height int, m *GittiModel) string {
 		Render(strings.ReplaceAll(m.CurrentRepoStashInfoList.View(), "No items.", ""))
 }
 
-func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
+func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 	keys := []string{""} // to prevent a misconfiguration on key binding will not crash the program
 
 	if m.ShowPopUp.Load() {
@@ -165,7 +167,7 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 			if CurrentSelectedBranch == nil {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentNone
 			} else {
-				isCurrentSelectedBranchCheckedOutBranch := CurrentSelectedBranch.(gitBranchItem).IsCheckedOut
+				isCurrentSelectedBranchCheckedOutBranch := CurrentSelectedBranch.(branch.GitBranchItem).IsCheckedOut
 				if isCurrentSelectedBranchCheckedOutBranch {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentIsCheckOut
 				} else {
@@ -221,7 +223,7 @@ func renderKeyBindingComponentPanel(width int, m *GittiModel) string {
 }
 
 // to update the width and height of all components
-func tuiWindowSizing(m *GittiModel) {
+func tuiWindowSizing(m *types.GittiModel) {
 	// Compute panel widths
 	m.WindowLeftPanelWidth = min(int(float64(m.Width)*settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio), constant.MaxLeftPanelWidth)
 	m.DetailComponentPanelWidth = m.Width - m.WindowLeftPanelWidth
@@ -240,7 +242,7 @@ func tuiWindowSizing(m *GittiModel) {
 	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset())
 }
 
-func leftPanelDynamicResize(m *GittiModel) {
+func leftPanelDynamicResize(m *types.GittiModel) {
 	leftPanelRemainingHeight := m.WindowCoreContentHeight - 7 // this is after reserving the height for the gitti version panel and also Padding
 
 	// we minus 2 if GitStatusComponent is not the one chosen is because GitStatusComponent

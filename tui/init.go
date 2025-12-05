@@ -7,6 +7,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
+	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 
 	"charm.land/bubbles/v2/key"
@@ -23,58 +24,58 @@ import (
 // see https://github.com/charmbracelet/bubbles/blob/master/list/list.go#L1222
 
 // init the list component for Branch Component
-func initBranchList(m *GittiModel) {
-	currentCheckOut := m.GitOperations.GitBranch.CurrentCheckOut()
-	latestBranchArray := []list.Item{
-		gitBranchItem(currentCheckOut),
-	}
+// func initBranchList(m *types.GittiModel) {
+// 	currentCheckOut := m.GitOperations.GitBranch.CurrentCheckOut()
+// 	latestBranchArray := []list.Item{
+// 		gitBranchItem(currentCheckOut),
+// 	}
 
-	m.CheckOutBranch = currentCheckOut.BranchName
+// 	m.CheckOutBranch = currentCheckOut.BranchName
 
-	for _, branch := range m.GitOperations.GitBranch.AllBranches() {
-		latestBranchArray = append(latestBranchArray, gitBranchItem(branch))
-	}
+// 	for _, branch := range m.GitOperations.GitBranch.AllBranches() {
+// 		latestBranchArray = append(latestBranchArray, gitBranchItem(branch))
+// 	}
 
-	m.CurrentRepoBranchesInfoList = list.New(latestBranchArray, gitBranchItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
-	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
-	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
-	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
-	m.CurrentRepoBranchesInfoList.SetShowFilter(false)
-	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf418 %s:", i18n.LANGUAGEMAPPING.Branches), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
-	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
-	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
-	m.CurrentRepoBranchesInfoList.Styles.TitleBar = style.NewStyle
+// 	m.CurrentRepoBranchesInfoList = list.New(latestBranchArray, gitBranchItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
+// 	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
+// 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
+// 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
+// 	m.CurrentRepoBranchesInfoList.SetShowFilter(false)
+// 	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf418 %s:", i18n.LANGUAGEMAPPING.Branches), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+// 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
+// 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
+// 	m.CurrentRepoBranchesInfoList.Styles.TitleBar = style.NewStyle
 
-	// Custom Help Model for Count Display
-	m.CurrentRepoBranchesInfoList.SetShowHelp(true)
-	m.CurrentRepoBranchesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = func() []key.Binding {
-		currentIndex := m.CurrentRepoBranchesInfoList.Index() + 1
-		totalCount := len(m.CurrentRepoBranchesInfoList.Items())
-		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
-		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
-		if totalCount == 0 {
-			countStr = "0/0"
-		}
-		return []key.Binding{
-			key.NewBinding(
-				key.WithKeys(countStr),
-				key.WithHelp(countStr, ""),
-			),
-		}
-	}
+// 	// Custom Help Model for Count Display
+// 	m.CurrentRepoBranchesInfoList.SetShowHelp(true)
+// 	m.CurrentRepoBranchesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+// 	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = func() []key.Binding {
+// 		currentIndex := m.CurrentRepoBranchesInfoList.Index() + 1
+// 		totalCount := len(m.CurrentRepoBranchesInfoList.Items())
+// 		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
+// 		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+// 		if totalCount == 0 {
+// 			countStr = "0/0"
+// 		}
+// 		return []key.Binding{
+// 			key.NewBinding(
+// 				key.WithKeys(countStr),
+// 				key.WithHelp(countStr, ""),
+// 			),
+// 		}
+// 	}
 
-	if m.ListNavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
-		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)
-		m.ListNavigationIndexPosition.LocalBranchComponent = len(m.CurrentRepoBranchesInfoList.Items()) - 1
-	} else {
-		m.CurrentRepoBranchesInfoList.Select(m.ListNavigationIndexPosition.LocalBranchComponent)
-	}
-}
+// 	if m.ListNavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
+// 		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)
+// 		m.ListNavigationIndexPosition.LocalBranchComponent = len(m.CurrentRepoBranchesInfoList.Items()) - 1
+// 	} else {
+// 		m.CurrentRepoBranchesInfoList.Select(m.ListNavigationIndexPosition.LocalBranchComponent)
+// 	}
+// }
 
 // init the list component for Modified Files Component
 // return bool was to tell if we need to reinit the detail component panel or not
-func initModifiedFilesList(m *GittiModel) bool {
+func initModifiedFilesList(m *types.GittiModel) bool {
 	latestModifiedFilesArray := m.GitOperations.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))
 	for _, modifiedFile := range latestModifiedFilesArray {
@@ -144,7 +145,7 @@ func initModifiedFilesList(m *GittiModel) bool {
 
 // init the list component for Stash info Component
 // return bool was to tell if we need to reinit the detail component panel or not
-func initStashList(m *GittiModel) bool {
+func initStashList(m *types.GittiModel) bool {
 	latestStashArray := m.GitOperations.GitStash.AllStash()
 	items := make([]list.Item, 0, len(latestStashArray))
 	for _, stashInfo := range latestStashArray {
@@ -213,7 +214,7 @@ func initStashList(m *GittiModel) bool {
 }
 
 // init the viewport pop up for showing info of global key binding
-func initGlobalKeyBindingPopUpModel(m *GittiModel) {
+func initGlobalKeyBindingPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
@@ -227,7 +228,7 @@ func initGlobalKeyBindingPopUpModel(m *GittiModel) {
 }
 
 // init the popup model for git commit
-func initGitCommitPopUpModel(m *GittiModel) {
+func initGitCommitPopUpModel(m *types.GittiModel) {
 	commitMsg := ""
 	commitDesc := ""
 	commitMsgPlaceholder := i18n.LANGUAGEMAPPING.CommitPopUpMessageInputPlaceHolder
@@ -275,7 +276,7 @@ func initGitCommitPopUpModel(m *GittiModel) {
 }
 
 // init the popup model for git amend commit
-func initGitAmendCommitPopUpModel(m *GittiModel) {
+func initGitAmendCommitPopUpModel(m *types.GittiModel) {
 	commitMsgAndDesc := m.GitOperations.GitCommit.GetLatestCommitMsgAndDesc()
 	commitMsg := commitMsgAndDesc.Message
 	commitDesc := commitMsgAndDesc.Description
@@ -324,7 +325,7 @@ func initGitAmendCommitPopUpModel(m *GittiModel) {
 }
 
 // init the popup model for prompting user to add remote origin
-func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
+func initAddRemotePromptPopUpModel(m *types.GittiModel, noInitialRemote bool) {
 	RemoteNameTextInput := textinput.New()
 	if noInitialRemote {
 		RemoteNameTextInput.SetValue("origin")
@@ -362,7 +363,7 @@ func initAddRemotePromptPopUpModel(m *GittiModel, noInitialRemote bool) {
 }
 
 // init the popup model for push output log
-func initGitRemotePushPopUpModel(m *GittiModel) {
+func initGitRemotePushPopUpModel(m *types.GittiModel) {
 	// for git push output viewport,
 	vp := viewport.New()
 	vp.SoftWrap = true
@@ -386,7 +387,7 @@ func initGitRemotePushPopUpModel(m *GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remoteName string, pushType string) (*GittiModel, tea.Cmd) {
+func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *types.GittiModel, remoteName string, pushType string) (*types.GittiModel, tea.Cmd) {
 	m.GitOperations.GitCommit.ClearGitRemotePushOutput()
 	if popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel); !ok {
 		initGitRemotePushPopUpModel(m)
@@ -403,7 +404,7 @@ func initGitRemotePushPopUpModelAndStartGitRemotePushService(m *GittiModel, remo
 }
 
 // init the popup model to choose remote to push to
-func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.GitRemoteInfo) {
+func initGitRemotePushChooseRemotePopUpModel(m *types.GittiModel, remoteList []git.GitRemoteInfo) {
 	items := make([]list.Item, 0, len(remoteList))
 	for _, remote := range remoteList {
 		items = append(items, gitRemoteItem(remote))
@@ -422,7 +423,7 @@ func initGitRemotePushChooseRemotePopUpModel(m *GittiModel, remoteList []git.Git
 }
 
 // init the popup model for choosing push type
-func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
+func initChoosePushTypePopUpModel(m *types.GittiModel, remoteName string) {
 	pushTypeOption := []gitPushOptionItem{
 		{
 			Name:     i18n.LANGUAGEMAPPING.NormalPush,
@@ -460,7 +461,7 @@ func initChoosePushTypePopUpModel(m *GittiModel, remoteName string) {
 }
 
 // init the popup model for creating a new branch
-func initCreateNewBranchPopUpModel(m *GittiModel, createType string) {
+func initCreateNewBranchPopUpModel(m *types.GittiModel, createType string) {
 	NewBranchNameInput := textinput.New()
 	NewBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.CreateNewBranchPrompt
 	NewBranchNameInput.Focus()
@@ -474,7 +475,7 @@ func initCreateNewBranchPopUpModel(m *GittiModel, createType string) {
 }
 
 // init the popup model for choosing new branch creation option
-func initChooseNewBranchTypePopUpModel(m *GittiModel) {
+func initChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 	newBranchTypeOption := []gitNewBranchTypeOptionItem{
 		{
 			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchTitle,
@@ -506,7 +507,7 @@ func initChooseNewBranchTypePopUpModel(m *GittiModel) {
 }
 
 // init the popup model for switching branch
-func initChooseSwitchBranchTypePopUpModel(m *GittiModel, branchName string) {
+func initChooseSwitchBranchTypePopUpModel(m *types.GittiModel, branchName string) {
 	switchBranchTypeOption := []gitSwitchBranchTypeOptionItem{
 		{
 			Name:             i18n.LANGUAGEMAPPING.SwitchBranchTitle,
@@ -539,7 +540,7 @@ func initChooseSwitchBranchTypePopUpModel(m *GittiModel, branchName string) {
 	}
 }
 
-func initSwitchBranchOutputPopUpModel(m *GittiModel, branchName string, switchType string) {
+func initSwitchBranchOutputPopUpModel(m *types.GittiModel, branchName string, switchType string) {
 	// for git push output viewport,
 	vp := viewport.New()
 	vp.SoftWrap = true
@@ -564,7 +565,7 @@ func initSwitchBranchOutputPopUpModel(m *GittiModel, branchName string, switchTy
 	m.PopUpModel = popUpModel
 }
 
-func initChooseGitPullTypePopUp(m *GittiModel) {
+func initChooseGitPullTypePopUp(m *types.GittiModel) {
 	pullTypeOption := []gitPullTypeOptionItem{
 		{
 			Name:     i18n.LANGUAGEMAPPING.GitPullOption,
@@ -603,7 +604,7 @@ func initChooseGitPullTypePopUp(m *GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func initGitPullOutputPopUpModel(m *GittiModel) {
+func initGitPullOutputPopUpModel(m *types.GittiModel) {
 	// for git pull output viewport
 	vp := viewport.New()
 	vp.SoftWrap = true
@@ -627,7 +628,7 @@ func initGitPullOutputPopUpModel(m *GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType string) {
+func initGitStashMessagePopUpModel(m *types.GittiModel, filePathName string, stashType string) {
 	stashMessageTextInput := textinput.New()
 	stashMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.GitStashMessagePlaceholder
 	stashMessageTextInput.Focus()
@@ -644,7 +645,7 @@ func initGitStashMessagePopUpModel(m *GittiModel, filePathName string, stashType
 }
 
 // for discard option list popup
-func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
+func initGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
 	discardTypeOption := []gitDiscardTypeOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
@@ -710,7 +711,7 @@ func initGitDiscardTypeOptionPopUp(m *GittiModel, filePathName string, newlyAdde
 }
 
 // for discard confirm prompt
-func initGitDiscardConfirmPromptPopup(m *GittiModel, filePathName string, discardType string) {
+func initGitDiscardConfirmPromptPopup(m *types.GittiModel, filePathName string, discardType string) {
 	popUpModel := &GitDiscardConfirmPromptPopUpModel{
 		FilePathName: filePathName,
 		DiscardType:  discardType,
@@ -719,7 +720,7 @@ func initGitDiscardConfirmPromptPopup(m *GittiModel, filePathName string, discar
 }
 
 // for git stash output popup
-func initGitStashOperationOutputPopUpModel(m *GittiModel, stashOperationType string) {
+func initGitStashOperationOutputPopUpModel(m *types.GittiModel, stashOperationType string) {
 	vp := viewport.New()
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
@@ -743,7 +744,7 @@ func initGitStashOperationOutputPopUpModel(m *GittiModel, stashOperationType str
 }
 
 // for git stash operation confirm prompt
-func initGitStashConfirmPromptPopUpModel(m *GittiModel, stashOperationType string, filePathName string, stashId string, stashMessage string) {
+func initGitStashConfirmPromptPopUpModel(m *types.GittiModel, stashOperationType string, filePathName string, stashId string, stashMessage string) {
 	popUpModel := &GitStashConfirmPromptPopUpModel{
 		StashOperationType: stashOperationType,
 		FilePathName:       filePathName,
@@ -754,7 +755,7 @@ func initGitStashConfirmPromptPopUpModel(m *GittiModel, stashOperationType strin
 }
 
 // for resolve conflict option list popup
-func initGitResolveConflictOptionPopUpModel(m *GittiModel, filePathName string) {
+func initGitResolveConflictOptionPopUpModel(m *types.GittiModel, filePathName string) {
 	resolveConflictOption := []gitResolveConflictOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictReset,

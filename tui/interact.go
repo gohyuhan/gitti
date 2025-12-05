@@ -3,7 +3,9 @@ package tui
 import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/utils"
 
 	tea "charm.land/bubbletea/v2"
@@ -15,7 +17,7 @@ const (
 )
 
 // the function to handle bubbletea key interactions
-func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+func gittiKeyInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	// global key binding
 	switch msg.String() {
 	case "ctrl+c":
@@ -45,7 +47,7 @@ func gittiKeyInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
 }
 
 // typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
-func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
 		switch m.PopUpType {
@@ -313,7 +315,7 @@ func handleTypingKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiMod
 	return m, nil
 }
 
-func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "?":
@@ -598,7 +600,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 					m.DetailPanelParentComponent = constant.StashComponent
 				}
 			case constant.LocalBranchComponent:
-				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(gitBranchItem)
+				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(branch.GitBranchItem)
 				// only proceed if the local branch selected is not current checkedout branch
 				// we can't switch from current checkout branch to current checkout branch, do we
 				if !currentSelectedLocalBranch.IsCheckedOut {
@@ -951,7 +953,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *GittiModel) (
 	return m, nil
 }
 
-func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg.String() {
 	case "wheelleft":
@@ -983,7 +985,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cm
 	return m, nil
 }
 
-func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// for within pop up component
 	switch m.PopUpType {
@@ -1084,7 +1086,7 @@ func upDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *GittiModel) (*GittiModel, tea
 	return m, nil
 }
 
-func upDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *GittiModel) (*GittiModel, tea.Cmd) {
+func upDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// for pop up that have viewport
 	switch m.PopUpType {

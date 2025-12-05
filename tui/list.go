@@ -17,37 +17,37 @@ import (
 // implementation for list compoenent
 // -----------------------------------------------------------------------------
 
-// for list component of git branch
-func (d gitBranchItemDelegate) Height() int                             { return 1 }
-func (d gitBranchItemDelegate) Spacing() int                            { return 0 }
-func (d gitBranchItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(gitBranchItem)
-	if !ok {
-		return
-	}
+// // for list component of git branch
+// func (d gitBranchItemDelegate) Height() int                             { return 1 }
+// func (d gitBranchItemDelegate) Spacing() int                            { return 0 }
+// func (d gitBranchItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+// func (d gitBranchItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+// 	i, ok := listItem.(gitBranchItem)
+// 	if !ok {
+// 		return
+// 	}
 
-	str := fmt.Sprintf("   %s", i.BranchName)
-	if i.IsCheckedOut {
-		str = fmt.Sprintf(" * %s", i.BranchName)
-	}
+// 	str := fmt.Sprintf("   %s", i.BranchName)
+// 	if i.IsCheckedOut {
+// 		str = fmt.Sprintf(" * %s", i.BranchName)
+// 	}
 
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+// 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	var fn func(...string) string
-	if index == m.Index() {
-		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
-		}
-	} else {
-		fn = func(s ...string) string {
-			return style.ItemStyle.Render("  " + strings.Join(s, " "))
-		}
-	}
-	str = utils.TruncateString(str, componentWidth)
+// 	var fn func(...string) string
+// 	if index == m.Index() {
+// 		fn = func(s ...string) string {
+// 			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+// 		}
+// 	} else {
+// 		fn = func(s ...string) string {
+// 			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+// 		}
+// 	}
+// 	str = utils.TruncateString(str, componentWidth)
 
-	fmt.Fprint(w, fn(str))
-}
+// 	fmt.Fprint(w, fn(str))
+// }
 
 // for list component of modified files
 func (d gitModifiedFilesItemDelegate) Height() int                             { return 1 }
