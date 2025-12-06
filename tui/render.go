@@ -8,6 +8,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -179,7 +180,7 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			if CurrentSelectedFile == nil {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentNone
 			} else {
-				file := CurrentSelectedFile.(gitModifiedFilesItem)
+				file := CurrentSelectedFile.(files.GitModifiedFilesItem)
 				if file.HasConflict {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentConflict
 				} else {

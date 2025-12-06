@@ -300,25 +300,6 @@ type GitResolveConflictOptionPopUpModel struct {
 
 // ---------------------------------
 //
-// for list component of git modified files
-//
-// ---------------------------------
-type (
-	gitModifiedFilesItemDelegate struct{}
-	gitModifiedFilesItem         struct {
-		FilePathname string
-		IndexState   string
-		WorkTree     string
-		HasConflict  bool
-	}
-)
-
-func (i gitModifiedFilesItem) FilterValue() string {
-	return i.FilePathname
-}
-
-// ---------------------------------
-//
 // for list component of git stashed files
 //
 // ---------------------------------

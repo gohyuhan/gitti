@@ -6,6 +6,7 @@ import (
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -624,7 +625,7 @@ func generateModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiM
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
-		fileStatus = git.FileStatus(currentSelectedModifiedFile.(gitModifiedFilesItem))
+		fileStatus = git.FileStatus(currentSelectedModifiedFile.(files.GitModifiedFilesItem))
 	} else {
 		return ""
 	}

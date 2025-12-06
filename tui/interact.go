@@ -4,6 +4,7 @@ import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/utils"
@@ -400,7 +401,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			case constant.ModifiedFilesComponent:
 				currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				if currentSelectedFileItem != nil {
-					currentSelectedFile := currentSelectedFileItem.(gitModifiedFilesItem)
+					currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
 					// return early if the file has conflict (we should not allow discard on conflict files but resolve option instead)
 					if currentSelectedFile.HasConflict {
 						return m, nil
@@ -518,7 +519,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			case constant.ModifiedFilesComponent:
 				currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				if currentSelectedFileItem != nil {
-					currentSelectedFile := currentSelectedFileItem.(gitModifiedFilesItem)
+					currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
 					// return early if the file has no conflict
 					if !currentSelectedFile.HasConflict {
 						return m, nil
@@ -537,7 +538,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			var filePathName string
 			if currentSelectedModifiedFile != nil {
-				selectedFile := currentSelectedModifiedFile.(gitModifiedFilesItem)
+				selectedFile := currentSelectedModifiedFile.(files.GitModifiedFilesItem)
 				// return early if the file is in a conflict status
 				if selectedFile.HasConflict {
 					return m, nil
@@ -556,7 +557,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			var filePathName string
 			if currentSelectedModifiedFile != nil {
-				filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+				filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
 				m.PopUpType = constant.GitStashMessagePopUp
 				initGitStashMessagePopUpModel(m, filePathName, git.STASHALL)
 				m.ShowPopUp.Store(true)
@@ -746,7 +747,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				var filePathName string
 				if currentSelectedModifiedFile != nil {
-					filePathName = currentSelectedModifiedFile.(gitModifiedFilesItem).FilePathname
+					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
 					gitStageOrUnstageService(m, filePathName)
 				}
 

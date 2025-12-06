@@ -6,6 +6,7 @@ import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -35,7 +36,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		Width:                            0,
 		Height:                           0,
 		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, branch.GitBranchItemDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, gitModifiedFilesItemDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, files.GitModifiedFilesItemDelegate{}, 0, 0),
 		CurrentRepoStashInfoList:         list.New([]list.Item{}, gitStashItemDelegate{}, 0, 0),
 		DetailPanelParentComponent:       "",
 		DetailPanelViewport:              vp,
@@ -76,7 +77,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// initializing earlier would cause the UI layout to break.
 		if m.IsRenderInit.CompareAndSwap(false, true) {
 			branch.InitBranchList(m)
-			initModifiedFilesList(m)
+			files.InitModifiedFilesList(m)
 			initStashList(m)
 		}
 	case tea.KeyMsg:
@@ -94,7 +95,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				fetchDetailComponentPanelInfoService(m, false)
 			}
 		case git.GIT_FILES_STATUS_UPDATE:
-			needReinit := initModifiedFilesList(m)
+			needReinit := files.InitModifiedFilesList(m)
 			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 				fetchDetailComponentPanelInfoService(m, needReinit)
 			}
