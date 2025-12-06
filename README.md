@@ -166,6 +166,13 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+### [v0.1.1]
+- Context-based Process Management: Refactored Git operations to use context.Context for process cancellation and termination instead of manual process killing, providing cleaner and more reliable subprocess management
+- Detail Panel Performance Optimization: Optimized the detail component panel info fetching to prevent UI blocking by implementing non-blocking async data retrieval, with additional optimizations to prevent unnecessary UI re-rendering
+- Renamed/Copied File Handling: Added proper handling for renamed files (index state "R") in stage, unstage, and discard operations, and improved overall handling of copied and renamed files
+- Git Stash Operations: Added output viewport and confirmation pop-ups for Git stash operations, with width adjustments for various TUI pop-ups
+- Git Conflict Resolution: Introduced Git conflict detection and resolve options with enhanced thread-safety for streaming Git output to the UI
+- Commit Output Control: Introduced InitialCommitStarted flag to control commit output viewport visibility and added viewport Y-offset adjustments for improved UI positioning
 ### [v0.1.0]
 - Initial release in development
 - Core TUI implementation

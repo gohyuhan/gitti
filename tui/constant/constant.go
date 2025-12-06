@@ -100,3 +100,8 @@ var ComponentNavigationList = []string{
 }
 
 const DETAIL_COMPONENT_PANEL_UPDATED = "DETAIL_COMPONENT_PANEL_UPDATED"
+
+const (
+	AUTHOR_GITHUB   = "https://github.com/gohyuhan"
+	AUTHOR_LINKEDIN = "https://my.linkedin.com/in/yu-han-goh-209480200"
+)

@@ -85,9 +85,9 @@ func main() {
 			updater.AutoUpdater()
 		}
 
-		gittiUiModel := tui.NewGittiModel(tuiUpdateChannel, repoPath, gitRepoPathInfo.RepoName, gitOperations)
+		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, repoPath, gitRepoPathInfo.RepoName, gitOperations)
 		gitti := tea.NewProgram(
-			gittiUiModel,
+			gittiAppModel,
 		)
 
 		tui.StartGitUpdateListener(gitti, gitUpdateChannel)

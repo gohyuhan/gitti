@@ -83,6 +83,17 @@ func (gr *GitRemote) CurrentBranchUpStream() string {
 
 // ----------------------------------
 //
+//	Related to Git Fetch
+//
+// ----------------------------------
+func (gr *GitRemote) GitFetch() {
+	gitArgs := []string{"fetch"}
+	fetchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	fetchCmdExecutor.Run()
+}
+
+// ----------------------------------
+//
 //	Related to Git Remote
 //
 // ----------------------------------
@@ -159,6 +170,8 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream() {
 	upstreamIcon, upstream, _ := hasUpstreamWithIcon()
 	gr.upStreamRemoteIcon = upstreamIcon
 	gr.currentBranchUpStream = upstream
+
+	gr.GitFetch()
 
 	gitArgs := []string{"rev-list", "--left-right", "--count", "HEAD...@{upstream}"}
 

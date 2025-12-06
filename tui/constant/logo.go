@@ -1,6 +1,6 @@
-package tui
+package constant
 
-var gittiAsciiArtLogo = []string{
+var GittiAsciiArtLogo = []string{
 	"                            ,----,       ,----,        ",
 	"                          ,/   .`|     ,/   .`|        ",
 	"  ,----..      ,---,    ,`   .'  :   ,`   .'  :   ,---,",

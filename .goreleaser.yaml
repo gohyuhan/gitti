@@ -44,13 +44,14 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - "^docs:"
-      - "^test:"
-      - "^ci:"
-      - "^chore:"
-      - "Merge pull request"
-      - "Merge branch"
-      - "^Revert"
+      - "(?i)^docs:?"
+      - "(?i)^test:?"
+      - "(?i)^ci:?"
+      - "(?i)^chore:?"
+      - "(?i)Merge pull request"
+      - "(?i)Merge branch"
+      - "(?i)^Revert"
+      - "(?i)^release:?"
   groups:
     # 1. Features (The Catch-All)
     # Display Order: 0 (Top)
@@ -59,15 +60,8 @@ changelog:
       regexp: "(?i)^.*(feature|feat|new|add|impl)"
       order: 0
 
-    # 2. Bug Fixes
+    # 2. Optimization
     # Display Order: 1
-    # Regex: Case insensitive (?i). Matches 'fix', 'fixes', 'hotfix', 'bug'...
-    - title: "🐛 Bug Fixes"
-      regexp: "(?i)^.*(fix|hotfix|bug)"
-      order: 1
-
-    # 3. Optimization
-    # Display Order: 2
     # Regex: Case insensitive (?i).
     # Matches:
     #  - 'opt' (covers 'opt:', 'optimize:', 'Optimization:', 'Optimisation:')
@@ -76,7 +70,15 @@ changelog:
     #  - 'style'
     - title: "♻️ Optimization"
       regexp: "(?i)^.*(refactor|opt|perf|style)"
+      order: 1
+
+    # 3. Bug Fixes
+    # Display Order: 2
+    # Regex: Case insensitive (?i). Matches 'fix', 'fixes', 'hotfix', 'bug'...
+    - title: "🐛 Bug Fixes"
+      regexp: "(?i)^.*(fix|hotfix|bug)"
       order: 2
+
 
 release:
   github:
