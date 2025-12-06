@@ -5,10 +5,18 @@ import (
 
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
-	"github.com/gohyuhan/gitti/tui/component/branch"
-	"github.com/gohyuhan/gitti/tui/component/files"
-	"github.com/gohyuhan/gitti/tui/component/stash"
+	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
+	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
+	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/interaction"
+	"github.com/gohyuhan/gitti/tui/layout"
+	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
+	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
+	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
+	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
+	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 
@@ -36,9 +44,9 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		TrackedUpstreamOrBranchIcon:      "",
 		Width:                            0,
 		Height:                           0,
-		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, branch.GitBranchItemDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, files.GitModifiedFilesItemDelegate{}, 0, 0),
-		CurrentRepoStashInfoList:         list.New([]list.Item{}, stash.GitStashItemDelegate{}, 0, 0),
+		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
+		CurrentRepoStashInfoList:         list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
 		DetailPanelParentComponent:       "",
 		DetailPanelViewport:              vp,
 		DetailPanelViewportOffset:        0,
@@ -72,17 +80,17 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.Width = msg.Width
 		m.Height = msg.Height
 		// recompute layout instantly
-		tuiWindowSizing(m)
+		layout.TuiWindowSizing(m)
 		// Initialize list components once, immediately after the first window resize.
 		// Valid dimensions are required to calculate item layouts (specifically text truncation);
 		// initializing earlier would cause the UI layout to break.
 		if m.IsRenderInit.CompareAndSwap(false, true) {
-			branch.InitBranchList(m)
-			files.InitModifiedFilesList(m)
-			stash.InitStashList(m)
+			branchComponent.InitBranchList(m)
+			filesComponent.InitModifiedFilesList(m)
+			stashComponent.InitStashList(m)
 		}
 	case tea.KeyMsg:
-		model, cmd := gittiKeyInteraction(msg, m)
+		model, cmd := interaction.GittiKeyInteraction(msg, m)
 		gAM.model = model
 		return gAM, cmd
 	case GitUpdateMsg:
@@ -91,34 +99,34 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case constant.DETAIL_COMPONENT_PANEL_UPDATED:
 			return gAM, nil
 		case git.GIT_BRANCH_UPDATE:
-			branch.InitBranchList(m)
+			branchComponent.InitBranchList(m)
 			if m.CurrentSelectedComponent == constant.LocalBranchComponent {
-				fetchDetailComponentPanelInfoService(m, false)
+				services.FetchDetailComponentPanelInfoService(m, false)
 			}
 		case git.GIT_FILES_STATUS_UPDATE:
-			needReinit := files.InitModifiedFilesList(m)
+			needReinit := filesComponent.InitModifiedFilesList(m)
 			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
-				fetchDetailComponentPanelInfoService(m, needReinit)
+				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_STASH_UPDATE:
-			needReinit := stash.InitStashList(m)
+			needReinit := stashComponent.InitStashList(m)
 			if m.CurrentSelectedComponent == constant.StashComponent {
-				fetchDetailComponentPanelInfoService(m, needReinit)
+				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_COMMIT_OUTPUT_UPDATE:
-			updatePopUpCommitOutputViewPort(m)
+			commitPopUp.UpdatePopUpCommitOutputViewPort(m)
 		case git.GIT_AMEND_COMMIT_OUTPUT_UPDATE:
-			updatePopUpAmendCommitOutputViewPort(m)
+			commitPopUp.UpdatePopUpAmendCommitOutputViewPort(m)
 		case git.GIT_REMOTE_PUSH_OUTPUT_UPDATE:
-			updatePopUpGitRemotePushOutputViewport(m)
+			pushPopUp.UpdatePopUpGitRemotePushOutputViewport(m)
 		case git.GIT_PULL_OUTPUT_UPDATE:
-			updatePopUpGitPullOutputViewport(m)
+			pullPopUp.UpdatePopUpGitPullOutputViewport(m)
 		case git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE:
 			gAM.updateGitRemoteStatusSyncLineStringAndUpStream()
 		}
 		return gAM, nil
 	case tea.MouseMsg:
-		model, cmd := GittiMouseInteraction(msg, m)
+		model, cmd := interaction.GittiMouseInteraction(msg, m)
 		gAM.model = model
 		return gAM, cmd
 	}
@@ -127,37 +135,37 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.CommitPopUp:
-			if commitPopup, ok := m.PopUpModel.(*GitCommitPopUpModel); ok && commitPopup.IsProcessing.Load() {
+			if commitPopup, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel); ok && commitPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				commitPopup.Spinner, cmd = commitPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		case constant.AmendCommitPopUp:
-			if amendCommitPopup, ok := m.PopUpModel.(*GitAmendCommitPopUpModel); ok && amendCommitPopup.IsProcessing.Load() {
+			if amendCommitPopup, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel); ok && amendCommitPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				amendCommitPopup.Spinner, cmd = amendCommitPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		case constant.GitRemotePushPopUp:
-			if pushPopup, ok := m.PopUpModel.(*GitRemotePushPopUpModel); ok && pushPopup.IsProcessing.Load() {
+			if pushPopup, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel); ok && pushPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				pushPopup.Spinner, cmd = pushPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		case constant.GitPullOutputPopUp:
-			if pullPopup, ok := m.PopUpModel.(*GitPullOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
+			if pullPopup, ok := m.PopUpModel.(*pullPopUp.GitPullOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		case constant.SwitchBranchOutputPopUp:
-			if pullPopup, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
+			if pullPopup, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		case constant.GitStashOperationOutputPopUp:
-			if stashPopup, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel); ok && stashPopup.IsProcessing.Load() {
+			if stashPopup, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel); ok && stashPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				stashPopup.Spinner, cmd = stashPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
@@ -169,7 +177,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (gAM *GittiAppModel) View() tea.View {
 	var v tea.View
-	v.SetContent(gittiMainPageView(gAM.model))
+	v.SetContent(layout.GittiMainPageView(gAM.model))
 	v.AltScreen = true
 	v.MouseMode = tea.MouseModeCellMotion
 	return v

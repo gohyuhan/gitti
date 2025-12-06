@@ -3,7 +3,6 @@ package branch
 import (
 	"fmt"
 
-	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -40,21 +39,7 @@ func InitBranchList(m *types.GittiModel) {
 	// Custom Help Model for Count Display
 	m.CurrentRepoBranchesInfoList.SetShowHelp(true)
 	m.CurrentRepoBranchesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = func() []key.Binding {
-		currentIndex := m.CurrentRepoBranchesInfoList.Index() + 1
-		totalCount := len(m.CurrentRepoBranchesInfoList.Items())
-		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
-		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
-		if totalCount == 0 {
-			countStr = "0/0"
-		}
-		return []key.Binding{
-			key.NewBinding(
-				key.WithKeys(countStr),
-				key.WithHelp(countStr, ""),
-			),
-		}
-	}
+	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, m.CurrentRepoBranchesInfoList)
 
 	if m.ListNavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
 		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)

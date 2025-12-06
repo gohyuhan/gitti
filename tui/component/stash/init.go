@@ -9,7 +9,6 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 
-	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
 )
 
@@ -34,6 +33,7 @@ func InitStashList(m *types.GittiModel) bool {
 			break
 		}
 	}
+	previousStashCount := len(m.CurrentRepoStashInfoList.Items())
 
 	m.CurrentRepoStashInfoList = list.New(items, GitStashItemDelegate{}, m.WindowLeftPanelWidth, m.StashComponentPanelHeight)
 	m.CurrentRepoStashInfoList.SetShowPagination(false)
@@ -47,24 +47,10 @@ func InitStashList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoStashInfoList.SetShowHelp(true)
 	m.CurrentRepoStashInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoStashInfoList.AdditionalShortHelpKeys = func() []key.Binding {
-		currentIndex := m.CurrentRepoStashInfoList.Index() + 1
-		totalCount := len(m.CurrentRepoStashInfoList.Items())
-		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
-		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
-		if totalCount == 0 {
-			countStr = "0/0"
-		}
-		return []key.Binding{
-			key.NewBinding(
-				key.WithKeys(countStr),
-				key.WithHelp(countStr, ""),
-			),
-		}
-	}
+	m.CurrentRepoStashInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, m.CurrentRepoStashInfoList)
 
 	if len(items) < 1 {
-		return true
+		return len(items) != previousStashCount
 	}
 
 	if selectedFilesPosition >= 0 {

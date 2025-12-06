@@ -1,4 +1,4 @@
-package tui
+package layout
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/popup"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -14,7 +15,7 @@ import (
 // -----------------------------------------------------------------------------
 // Gitti Main Page View
 // -----------------------------------------------------------------------------
-func gittiMainPageView(m *types.GittiModel) string {
+func GittiMainPageView(m *types.GittiModel) string {
 	if m.Width < constant.MinWidth || m.Height < constant.MinHeight {
 		title := style.NewStyle.
 			Bold(true).
@@ -85,7 +86,7 @@ func gittiMainPageView(m *types.GittiModel) string {
 		baseLayer := lipgloss.NewLayer(mainView)
 		canvas.AddLayers(baseLayer)
 		// Render the popup view into a string.
-		popUpComponent := renderPopUpComponent(m)
+		popUpComponent := popup.RenderPopUpComponent(m)
 
 		// Calculate the X and Y coordinates to center the popup.
 		// We need the popup's dimensions for this.

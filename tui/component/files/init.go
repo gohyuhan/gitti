@@ -3,7 +3,6 @@ package files
 import (
 	"fmt"
 
-	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -34,6 +33,8 @@ func InitModifiedFilesList(m *types.GittiModel) bool {
 		}
 	}
 
+	previousModifiedFilesCount := len(m.CurrentRepoModifiedFilesInfoList.Items())
+
 	m.CurrentRepoModifiedFilesInfoList = list.New(items, GitModifiedFilesItemDelegate{}, m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight)
 	m.CurrentRepoModifiedFilesInfoList.SetShowPagination(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
@@ -46,24 +47,10 @@ func InitModifiedFilesList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(true)
 	m.CurrentRepoModifiedFilesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoModifiedFilesInfoList.AdditionalShortHelpKeys = func() []key.Binding {
-		currentIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
-		totalCount := len(m.CurrentRepoModifiedFilesInfoList.Items())
-		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
-		countStr = utils.TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
-		if totalCount == 0 {
-			countStr = "0/0"
-		}
-		return []key.Binding{
-			key.NewBinding(
-				key.WithKeys(countStr),
-				key.WithHelp(countStr, ""),
-			),
-		}
-	}
+	m.CurrentRepoModifiedFilesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, m.CurrentRepoModifiedFilesInfoList)
 
 	if len(items) < 1 {
-		return true
+		return len(items) != previousModifiedFilesCount
 	}
 
 	if selectedFilesPosition >= 0 {
