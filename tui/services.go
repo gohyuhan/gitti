@@ -7,6 +7,7 @@ import (
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/component/files"
+	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -646,20 +647,20 @@ func generateModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiM
 // for stash detail panel view
 func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
-	var stash gitStashItem
+	var stashItem stash.GitStashItem
 	if currentSelectedStash != nil {
-		stash = currentSelectedStash.(gitStashItem)
+		stashItem = currentSelectedStash.(stash.GitStashItem)
 	} else {
 		return ""
 	}
 
 	vpLine := fmt.Sprintf(
 		"[%s]\n[%s]\n\n",
-		style.StashIdStyle.Render(stash.Id),
-		style.StashMessageStyle.Render(stash.Message),
+		style.StashIdStyle.Render(stashItem.Id),
+		style.StashMessageStyle.Render(stashItem.Message),
 	)
 
-	stashDetail := m.GitOperations.GitStash.GitStashDetail(ctx, stash.Id)
+	stashDetail := m.GitOperations.GitStash.GitStashDetail(ctx, stashItem.Id)
 	if len(stashDetail) < 1 {
 		return ""
 	}

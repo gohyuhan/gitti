@@ -270,51 +270,6 @@ type GitResolveConflictOptionPopUpModel struct {
 	ResolveConflictOptionList list.Model
 }
 
-// // ---------------------------------
-// //
-// // to record the current navigation index position
-// //
-// // ---------------------------------
-// type GittiComponentsCurrentListNavigationIndexPosition struct {
-// 	LocalBranchComponent   int
-// 	ModifiedFilesComponent int
-// 	StashComponent         int
-// }
-
-// // ---------------------------------
-// //
-// // for list component of git branch
-// //
-// // ---------------------------------
-// type (
-// 	gitBranchItemDelegate struct{}
-// 	gitBranchItem         struct {
-// 		BranchName   string
-// 		IsCheckedOut bool
-// 	}
-// )
-
-// func (i gitBranchItem) FilterValue() string {
-// 	return i.BranchName
-// }
-
-// ---------------------------------
-//
-// for list component of git stashed files
-//
-// ---------------------------------
-type (
-	gitStashItemDelegate struct{}
-	gitStashItem         struct {
-		Id      string
-		Message string
-	}
-)
-
-func (i gitStashItem) FilterValue() string {
-	return i.Message
-}
-
 // ---------------------------------
 //
 // for list component of git remote

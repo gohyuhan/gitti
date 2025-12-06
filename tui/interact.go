@@ -5,6 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/component/files"
+	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/utils"
@@ -393,7 +394,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			case constant.StashComponent:
 				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 				if selectedStashId != nil {
-					initGitStashConfirmPromptPopUpModel(m, git.DROPSTASH, "", selectedStashId.(gitStashItem).Id, selectedStashId.(gitStashItem).Message)
+					initGitStashConfirmPromptPopUpModel(m, git.DROPSTASH, "", selectedStashId.(stash.GitStashItem).Id, selectedStashId.(stash.GitStashItem).Message)
 					m.PopUpType = constant.GitStashConfirmPromptPopUp
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
@@ -579,7 +580,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 		if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponent {
 			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 			if selectedStashId != nil {
-				initGitStashConfirmPromptPopUpModel(m, git.POPSTASH, "", selectedStashId.(gitStashItem).Id, selectedStashId.(gitStashItem).Message)
+				initGitStashConfirmPromptPopUpModel(m, git.POPSTASH, "", selectedStashId.(stash.GitStashItem).Id, selectedStashId.(stash.GitStashItem).Message)
 				m.PopUpType = constant.GitStashConfirmPromptPopUp
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
@@ -754,7 +755,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			case constant.StashComponent:
 				selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 				if selectedStashId != nil {
-					initGitStashConfirmPromptPopUpModel(m, git.APPLYSTASH, "", selectedStashId.(gitStashItem).Id, selectedStashId.(gitStashItem).Message)
+					initGitStashConfirmPromptPopUpModel(m, git.APPLYSTASH, "", selectedStashId.(stash.GitStashItem).Id, selectedStashId.(stash.GitStashItem).Message)
 					m.PopUpType = constant.GitStashConfirmPromptPopUp
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)

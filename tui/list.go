@@ -17,36 +17,6 @@ import (
 // implementation for list compoenent
 // -----------------------------------------------------------------------------
 
-// for list component of stash
-func (d gitStashItemDelegate) Height() int                             { return 1 }
-func (d gitStashItemDelegate) Spacing() int                            { return 0 }
-func (d gitStashItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d gitStashItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(gitStashItem)
-	if !ok {
-		return
-	}
-
-	str := fmt.Sprintf(" %s", i.Message)
-
-	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
-
-	var fn func(...string) string
-	if index == m.Index() {
-		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
-		}
-	} else {
-		fn = func(s ...string) string {
-			return style.ItemStyle.Render("  " + strings.Join(s, " "))
-		}
-	}
-
-	str = utils.TruncateString(str, componentWidth)
-
-	fmt.Fprint(w, fn(str))
-}
-
 // for list component of git remote
 func (d gitRemoteItemDelegate) Height() int                             { return 1 }
 func (d gitRemoteItemDelegate) Spacing() int                            { return 0 }
