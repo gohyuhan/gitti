@@ -1,6 +1,13 @@
 package utils
 
 import (
+	"fmt"
+
+	"charm.land/bubbles/v2/key"
+	"charm.land/bubbles/v2/list"
+
+	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/types"
 	"golang.org/x/text/width"
 )
 
@@ -36,4 +43,22 @@ func TruncateString(s string, maxWidth int) string {
 	}
 
 	return string(result)
+}
+
+func ListCounterHelper(m *types.GittiModel, list list.Model) func() []key.Binding {
+	return func() []key.Binding {
+		currentIndex := list.Index() + 1
+		totalCount := len(list.Items())
+		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
+		countStr = TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+		if totalCount == 0 {
+			countStr = "0/0"
+		}
+		return []key.Binding{
+			key.NewBinding(
+				key.WithKeys(countStr),
+				key.WithHelp(countStr, ""),
+			),
+		}
+	}
 }
