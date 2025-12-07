@@ -19,7 +19,8 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 💬 **Commit Interface** - Write commits with a dedicated UI
 - 🚀 **Push/Pull Operations** - Manage remote operations seamlessly
 - 💿 **Changes Stash Operations** - Manage stash operations seamlessly
-- 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
+- � **Conflict Resolution** - Detect and resolve merge conflicts with interactive options
+- �📦 **Basic Submodule Support** - Work with Git submodules in your repositories
 - 🌍 **Multi-language Support** - English, Japanese, 简体中文, 繁體中文
 - ⚡ **Real-time Updates** - File system monitoring for instant status updates
 - ⌨️ **Keyboard-driven** - Efficient navigation without touching the mouse
@@ -171,7 +172,7 @@ gitti --init-dbranch main --global
 - Detail Panel Performance Optimization: Optimized the detail component panel info fetching to prevent UI blocking by implementing non-blocking async data retrieval, with additional optimizations to prevent unnecessary UI re-rendering
 - Renamed/Copied File Handling: Added proper handling for renamed files (index state "R") in stage, unstage, and discard operations, and improved overall handling of copied and renamed files
 - Git Stash Operations: Added output viewport and confirmation pop-ups for Git stash operations, with width adjustments for various TUI pop-ups
-- Git Conflict Resolution: Introduced Git conflict detection and resolve options with enhanced thread-safety for streaming Git output to the UI
+- Git Conflict Resolution: Introduced Git conflict detection and resolve options with enhanced thread-safety for streaming Git output to the UI. A new Keybinding for conflict resolution is added: `r` (resolve)
 - Commit Output Control: Introduced InitialCommitStarted flag to control commit output viewport visibility and added viewport Y-offset adjustments for improved UI positioning
 ### [v0.1.0]
 - Initial release in development
