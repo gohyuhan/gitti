@@ -47,7 +47,7 @@ func InitStashList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoStashInfoList.SetShowHelp(true)
 	m.CurrentRepoStashInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoStashInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, m.CurrentRepoStashInfoList)
+	m.CurrentRepoStashInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoStashInfoList)
 
 	if len(items) < 1 {
 		return len(items) != previousStashCount

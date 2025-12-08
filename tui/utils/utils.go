@@ -45,7 +45,7 @@ func TruncateString(s string, maxWidth int) string {
 	return string(result)
 }
 
-func ListCounterHelper(m *types.GittiModel, list list.Model) func() []key.Binding {
+func ListCounterHelper(m *types.GittiModel, list *list.Model) func() []key.Binding {
 	return func() []key.Binding {
 		currentIndex := list.Index() + 1
 		totalCount := len(list.Items())

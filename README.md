@@ -9,6 +9,7 @@ A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 Gitti is a visual Git client built for developers who live in the terminal. It provides an intuitive TUI (Terminal User Interface) for common Git operations without the overhead of traditional GUI applications or the verbosity of CLI commands.
 
 ## Why Gitti?
+
 Gitti is built for terminal-focused developers who need visual Git operations without breaking their flow. Traditional GUI clients like GitHub Desktop offer great interfaces but consume significant RAM and force context switching that disrupts your coding rhythm. Pure CLI commands are powerful but lack visual context for reviewing changes and managing branches. Born from personal need while working in Neovim, Gitti bridges this gap by bringing an intuitive, lightweight TUI directly into your terminal, no window management, no context switching, just seamless Git operations with visual clarity. Plus, it's universal with built-in support for English, Japanese, Simplified & Traditional Chinese.
 
 ## Features
@@ -28,11 +29,13 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 ## Installation
 
 ### Linux
+
 ```bash
 curl --proto "=https" -sSfL https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
 ```
 
 ### macOS (curl or homebrew)
+
 ```bash
 curl --proto "=https" -sSfL https://github.com/gohyuhan/gitti/releases/latest/download/install.sh | bash
 
@@ -45,6 +48,7 @@ brew update && brew install gitti
 ```
 
 ### Windows (PowerShell or scoop)
+
 ```powershell
 powershell -c "irm https://github.com/gohyuhan/gitti/releases/latest/download/install.ps1 | iex"
 
@@ -57,7 +61,9 @@ scoop update; scoop install gitti
 ```
 
 ### Go Install
+
 If you have Go installed, you can install Gitti directly:
+
 ```bash
 go install github.com/gohyuhan/gitti@latest
 ```
@@ -65,6 +71,7 @@ go install github.com/gohyuhan/gitti@latest
 ## Uninstall & Cleanup
 
 ### macOS (Homebrew)
+
 ```bash
 # 1. Uninstall + remove ALL versions
 brew uninstall --force gitti
@@ -90,6 +97,7 @@ rm -rf ~/Library/Caches/Homebrew/downloads/*gitti*
 ```
 
 ### Windows (Scoop)
+
 ```powershell
 # 1. Uninstall the app (all versions)
 scoop uninstall gitti 2>$null
@@ -110,12 +118,14 @@ scoop cache rm "gitti*" 2>$null
 ### Manual Installation (curl / powershell)
 
 #### macOS / Linux
+
 ```bash
 # Remove binary (if installed via curl)
 sudo rm -f /usr/local/bin/gitti
 ```
 
 #### Windows
+
 ```powershell
 # Remove binary and directory
 Remove-Item -Path "$env:LOCALAPPDATA\gitti" -Recurse -Force
@@ -126,16 +136,19 @@ Remove-Item -Path "$env:LOCALAPPDATA\gitti" -Recurse -Force
 To completely remove Gitti's configuration files:
 
 #### macOS
+
 ```bash
 rm -rf "$HOME/Library/Application Support/gitti"
 ```
 
 #### Linux
+
 ```bash
 rm -rf "$HOME/.config/gitti"
 ```
 
 #### Windows
+
 ```powershell
 Remove-Item -Path "$env:APPDATA\gitti" -Recurse -Force
 ```
@@ -143,6 +156,7 @@ Remove-Item -Path "$env:APPDATA\gitti" -Recurse -Force
 ## Quick Start
 
 Launch Gitti in any Git repository:
+
 ```bash
 gitti
 ```
@@ -150,6 +164,7 @@ gitti
 ### Configuration
 
 Set your preferred language:
+
 ```bash
 gitti --language en    # English
 gitti --language ja    # Japanese
@@ -158,6 +173,7 @@ gitti --language zh-hant  # Traditional Chinese
 ```
 
 Configure default branch for new repositories:
+
 ```bash
 # For gitti only
 gitti --init-dbranch main
@@ -167,14 +183,22 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+
+### [v0.1.2]
+
+- hotfix: list counter not counting
+
 ### [v0.1.1]
+
 - Context-based Process Management: Refactored Git operations to use context.Context for process cancellation and termination instead of manual process killing, providing cleaner and more reliable subprocess management
 - Detail Panel Performance Optimization: Optimized the detail component panel info fetching to prevent UI blocking by implementing non-blocking async data retrieval, with additional optimizations to prevent unnecessary UI re-rendering
 - Renamed/Copied File Handling: Added proper handling for renamed files (index state "R") in stage, unstage, and discard operations, and improved overall handling of copied and renamed files
 - Git Stash Operations: Added output viewport and confirmation pop-ups for Git stash operations, with width adjustments for various TUI pop-ups
 - Git Conflict Resolution: Introduced Git conflict detection and resolve options with enhanced thread-safety for streaming Git output to the UI. A new Keybinding for conflict resolution is added: `r` (resolve)
 - Commit Output Control: Introduced InitialCommitStarted flag to control commit output viewport visibility and added viewport Y-offset adjustments for improved UI positioning
+
 ### [v0.1.0]
+
 - Initial release in development
 - Core TUI implementation
 - Branch management and switching
@@ -194,6 +218,7 @@ MIT License - see [LICENSE](LICENSE) file for details
 ## Acknowledgments
 
 Built with:
+
 - [Bubble Tea](https://github.com/charmbracelet/bubbletea) - TUI framework
 - [Lip Gloss](https://github.com/charmbracelet/lipgloss) - Terminal styling
 - [Bubbles](https://github.com/charmbracelet/bubbles) - TUI components

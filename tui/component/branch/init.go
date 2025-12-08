@@ -39,7 +39,7 @@ func InitBranchList(m *types.GittiModel) {
 	// Custom Help Model for Count Display
 	m.CurrentRepoBranchesInfoList.SetShowHelp(true)
 	m.CurrentRepoBranchesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, m.CurrentRepoBranchesInfoList)
+	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoBranchesInfoList)
 
 	if m.ListNavigationIndexPosition.LocalBranchComponent > len(m.CurrentRepoBranchesInfoList.Items())-1 {
 		m.CurrentRepoBranchesInfoList.Select(len(m.CurrentRepoBranchesInfoList.Items()) - 1)

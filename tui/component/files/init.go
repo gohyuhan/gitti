@@ -47,7 +47,7 @@ func InitModifiedFilesList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(true)
 	m.CurrentRepoModifiedFilesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoModifiedFilesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, m.CurrentRepoModifiedFilesInfoList)
+	m.CurrentRepoModifiedFilesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoModifiedFilesInfoList)
 
 	if len(items) < 1 {
 		return len(items) != previousModifiedFilesCount
