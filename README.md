@@ -183,6 +183,9 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+### [v0.1.3]
+
+- hotfix: irrelevant git events trigger update and add control for git fetch
 
 ### [v0.1.2]
 
