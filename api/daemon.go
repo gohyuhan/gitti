@@ -216,7 +216,7 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 	}
 
 	// Trigger only for relevant ops
-	if event.Op&(fsnotify.Write|fsnotify.Remove|fsnotify.Rename|fsnotify.Chmod) != 0 {
+	if event.Op&(fsnotify.Write|fsnotify.Remove|fsnotify.Rename) != 0 {
 		return true
 	}
 
