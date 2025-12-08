@@ -183,6 +183,9 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+### [v0.1.3]
+
+- hotfix: fix daemon inrelevant event triggering update frequently (git CHMOD event to be specific)
 
 ### [v0.1.2]
 
