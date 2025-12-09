@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gohyuhan/gitti/executor"
 )
@@ -114,6 +115,7 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 		scanner := bufio.NewScanner(stdout)
 		scanner.Split(splitOnCarriageReturnOrNewline)
 		cursorIndex := 0
+		lastSent := time.Time{}
 		for scanner.Scan() {
 			select {
 			case <-ctx.Done():
@@ -124,13 +126,25 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 				gc.gitCommitOutput = updatedGitCommitOutput
 				cursorIndex = updatedCursorIndex
 				gc.gitCommitOutputMu.Unlock()
-				if isAmendCommit {
-					gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE
-				} else {
-					gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE
+				if time.Since(lastSent) >= STREAMUPDATETHROTTLEMS*time.Millisecond {
+					if isAmendCommit {
+						select {
+						case gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE:
+							lastSent = time.Now()
+						default:
+						}
+					} else {
+						select {
+						case gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE:
+							lastSent = time.Now()
+						default:
+						}
+					}
 				}
 			}
 		}
+		// trigger an update once it ends
+		gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE
 	}()
 
 	waitErr := commitCmd.Wait()
@@ -245,6 +259,7 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 		scanner := bufio.NewScanner(stdout)
 		scanner.Split(splitOnCarriageReturnOrNewline)
 		cursorIndex := 0
+		lastSent := time.Time{}
 		for scanner.Scan() {
 			select {
 			case <-ctx.Done():
@@ -255,9 +270,17 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 				gc.gitRemotePushOutput = updatedGitRemotePushOutput
 				cursorIndex = updatedCursorIndex
 				gc.gitRemotePushOutputMu.Unlock()
-				gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
+				if time.Since(lastSent) >= STREAMUPDATETHROTTLEMS*time.Millisecond {
+					select {
+					case gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE:
+						lastSent = time.Now()
+					default:
+					}
+				}
 			}
 		}
+		// trigger an update once it ends
+		gc.updateChannel <- GIT_REMOTE_PUSH_OUTPUT_UPDATE
 	}()
 
 	waitErr := cmd.Wait()
