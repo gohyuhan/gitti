@@ -58,6 +58,7 @@ var jA = LanguageMapping{
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] ブランチ切り替え",
 		"[n] 新しいブランチ",
+		"[d] ブランチを削除",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
@@ -181,6 +182,13 @@ var jA = LanguageMapping{
 		"[enter] 実行",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitDeleteBranchOutputPopUp: []string{
+		"[esc] 閉じる",
+	},
+	KeyBindingForGitDeleteBranchConfirmPromptPopUp: []string{
+		"[enter] 実行",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -265,6 +273,9 @@ var jA = LanguageMapping{
 	GitResolveConflictResetInfo:                              "%s の競合マーカーを復元します（ステージされた変更は破棄されます）",
 	GitResolveConflictAcceptLocalChangesInfo:                 "競合しているファイル %s でローカルの変更を採用します",
 	GitResolveConflictAcceptIncomingChangesInfo:              "競合しているファイル %s で取り込む側の変更を採用します",
+	GitDeleteBranchTitle:                                     "ブランチを削除",
+	GitDeleteBranchComfirmPrompt:                             "以下のブランチを削除してもよろしいですか \n [%s]",
+	DeletingBranch:                                           "ブランチを削除中...",
 }
 
 // for about gitti

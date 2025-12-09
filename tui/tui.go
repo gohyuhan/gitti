@@ -168,6 +168,12 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				stashPopup.Spinner, cmd = stashPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
+		case constant.GitDeleteBranchOutputPopUp:
+			if branchPopup, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
 		}
 	}
 	return gAM, tea.Batch(cmds...)

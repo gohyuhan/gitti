@@ -71,3 +71,27 @@ func GitCreateNewBranchAndSwitchService(m *types.GittiModel, validBranchName str
 		m.GitOperations.GitBranch.GitCreateNewBranchAndSwitch(validBranchName)
 	}()
 }
+
+// ------------------------------------
+//
+//	For branch delete
+//
+// ------------------------------------
+func GitDeleteBranchService(m *types.GittiModel, branchName string) {
+	go func() {
+		result, success := m.GitOperations.GitBranch.DeleteLocalBranch(branchName)
+		popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
+		if ok {
+			if success {
+				popUp.HasError.Store(false)
+				popUp.ProcessSuccess.Store(true)
+			} else {
+				popUp.HasError.Store(true)
+				popUp.ProcessSuccess.Store(false)
+			}
+			popUp.IsProcessing.Store(false)
+			popUp.BranchDeleteOutputViewport.SetContentLines(result)
+			popUp.BranchDeleteOutputViewport.PageDown()
+		}
+	}()
+}

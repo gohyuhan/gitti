@@ -73,35 +73,37 @@ type LanguageMapping struct {
 	MinimumTerminalWidth       string
 	Loading                    string
 	// for Key Bindings
-	KeyBindingForGitStatusComponent           []string
-	KeyBindingLocalBranchComponentIsCheckOut  []string
-	KeyBindingLocalBranchComponentDefault     []string
-	KeyBindingLocalBranchComponentNone        []string
-	KeyBindingModifiedFilesComponentConflict  []string
-	KeyBindingModifiedFilesComponentIsStaged  []string
-	KeyBindingModifiedFilesComponentDefault   []string
-	KeyBindingModifiedFilesComponentNone      []string
-	KeyBindingKeyDetailComponent              []string
-	KeyBindingKeyStashComponent               []string
-	KeyBindingKeyStashComponentNone           []string
-	KeyBindingForCommitPopUp                  []string
-	KeyBindingForAmendCommitPopUp             []string
-	KeyBindingForAddRemotePromptPopUp         []string
-	KeyBindingForGitRemotePushPopUp           []string
-	KeyBindingForChooseRemotePopUp            []string
-	KeyBindingForChoosePushTypePopUp          []string
-	KeyBindingForChooseNewBranchTypePopUp     []string
-	KeyBindingForCreateNewBranchPopUp         []string
-	KeyBindingForChooseSwitchBranchTypePopUp  []string
-	KeyBindingForSwitchBranchOutputPopUp      []string
-	KeyBindingForChooseGitPullTypePopUp       []string
-	KeyBindingForGitPullOutputPopUp           []string
-	KeyBindingForGitStashMessagePopUp         []string
-	KeyBindingForGitDiscardTypeOptionPopUp    []string
-	KeyBindingForGitDiscardConfirmPromptPopUp []string
-	KeyBindingForGitStashOperationOutputPopUp []string
-	KeyBindingForGitStashConfirmPromptPopUp   []string
-	KeyBindingForGlobalKeyBindingPopUp        []string
+	KeyBindingForGitStatusComponent                []string
+	KeyBindingLocalBranchComponentIsCheckOut       []string
+	KeyBindingLocalBranchComponentDefault          []string
+	KeyBindingLocalBranchComponentNone             []string
+	KeyBindingModifiedFilesComponentConflict       []string
+	KeyBindingModifiedFilesComponentIsStaged       []string
+	KeyBindingModifiedFilesComponentDefault        []string
+	KeyBindingModifiedFilesComponentNone           []string
+	KeyBindingKeyDetailComponent                   []string
+	KeyBindingKeyStashComponent                    []string
+	KeyBindingKeyStashComponentNone                []string
+	KeyBindingForCommitPopUp                       []string
+	KeyBindingForAmendCommitPopUp                  []string
+	KeyBindingForAddRemotePromptPopUp              []string
+	KeyBindingForGitRemotePushPopUp                []string
+	KeyBindingForChooseRemotePopUp                 []string
+	KeyBindingForChoosePushTypePopUp               []string
+	KeyBindingForChooseNewBranchTypePopUp          []string
+	KeyBindingForCreateNewBranchPopUp              []string
+	KeyBindingForChooseSwitchBranchTypePopUp       []string
+	KeyBindingForSwitchBranchOutputPopUp           []string
+	KeyBindingForChooseGitPullTypePopUp            []string
+	KeyBindingForGitPullOutputPopUp                []string
+	KeyBindingForGitStashMessagePopUp              []string
+	KeyBindingForGitDiscardTypeOptionPopUp         []string
+	KeyBindingForGitDiscardConfirmPromptPopUp      []string
+	KeyBindingForGitStashOperationOutputPopUp      []string
+	KeyBindingForGitStashConfirmPromptPopUp        []string
+	KeyBindingForGitDeleteBranchOutputPopUp        []string
+	KeyBindingForGitDeleteBranchConfirmPromptPopUp []string
+	KeyBindingForGlobalKeyBindingPopUp             []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -206,4 +208,8 @@ type LanguageMapping struct {
 	GitResolveConflictResetInfo                 string
 	GitResolveConflictAcceptLocalChangesInfo    string
 	GitResolveConflictAcceptIncomingChangesInfo string
+	// for git delete branch
+	GitDeleteBranchTitle         string
+	GitDeleteBranchComfirmPrompt string
+	DeletingBranch               string
 }

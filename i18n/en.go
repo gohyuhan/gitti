@@ -59,6 +59,7 @@ var eN = LanguageMapping{
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] switch branch",
 		"[n] new branch",
+		"[d] delete branch",
 		"[?] global key binding",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
@@ -182,6 +183,13 @@ var eN = LanguageMapping{
 		"[enter] proceed",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitDeleteBranchOutputPopUp: []string{
+		"[esc] close",
+	},
+	KeyBindingForGitDeleteBranchConfirmPromptPopUp: []string{
+		"[enter] proceed",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -266,6 +274,8 @@ var eN = LanguageMapping{
 	GitResolveConflictResetInfo:                              "Restores conflict markers in: %s (discards staged changes)",
 	GitResolveConflictAcceptLocalChangesInfo:                 "Accept local changes for conflicted file: %s",
 	GitResolveConflictAcceptIncomingChangesInfo:              "Accept incoming changes for conflicted file: %s",
+	GitDeleteBranchTitle:                                     "Delete Branch",
+	GitDeleteBranchComfirmPrompt:                             "Are you sure to delete the following branch \n [%s]",
 }
 
 // for about gitti

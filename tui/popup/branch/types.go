@@ -62,6 +62,28 @@ type SwitchBranchOutputPopUpModel struct {
 
 // ---------------------------------
 //
+// for branch delete confirm prompt pop up
+//
+// ---------------------------------
+type GitDeleteBranchConfirmPromptPopUpModel struct {
+	BranchName string
+}
+
+// ---------------------------------
+//
+// for branch delete output result pop up
+//
+// ---------------------------------
+type GitDeleteBranchOutputPopUpModel struct {
+	BranchDeleteOutputViewport viewport.Model
+	Spinner                    spinner.Model
+	IsProcessing               atomic.Bool // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                   atomic.Bool // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess             atomic.Bool // has the process sucessfuly executed
+}
+
+// ---------------------------------
+//
 // for new branch option selection option
 //
 // ---------------------------------

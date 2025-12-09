@@ -6,26 +6,28 @@ package constant
 //
 // -----------------------------------------------------------------------------
 const (
-	NoPopUp                       = "NoPopUp"
-	GlobalKeyBindingPopUp         = "GlobalKeyBindingPopUp"
-	AmendCommitPopUp              = "AmendCommitPopUp"              // IsTyping will be true
-	CommitPopUp                   = "CommitPopUp"                   // IsTyping will be true
-	AddRemotePromptPopUp          = "AddRemotePromptPopUp"          // IsTyping will be true
-	ChoosePushTypePopUp           = "ChoosePushTypePopUp"           // IsTyping will be false
-	ChooseRemotePopUp             = "ChooseRemotePopUp"             // IsTyping will be false
-	GitRemotePushPopUp            = "GitRemotePushPopUp"            // IsTyping will be false
-	ChooseNewBranchTypePopUp      = "ChooseNewBranchTypePopUp"      // IsTyping will be false
-	CreateNewBranchPopUp          = "CreateNewBranchPopUp"          // IsTyping will be true
-	ChooseSwitchBranchTypePopUp   = "ChooseSwitchBranchTypePopUp"   // IsTyping will be false
-	SwitchBranchOutputPopUp       = "SwitchBranchOutputPopUp"       // IsTyping will be false
-	ChooseGitPullTypePopUp        = "ChooseGitPullTypePopUp"        // IsTyping will be false
-	GitPullOutputPopUp            = "GitPullOutputPopUp"            // IsTyping will be false
-	GitStashMessagePopUp          = "GitStashMessagePopUp"          // IsTyping will be true
-	GitDiscardTypeOptionPopUp     = "GitDiscardTypeOptionPopUp"     // IsTyping will be false
-	GitDiscardConfirmPromptPopUp  = "GitDiscardConfirmPromptPopUp"  // IsTyping will be false
-	GitStashOperationOutputPopUp  = "GitStashOperationOutputPopUp"  // IsTyping will be false
-	GitStashConfirmPromptPopUp    = "GitStashConfirmPromptPopUp"    // IsTyping will be false
-	GitResolveConflictOptionPopUp = "GitResolveConflictOptionPopUp" // IsTyping will be false
+	NoPopUp                           = "NoPopUp"
+	GlobalKeyBindingPopUp             = "GlobalKeyBindingPopUp"
+	AmendCommitPopUp                  = "AmendCommitPopUp"                  // IsTyping will be true
+	CommitPopUp                       = "CommitPopUp"                       // IsTyping will be true
+	AddRemotePromptPopUp              = "AddRemotePromptPopUp"              // IsTyping will be true
+	ChoosePushTypePopUp               = "ChoosePushTypePopUp"               // IsTyping will be false
+	ChooseRemotePopUp                 = "ChooseRemotePopUp"                 // IsTyping will be false
+	GitRemotePushPopUp                = "GitRemotePushPopUp"                // IsTyping will be false
+	ChooseNewBranchTypePopUp          = "ChooseNewBranchTypePopUp"          // IsTyping will be false
+	CreateNewBranchPopUp              = "CreateNewBranchPopUp"              // IsTyping will be true
+	ChooseSwitchBranchTypePopUp       = "ChooseSwitchBranchTypePopUp"       // IsTyping will be false
+	SwitchBranchOutputPopUp           = "SwitchBranchOutputPopUp"           // IsTyping will be false
+	ChooseGitPullTypePopUp            = "ChooseGitPullTypePopUp"            // IsTyping will be false
+	GitPullOutputPopUp                = "GitPullOutputPopUp"                // IsTyping will be false
+	GitStashMessagePopUp              = "GitStashMessagePopUp"              // IsTyping will be true
+	GitDiscardTypeOptionPopUp         = "GitDiscardTypeOptionPopUp"         // IsTyping will be false
+	GitDiscardConfirmPromptPopUp      = "GitDiscardConfirmPromptPopUp"      // IsTyping will be false
+	GitStashOperationOutputPopUp      = "GitStashOperationOutputPopUp"      // IsTyping will be false
+	GitStashConfirmPromptPopUp        = "GitStashConfirmPromptPopUp"        // IsTyping will be false
+	GitResolveConflictOptionPopUp     = "GitResolveConflictOptionPopUp"     // IsTyping will be false
+	GitDeleteBranchConfirmPromptPopUp = "GitDeleteBranchConfirmPromptPopUp" // IsTyping will be false
+	GitDeleteBranchOutputPopUp        = "GitDeleteBranchOutputPopUp"        // IsTyping will be false
 )
 
 const AUTOCLOSEINTERVAL = 500
@@ -41,26 +43,28 @@ const (
 
 	ListItemOrTitleWidthPad = 4
 
-	MaxLeftPanelWidth                     = 80
-	MaxGlobalKeyBindingPopUpWidth         = 150
-	MaxCommitPopUpWidth                   = 150
-	MaxAmendCommitPopUpWidth              = 150
-	MaxAddRemotePromptPopUpWidth          = 150
-	MaxGitRemotePushPopUpWidth            = 150
-	MaxChooseRemotePopUpWidth             = 150
-	MaxChoosePushTypePopUpWidth           = 150
-	MaxChooseNewBranchTypePopUpWidth      = 150
-	MaxCreateNewBranchPopUpWidth          = 150
-	MaxChooseSwitchBranchTypePopUpWidth   = 150
-	MaxSwitchBranchOutputPopUpWidth       = 150
-	MaxChooseGitPullTypePopUpWidth        = 150
-	MaxGitPullOutputPopUpWidth            = 150
-	MaxGitStashMessagePopUpWidth          = 150
-	MaxGitDiscardTypeOptionPopUpWidth     = 150
-	MaxGitDiscardConfirmPromptPopupWidth  = 150
-	MaxGitStashOperationOutputPopUpWidth  = 150
-	MaxGitStashConfirmPromptPopUpWidth    = 150
-	MaxGitResolveConflictOptionPopUpWidth = 150
+	MaxLeftPanelWidth                         = 80
+	MaxGlobalKeyBindingPopUpWidth             = 150
+	MaxCommitPopUpWidth                       = 150
+	MaxAmendCommitPopUpWidth                  = 150
+	MaxAddRemotePromptPopUpWidth              = 150
+	MaxGitRemotePushPopUpWidth                = 150
+	MaxChooseRemotePopUpWidth                 = 150
+	MaxChoosePushTypePopUpWidth               = 150
+	MaxChooseNewBranchTypePopUpWidth          = 150
+	MaxCreateNewBranchPopUpWidth              = 150
+	MaxChooseSwitchBranchTypePopUpWidth       = 150
+	MaxSwitchBranchOutputPopUpWidth           = 150
+	MaxChooseGitPullTypePopUpWidth            = 150
+	MaxGitPullOutputPopUpWidth                = 150
+	MaxGitStashMessagePopUpWidth              = 150
+	MaxGitDiscardTypeOptionPopUpWidth         = 150
+	MaxGitDiscardConfirmPromptPopupWidth      = 150
+	MaxGitStashOperationOutputPopUpWidth      = 150
+	MaxGitStashConfirmPromptPopUpWidth        = 150
+	MaxGitResolveConflictOptionPopUpWidth     = 150
+	MaxGitDeleteBranchConfirmPromptPopUpWidth = 150
+	MaxGitDeleteBranchOutputPopUpWidth        = 150
 
 	PopUpGlobalKeyBindingViewPortHeight        = 30
 	PopUpGitCommitOutputViewPortHeight         = 10
@@ -77,6 +81,7 @@ const (
 	PopUpGitDiscardTypeOptionHeight            = 6
 	PopUpGitStashOperationOutputViewPortHeight = 10
 	PopUpGitResolveConflictOptionPopUpHeight   = 6
+	PopUpGitDeleteBranchOutputViewportHeight   = 4
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
