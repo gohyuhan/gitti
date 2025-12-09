@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os/exec"
 	"sync"
+	"time"
 
 	"github.com/gohyuhan/gitti/executor"
 )
@@ -91,6 +92,7 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 		scanner := bufio.NewScanner(stdout)
 		scanner.Split(splitOnCarriageReturnOrNewline)
 		cursorIndex := 0
+		lastSent := time.Time{}
 		for scanner.Scan() {
 			select {
 			case <-ctx.Done():
@@ -101,9 +103,17 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 				gp.gitPullOutput = updatedGitPullOutput
 				cursorIndex = updatedCursorIndex
 				gp.gitPullOutputMu.Unlock()
-				gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE
+				if time.Since(lastSent) >= STREAMUPDATETHROTTLEMS*time.Millisecond {
+					select {
+					case gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE:
+						lastSent = time.Now()
+					default:
+					}
+				}
 			}
 		}
+		// trigger an update once it ends
+		gp.updateChannel <- GIT_PULL_OUTPUT_UPDATE
 	}()
 
 	waitErr := cmdExecutor.Wait()
