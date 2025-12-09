@@ -99,6 +99,19 @@ func handleNonTypingcKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 func handleNonTypingdKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchComponent:
+			selectedBranchItem := m.CurrentRepoBranchesInfoList.SelectedItem()
+			if selectedBranchItem != nil {
+				branchItem := selectedBranchItem.(branch.GitBranchItem)
+				if branchItem.IsCheckedOut {
+					return m, nil
+				} else {
+					branchPopUp.InitGitDeleteBranchConfirmPromptPopUpModel(m, branchItem.BranchName)
+					m.PopUpType = constant.GitDeleteBranchConfirmPromptPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+				}
+			}
 		case constant.StashComponent:
 			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 			if selectedStashId != nil {
@@ -433,6 +446,21 @@ func handleNonTypingEnterKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 			}
+		case constant.GitDeleteBranchConfirmPromptPopUp:
+			popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchConfirmPromptPopUpModel)
+			branchName := popUp.BranchName
+			if ok {
+				branchPopUp.InitGitDeleteBranchOutputPopUpModel(m)
+				popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
+				if ok {
+					popUp.IsProcessing.Store(true)
+					m.PopUpType = constant.GitDeleteBranchOutputPopUp
+					services.GitDeleteBranchService(m, branchName)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					return m, popUp.Spinner.Tick
+				}
+			}
 		}
 	}
 	return m, nil
@@ -556,12 +584,30 @@ func handleNonTypingEscKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp
 			m.PopUpModel = nil
+
 		case constant.GitResolveConflictOptionPopUp:
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp
 			m.PopUpModel = nil
+
+		case constant.GitDeleteBranchConfirmPromptPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+
+		case constant.GitDeleteBranchOutputPopUp:
+			popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
+			if ok && !popUp.IsProcessing.Load() {
+				// only close when done processing
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
 		}
+
 		return m, nil
 	} else {
 		switch m.CurrentSelectedComponent {

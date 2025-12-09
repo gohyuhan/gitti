@@ -58,6 +58,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切换分支",
 		"[n] 新建分支",
+		"[d] 删除分支",
 		"[?] 全局快捷键",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
@@ -181,6 +182,13 @@ var zH_HANS = LanguageMapping{
 		"[enter] 继续",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitDeleteBranchOutputPopUp: []string{
+		"[esc] 关闭",
+	},
+	KeyBindingForGitDeleteBranchConfirmPromptPopUp: []string{
+		"[enter] 继续",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -265,6 +273,9 @@ var zH_HANS = LanguageMapping{
 	GitResolveConflictResetInfo:                              "恢复 %s 中的冲突标记（将丢弃已暂存的更改）",
 	GitResolveConflictAcceptLocalChangesInfo:                 "接受冲突文件 %s 的本地更改",
 	GitResolveConflictAcceptIncomingChangesInfo:              "接受冲突文件 %s 的传入更改",
+	GitDeleteBranchTitle:                                     "删除分支",
+	GitDeleteBranchComfirmPrompt:                             "您确定要删除以下分支吗 \n [%s]",
+	DeletingBranch:                                           "正在删除分支...",
 }
 
 // for about gitti

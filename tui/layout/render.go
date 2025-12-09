@@ -169,6 +169,16 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			}
 		case constant.GitStashConfirmPromptPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashConfirmPromptPopUp
+		case constant.GitDeleteBranchConfirmPromptPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDeleteBranchConfirmPromptPopUp
+		case constant.GitDeleteBranchOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDeleteBranchOutputPopUp
+			popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
+			if ok {
+				if popUp.IsProcessing.Load() {
+					keys = []string{"..."} // nothing can be done during stash operation, only force quit gitti is possible
+				}
+			}
 		}
 	} else {
 		//-----------------------------

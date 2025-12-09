@@ -116,3 +116,33 @@ func InitSwitchBranchOutputPopUpModel(m *types.GittiModel, branchName string, sw
 	popUpModel.ProcessSuccess.Store(false)
 	m.PopUpModel = popUpModel
 }
+
+func InitGitDeleteBranchConfirmPromptPopUpModel(m *types.GittiModel, branchName string) {
+	popUpModel := &GitDeleteBranchConfirmPromptPopUpModel{
+		BranchName: branchName,
+	}
+	m.PopUpModel = popUpModel
+}
+
+func InitGitDeleteBranchOutputPopUpModel(m *types.GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpGitDeleteBranchOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxGitDeleteBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &GitDeleteBranchOutputPopUpModel{
+		BranchDeleteOutputViewport: vp,
+		Spinner:                    s,
+	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+
+	m.PopUpModel = popUpModel
+}

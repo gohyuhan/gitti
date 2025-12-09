@@ -130,3 +130,66 @@ func RenderSwitchBranchOutputPopUp(m *types.GittiModel) string {
 	}
 	return ""
 }
+
+// ------------------------------------
+//
+//	For Git delete branch confirmation prompt
+//
+// ------------------------------------
+func RenderGitDeleteBranchConfirmPromptPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitDeleteBranchConfirmPromptPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitDeleteBranchConfirmPromptPopUpWidth, int(float64(m.Width)*0.8))
+		deleteConfirmationPrompt := fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDeleteBranchComfirmPrompt, style.NewStyle.Foreground(style.ColorYellowWarm).Render(popUp.BranchName))
+
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(deleteConfirmationPrompt)
+	}
+
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Git delete branch output result
+//
+// ------------------------------------
+func RenderGitDeleteBranchOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitDeleteBranchOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitDeleteBranchOutputPopUpWidth, int(float64(m.Width)*0.8))
+
+		outputViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpGitDeleteBranchOutputViewportHeight + 2)
+		if popUp.HasError.Load() {
+			outputViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			outputViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.BranchDeleteOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.BranchDeleteOutputViewport.SetYOffset(popUp.BranchDeleteOutputViewport.YOffset())
+		outputViewPort := outputViewPortStyle.Render(popUp.BranchDeleteOutputViewport.View())
+
+		var content string
+		if popUp.IsProcessing.Load() {
+			processingText := popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.DeletingBranch
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				i18n.LANGUAGEMAPPING.GitDeleteBranchTitle,
+				processingText,
+				outputViewPort,
+			)
+
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				i18n.LANGUAGEMAPPING.GitDeleteBranchTitle,
+				outputViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Render(content)
+	}
+	return ""
+}

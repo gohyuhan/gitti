@@ -62,6 +62,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = stash.RenderGitStashConfirmPromptPopUp(m)
 	case constant.GitResolveConflictOptionPopUp:
 		popUp = resolve.RenderGitResolveConflictOptionPopUp(m)
+	case constant.GitDeleteBranchConfirmPromptPopUp:
+		popUp = branch.RenderGitDeleteBranchConfirmPromptPopUp(m)
+	case constant.GitDeleteBranchOutputPopUp:
+		popUp = branch.RenderGitDeleteBranchOutputPopUp(m)
 	}
 	return popUp
 }

@@ -229,3 +229,27 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 
 	return gitOpsOutput, true
 }
+
+// ----------------------------------
+//
+//	Related to delete branch in local
+//
+// ----------------------------------
+func (gb *GitBranch) DeleteLocalBranch(branchName string) ([]string, bool) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+	gitArgs := []string{"branch", "-D", branchName}
+	branchDeleteExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	branchDeleteOutput, branchDeleteErr := branchDeleteExecutor.CombinedOutput()
+
+	gitOpsOutput := processGeneralGitOpsOutputIntoStringArray(branchDeleteOutput)
+
+	if branchDeleteErr != nil {
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT DELETE BRANCH ERROR]: %w", branchDeleteErr))
+		return gitOpsOutput, false
+	}
+
+	return gitOpsOutput, true
+}
