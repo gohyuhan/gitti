@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"charm.land/lipgloss/v2"
 	gitticonst "github.com/gohyuhan/gitti/constant"
 	"github.com/gohyuhan/gitti/i18n"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
@@ -32,6 +33,20 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 		borderStyle = style.SelectedBorderStyle
 	}
 
+	var remoteSyncStateLineString string
+	additionalWidth := 0
+
+	if m.RemoteSyncLocalState == "" || m.RemoteSyncRemoteState == "" {
+		remoteSyncStateLineString = style.ErrorStyle.Render("\uf00d")
+		additionalWidth += 1
+	} else {
+		local := style.LocalStatusStyle.Render(fmt.Sprintf("%s↑", m.RemoteSyncLocalState))
+		remote := style.RemoteStatusStyle.Render(fmt.Sprintf("%s↓", m.RemoteSyncRemoteState))
+
+		remoteSyncStateLineString = local + " " + remote
+		additionalWidth += 3 + lipgloss.Width(m.RemoteSyncLocalState) + lipgloss.Width(m.RemoteSyncRemoteState)
+	}
+
 	trackedUpStreamOrBranchName := m.CheckOutBranch
 	if m.BranchUpStream != "" {
 		trackedUpStreamOrBranchName = m.BranchUpStream
@@ -39,13 +54,13 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 
 	repoTrackBranchName := fmt.Sprintf(" %s -> %s %s", m.RepoName, m.TrackedUpstreamOrBranchIcon, trackedUpStreamOrBranchName)
 
-	// the max width is the window width - padding - the length of RemoteSyncStateLineString (max of 5)
-	repoTrackBranchName = utils.TruncateString(repoTrackBranchName, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-5)
+	// the max width is the window width - padding - the length of RemoteSyncStateLineString
+	repoTrackBranchName = utils.TruncateString(repoTrackBranchName, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-additionalWidth)
 
 	return borderStyle.
 		Width(m.WindowLeftPanelWidth).
 		Height(1).
-		Render(fmt.Sprintf("%s%s", m.RemoteSyncStateLineString, repoTrackBranchName))
+		Render(fmt.Sprintf("%s%s", remoteSyncStateLineString, repoTrackBranchName))
 }
 
 // Render the Local Branches panel
@@ -213,10 +228,17 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 
 	var keyBindingLine string
 	keyBindingLine = strings.Join(keys, "  |  ")
-	processedWidth := width - len(gitticonst.APPVERSION) - 3
+	processedWidth := width - lipgloss.Width(gitticonst.APPVERSION) - 3
 	keyBindingLine = utils.TruncateString(keyBindingLine, processedWidth)
 	versionLine := style.NewStyle.Foreground(style.ColorYellowWarm).Render(gitticonst.APPVERSION)
-	content := fmt.Sprintf("%-*s  %s", processedWidth, keyBindingLine, versionLine)
+	parsedKeyBindingLine := style.NewStyle.Width(processedWidth).Align(lipgloss.Left).Render(keyBindingLine)
+
+	content := lipgloss.JoinHorizontal(
+		lipgloss.Top,
+		parsedKeyBindingLine,
+		" ",
+		versionLine,
+	)
 
 	return style.BottomKeyBindingStyle.
 		Width(width).

@@ -1,8 +1,6 @@
 package tui
 
 import (
-	"fmt"
-
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
@@ -17,7 +15,6 @@ import (
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	"github.com/gohyuhan/gitti/tui/services"
-	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 
 	"charm.land/bubbles/v2/list"
@@ -39,7 +36,8 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		RepoPath:                         repoPath,
 		RepoName:                         repoName,
 		CheckOutBranch:                   "",
-		RemoteSyncStateLineString:        "",
+		RemoteSyncLocalState:             "",
+		RemoteSyncRemoteState:            "",
 		BranchUpStream:                   "",
 		TrackedUpstreamOrBranchIcon:      "",
 		Width:                            0,
@@ -191,13 +189,6 @@ func (gAM *GittiAppModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
 
 	// set remote sync status
 	remoteSynsStatusInfo := m.GitOperations.GitRemote.RemoteSyncStatus()
-	if remoteSynsStatusInfo.Local == "" || remoteSynsStatusInfo.Remote == "" {
-		m.RemoteSyncStateLineString = style.ErrorStyle.Render("\uf00d")
-		return
-	}
-
-	local := style.LocalStatusStyle.Render(fmt.Sprintf("%s↑", remoteSynsStatusInfo.Local))
-	remote := style.RemoteStatusStyle.Render(fmt.Sprintf("%s↓", remoteSynsStatusInfo.Remote))
-
-	m.RemoteSyncStateLineString = local + " " + remote
+	m.RemoteSyncLocalState = remoteSynsStatusInfo.Local
+	m.RemoteSyncRemoteState = remoteSynsStatusInfo.Remote
 }

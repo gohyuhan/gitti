@@ -18,7 +18,8 @@ type GittiModel struct {
 	RepoPath                                  string
 	RepoName                                  string
 	CheckOutBranch                            string
-	RemoteSyncStateLineString                 string
+	RemoteSyncLocalState                      string
+	RemoteSyncRemoteState                     string
 	BranchUpStream                            string
 	TrackedUpstreamOrBranchIcon               string
 	Width                                     int
