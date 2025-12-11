@@ -52,6 +52,24 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		// if it was the Gitti status component panel that got selected (because its height is fix),
 		// the next panel will get the selected height which is the branch component panel
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+	case constant.DetailComponentTwo:
+		switch m.DetailPanelParentComponent {
+		case constant.LocalBranchComponent:
+			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.ModifiedFilesComponent:
+			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.StashComponent:
+			m.StashComponentPanelHeight = selectedComponentPanelHeight
+		}
+	case constant.DetailComponent:
+		switch m.DetailPanelParentComponent {
+		case constant.LocalBranchComponent:
+			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.ModifiedFilesComponent:
+			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.StashComponent:
+			m.StashComponentPanelHeight = selectedComponentPanelHeight
+		}
 	}
 	// update all components Width and Height
 	m.CurrentRepoBranchesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)

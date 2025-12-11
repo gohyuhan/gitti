@@ -93,7 +93,8 @@ const (
 
 	// this is not a selectable component from key binding but act like an extension for each component to enter for more detail,
 	// no component index, the current selected component index will be still set as its parent's
-	DetailComponent = "EC-DT" // extended component -  detail component
+	DetailComponent    = "EC-DT"  // extended component -  detail component
+	DetailComponentTwo = "EC-DT2" // extended component -  detail component two (currently only used for unstaged changes diff)
 )
 
 // will be used by the key binding navigation of going to previous or next component panel

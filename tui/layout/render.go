@@ -90,9 +90,13 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 // Render the detail component part at the right of the window,
 // however the content within it will be dynamic based on the current selected component
 func renderDetailComponentPanel(width int, height int, m *types.GittiModel) string {
-	borderStyle := style.PanelBorderStyle
+	detailComponentBorderStyle := style.PanelBorderStyle
+	detailComponentTwoBorderStyle := style.PanelBorderStyle
+
 	if m.CurrentSelectedComponent == constant.DetailComponent {
-		borderStyle = style.SelectedBorderStyle
+		detailComponentBorderStyle = style.SelectedBorderStyle
+	} else if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+		detailComponentTwoBorderStyle = style.SelectedBorderStyle
 	}
 
 	var content string
@@ -105,20 +109,20 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 		if m.DetailComponentPanelLayout == constant.HORIZONTAL {
 			content = lipgloss.JoinHorizontal(
 				lipgloss.Top,
-				borderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelViewport.View()),
-				borderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelTwoViewport.View()),
+				detailComponentBorderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelViewport.View()),
+				detailComponentTwoBorderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelTwoViewport.View()),
 			)
 		} else {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
-				borderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
-				borderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelTwoViewport.View()),
+				detailComponentBorderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
+				detailComponentTwoBorderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelTwoViewport.View()),
 			)
 		}
 	} else {
 		content = lipgloss.JoinHorizontal(
 			lipgloss.Top,
-			borderStyle.Width(detailPanelWidth).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
+			detailComponentBorderStyle.Width(detailPanelWidth).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
 		)
 	}
 
@@ -254,6 +258,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 				}
 			}
 		case constant.DetailComponent:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
+		case constant.DetailComponentTwo:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 		case constant.StashComponent:
 			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
