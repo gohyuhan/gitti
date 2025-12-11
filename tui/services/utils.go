@@ -55,13 +55,19 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		}()
 
 		var contentLine string
+		var contentLine2 string // fro detail panel 2nd (only used for files changes to show staged and unstaged diff in seperated panel)
+		setForDetailComponentTwo := false
 		var theCurrentSelectedComponent string
 		// reinit and render detail component panel viewport
 		if reinit {
 			m.DetailPanelViewport.SetContent(style.NewStyle.Render(i18n.LANGUAGEMAPPING.Loading))
+			m.ShowDetailPanelTwo.Store(false)
 			m.DetailPanelViewportOffset = 0
 			m.DetailPanelViewport.SetXOffset(0)
 			m.DetailPanelViewport.SetYOffset(0)
+			m.DetailPanelTwoViewportOffset = 0
+			m.DetailPanelTwoViewport.SetXOffset(0)
+			m.DetailPanelTwoViewport.SetYOffset(0)
 		}
 		if m.CurrentSelectedComponent == constant.DetailComponent {
 			// if the current selected one is the detail component itself, the current selected one will be its parent (the component that led into the detail component)
@@ -71,7 +77,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		}
 		switch theCurrentSelectedComponent {
 		case constant.ModifiedFilesComponent:
-			contentLine = generateModifiedFileDetailPanelContent(ctx, m)
+			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
 		case constant.StashComponent:
 			contentLine = generateStashDetailPanelContent(ctx, m)
 		default:
@@ -86,8 +92,13 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 				// if the content will be empty, render about gitti for detail panel
 				contentLine = generateAboutGittiContent()
 			}
-
 			m.DetailPanelViewport.SetContent(contentLine)
+
+			if setForDetailComponentTwo {
+				m.DetailPanelTwoViewport.SetContent(contentLine2)
+				m.ShowDetailPanelTwo.Store(true)
+			}
+
 			m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
 			return
 		}
@@ -95,26 +106,52 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 }
 
 // for modified file detail panel view
-func generateModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
+func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiModel) (string, string, bool) {
+	shouldRenderDetailComponentPanelTwo := false
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
 		fileStatus = git.FileStatus(currentSelectedModifiedFile.(files.GitModifiedFilesItem))
 	} else {
-		return ""
+		return "", "", shouldRenderDetailComponentPanelTwo
 	}
 
-	vpLine := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
-	fileDiffLines := m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus)
-	if fileDiffLines == nil {
-		vpLine += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
-		return vpLine
+	vpLine1 := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
+	var vpLine2 string
+	var fileDiffLines1 []string
+	var fileDiffLines2 []string
+	getDiffTypeForVpLine1 := git.GETCOMBINEDDIFF
+
+	// indicating that the file is not in conflict state and have both staged and unstaged changes
+	if !fileStatus.HasConflict && fileStatus.IndexState != " " && fileStatus.WorkTree != " " {
+		shouldRenderDetailComponentPanelTwo = true
+		vpLine2 = fmt.Sprintf("%s\n\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.UnstagedTitle, fileStatus.FilePathname)
+		fileDiffLines2 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, git.GETUNSTAGEDDIFF)
+
+		if fileDiffLines2 == nil {
+			vpLine2 += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
+		} else {
+			for _, line := range fileDiffLines2 {
+				line = style.NewStyle.Render(line)
+				vpLine2 += line + "\n"
+			}
+		}
+
+		getDiffTypeForVpLine1 = git.GETSTAGEDDIFF
+		vpLine1 = fmt.Sprintf("%s\n\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.StagedTitle, fileStatus.FilePathname)
 	}
-	for _, line := range fileDiffLines {
-		line = style.NewStyle.Render(line)
-		vpLine += line + "\n"
+
+	fileDiffLines1 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, getDiffTypeForVpLine1)
+	if fileDiffLines1 == nil {
+		vpLine1 += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
+	} else {
+		for _, line := range fileDiffLines1 {
+			line = style.NewStyle.Render(line)
+			vpLine1 += line + "\n"
+		}
 	}
-	return vpLine
+
+	return vpLine1, vpLine2, shouldRenderDetailComponentPanelTwo
 }
 
 // for stash detail panel view

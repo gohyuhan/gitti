@@ -48,6 +48,8 @@ var zH_HANS = LanguageMapping{
 	CurrentTerminalWidth:                "当前宽度",
 	MinimumTerminalWidth:                "最小要求宽度",
 	Loading:                             "加载中...",
+	StagedTitle:                         "已暂存的更改",
+	UnstagedTitle:                       "未暂存的更改",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全局快捷键",
 	},

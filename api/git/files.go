@@ -89,7 +89,7 @@ func (gf *GitFiles) GetGitFilesStatus() {
 }
 
 // get the file diff content
-func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus) []string {
+func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus, DiffType string) []string {
 	filePathName := fileStatus.FilePathname
 	if fileStatus.IndexState == "R" || fileStatus.IndexState == "C" {
 		if strings.Contains(filePathName, "->") {
@@ -99,7 +99,15 @@ func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus)
 			}
 		}
 	}
-	gitArgs := []string{"diff", "HEAD", "--", filePathName}
+	var gitArgs []string
+	switch DiffType {
+	case GETSTAGEDDIFF:
+		gitArgs = []string{"diff", "--cached", filePathName}
+	case GETUNSTAGEDDIFF:
+		gitArgs = []string{"diff", filePathName}
+	case GETCOMBINEDDIFF:
+		gitArgs = []string{"diff", "HEAD", "--", filePathName}
+	}
 	// the file is untracked
 	isNewFile := fileStatus.WorkTree == "?" ||
 		fileStatus.IndexState == "?" ||

@@ -48,6 +48,8 @@ var zH_HANT = LanguageMapping{
 	CurrentTerminalWidth:                "目前寬度",
 	MinimumTerminalWidth:                "最小需求寬度",
 	Loading:                             "載入中...",
+	StagedTitle:                         "已暫存的變更",
+	UnstagedTitle:                       "未暫存的變更",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全域快捷鍵",
 	},

@@ -49,6 +49,8 @@ var eN = LanguageMapping{
 	CurrentTerminalWidth:                "Current width",
 	MinimumTerminalWidth:                "Minimum required height",
 	Loading:                             "Loading...",
+	StagedTitle:                         "Staged Changes",
+	UnstagedTitle:                       "Unstaged Changes",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},
@@ -276,6 +278,7 @@ var eN = LanguageMapping{
 	GitResolveConflictAcceptIncomingChangesInfo:              "Accept incoming changes for conflicted file: %s",
 	GitDeleteBranchTitle:                                     "Delete Branch",
 	GitDeleteBranchComfirmPrompt:                             "Are you sure to delete the following branch \n [%s]",
+	DeletingBranch:                                           "Deleting branch...",
 }
 
 // for about gitti

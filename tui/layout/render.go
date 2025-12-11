@@ -94,10 +94,38 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 	if m.CurrentSelectedComponent == constant.DetailComponent {
 		borderStyle = style.SelectedBorderStyle
 	}
-	return borderStyle.
+
+	var content string
+	detailPanelWidth := width
+	detailPanelHeight := height
+
+	if m.ShowDetailPanelTwo.Load() {
+		detailPanelHeight = (height / 2)
+		detailPanelWidth = (width / 2)
+		if m.DetailComponentPanelLayout == constant.HORIZONTAL {
+			content = lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				borderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelViewport.View()),
+				borderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelTwoViewport.View()),
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				borderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
+				borderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelTwoViewport.View()),
+			)
+		}
+	} else {
+		content = lipgloss.JoinHorizontal(
+			lipgloss.Top,
+			borderStyle.Width(detailPanelWidth).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
+		)
+	}
+
+	return style.NewStyle.
 		Width(width).
 		Height(height).
-		Render(m.DetailPanelViewport.View())
+		Render(content)
 }
 
 func renderStashComponentPanel(width int, height int, m *types.GittiModel) string {

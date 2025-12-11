@@ -144,7 +144,11 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 			}
 		}
 		// trigger an update once it ends
-		gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE
+		if isAmendCommit {
+			gc.updateChannel <- GIT_AMEND_COMMIT_OUTPUT_UPDATE
+		} else {
+			gc.updateChannel <- GIT_COMMIT_OUTPUT_UPDATE
+		}
 	}()
 
 	waitErr := commitCmd.Wait()

@@ -110,3 +110,8 @@ const (
 	AUTHOR_GITHUB   = "https://github.com/gohyuhan"
 	AUTHOR_LINKEDIN = "https://my.linkedin.com/in/yu-han-goh-209480200"
 )
+
+const (
+	HORIZONTAL = "HORIZONTAL"
+	VERTICAL   = "VERTICAL"
+)

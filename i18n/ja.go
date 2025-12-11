@@ -48,6 +48,8 @@ var jA = LanguageMapping{
 	CurrentTerminalWidth:                "現在の幅",
 	MinimumTerminalWidth:                "必要な最小の幅",
 	Loading:                             "読み込み中...",
+	StagedTitle:                         "ステージされた変更",
+	UnstagedTitle:                       "ステージされていない変更",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] グローバルキー操作",
 	},
