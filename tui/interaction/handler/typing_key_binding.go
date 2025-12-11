@@ -13,7 +13,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-func handleTypingESCKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
 		services.GitCommitCancelService(m)
@@ -35,7 +35,7 @@ func handleTypingESCKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (
 	return m, nil
 }
 
-func handleTypingTabKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
@@ -80,7 +80,7 @@ func handleTypingTabKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (
 	return m, nil
 }
 
-func handleTypingShiftTabKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
@@ -125,7 +125,7 @@ func handleTypingShiftTabKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 	return m, nil
 }
 
-func handleTypingCtrleKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
@@ -161,7 +161,7 @@ func handleTypingCtrleKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel)
 	return m, nil
 }
 
-func handleTypingEnterKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)

@@ -28,6 +28,13 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	vp.MouseWheelEnabled = true
 	vp.SetHorizontalStep(1)
 	vp.MouseWheelDelta = 1
+
+	vpTwo := viewport.New()
+	vpTwo.SoftWrap = false
+	vpTwo.MouseWheelEnabled = true
+	vpTwo.SetHorizontalStep(1)
+	vpTwo.MouseWheelDelta = 1
+
 	gittiModel := &types.GittiModel{
 		TuiUpdateChannel:                 tuiUpdateChannel,
 		CurrentSelectedComponent:         constant.ModifiedFilesComponent,
@@ -48,6 +55,9 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		DetailPanelParentComponent:       "",
 		DetailPanelViewport:              vp,
 		DetailPanelViewportOffset:        0,
+		DetailPanelTwoViewport:           vpTwo,
+		DetailPanelTwoViewportOffset:     0,
+		DetailComponentPanelLayout:       constant.HORIZONTAL,
 		ListNavigationIndexPosition:      types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
 		PopUpType:                        constant.NoPopUp,
 		PopUpModel:                       struct{}{},
@@ -58,6 +68,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	gittiModel.ShowPopUp.Store(false)
 	gittiModel.IsTyping.Store(false)
 	gittiModel.IsDetailComponentPanelInfoFetchProcessing.Store(false)
+	gittiModel.ShowDetailPanelTwo.Store(false)
 
 	return &GittiAppModel{model: gittiModel}
 }
@@ -95,6 +106,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		updateEvent := string(msg)
 		switch updateEvent {
 		case constant.DETAIL_COMPONENT_PANEL_UPDATED:
+			layout.UpdateDetailComponentViewportLayout(gAM.model)
 			return gAM, nil
 		case git.GIT_BRANCH_UPDATE:
 			branchComponent.InitBranchList(m)

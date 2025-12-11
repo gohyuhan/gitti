@@ -22,7 +22,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingGlobalKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	m.ShowPopUp.Store(true)
 	m.IsTyping.Store(false)
 	m.PopUpType = constant.GlobalKeyBindingPopUp
@@ -30,7 +30,7 @@ func handleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 	return m, nil
 }
 
-func handleNonTyping1KeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTyping1KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.LocalBranchComponent {
 			m.CurrentSelectedComponent = constant.LocalBranchComponent
@@ -42,7 +42,7 @@ func handleNonTyping1KeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTyping2KeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTyping2KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.ModifiedFilesComponent {
 			m.CurrentSelectedComponent = constant.ModifiedFilesComponent
@@ -54,7 +54,7 @@ func handleNonTyping2KeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTyping3KeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTyping3KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.StashComponent {
 			m.CurrentSelectedComponent = constant.StashComponent
@@ -66,7 +66,7 @@ func handleNonTyping3KeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingaKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		m.ShowPopUp.Store(true)
 		m.PopUpType = constant.AmendCommitPopUp
@@ -79,7 +79,7 @@ func handleNonTypingaKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingcKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingcKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		m.GitOperations.GitCommit.ClearGitCommitOutput()
 		// if the current pop up model is not commit pop up model, then init it
@@ -96,7 +96,7 @@ func handleNonTypingcKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingdKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchComponent:
@@ -167,7 +167,7 @@ func handleNonTypingdKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingnKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent == constant.LocalBranchComponent {
 			m.PopUpType = constant.ChooseNewBranchTypePopUp
@@ -181,7 +181,7 @@ func handleNonTypingnKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingpKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		// first we need to check if there are any push/pull origin origin for this repo
 		// if not we prompt the user to add a new remote origin
@@ -215,7 +215,7 @@ func handleNonTypingpKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingPKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		// first we need to check if there are any push/pull origin for this repo
 		// if not we prompt the user to add a new remote origin
@@ -239,7 +239,7 @@ func handleNonTypingPKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingrKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.ModifiedFilesComponent:
@@ -260,7 +260,7 @@ func handleNonTypingrKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingsKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingsKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 		currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 		var filePathName string
@@ -280,7 +280,7 @@ func handleNonTypingsKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingSKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingSKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 		currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 		var filePathName string
@@ -295,7 +295,7 @@ func handleNonTypingSKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) 
 	return m, nil
 }
 
-func handleNonTypingqQKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingqQKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if api.GITDAEMON != nil {
 			api.GITDAEMON.Stop()
@@ -305,7 +305,7 @@ func handleNonTypingqQKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel)
 	return m, nil
 }
 
-func handleNonTypingBackspaceKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponent {
 		selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
 		if selectedStashId != nil {
@@ -318,7 +318,7 @@ func handleNonTypingBackspaceKeyBindingInteraction(msg tea.KeyMsg, m *types.Gitt
 	return m, nil
 }
 
-func handleNonTypingEnterKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.ModifiedFilesComponent:
@@ -466,7 +466,7 @@ func handleNonTypingEnterKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 	return m, nil
 }
 
-func handleNonTypingTabKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	nextNavigation := m.CurrentSelectedComponentIndex + 1
 	if nextNavigation < len(constant.ComponentNavigationList) {
 		m.CurrentSelectedComponentIndex = nextNavigation
@@ -477,7 +477,7 @@ func handleNonTypingTabKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 	return m, nil
 }
 
-func handleNonTypingShiftTabKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	previousNavigation := m.CurrentSelectedComponentIndex - 1
 	if previousNavigation >= 0 {
 		m.CurrentSelectedComponentIndex = previousNavigation
@@ -488,7 +488,7 @@ func handleNonTypingShiftTabKeyBindingInteraction(msg tea.KeyMsg, m *types.Gitti
 	return m, nil
 }
 
-func handleNonTypingSpaceKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.ModifiedFilesComponent:
@@ -512,7 +512,7 @@ func handleNonTypingSpaceKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 	return m, nil
 }
 
-func handleNonTypingEscKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.GlobalKeyBindingPopUp:
@@ -614,6 +614,9 @@ func handleNonTypingEscKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 		case constant.DetailComponent:
 			m.CurrentSelectedComponent = m.DetailPanelParentComponent
 			m.DetailPanelParentComponent = ""
+		case constant.DetailComponentTwo:
+			m.CurrentSelectedComponent = m.DetailPanelParentComponent
+			m.DetailPanelParentComponent = ""
 		}
 	}
 	return m, nil
@@ -649,6 +652,9 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 			}
 		case constant.DetailComponent:
 			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+			return m, cmd
+		case constant.DetailComponentTwo:
+			m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 			return m, cmd
 		}
 	} else {
@@ -688,6 +694,9 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 		case constant.DetailComponent:
 			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 			return m, cmd
+		case constant.DetailComponentTwo:
+			m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
+			return m, cmd
 		}
 	} else {
 		return UpDownKeyMsgUpdateForPopUp(msg, m)
@@ -698,7 +707,14 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
-		m.DetailPanelViewport.ScrollLeft(1)
+		switch m.CurrentSelectedComponent {
+		case constant.DetailComponent:
+			m.DetailPanelViewport.ScrollLeft(1)
+		case constant.DetailComponentTwo:
+			m.DetailPanelTwoViewport.ScrollLeft(1)
+		default:
+			m.DetailPanelViewport.ScrollLeft(1)
+		}
 	} else {
 		switch m.PopUpType {
 		case constant.CommitPopUp:
@@ -715,7 +731,14 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
-		m.DetailPanelViewport.ScrollRight(1)
+		switch m.CurrentSelectedComponent {
+		case constant.DetailComponent:
+			m.DetailPanelViewport.ScrollRight(1)
+		case constant.DetailComponentTwo:
+			m.DetailPanelTwoViewport.ScrollRight(1)
+		default:
+			m.DetailPanelViewport.ScrollRight(1)
+		}
 	} else {
 		switch m.PopUpType {
 		case constant.CommitPopUp:
@@ -724,6 +747,28 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 				popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
 				return m, cmd
 			}
+		}
+	}
+	return m, nil
+}
+
+// handleNonTypingLeftBracketKeyBindingInteraction handles the '[' key not only for navigation but contextually to switch to the previous detail component panel
+func handleNonTypingLeftBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		// handle detail component panel switching
+		if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+			m.CurrentSelectedComponent = constant.DetailComponent
+		}
+	}
+	return m, nil
+}
+
+// handleNonTypingRightBracketKeyBindingInteraction handles the ']' key not only for navigation but contextually to switch to the next detail component panel
+func handleNonTypingRightBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		// handle detail component panel switching
+		if m.CurrentSelectedComponent == constant.DetailComponent && m.ShowDetailPanelTwo.Load() {
+			m.CurrentSelectedComponent = constant.DetailComponentTwo
 		}
 	}
 	return m, nil

@@ -19,11 +19,13 @@ func TuiWindowSizing(m *types.GittiModel) {
 	LeftPanelDynamicResize(m)
 
 	// update viewport
-	m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight) // some margin
-	m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+	UpdateDetailComponentViewportLayout(m)
 	m.DetailPanelViewportOffset = max(0, int(m.DetailPanelViewport.HorizontalScrollPercent()*float64(m.DetailPanelViewportOffset))-1)
+	m.DetailPanelTwoViewportOffset = max(0, int(m.DetailPanelTwoViewport.HorizontalScrollPercent()*float64(m.DetailPanelTwoViewportOffset))-1)
 	m.DetailPanelViewport.SetXOffset(m.DetailPanelViewportOffset)
 	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset())
+	m.DetailPanelTwoViewport.SetXOffset(m.DetailPanelTwoViewportOffset)
+	m.DetailPanelTwoViewport.SetYOffset(m.DetailPanelTwoViewport.YOffset())
 }
 
 func LeftPanelDynamicResize(m *types.GittiModel) {
@@ -50,6 +52,24 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		// if it was the Gitti status component panel that got selected (because its height is fix),
 		// the next panel will get the selected height which is the branch component panel
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+	case constant.DetailComponentTwo:
+		switch m.DetailPanelParentComponent {
+		case constant.LocalBranchComponent:
+			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.ModifiedFilesComponent:
+			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.StashComponent:
+			m.StashComponentPanelHeight = selectedComponentPanelHeight
+		}
+	case constant.DetailComponent:
+		switch m.DetailPanelParentComponent {
+		case constant.LocalBranchComponent:
+			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.ModifiedFilesComponent:
+			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.StashComponent:
+			m.StashComponentPanelHeight = selectedComponentPanelHeight
+		}
 	}
 	// update all components Width and Height
 	m.CurrentRepoBranchesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
@@ -60,4 +80,29 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 
 	m.CurrentRepoStashInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)
+}
+
+func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
+	if m.ShowDetailPanelTwo.Load() {
+		// vertical layout
+		// Since terminal characters are usually about twice as tall as they are wide,
+		// we weight the height by 2 to approximate visual "squareness".
+		if m.DetailComponentPanelHeight*2 > m.DetailComponentPanelWidth {
+			m.DetailComponentPanelLayout = constant.VERTICAL
+			m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight/2 - 1)
+			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+			m.DetailPanelTwoViewport.SetHeight(m.DetailComponentPanelHeight/2 - 1)
+			m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+		} else {
+			// horizontal layout
+			m.DetailComponentPanelLayout = constant.HORIZONTAL
+			m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight)
+			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth/2 - 2)
+			m.DetailPanelTwoViewport.SetHeight(m.DetailComponentPanelHeight)
+			m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth/2 - 2)
+		}
+	} else {
+		m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight)
+		m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+	}
 }

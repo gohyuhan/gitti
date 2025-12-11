@@ -37,6 +37,10 @@ type GittiModel struct {
 	DetailPanelParentComponent                string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
 	DetailPanelViewport                       viewport.Model
 	DetailPanelViewportOffset                 int
+	DetailPanelTwoViewport                    viewport.Model
+	DetailPanelTwoViewportOffset              int
+	ShowDetailPanelTwo                        atomic.Bool
+	DetailComponentPanelLayout                string
 	ListNavigationIndexPosition               GittiComponentsCurrentListNavigationIndexPosition
 	ShowPopUp                                 atomic.Bool
 	PopUpType                                 string

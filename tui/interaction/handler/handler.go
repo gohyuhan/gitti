@@ -14,24 +14,24 @@ import (
 func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
-		return handleTypingESCKeyBindingInteraction(msg, m)
+		return handleTypingESCKeyBindingInteraction(m)
 
 		// in typing mode, tab is move to next input
 	case "tab":
-		return handleTypingTabKeyBindingInteraction(msg, m)
+		return handleTypingTabKeyBindingInteraction(m)
 
 	// in typing mode, shift+tab is move to previous input
 	case "shift+tab":
-		return handleTypingShiftTabKeyBindingInteraction(msg, m)
+		return handleTypingShiftTabKeyBindingInteraction(m)
 
 	// because textare will use `enter` for line change and it will not be safe to use `enter` for submitting,
 	// so `ctrl+e` will be used for submitting
 	case "ctrl+e":
-		return handleTypingCtrleKeyBindingInteraction(msg, m)
+		return handleTypingCtrleKeyBindingInteraction(m)
 
 	// because input mostly will no involve `enter` for change line, so `enter` can be safely used for submitting
 	case "enter":
-		return handleTypingEnterKeyBindingInteraction(msg, m)
+		return handleTypingEnterKeyBindingInteraction(m)
 	}
 
 	// for input typing update
@@ -102,67 +102,73 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "?":
-		return handleNonTypingGlobalKeyBindingInteraction(msg, m)
+		return handleNonTypingGlobalKeyBindingInteraction(m)
 
 	case "1":
-		return handleNonTyping1KeyBindingInteraction(msg, m)
+		return handleNonTyping1KeyBindingInteraction(m)
 
 	case "2":
-		return handleNonTyping2KeyBindingInteraction(msg, m)
+		return handleNonTyping2KeyBindingInteraction(m)
 
 	case "3":
-		return handleNonTyping3KeyBindingInteraction(msg, m)
+		return handleNonTyping3KeyBindingInteraction(m)
 
 	case "A":
-		return handleNonTypingaKeyBindingInteraction(msg, m)
+		return handleNonTypingaKeyBindingInteraction(m)
 
 	case "c":
-		return handleNonTypingcKeyBindingInteraction(msg, m)
+		return handleNonTypingcKeyBindingInteraction(m)
 
 	case "d":
-		return handleNonTypingdKeyBindingInteraction(msg, m)
+		return handleNonTypingdKeyBindingInteraction(m)
 
 	case "n":
-		return handleNonTypingnKeyBindingInteraction(msg, m)
+		return handleNonTypingnKeyBindingInteraction(m)
 
 	case "p":
-		return handleNonTypingpKeyBindingInteraction(msg, m)
+		return handleNonTypingpKeyBindingInteraction(m)
 
 	case "P":
-		return handleNonTypingPKeyBindingInteraction(msg, m)
+		return handleNonTypingPKeyBindingInteraction(m)
 
 	case "r":
-		return handleNonTypingrKeyBindingInteraction(msg, m)
+		return handleNonTypingrKeyBindingInteraction(m)
 
 	case "s":
-		return handleNonTypingsKeyBindingInteraction(msg, m)
+		return handleNonTypingsKeyBindingInteraction(m)
 
 	case "S":
-		return handleNonTypingSKeyBindingInteraction(msg, m)
+		return handleNonTypingSKeyBindingInteraction(m)
+
+	case "[":
+		return handleNonTypingLeftBracketKeyBindingInteraction(m)
+
+	case "]":
+		return handleNonTypingRightBracketKeyBindingInteraction(m)
 
 	case "q", "Q":
 		// only work when there is no pop up
-		return handleNonTypingqQKeyBindingInteraction(msg, m)
+		return handleNonTypingqQKeyBindingInteraction(m)
 
 	case "backspace":
-		return handleNonTypingBackspaceKeyBindingInteraction(msg, m)
+		return handleNonTypingBackspaceKeyBindingInteraction(m)
 
 	case "enter":
-		return handleNonTypingEnterKeyBindingInteraction(msg, m)
+		return handleNonTypingEnterKeyBindingInteraction(m)
 
 	case "tab":
 		// next component navigation
-		return handleNonTypingTabKeyBindingInteraction(msg, m)
+		return handleNonTypingTabKeyBindingInteraction(m)
 
 	case "shift+tab":
 		// previous component navigation
-		return handleNonTypingShiftTabKeyBindingInteraction(msg, m)
+		return handleNonTypingShiftTabKeyBindingInteraction(m)
 
 	case "space":
-		return handleNonTypingSpaceKeyBindingInteraction(msg, m)
+		return handleNonTypingSpaceKeyBindingInteraction(m)
 
 	case "esc":
-		return handleNonTypingEscKeyBindingInteraction(msg, m)
+		return handleNonTypingEscKeyBindingInteraction(m)
 
 	case "up", "k":
 		return handleNonTypingUpkKeyBindingInteraction(msg, m)

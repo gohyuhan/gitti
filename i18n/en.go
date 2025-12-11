@@ -49,6 +49,8 @@ var eN = LanguageMapping{
 	CurrentTerminalWidth:                "Current width",
 	MinimumTerminalWidth:                "Minimum required height",
 	Loading:                             "Loading...",
+	StagedTitle:                         "Staged Changes",
+	UnstagedTitle:                       "Unstaged Changes",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},
@@ -276,6 +278,7 @@ var eN = LanguageMapping{
 	GitResolveConflictAcceptIncomingChangesInfo:              "Accept incoming changes for conflicted file: %s",
 	GitDeleteBranchTitle:                                     "Delete Branch",
 	GitDeleteBranchComfirmPrompt:                             "Are you sure to delete the following branch \n [%s]",
+	DeletingBranch:                                           "Deleting branch...",
 }
 
 // for about gitti
@@ -321,73 +324,78 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[1]",
+		KeyBindingLine:  "1",
 		TitleOrInfoLine: "navigate to branch component",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[2]",
+		KeyBindingLine:  "2",
 		TitleOrInfoLine: "navigate to modified file component",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[3]",
+		KeyBindingLine:  "3",
 		TitleOrInfoLine: "naviagte to stash component",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[Q/q]",
+		KeyBindingLine:  "Q/q",
 		TitleOrInfoLine: "quit",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ctrl+c]",
+		KeyBindingLine:  "ctrl+c",
 		TitleOrInfoLine: "force quit [!!]",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ctrl+g]",
+		KeyBindingLine:  "ctrl+g",
 		TitleOrInfoLine: "go to author github in browser [!!]",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ctrl+l]",
+		KeyBindingLine:  "ctrl+l",
 		TitleOrInfoLine: "go to author linkedin in browser [!!]",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[p]",
+		KeyBindingLine:  "p",
 		TitleOrInfoLine: "push changes",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[P]",
+		KeyBindingLine:  "P",
 		TitleOrInfoLine: "pull from remote",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[tab]",
+		KeyBindingLine:  "tab",
 		TitleOrInfoLine: "move to next component panel",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[shift+tab]",
+		KeyBindingLine:  "shift+tab",
 		TitleOrInfoLine: "move to next previous panel",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ctrl+s]",
+		KeyBindingLine:  "ctrl+s",
 		TitleOrInfoLine: "stage all changes [!!]",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ctrl+u]",
+		KeyBindingLine:  "ctrl+u",
 		TitleOrInfoLine: "unstage all changes [!!]",
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[space]",
+		KeyBindingLine:  "space",
 		TitleOrInfoLine: "amend commit (modifies the latest commit)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ / ]",
+		TitleOrInfoLine: "navigated between staged and unstaged diff detail component panel",
 		LineType:        INFO,
 	},
 }
