@@ -84,7 +84,7 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 
 	scanner := bufio.NewScanner(stdout)
 	renderer := NewGraphRenderer()
-
+	gitCommitLogOutput := make([]CommitLog, 0)
 	// 2. Process Commits
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -109,8 +109,10 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 
 		cL.LaneString = commitLaneString
 		cL.Color = nodeColor
-		gCL.gitCommitLogOutput = append(gCL.gitCommitLogOutput, cL)
+		gitCommitLogOutput = append(gitCommitLogOutput, cL)
 	}
+
+	gCL.gitCommitLogOutput = gitCommitLogOutput
 }
 
 // RenderCommit generates the visual graph line for a single commit.

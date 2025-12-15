@@ -93,6 +93,11 @@ var eN = LanguageMapping{
 	KeyBindingModifiedFilesComponentNone: []string{
 		"[?] global key binding",
 	},
+	KeyBindingCommitLogComponent: []string{
+		"[↑/↓] move up and down",
+		"[enter] view commit log content",
+		"[?] global key binding",
+	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
