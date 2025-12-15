@@ -43,6 +43,7 @@ func InitModifiedFilesList(m *types.GittiModel) bool {
 	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[2] \ueae9 %s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoModifiedFilesInfoList.Styles.TitleBar = style.NewStyle
+	m.CurrentRepoModifiedFilesInfoList.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
 
 	// Custom Help Model for Count Display
 	m.CurrentRepoModifiedFilesInfoList.SetShowHelp(true)

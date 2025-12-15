@@ -30,9 +30,11 @@ type GittiModel struct {
 	DetailComponentPanelHeight                int
 	LocalBranchesComponentPanelHeight         int
 	ModifiedFilesComponentPanelHeight         int
+	CommitLogComponentPanelHeight             int
 	StashComponentPanelHeight                 int
 	CurrentRepoBranchesInfoList               list.Model
 	CurrentRepoModifiedFilesInfoList          list.Model
+	CurrentRepoCommitLogInfoList              list.Model
 	CurrentRepoStashInfoList                  list.Model
 	DetailPanelParentComponent                string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
 	DetailPanelViewport                       viewport.Model
@@ -60,5 +62,6 @@ type GittiModel struct {
 type GittiComponentsCurrentListNavigationIndexPosition struct {
 	LocalBranchComponent   int
 	ModifiedFilesComponent int
+	CommitLogComponent     int
 	StashComponent         int
 }

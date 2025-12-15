@@ -3,12 +3,13 @@ package api
 import "github.com/gohyuhan/gitti/api/git"
 
 type GitOperations struct {
-	GitBranch *git.GitBranch
-	GitCommit *git.GitCommit
-	GitFiles  *git.GitFiles
-	GitPull   *git.GitPull
-	GitStash  *git.GitStash
-	GitRemote *git.GitRemote
+	GitBranch    *git.GitBranch
+	GitCommit    *git.GitCommit
+	GitFiles     *git.GitFiles
+	GitPull      *git.GitPull
+	GitStash     *git.GitStash
+	GitRemote    *git.GitRemote
+	GitCommitLog *git.GitCommitLog
 }
 
 type GitRepoPath struct {

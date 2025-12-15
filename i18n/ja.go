@@ -40,6 +40,7 @@ var jA = LanguageMapping{
 	GitInitPromptInvalidInput:           "無効な入力です. [Y/y] または [N/n] を入力してください.",
 	Branches:                            "ブランチ",
 	ModifiedFiles:                       "変更されたファイル",
+	CommitLog:                           "コミットログ",
 	Stash:                               "スタッシュ",
 	FileTypeUnSupportedPreview:          "現在選択されているファイル形式はプレビューに対応していません",
 	TerminalSizeWarning:                 "端末サイズが小さすぎます - サイズを変更してください.",
@@ -89,6 +90,11 @@ var jA = LanguageMapping{
 		"[?] グローバルキー操作",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[?] グローバルキー操作",
+	},
+	KeyBindingCommitLogComponent: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] コミットログの内容を表示",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingKeyDetailComponent: []string{

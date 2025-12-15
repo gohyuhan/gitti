@@ -87,6 +87,18 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 		Render(strings.ReplaceAll(m.CurrentRepoModifiedFilesInfoList.View(), "No items.", ""))
 }
 
+// Render the Changed Files panel
+func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) string {
+	borderStyle := style.PanelBorderStyle
+	if m.CurrentSelectedComponent == constant.CommitLogComponent {
+		borderStyle = style.SelectedBorderStyle
+	}
+	return borderStyle.
+		Width(width).
+		Height(height).
+		Render(strings.ReplaceAll(m.CurrentRepoCommitLogInfoList.View(), "No items.", ""))
+}
+
 // Render the detail component part at the right of the window,
 // however the content within it will be dynamic based on the current selected component
 func renderDetailComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -257,6 +269,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					}
 				}
 			}
+		case constant.CommitLogComponent:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
 		case constant.DetailComponent:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 		case constant.DetailComponentTwo:

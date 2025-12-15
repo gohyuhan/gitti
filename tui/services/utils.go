@@ -7,6 +7,7 @@ import (
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -78,6 +79,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		switch theCurrentSelectedComponent {
 		case constant.ModifiedFilesComponent:
 			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
+		case constant.CommitLogComponent:
+			contentLine = generateCommitLogDetailPanelContent(ctx, m)
 		case constant.StashComponent:
 			contentLine = generateStashDetailPanelContent(ctx, m)
 		default:
@@ -152,6 +155,29 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 	}
 
 	return vpLine1, vpLine2, shouldRenderDetailComponentPanelTwo
+}
+
+// for commit log detail panel view
+func generateCommitLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
+	currentSelectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
+	var commitLogItem commitlog.GitCommitLogItem
+	var vpLine string
+	if currentSelectedCommitLog != nil {
+		commitLogItem = currentSelectedCommitLog.(commitlog.GitCommitLogItem)
+	} else {
+		return ""
+	}
+
+	commitLogDetail := m.GitOperations.GitCommitLog.GitCommitLogDetail(ctx, commitLogItem.Hash)
+	if len(commitLogDetail) < 1 {
+		return ""
+	}
+
+	for _, Line := range commitLogDetail {
+		line := style.NewStyle.Render(Line)
+		vpLine += line + "\n"
+	}
+	return vpLine
 }
 
 // for stash detail panel view

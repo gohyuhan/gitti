@@ -29,16 +29,18 @@ func TuiWindowSizing(m *types.GittiModel) {
 }
 
 func LeftPanelDynamicResize(m *types.GittiModel) {
-	leftPanelRemainingHeight := m.WindowCoreContentHeight - 7 // this is after reserving the height for the gitti version panel and also Padding
+	// this is after reserving the height for the gitti status panel and also Padding
+	leftPanelRemainingHeight := m.WindowCoreContentHeight - 1 - ((len(constant.ComponentNavigationList) - 1) * 2)
 
 	// we minus 2 if GitStatusComponent is not the one chosen is because GitStatusComponent
 	// and the one that got selected will not be account in to the dynamic height calculation
 	// ( gitti status component's height is fix at 3, while the selected one will always get 40% )
 	componentWithDynamicHeight := (len(constant.ComponentNavigationList) - 2)
-	unSelectedComponentPanelHeightPerComponent := (int(float64(leftPanelRemainingHeight)*(1.0-constant.SelectedLeftPanelComponentHeightRatio)) / componentWithDynamicHeight)
+	unSelectedComponentPanelHeightPerComponent := int(int(float64(leftPanelRemainingHeight)*(1.0-constant.SelectedLeftPanelComponentHeightRatio)) / componentWithDynamicHeight)
 	selectedComponentPanelHeight := leftPanelRemainingHeight - (unSelectedComponentPanelHeightPerComponent * componentWithDynamicHeight)
 	m.LocalBranchesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.ModifiedFilesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+	m.CommitLogComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.StashComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 
 	switch m.CurrentSelectedComponent {
@@ -46,6 +48,8 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 	case constant.ModifiedFilesComponent:
 		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+	case constant.CommitLogComponent:
+		m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 	case constant.StashComponent:
 		m.StashComponentPanelHeight = selectedComponentPanelHeight
 	case constant.GitStatusComponent:
@@ -58,6 +62,8 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponent:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.CommitLogComponent:
+			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponent:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight
 		}
@@ -67,16 +73,22 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponent:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
+		case constant.CommitLogComponent:
+			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponent:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight
 		}
 	}
+
 	// update all components Width and Height
 	m.CurrentRepoBranchesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoBranchesInfoList.SetHeight(m.LocalBranchesComponentPanelHeight)
 
 	m.CurrentRepoModifiedFilesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoModifiedFilesInfoList.SetHeight(m.ModifiedFilesComponentPanelHeight)
+
+	m.CurrentRepoCommitLogInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoCommitLogInfoList.SetHeight(m.CommitLogComponentPanelHeight)
 
 	m.CurrentRepoStashInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)

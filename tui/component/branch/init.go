@@ -35,6 +35,7 @@ func InitBranchList(m *types.GittiModel) {
 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
 	m.CurrentRepoBranchesInfoList.Styles.TitleBar = style.NewStyle
+	m.CurrentRepoBranchesInfoList.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
 
 	// Custom Help Model for Count Display
 	m.CurrentRepoBranchesInfoList.SetShowHelp(true)

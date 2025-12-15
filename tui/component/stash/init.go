@@ -40,9 +40,10 @@ func InitStashList(m *types.GittiModel) bool {
 	m.CurrentRepoStashInfoList.SetShowStatusBar(false)
 	m.CurrentRepoStashInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoStashInfoList.SetShowFilter(false)
-	m.CurrentRepoStashInfoList.Title = utils.TruncateString(fmt.Sprintf("[3] \ueaf7 %s:", i18n.LANGUAGEMAPPING.Stash), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoStashInfoList.Title = utils.TruncateString(fmt.Sprintf("[4] \ueaf7 %s:", i18n.LANGUAGEMAPPING.Stash), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 	m.CurrentRepoStashInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoStashInfoList.Styles.TitleBar = style.NewStyle
+	m.CurrentRepoStashInfoList.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
 
 	// Custom Help Model for Count Display
 	m.CurrentRepoStashInfoList.SetShowHelp(true)

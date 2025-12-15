@@ -56,9 +56,21 @@ func handleNonTyping2KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 
 func handleNonTyping3KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
+		if m.CurrentSelectedComponent != constant.CommitLogComponent {
+			m.CurrentSelectedComponent = constant.CommitLogComponent
+			m.CurrentSelectedComponentIndex = 3
+			layout.LeftPanelDynamicResize(m)
+			services.FetchDetailComponentPanelInfoService(m, true)
+		}
+	}
+	return m, nil
+}
+
+func handleNonTyping4KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.StashComponent {
 			m.CurrentSelectedComponent = constant.StashComponent
-			m.CurrentSelectedComponentIndex = 3
+			m.CurrentSelectedComponentIndex = 4
 			layout.LeftPanelDynamicResize(m)
 			services.FetchDetailComponentPanelInfoService(m, true)
 		}
@@ -325,6 +337,11 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			if len(m.CurrentRepoModifiedFilesInfoList.Items()) > 0 {
 				m.CurrentSelectedComponent = constant.DetailComponent
 				m.DetailPanelParentComponent = constant.ModifiedFilesComponent
+			}
+		case constant.CommitLogComponent:
+			if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
+				m.CurrentSelectedComponent = constant.DetailComponent
+				m.DetailPanelParentComponent = constant.CommitLogComponent
 			}
 		case constant.StashComponent:
 			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
@@ -642,6 +659,14 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 				m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
+		case constant.CommitLogComponent:
+			// we don't use the list native Update() because we need to also track the current selected index
+			if m.CurrentRepoCommitLogInfoList.Index() > 0 {
+				latestIndex := m.CurrentRepoCommitLogInfoList.Index() - 1
+				m.CurrentRepoCommitLogInfoList.Select(latestIndex)
+				m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
+				services.FetchDetailComponentPanelInfoService(m, true)
+			}
 		case constant.StashComponent:
 			// we don't use the list native Update() because we need to also track the current selected index
 			if m.CurrentRepoStashInfoList.Index() > 0 {
@@ -681,6 +706,14 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 				latestIndex := m.CurrentRepoModifiedFilesInfoList.Index() + 1
 				m.CurrentRepoModifiedFilesInfoList.Select(latestIndex)
 				m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
+				services.FetchDetailComponentPanelInfoService(m, true)
+			}
+		case constant.CommitLogComponent:
+			// we don't use the list native Update() because we need to also track the current selected index
+			if m.CurrentRepoCommitLogInfoList.Index() < len(m.CurrentRepoCommitLogInfoList.Items())-1 {
+				latestIndex := m.CurrentRepoCommitLogInfoList.Index() + 1
+				m.CurrentRepoCommitLogInfoList.Select(latestIndex)
+				m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		case constant.StashComponent:
