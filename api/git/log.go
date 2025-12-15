@@ -101,13 +101,12 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 
 		// 3. Render
 		// The renderer returns the commit lane string
-		commitLaneString := renderer.RenderCommit(cL)
+		commitLaneString, nodeColor := renderer.RenderCommit(cL)
 
 		cL.LaneString = commitLaneString
+		cL.Color = nodeColor
 		gCL.gitCommitLogOutput = append(gCL.gitCommitLogOutput, cL)
 	}
-
-	gCL.updateChannel <- GIT_LOG_UPDATE
 }
 
 // RenderCommit generates the visual graph line for a single commit.
@@ -175,7 +174,7 @@ func NewGraphRenderer() *GraphRenderer {
 //	Render the Commit Lane graph line
 //
 // ----------------------------------
-func (g *GraphRenderer) RenderCommit(cL CommitLog) string {
+func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 	// -- Step 1: Identify the Commit's Lane --
 	// Find which existing lane this commit belongs to.
 
@@ -452,5 +451,5 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) string {
 	// Update State for next iteration ("Snap" happens here implicitly)
 	g.currentLanes = nextLanes
 
-	return strings.TrimRight(sb.String(), " ")
+	return strings.TrimRight(sb.String(), " "), nodeColor
 }

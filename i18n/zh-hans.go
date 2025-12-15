@@ -40,6 +40,7 @@ var zH_HANS = LanguageMapping{
 	GitInitPromptInvalidInput:           "输入无效, 请输入 [Y/y] 或 [N/n].",
 	Branches:                            "分支",
 	ModifiedFiles:                       "已修改的文件",
+	CommitLog:                           "提交记录",
 	Stash:                               "暂存",
 	FileTypeUnSupportedPreview:          "当前选择的文件类型不支持预览",
 	TerminalSizeWarning:                 "终端窗口太小 — 请调整大小后继续.",
@@ -89,6 +90,11 @@ var zH_HANS = LanguageMapping{
 		"[?] 全局快捷键",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[?] 全局快捷键",
+	},
+	KeyBindingCommitLogComponent: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 查看提交日志内容",
 		"[?] 全局快捷键",
 	},
 	KeyBindingKeyDetailComponent: []string{

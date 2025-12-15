@@ -4,6 +4,7 @@ import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
+	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -51,6 +52,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		Height:                           0,
 		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
 		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
+		CurrentRepoCommitLogInfoList:     list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
 		CurrentRepoStashInfoList:         list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
 		DetailPanelParentComponent:       "",
 		DetailPanelViewport:              vp,
@@ -96,6 +98,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.IsRenderInit.CompareAndSwap(false, true) {
 			branchComponent.InitBranchList(m)
 			filesComponent.InitModifiedFilesList(m)
+			commitlogComponent.InitGitCommitLogList(m)
 			stashComponent.InitStashList(m)
 		}
 	case tea.KeyMsg:
@@ -116,6 +119,11 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_FILES_STATUS_UPDATE:
 			needReinit := filesComponent.InitModifiedFilesList(m)
 			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+				services.FetchDetailComponentPanelInfoService(m, needReinit)
+			}
+		case git.GIT_LOG_UPDATE:
+			needReinit := commitlogComponent.InitGitCommitLogList(m)
+			if m.CurrentSelectedComponent == constant.CommitLogComponent {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_STASH_UPDATE:

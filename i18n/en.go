@@ -41,6 +41,7 @@ var eN = LanguageMapping{
 	GitInitPromptInvalidInput:           "Invalid input, please enter [Y/y] or [N/n].",
 	Branches:                            "Branches",
 	ModifiedFiles:                       "Modified Files",
+	CommitLog:                           "Commit Log",
 	Stash:                               "Stash",
 	FileTypeUnSupportedPreview:          "The current selected file type is not supported for preview",
 	TerminalSizeWarning:                 "Terminal too small — resize to continue.",

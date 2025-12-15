@@ -23,6 +23,7 @@ type GitDaemon struct {
 	gitRemoteSyncStatusActiveRefreshDur time.Duration
 	isGitBranchPassiveRunning           atomic.Bool
 	isGitFilesPassiveActiveRunning      atomic.Bool
+	isGitCommitLogPassiveRunning        atomic.Bool
 	isGitStashPassiveRunning            atomic.Bool
 	isGitRemoteSyncStatusActiveRunning  atomic.Bool
 	watcherTimer                        *time.Timer
@@ -66,6 +67,7 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 	gd.isGitFilesPassiveActiveRunning.Store(false)
 	gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 	gd.isGitBranchPassiveRunning.Store(false)
+	gd.isGitCommitLogPassiveRunning.Store(false)
 	gd.isGitStashPassiveRunning.Store(false)
 	gd.watcherTimer.Stop()
 	gd.gitFilesActiveTimer.Stop()
@@ -174,6 +176,13 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(needFetch)
 			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
+		}
+	}()
+	go func() {
+		if gd.isGitCommitLogPassiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitCommitLogPassiveRunning.Store(false)
+			gd.gitOperations.GitCommitLog.GetCommitLogs()
+			gd.updateChannel <- git.GIT_LOG_UPDATE
 		}
 	}()
 	go func() {

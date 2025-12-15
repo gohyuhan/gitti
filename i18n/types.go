@@ -64,6 +64,7 @@ type LanguageMapping struct {
 	// Gitti UI text
 	Branches                   string
 	ModifiedFiles              string
+	CommitLog                  string
 	Stash                      string
 	FileTypeUnSupportedPreview string
 	TerminalSizeWarning        string
@@ -83,6 +84,7 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentIsStaged       []string
 	KeyBindingModifiedFilesComponentDefault        []string
 	KeyBindingModifiedFilesComponentNone           []string
+	KeyBindingCommitLogComponent                   []string
 	KeyBindingKeyDetailComponent                   []string
 	KeyBindingKeyStashComponent                    []string
 	KeyBindingKeyStashComponentNone                []string

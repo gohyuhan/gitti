@@ -30,13 +30,11 @@ const (
 	GitDeleteBranchOutputPopUp        = "GitDeleteBranchOutputPopUp"        // IsTyping will be false
 )
 
-const AUTOCLOSEINTERVAL = 500
-
 const SelectedLeftPanelComponentHeightRatio = 0.4
 
 const (
 	MinWidth  = 80
-	MinHeight = 24
+	MinHeight = 27
 
 	Padding                             = 1
 	MainPageKeyBindingLayoutPanelHeight = 1
@@ -89,7 +87,8 @@ const (
 	GitStatusComponent     = "C0" // component index 0
 	LocalBranchComponent   = "C1" // component index 1
 	ModifiedFilesComponent = "C2" // component index 2
-	StashComponent         = "C3" // component index 3
+	CommitLogComponent     = "C3" // component index 3
+	StashComponent         = "C4" // component index 3
 
 	// this is not a selectable component from key binding but act like an extension for each component to enter for more detail,
 	// no component index, the current selected component index will be still set as its parent's
@@ -102,6 +101,7 @@ var ComponentNavigationList = []string{
 	GitStatusComponent,
 	LocalBranchComponent,
 	ModifiedFilesComponent,
+	CommitLogComponent,
 	StashComponent,
 }
 
