@@ -2,8 +2,12 @@ package git
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"os/exec"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/gohyuhan/gitti/executor"
@@ -452,4 +456,70 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 	g.currentLanes = nextLanes
 
 	return strings.TrimRight(sb.String(), " "), nodeColor
+}
+
+func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash string) []string {
+	var gitArgs []string
+
+	if gCL.checkIsLargeCommit(commitHash) {
+		gitArgs = []string{"show", commitHash}
+	} else {
+		gitArgs = []string{"show", "--stat", commitHash}
+	}
+
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
+	gitOutput, err := cmdExecutor.Output()
+	if err != nil {
+		if ctx.Err() != nil {
+			// This catches context.Canceled
+			gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[COMMIT LOG DETAIL OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+			return nil
+		}
+		exitError, ok := err.(*exec.ExitError)
+		if ok {
+			if exitError.ExitCode() != 1 {
+				gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT COMMIT LOG DETAIL ERROR]: %w", err))
+				return nil
+			}
+		} else {
+			gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT COMMIT LOG DETAIL ERROR]: %w", err))
+			return nil
+		}
+	}
+
+	commitChangesLine := processGeneralGitOpsOutputIntoStringArray(gitOutput)
+	return commitChangesLine
+}
+
+// ----------------------------------
+//
+// # Helper to determine if it was a large commit
+//
+// ----------------------------------
+func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
+	const fileThreshold = 25
+
+	gitArgs := []string{"show", "--shortstat", "--format=''", commitHash}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	cmdOutput, cmdErr := cmd.Output()
+
+	if cmdErr != nil {
+		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG CHECK LARGE COMMIT ERROR]: %s", cmdErr.Error()))
+		return true
+	}
+
+	re := regexp.MustCompile(`(\d+)\s+files?\s+changed`)
+	matches := re.FindStringSubmatch(string(cmdOutput))
+	if len(matches) < 2 {
+		// No shortstat (e.g. merge commit with no changes)
+		return false
+	}
+
+	filesChanged, err := strconv.Atoi(matches[1])
+	if err != nil {
+		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG CHECK LARGE COMMIT ERROR]: %s", cmdErr.Error()))
+		return true
+	}
+
+	return filesChanged > fileThreshold
 }
