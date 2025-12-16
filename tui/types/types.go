@@ -25,6 +25,7 @@ type GittiModel struct {
 	Width                                     int
 	Height                                    int
 	WindowLeftPanelWidth                      int // this is the left part of the window
+	WindowLeftPanelRatio                      float64
 	DetailComponentPanelWidth                 int // this is the right part of the window, will always be for detail component panel only
 	WindowCoreContentHeight                   int // this is the height of the part where key binding panel is not included
 	DetailComponentPanelHeight                int

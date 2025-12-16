@@ -1,7 +1,6 @@
 package layout
 
 import (
-	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -9,7 +8,7 @@ import (
 // to update the width and height of all components
 func TuiWindowSizing(m *types.GittiModel) {
 	// Compute panel widths
-	m.WindowLeftPanelWidth = min(int(float64(m.Width)*settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio), constant.MaxLeftPanelWidth)
+	m.WindowLeftPanelWidth = int(float64(m.Width) * m.WindowLeftPanelRatio)
 	m.DetailComponentPanelWidth = m.Width - m.WindowLeftPanelWidth
 
 	m.WindowCoreContentHeight = m.Height - constant.MainPageKeyBindingLayoutPanelHeight - 2*constant.Padding
@@ -99,19 +98,22 @@ func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 		// vertical layout
 		// Since terminal characters are usually about twice as tall as they are wide,
 		// we weight the height by 2 to approximate visual "squareness".
+		splitHeight := int(m.DetailComponentPanelHeight / 2)
+		splitWidth := int(m.DetailComponentPanelWidth / 2)
+
 		if m.DetailComponentPanelHeight*2 > m.DetailComponentPanelWidth {
 			m.DetailComponentPanelLayout = constant.VERTICAL
-			m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight/2 - 1)
+			m.DetailPanelViewport.SetHeight(splitHeight - 1)
 			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
-			m.DetailPanelTwoViewport.SetHeight(m.DetailComponentPanelHeight/2 - 1)
+			m.DetailPanelTwoViewport.SetHeight(m.DetailComponentPanelHeight - splitHeight - 1)
 			m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - 2)
 		} else {
 			// horizontal layout
 			m.DetailComponentPanelLayout = constant.HORIZONTAL
 			m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight)
-			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth/2 - 2)
+			m.DetailPanelViewport.SetWidth(splitWidth - 2)
 			m.DetailPanelTwoViewport.SetHeight(m.DetailComponentPanelHeight)
-			m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth/2 - 2)
+			m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - splitWidth - 2)
 		}
 	} else {
 		m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight)

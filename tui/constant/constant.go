@@ -41,7 +41,6 @@ const (
 
 	ListItemOrTitleWidthPad = 4
 
-	MaxLeftPanelWidth                         = 80
 	MaxGlobalKeyBindingPopUpWidth             = 150
 	MaxCommitPopUpWidth                       = 150
 	MaxAmendCommitPopUpWidth                  = 150

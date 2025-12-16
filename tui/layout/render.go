@@ -116,19 +116,19 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 	detailPanelHeight := height
 
 	if m.ShowDetailPanelTwo.Load() {
-		detailPanelHeight = (height / 2)
-		detailPanelWidth = (width / 2)
+		detailPanelHeight = int(height / 2)
+		detailPanelWidth = int(width / 2)
 		if m.DetailComponentPanelLayout == constant.HORIZONTAL {
 			content = lipgloss.JoinHorizontal(
 				lipgloss.Top,
 				detailComponentBorderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelViewport.View()),
-				detailComponentTwoBorderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelTwoViewport.View()),
+				detailComponentTwoBorderStyle.Width(width-detailPanelWidth).Height(height).Render(m.DetailPanelTwoViewport.View()),
 			)
 		} else {
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				detailComponentBorderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
-				detailComponentTwoBorderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelTwoViewport.View()),
+				detailComponentTwoBorderStyle.Width(width).Height(height-detailPanelHeight).Render(m.DetailPanelTwoViewport.View()),
 			)
 		}
 	} else {

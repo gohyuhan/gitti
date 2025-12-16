@@ -3,6 +3,7 @@ package tui
 import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/settings"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
@@ -50,6 +51,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		TrackedUpstreamOrBranchIcon:      "",
 		Width:                            0,
 		Height:                           0,
+		WindowLeftPanelRatio:             settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio,
 		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
 		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
 		CurrentRepoCommitLogInfoList:     list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
