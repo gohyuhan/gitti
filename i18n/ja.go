@@ -410,4 +410,9 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "ステージ済みおよびステージなしの差分詳細パネル間を移動",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "- / +",
+		TitleOrInfoLine: "左パネルの幅の比率を増減 [!!]",
+		LineType:        INFO,
+	},
 }

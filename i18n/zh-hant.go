@@ -409,4 +409,9 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "在已暫存和未暫存的差異詳細資訊面板之間導航",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "- / +",
+		TitleOrInfoLine: "增大或減小左側面板寬度比例 [!!]",
+		LineType:        INFO,
+	},
 }

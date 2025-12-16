@@ -404,4 +404,9 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "navigated between staged and unstaged diff detail component panel",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "- / +",
+		TitleOrInfoLine: "increase or decrease the left panel width ratio [!!]",
+		LineType:        INFO,
+	},
 }

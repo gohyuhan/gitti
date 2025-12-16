@@ -409,4 +409,9 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "在已暂存和未暂存的差异详细信息面板之间导航",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "- / +",
+		TitleOrInfoLine: "增大或减小左侧面板宽度比例 [!!]",
+		LineType:        INFO,
+	},
 }
