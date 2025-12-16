@@ -7,7 +7,9 @@ import (
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // for resolve conflict option list popup
@@ -40,8 +42,13 @@ func InitGitResolveConflictOptionPopUpModel(m *types.GittiModel, filePathName st
 	rROL.SetShowPagination(false)
 	rROL.SetShowStatusBar(false)
 	rROL.SetFilteringEnabled(false)
-	rROL.SetShowHelp(false)
 	rROL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	rROL.SetShowHelp(true)
+	rROL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	rROL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	rROL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &rROL, constant.MaxGitResolveConflictOptionPopUpWidth)
 
 	popUpModel := &GitResolveConflictOptionPopUpModel{
 		ResolveConflictOptionList: rROL,

@@ -10,6 +10,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // init the popup model for creating a new branch
@@ -50,8 +51,13 @@ func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 	nBTOL.SetShowPagination(false)
 	nBTOL.SetShowStatusBar(false)
 	nBTOL.SetFilteringEnabled(false)
-	nBTOL.SetShowHelp(false)
 	nBTOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	nBTOL.SetShowHelp(true)
+	nBTOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	nBTOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	nBTOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &nBTOL, constant.MaxChooseNewBranchTypePopUpWidth)
 
 	m.PopUpModel = &ChooseNewBranchTypeOptionPopUpModel{
 		NewBranchTypeOptionList: nBTOL,
@@ -83,8 +89,13 @@ func InitChooseSwitchBranchTypePopUpModel(m *types.GittiModel, branchName string
 	sBTOL.SetShowPagination(false)
 	sBTOL.SetShowStatusBar(false)
 	sBTOL.SetFilteringEnabled(false)
-	sBTOL.SetShowHelp(false)
 	sBTOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	sBTOL.SetShowHelp(true)
+	sBTOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	sBTOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	sBTOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &sBTOL, constant.MaxChooseSwitchBranchTypePopUpWidth)
 
 	m.PopUpModel = &ChooseSwitchBranchTypePopUpModel{
 		SwitchTypeOptionList: sBTOL,

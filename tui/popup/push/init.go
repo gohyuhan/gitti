@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // init the popup model for push output log
@@ -65,8 +66,13 @@ func InitChoosePushTypePopUpModel(m *types.GittiModel, remoteName string) {
 	pOL.SetShowPagination(false)
 	pOL.SetShowStatusBar(false)
 	pOL.SetFilteringEnabled(false)
-	pOL.SetShowHelp(false)
 	pOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	pOL.SetShowHelp(true)
+	pOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	pOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	pOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &pOL, constant.MaxChoosePushTypePopUpWidth)
 
 	m.PopUpModel = &ChoosePushTypePopUpModel{
 		PushOptionList: pOL,

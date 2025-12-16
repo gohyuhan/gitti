@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 func InitChooseGitPullTypePopUp(m *types.GittiModel) {
@@ -40,8 +41,13 @@ func InitChooseGitPullTypePopUp(m *types.GittiModel) {
 	cGPOL.SetShowPagination(false)
 	cGPOL.SetShowStatusBar(false)
 	cGPOL.SetFilteringEnabled(false)
-	cGPOL.SetShowHelp(false)
 	cGPOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	cGPOL.SetShowHelp(true)
+	cGPOL.KeyMap = list.KeyMap{}
+	cGPOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	cGPOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cGPOL, constant.MaxChooseGitPullTypePopUpWidth)
 
 	popUpModel := &ChooseGitPullTypePopUpModel{
 		PullTypeOptionList: cGPOL,

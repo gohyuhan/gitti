@@ -62,3 +62,22 @@ func ListCounterHelper(m *types.GittiModel, list *list.Model) func() []key.Bindi
 		}
 	}
 }
+
+func PopUpListCounterHelper(m *types.GittiModel, list *list.Model, maxWidth int) func() []key.Binding {
+	return func() []key.Binding {
+		currentIndex := list.Index() + 1
+		totalCount := len(list.Items())
+		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
+		width := (min(maxWidth, int(float64(m.Width)*0.8)) - 4)
+		countStr = TruncateString(countStr, width-constant.ListItemOrTitleWidthPad-2)
+		if totalCount == 0 {
+			countStr = "0/0"
+		}
+		return []key.Binding{
+			key.NewBinding(
+				key.WithKeys(countStr),
+				key.WithHelp(countStr, ""),
+			),
+		}
+	}
+}

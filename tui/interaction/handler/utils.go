@@ -13,6 +13,7 @@ import (
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -23,44 +24,128 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 	case constant.ChooseRemotePopUp:
 		popUp, ok := m.PopUpModel.(*remotePopUp.ChooseRemotePopUpModel)
 		if ok {
-			popUp.RemoteList, cmd = popUp.RemoteList.Update(msg)
-			return m, cmd
+			switch msg.String() {
+			case "up", "k":
+				if popUp.RemoteList.Index() > 0 {
+					latestIndex := popUp.RemoteList.Index() - 1
+					popUp.RemoteList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.RemoteList.Index() < len(popUp.RemoteList.Items())-1 {
+					latestIndex := popUp.RemoteList.Index() + 1
+					popUp.RemoteList.Select(latestIndex)
+				}
+			}
+			popUp.RemoteList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.RemoteList, constant.MaxChooseRemotePopUpWidth)
+			return m, nil
 		}
 	case constant.ChoosePushTypePopUp:
 		popUp, ok := m.PopUpModel.(*pushPopUp.ChoosePushTypePopUpModel)
 		if ok {
-			popUp.PushOptionList, cmd = popUp.PushOptionList.Update(msg)
-			return m, cmd
+			switch msg.String() {
+			case "up", "k":
+				if popUp.PushOptionList.Index() > 0 {
+					latestIndex := popUp.PushOptionList.Index() - 1
+					popUp.PushOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.PushOptionList.Index() < len(popUp.PushOptionList.Items())-1 {
+					latestIndex := popUp.PushOptionList.Index() + 1
+					popUp.PushOptionList.Select(latestIndex)
+				}
+			}
+			popUp.PushOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.PushOptionList, constant.MaxChoosePushTypePopUpWidth)
+			return m, nil
 		}
 	case constant.ChooseNewBranchTypePopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseNewBranchTypeOptionPopUpModel)
 		if ok {
-			popUp.NewBranchTypeOptionList, cmd = popUp.NewBranchTypeOptionList.Update(msg)
-			return m, cmd
+			switch msg.String() {
+			case "up", "k":
+				if popUp.NewBranchTypeOptionList.Index() > 0 {
+					latestIndex := popUp.NewBranchTypeOptionList.Index() - 1
+					popUp.NewBranchTypeOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.NewBranchTypeOptionList.Index() < len(popUp.NewBranchTypeOptionList.Items())-1 {
+					latestIndex := popUp.NewBranchTypeOptionList.Index() + 1
+					popUp.NewBranchTypeOptionList.Select(latestIndex)
+				}
+			}
+			popUp.NewBranchTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.NewBranchTypeOptionList, constant.MaxChooseNewBranchTypePopUpWidth)
+			return m, nil
 		}
 	case constant.ChooseSwitchBranchTypePopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseSwitchBranchTypePopUpModel)
 		if ok {
-			popUp.SwitchTypeOptionList, cmd = popUp.SwitchTypeOptionList.Update(msg)
-			return m, cmd
+			switch msg.String() {
+			case "up", "k":
+				if popUp.SwitchTypeOptionList.Index() > 0 {
+					latestIndex := popUp.SwitchTypeOptionList.Index() - 1
+					popUp.SwitchTypeOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.SwitchTypeOptionList.Index() < len(popUp.SwitchTypeOptionList.Items())-1 {
+					latestIndex := popUp.SwitchTypeOptionList.Index() + 1
+					popUp.SwitchTypeOptionList.Select(latestIndex)
+				}
+			}
+			popUp.SwitchTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.SwitchTypeOptionList, constant.MaxChooseSwitchBranchTypePopUpWidth)
+			return m, nil
 		}
 	case constant.ChooseGitPullTypePopUp:
 		popUp, ok := m.PopUpModel.(*pullPopUp.ChooseGitPullTypePopUpModel)
 		if ok {
-			popUp.PullTypeOptionList, cmd = popUp.PullTypeOptionList.Update(msg)
-			return m, cmd
+			switch msg.String() {
+			case "up", "k":
+				if popUp.PullTypeOptionList.Index() > 0 {
+					latestIndex := popUp.PullTypeOptionList.Index() - 1
+					popUp.PullTypeOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.PullTypeOptionList.Index() < len(popUp.PullTypeOptionList.Items())-1 {
+					latestIndex := popUp.PullTypeOptionList.Index() + 1
+					popUp.PullTypeOptionList.Select(latestIndex)
+				}
+			}
+			popUp.PullTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.PullTypeOptionList, constant.MaxChooseGitPullTypePopUpWidth)
+			return m, nil
 		}
 	case constant.GitDiscardTypeOptionPopUp:
 		popUp, ok := m.PopUpModel.(*discardPopUp.GitDiscardTypeOptionPopUpModel)
 		if ok {
-			popUp.DiscardTypeOptionList, cmd = popUp.DiscardTypeOptionList.Update(msg)
-			return m, cmd
+			switch msg.String() {
+			case "up", "k":
+				if popUp.DiscardTypeOptionList.Index() > 0 {
+					latestIndex := popUp.DiscardTypeOptionList.Index() - 1
+					popUp.DiscardTypeOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.DiscardTypeOptionList.Index() < len(popUp.DiscardTypeOptionList.Items())-1 {
+					latestIndex := popUp.DiscardTypeOptionList.Index() + 1
+					popUp.DiscardTypeOptionList.Select(latestIndex)
+				}
+			}
+			popUp.DiscardTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.DiscardTypeOptionList, constant.MaxGitDiscardTypeOptionPopUpWidth)
+			return m, nil
 		}
 	case constant.GitResolveConflictOptionPopUp:
 		popUp, ok := m.PopUpModel.(*resolvePopUp.GitResolveConflictOptionPopUpModel)
 		if ok {
-			popUp.ResolveConflictOptionList, cmd = popUp.ResolveConflictOptionList.Update(msg)
-			return m, cmd
+			switch msg.String() {
+			case "up", "k":
+				if popUp.ResolveConflictOptionList.Index() > 0 {
+					latestIndex := popUp.ResolveConflictOptionList.Index() - 1
+					popUp.ResolveConflictOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.ResolveConflictOptionList.Index() < len(popUp.ResolveConflictOptionList.Items())-1 {
+					latestIndex := popUp.ResolveConflictOptionList.Index() + 1
+					popUp.ResolveConflictOptionList.Select(latestIndex)
+				}
+			}
+			popUp.ResolveConflictOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.ResolveConflictOptionList, constant.MaxGitResolveConflictOptionPopUpWidth)
+			return m, nil
 		}
 
 	// following is for viewport

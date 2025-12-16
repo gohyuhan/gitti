@@ -7,7 +7,9 @@ import (
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // for discard option list popup
@@ -65,8 +67,13 @@ func InitGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, new
 	gDTOL.SetShowPagination(false)
 	gDTOL.SetShowStatusBar(false)
 	gDTOL.SetFilteringEnabled(false)
-	gDTOL.SetShowHelp(false)
 	gDTOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	gDTOL.SetShowHelp(true)
+	gDTOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	gDTOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	gDTOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &gDTOL, constant.MaxGitDiscardTypeOptionPopUpWidth)
 
 	popUpModel := &GitDiscardTypeOptionPopUpModel{
 		DiscardTypeOptionList: gDTOL,
