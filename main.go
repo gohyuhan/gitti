@@ -53,6 +53,7 @@ func main() {
 	autoUpdate := flag.String("auto-update", "", i18n.LANGUAGEMAPPING.FlagAutoUpdate)
 	updatePrompt := flag.Bool("update", false, i18n.LANGUAGEMAPPING.FlagUpdate)
 	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
+	setEditor := flag.Bool("editor", false, i18n.LANGUAGEMAPPING.FlagEditor)
 
 	flag.Parse()
 
@@ -72,6 +73,8 @@ func main() {
 		config.SetAutoUpdate(*autoUpdate)
 	case *updatePrompt:
 		updater.Update()
+	case *setEditor:
+		config.ChooseAndSetEditor()
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string)

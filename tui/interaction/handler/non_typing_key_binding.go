@@ -20,6 +20,7 @@ import (
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 func handleNonTypingGlobalKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -173,6 +174,28 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 					discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
 				}
+			}
+		}
+	}
+	return m, nil
+}
+
+func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+
+		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+		if currentSelectedFileItem != nil {
+			currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
+			cmd, isNonEditorEditor := utils.ReturnEditorLaunchCommand(currentSelectedFile.FilePathname, m.UserSetEditor)
+			if isNonEditorEditor {
+				cmd.Start()
+				return m, nil
+			} else {
+				return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
+					return types.EditorFinishedMsg{
+						Err: err,
+					}
+				})
 			}
 		}
 	}

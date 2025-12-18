@@ -32,6 +32,7 @@ type GittiConfigSettings struct {
 	LanguageCode                    string    `json:"language_code"`
 	LastUpdateCheckTime             time.Time `json:"last_update_check_time"`
 	AutoUpdate                      bool      `json:"auto_update"`
+	Editor                          string    `json:"editor"`
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
@@ -44,6 +45,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	LanguageCode:                    "EN",
 	LastUpdateCheckTime:             time.Now().UTC(),
 	AutoUpdate:                      true,
+	Editor:                          "vim",
 }
 
 // getConfigPath returns the config.json path (creates directories if needed)
@@ -197,6 +199,14 @@ func UpdateLastFetchTime() {
 
 func UpdateAutoUpdate(autoUpdate bool) {
 	GITTICONFIGSETTINGS.AutoUpdate = autoUpdate
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
+
+func UpdateEditor(editor string) {
+	GITTICONFIGSETTINGS.Editor = editor
 	cfgPath, err := getConfigPath()
 	if err == nil {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)

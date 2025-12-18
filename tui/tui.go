@@ -39,6 +39,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 
 	gittiModel := &types.GittiModel{
 		TuiUpdateChannel:                 tuiUpdateChannel,
+		UserSetEditor:                    settings.GITTICONFIGSETTINGS.Editor,
 		CurrentSelectedComponent:         constant.ModifiedFilesComponent,
 		CurrentSelectedComponentIndex:    2,
 		TotalComponentCount:              4,
@@ -144,6 +145,8 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE:
 			gAM.updateGitRemoteStatusSyncLineStringAndUpStream()
 		}
+		return gAM, nil
+	case types.EditorFinishedMsg:
 		return gAM, nil
 	case tea.MouseMsg:
 		model, cmd := interaction.GittiMouseInteraction(msg, m)

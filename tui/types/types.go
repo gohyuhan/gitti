@@ -11,6 +11,7 @@ import (
 
 type GittiModel struct {
 	IsRenderInit                              atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
+	UserSetEditor                             string
 	TuiUpdateChannel                          chan string
 	CurrentSelectedComponent                  string
 	CurrentSelectedComponentIndex             int
@@ -65,4 +66,13 @@ type GittiComponentsCurrentListNavigationIndexPosition struct {
 	ModifiedFilesComponent int
 	CommitLogComponent     int
 	StashComponent         int
+}
+
+// ---------------------------------
+//
+// # A bubbletea message to indicate that the editor has quit or close (apply only for terminal editor, external GUI like vscode/zed/cursor etc will not need this)
+//
+// ---------------------------------
+type EditorFinishedMsg struct {
+	Err error
 }

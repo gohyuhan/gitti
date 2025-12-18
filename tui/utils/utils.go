@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"os/exec"
+	"strings"
 
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
@@ -80,4 +82,46 @@ func PopUpListCounterHelper(m *types.GittiModel, list *list.Model, maxWidth int)
 			),
 		}
 	}
+}
+
+func ReturnEditorLaunchCommand(fileName string, userSetEditor string) (*exec.Cmd, bool) {
+	filepath := "."
+	if fileName != "" {
+		filepath = fileName
+	}
+	var isNonTerminalEditor bool
+	var editorCommand string
+
+	switch strings.ToLower(userSetEditor) {
+	case "nano":
+		editorCommand = "nano"
+		isNonTerminalEditor = false
+	case "vim":
+		editorCommand = "vim"
+		isNonTerminalEditor = false
+	case "neovim":
+		editorCommand = "nvim"
+		isNonTerminalEditor = false
+	case "vscode":
+		editorCommand = "code"
+		isNonTerminalEditor = true
+	case "zed":
+		editorCommand = "zed"
+		isNonTerminalEditor = true
+	case "cursor":
+		editorCommand = "cursor"
+		isNonTerminalEditor = true
+	case "windsurf":
+		editorCommand = "windsurf"
+		isNonTerminalEditor = true
+	case "antigravity":
+		editorCommand = "antigravity"
+		isNonTerminalEditor = true
+	default:
+		editorCommand = "vi"
+		isNonTerminalEditor = false
+	}
+
+	cmd := exec.Command(editorCommand, []string{filepath}...)
+	return cmd, isNonTerminalEditor
 }

@@ -36,13 +36,13 @@ type LanguageMapping struct {
 	UpdaterAutoUpdaterDisable           string
 	UpdaterAutoUpdaterSetError          string
 	// flag expalnation
-	FlagVersion                 string
-	FlagLangCode                string
-	FlagInitDefaultBranch       string
-	FlagInitStashGitIgnoredFile string
-	FlagAutoUpdate              string
-	FlagUpdate                  string
-	FlagGlobal                  string
+	FlagVersion           string
+	FlagLangCode          string
+	FlagInitDefaultBranch string
+	FlagAutoUpdate        string
+	FlagUpdate            string
+	FlagGlobal            string
+	FlagEditor            string
 	// Run Error
 	FailToGetCWD                string
 	TuiRunFail                  string
@@ -53,9 +53,12 @@ type LanguageMapping struct {
 	// init default branch
 	GittiDefaultBranchSet              string
 	GittiDefaultAndGitDefaultBranchSet string
-	// update to stash ignored file setting
-	GittiStashIgnoredFile        string
-	GittiWillNotStashIgnoredFile string
+	// set editor related
+	EditorTitle       string
+	EditorDescription string
+	EditorInstruction string
+	EditorSetError    string
+	EditorSetSuccess  string
 	// Gitti terminal text
 	GitNotInstalledError      string
 	GitNotInitPrompt          string

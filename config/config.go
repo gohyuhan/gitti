@@ -65,10 +65,50 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperatio
 	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations)
 
 	return gitOperations, gitRepoPathInfo
-
 }
 
 func InitGlobalSettingAndLanguage() {
 	settings.InitOrReadConfig()
 	i18n.InitGittiLanguageMapping(settings.GITTICONFIGSETTINGS.LanguageCode)
+}
+
+func ChooseAndSetEditor() {
+	editors := []string{
+		"Vim",
+		"Neovim",
+		"Nano",
+		"VSCode",
+		"Zed",
+		"Cursor",
+		"Windsurf",
+		"Antigravity",
+	}
+
+	// 1. Print the menu
+	fmt.Println(i18n.LANGUAGEMAPPING.EditorTitle)
+	fmt.Println(i18n.LANGUAGEMAPPING.EditorDescription)
+	for i, name := range editors {
+		fmt.Printf("[%d] %s\n", i+1, name)
+	}
+	fmt.Print(i18n.LANGUAGEMAPPING.EditorInstruction)
+
+	// 2. Read input
+	var selection int
+	_, err := fmt.Scan(&selection)
+
+	// 3. Validate input
+	if err != nil || selection < 1 || selection > len(editors) {
+		// clear the invalid input from buffer if needed, or just loop
+		fmt.Println(i18n.LANGUAGEMAPPING.EditorSetError)
+		os.Exit(1)
+	}
+
+	// 4. Map to internal value
+	choice := editors[selection-1]
+	fmt.Printf("Selected: %s\n", choice)
+
+	// Save the result to your config
+	settings.UpdateEditor(strings.ToLower(choice))
+	fmt.Printf(i18n.LANGUAGEMAPPING.EditorSetSuccess, choice)
+	os.Exit(0)
 }
