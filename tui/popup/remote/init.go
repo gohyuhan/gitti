@@ -49,8 +49,8 @@ func InitAddRemotePromptPopUpModel(m *types.GittiModel, noInitialRemote bool) {
 	m.PopUpModel = popUpModel
 }
 
-// init the popup model to choose remote to push to
-func InitGitRemotePushChooseRemotePopUpModel(m *types.GittiModel, remoteList []git.GitRemoteInfo) {
+// init the popup model to choose remote
+func InitChooseRemotePopUpModel(m *types.GittiModel, remoteList []git.GitRemoteInfo, action string) {
 	items := make([]list.Item, 0, len(remoteList))
 	for _, remote := range remoteList {
 		items = append(items, GitRemoteItem(remote))
@@ -65,5 +65,6 @@ func InitGitRemotePushChooseRemotePopUpModel(m *types.GittiModel, remoteList []g
 
 	m.PopUpModel = &ChooseRemotePopUpModel{
 		RemoteList: rL,
+		Action:     action,
 	}
 }

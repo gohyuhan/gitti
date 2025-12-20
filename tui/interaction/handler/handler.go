@@ -95,6 +95,14 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 			popUp.StashMessageInput, cmd = popUp.StashMessageInput.Update(msg)
 			return m, cmd
 		}
+	case constant.CreateBranchBasedOnRemotePopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemotePopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.RemoteBranchNameInput, cmd = popUp.RemoteBranchNameInput.Update(msg)
+			return m, cmd
+		}
+
 	}
 	return m, nil
 }

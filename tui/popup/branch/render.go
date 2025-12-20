@@ -193,3 +193,87 @@ func RenderGitDeleteBranchOutputPopUp(m *types.GittiModel) string {
 	}
 	return ""
 }
+
+// ------------------------------------
+//
+//	For Create New Branch Based on remote
+//
+// ------------------------------------
+func RenderCreateBranchBasedOnRemotePopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*CreateBranchBasedOnRemotePopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxCreateBranchBasedOnRemotePopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteTitle)
+		popUp.RemoteBranchNameInput.SetWidth(popUpWidth - 4)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			i18n.LANGUAGEMAPPING.RemoteOriginTitle,
+			fmt.Sprintf(" %s", popUp.RemoteOrigin),
+			i18n.LANGUAGEMAPPING.EnterRemoteBranchTitle,
+			popUp.RemoteBranchNameInput.View(),
+		)
+		modifiedBranchName, isValid := api.IsBranchNameValid(popUp.RemoteBranchNameInput.Value())
+		if !isValid {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				i18n.LANGUAGEMAPPING.RemoteOriginTitle,
+				fmt.Sprintf(" %s", popUp.RemoteOrigin),
+				i18n.LANGUAGEMAPPING.EnterRemoteBranchTitle,
+				popUp.RemoteBranchNameInput.View(),
+				style.BranchInvalidWarningStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.NewBranchInvalidWarning, modifiedBranchName)),
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Create New Branch Based on remote output result
+//
+// ------------------------------------
+func RenderCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*CreateBranchBasedOnRemoteOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxCreateBranchBasedOnRemoteOutputPopUpWidth, int(float64(m.Width)*0.8))
+
+		outputViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpCreateBranchBasedOnRemoteOutputViewportHeight + 2)
+		if popUp.HasError.Load() {
+			outputViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			outputViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.CreateBranchBasedOnRemoteOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.CreateBranchBasedOnRemoteOutputViewport.SetYOffset(popUp.CreateBranchBasedOnRemoteOutputViewport.YOffset())
+		outputViewPort := outputViewPortStyle.Render(popUp.CreateBranchBasedOnRemoteOutputViewport.View())
+
+		var content string
+		if popUp.IsProcessing.Load() {
+			processingText := popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.CreatingNewBranchBasedOnRemoteProcessing
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				i18n.LANGUAGEMAPPING.CreatingNewBranchBasedOnRemoteTitle,
+				processingText,
+				outputViewPort,
+			)
+
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				i18n.LANGUAGEMAPPING.CreatingNewBranchBasedOnRemoteTitle,
+				outputViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Render(content)
+	}
+	return ""
+}

@@ -31,6 +31,11 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
 		m.PopUpModel = nil
+	case constant.CreateBranchBasedOnRemotePopUp:
+		m.ShowPopUp.Store(false)
+		m.IsTyping.Store(false)
+		m.PopUpType = constant.NoPopUp
+		m.PopUpModel = nil
 	}
 	return m, nil
 }
@@ -210,6 +215,31 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.GitStashConfirmPromptPopUp
 		}
+
+	case constant.CreateBranchBasedOnRemotePopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemotePopUpModel)
+		if ok {
+			// we direclty close the pop up and trigger the branch creation operation
+			validBranchName, _ := api.IsBranchNameValid(popUp.RemoteBranchNameInput.Value())
+			remoteOrigin := popUp.RemoteOrigin
+			if len(validBranchName) > 0 {
+				branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUp(m)
+				popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
+				if ok {
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.CreateBranchBasedOnRemoteOutputPopUp
+					popUp.IsProcessing.Store(true)
+					services.CreateNewBranchBasedOnRemoteService(m, remoteOrigin, validBranchName)
+					return m, popUp.Spinner.Tick
+				} else {
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.NoPopUp
+				}
+			}
+		}
+
 	}
 	return m, nil
 }

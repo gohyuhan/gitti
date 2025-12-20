@@ -95,3 +95,27 @@ func GitDeleteBranchService(m *types.GittiModel, branchName string) {
 		}
 	}()
 }
+
+// ------------------------------------
+//
+//	For create new branch based on remote branch
+//
+// ------------------------------------
+func CreateNewBranchBasedOnRemoteService(m *types.GittiModel, remoteName string, branchName string) {
+	go func() {
+		result, success := m.GitOperations.GitBranch.GitCreateNewBranchBasedOnRemote(remoteName, branchName)
+		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
+		if ok {
+			if success {
+				popUp.HasError.Store(false)
+				popUp.ProcessSuccess.Store(true)
+			} else {
+				popUp.HasError.Store(true)
+				popUp.ProcessSuccess.Store(false)
+			}
+			popUp.IsProcessing.Store(false)
+			popUp.CreateBranchBasedOnRemoteOutputViewport.SetContentLines(result)
+			popUp.CreateBranchBasedOnRemoteOutputViewport.PageDown()
+		}
+	}()
+}

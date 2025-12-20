@@ -43,6 +43,7 @@ type AddRemotePromptPopUpModel struct {
 // ---------------------------------
 type ChooseRemotePopUpModel struct {
 	RemoteList list.Model
+	Action     string
 }
 
 // ---------------------------------

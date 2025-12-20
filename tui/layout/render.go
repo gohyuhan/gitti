@@ -223,6 +223,17 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					keys = []string{"..."} // nothing can be done during stash operation, only force quit gitti is possible
 				}
 			}
+		case constant.CreateBranchBasedOnRemotePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateBranchBasedOnRemotePopUp
+		case constant.CreateBranchBasedOnRemoteOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateBranchBasedOnRemoteOutputPopUp
+			popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
+			if ok {
+				if popUp.IsProcessing.Load() {
+					keys = []string{"..."} // nothing can be done during stash operation, only force quit gitti is possible
+				}
+			}
+
 		}
 	} else {
 		//-----------------------------

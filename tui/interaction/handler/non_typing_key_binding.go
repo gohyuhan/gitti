@@ -242,7 +242,7 @@ func handleNonTypingpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				// if remote is more than 1 let user choose which remote to push to first before pushing
 				m.PopUpType = constant.ChooseRemotePopUp
 				if _, ok := m.PopUpModel.(*remotePopUp.ChooseRemotePopUpModel); !ok {
-					remotePopUp.InitGitRemotePushChooseRemotePopUpModel(m, remotes)
+					remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.PUSHACTION)
 				}
 			}
 		}
@@ -388,10 +388,20 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			popUp, ok := m.PopUpModel.(*remotePopUp.ChooseRemotePopUpModel)
 			if ok {
 				remote := popUp.RemoteList.SelectedItem()
-				m.PopUpType = constant.ChoosePushTypePopUp
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(false)
-				pushPopUp.InitChoosePushTypePopUpModel(m, remote.(remotePopUp.GitRemoteItem).Name)
+				remoteName := remote.(remotePopUp.GitRemoteItem).Name
+				switch popUp.Action {
+				case constant.PUSHACTION:
+					m.PopUpType = constant.ChoosePushTypePopUp
+					m.IsTyping.Store(false)
+					m.ShowPopUp.Store(true)
+					pushPopUp.InitChoosePushTypePopUpModel(m, remoteName)
+				case constant.CREATEBRANCHBASEDONREMOTE:
+					m.IsTyping.Store(true)
+					m.ShowPopUp.Store(true)
+					m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
+					// only one remote found so, we will default to that remote
+					branchPopUp.InitCreateBranchBasedOnRemotePopUp(m, remoteName)
+				}
 			}
 
 		case constant.ChoosePushTypePopUp:
@@ -407,11 +417,42 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.ChooseNewBranchTypePopUp:
 			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseNewBranchTypeOptionPopUpModel)
 			if ok {
-				m.PopUpType = constant.CreateNewBranchPopUp
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(true)
 				selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
-				branchPopUp.InitCreateNewBranchPopUpModel(m, selectedOption.(branchPopUp.GitNewBranchTypeOptionItem).NewBranchType)
+				newBranchType := selectedOption.(branchPopUp.GitNewBranchTypeOptionItem).NewBranchType
+				if newBranchType == git.NEWBRANCHBASEDONREMOTE {
+					if !m.GitOperations.GitRemote.CheckRemoteExist() {
+						// if no remote found, we add one
+						m.PopUpType = constant.AddRemotePromptPopUp
+						if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
+							remotePopUp.InitAddRemotePromptPopUpModel(m, true)
+						} else {
+							popUp.AddRemoteOutputViewport.SetContent("")
+						}
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(true)
+					} else {
+						m.ShowPopUp.Store(true)
+						remotes := m.GitOperations.GitRemote.Remote()
+						if len(remotes) == 1 {
+							m.IsTyping.Store(true)
+							m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
+							// only one remote found so, we will default to that remote
+							branchPopUp.InitCreateBranchBasedOnRemotePopUp(m, remotes[0].Name)
+						} else if len(remotes) > 1 {
+							m.IsTyping.Store(false)
+							// if remote is more than 1 let user choose which remote
+							m.PopUpType = constant.ChooseRemotePopUp
+							if _, ok := m.PopUpModel.(*remotePopUp.ChooseRemotePopUpModel); !ok {
+								remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.CREATEBRANCHBASEDONREMOTE)
+							}
+						}
+					}
+				} else {
+					m.PopUpType = constant.CreateNewBranchPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+					branchPopUp.InitCreateNewBranchPopUpModel(m, newBranchType)
+				}
 			}
 
 		case constant.ChooseSwitchBranchTypePopUp:
@@ -639,6 +680,16 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 
 		case constant.GitDeleteBranchOutputPopUp:
 			popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
+			if ok && !popUp.IsProcessing.Load() {
+				// only close when done processing
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
+		case constant.CreateBranchBasedOnRemoteOutputPopUp:
+			// Block ESC during create new branch based on remote operation - operation must complete
+			popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
 			if ok && !popUp.IsProcessing.Load() {
 				// only close when done processing
 				m.ShowPopUp.Store(false)
