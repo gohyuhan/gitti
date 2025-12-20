@@ -78,34 +78,23 @@ func GittiMainPageView(m *types.GittiModel) string {
 	mainView := lipgloss.JoinVertical(lipgloss.Left, content, bottomBar)
 
 	if m.ShowPopUp.Load() {
-		// --- SETUP THE CANVAS ---
-		// Create a new canvas that will hold all our layers.
-		canvas := lipgloss.NewCanvas()
-
-		// Create the base layer from our main UI string.
-		// It has no offset (X:0, Y:0) and is the bottom-most layer (Z:0).
-		baseLayer := lipgloss.NewLayer(mainView)
-		canvas.AddLayers(baseLayer)
 		// Render the popup view into a string.
 		popUpComponent := popup.RenderPopUpComponent(m)
 
 		// Calculate the X and Y coordinates to center the popup.
-		// We need the popup's dimensions for this.
 		popUpWidth := lipgloss.Width(popUpComponent)
 		popUpHeight := lipgloss.Height(popUpComponent)
 		x := (m.Width - popUpWidth) / 2
 		y := (m.Height - popUpHeight) / 2
 
-		// Create a new layer for the popup.
-		// Position it using the calculated X and Y.
-		// Give it a higher Z-index to ensure it's drawn on top.
-		popUpLayer := lipgloss.NewLayer(popUpComponent).X(x).Y(y).Z(1)
-
-		// Add the popup layer to the canvas.
-		canvas.AddLayers(popUpLayer)
-		// Render the entire canvas with all its layers into the final string.
+		// In V2, lipgloss.Canvas and Layers are powerful but can be expensive if allocated every frame.
+		// However, since we need z-index layering for popups, we use them only when needed.
+		canvas := lipgloss.NewCanvas()
+		canvas.AddLayers(
+			lipgloss.NewLayer(mainView),
+			lipgloss.NewLayer(popUpComponent).X(x).Y(y).Z(1),
+		)
 		return canvas.Render()
-
 	}
 
 	return mainView

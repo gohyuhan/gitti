@@ -15,12 +15,12 @@ import (
 
 // Commit represents a single git commit with all necessary graph information
 type CommitLog struct {
-	Hash       string
-	Parents    []string
-	Message    string
-	Author     string
-	LaneString string
-	Color      string
+	Hash         string
+	Parents      []string
+	Message      string
+	Author       string
+	LaneCharInfo []Cell
+	ColorID      int
 }
 
 type GitCommitLog struct {
@@ -105,10 +105,10 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 
 		// 3. Render
 		// The renderer returns the commit lane string
-		commitLaneString, nodeColor := renderer.RenderCommit(cL)
+		laneCharInfo, colorID := renderer.RenderCommit(cL)
 
-		cL.LaneString = commitLaneString
-		cL.Color = nodeColor
+		cL.LaneCharInfo = laneCharInfo
+		cL.ColorID = colorID
 		gitCommitLogOutput = append(gitCommitLogOutput, cL)
 	}
 
@@ -125,35 +125,12 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 //  3. Stable Colors: To make this "snap" less confusing, branches keep their assigned
 //     color even if they move to a different column index.
 
-// Palette provides distinct colors for different branches.
-var Palette = []string{
-	"\033[38;5;57m",  // Deep Purple
-	"\033[38;5;63m",  // Purple-Blue
-	"\033[38;5;69m",  // Blue
-	"\033[38;5;75m",  // Light Blue
-	"\033[38;5;81m",  // Cyan-Blue
-	"\033[38;5;87m",  // Cyan
-	"\033[38;5;49m",  // Spring Green
-	"\033[38;5;42m",  // Green
-	"\033[38;5;202m", // OrangeRed
-	"\033[38;5;196m", // Red
-	"\033[38;5;208m", // Orange
-	"\033[38;5;220m", // Gold
-}
-
-func getColor(colorID int) string {
-	if colorID < 0 {
-		return ColorReset
-	}
-	return Palette[colorID%len(Palette)]
-}
-
 // --- Graph Renderer ---
 
 // Cell represents a single character in the terminal output grid.
 type Cell struct {
-	Char  rune
-	Color string
+	Char    rune
+	ColorID int
 }
 
 // Lane represents a persistent branch in the graph.
@@ -180,7 +157,7 @@ func NewGraphRenderer() *GraphRenderer {
 //	Render the Commit Lane graph line
 //
 // ----------------------------------
-func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
+func (g *GraphRenderer) RenderCommit(cL CommitLog) ([]Cell, int) {
 	// -- Step 1: Identify the Commit's Lane --
 	// Find which existing lane this commit belongs to.
 
@@ -208,9 +185,6 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 		commitLaneIdx = len(g.currentLanes)
 		g.currentLanes = append(g.currentLanes, commitLane)
 	}
-
-	// The Node (*) always takes the color of its own lane.
-	nodeColor := getColor(commitLane.ColorID)
 
 	// -- Step 2: Plan the Next State (Evolution) --
 	// We determine what the lanes will look like for the NEXT commit.
@@ -265,7 +239,6 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 			isMerge := false
 			if slices.Contains(incomingMergeIndices, i) {
 				isMerge = true
-				break
 			}
 
 			if isMerge {
@@ -312,18 +285,18 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 	cells := make([]Cell, lineLen+1) // +1 buffer
 	// Initialize with empty
 	for k := range cells {
-		cells[k] = Cell{Char: ' ', Color: ColorReset}
+		cells[k] = Cell{Char: ' ', ColorID: -1}
 	}
 
 	// Helper to set a character at a specific visual index
-	setChar := func(idx int, r rune, color string) {
+	setChar := func(idx int, r rune, colorID int) {
 		if idx >= 0 && idx < len(cells) {
-			cells[idx] = Cell{Char: r, Color: color}
+			cells[idx] = Cell{Char: r, ColorID: colorID}
 		}
 	}
 
 	// Helper to draw horizontal lines '─'
-	drawHorizontal := func(srcIdx, destIdx int, color string) {
+	drawHorizontal := func(srcIdx, destIdx int, colorID int) {
 		// Convert logical indices directly to visual indices (x2)
 		start := srcIdx * 2
 		end := destIdx * 2
@@ -343,7 +316,7 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 			if cells[k].Char != ' ' {
 				continue
 			}
-			cells[k] = Cell{Char: '─', Color: color}
+			cells[k] = Cell{Char: '─', ColorID: colorID}
 		}
 	}
 
@@ -359,7 +332,6 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 		isMerge := false
 		if slices.Contains(incomingMergeIndices, i) {
 			isMerge = true
-			break
 		}
 
 		if isMerge {
@@ -380,38 +352,34 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 			}
 		}
 
-		color := getColor(lane.ColorID)
-
 		if nextIdx == -1 {
 			// Should not happen for a pass-through (unless it dies unexpectedly),
 			// but fallback to straight pipe.
-			setChar(i*2, '│', color)
+			setChar(i*2, '│', lane.ColorID)
 		} else if nextIdx < i {
 			// Shifting Left: ↙
 			// Visually points to the column it will occupy on the next line.
-			setChar(i*2, '↙', color)
+			setChar(i*2, '↙', lane.ColorID)
 		} else if nextIdx > i {
 			// Shifting Right: ↘
-			setChar(i*2, '↘', color)
+			setChar(i*2, '↘', lane.ColorID)
 		} else {
 			// Straight: │
-			setChar(i*2, '│', color)
+			setChar(i*2, '│', lane.ColorID)
 		}
 	}
 
 	// Drawing Layer 2: Incoming Merges (Other lanes joining THIS commit)
 	for _, srcIdx := range incomingMergeIndices {
-		color := getColor(g.currentLanes[srcIdx].ColorID)
-
 		// Draw Horizontal connection to the Commit Node
-		drawHorizontal(srcIdx, commitLaneIdx, color)
+		drawHorizontal(srcIdx, commitLaneIdx, g.currentLanes[srcIdx].ColorID)
 
 		// Draw the Corner
 		cornerChar := '┘'
 		if srcIdx < commitLaneIdx {
 			cornerChar = '└'
 		}
-		setChar(srcIdx*2, cornerChar, color)
+		setChar(srcIdx*2, cornerChar, g.currentLanes[srcIdx].ColorID)
 	}
 
 	// Drawing Layer 3: Forks (Commit splitting to new Parents)
@@ -421,17 +389,15 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 		for i := 1; i < len(parents); i++ {
 			destIdx := forkDestinations[i] // Where this parent lands in nextLanes
 
-			color := nodeColor
-
 			// Draw Horizontal connection
-			drawHorizontal(commitLaneIdx, destIdx, color)
+			drawHorizontal(commitLaneIdx, destIdx, commitLaneIdx)
 
 			// Draw Corner at Destination
 			cornerChar := '┐'
 			if destIdx < commitLaneIdx {
 				cornerChar = '┌'
 			}
-			setChar(destIdx*2, cornerChar, color)
+			setChar(destIdx*2, cornerChar, commitLaneIdx)
 		}
 	}
 
@@ -440,24 +406,12 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) (string, string) {
 	if len(parents) > 1 {
 		commitNodeIndicator = '◎' // Bullseye for merges
 	}
-	setChar(commitLaneIdx*2, commitNodeIndicator, nodeColor)
-
-	// -- Step 4: Finalize Output --
-	var sb strings.Builder
-	for _, c := range cells {
-		if c.Char == ' ' {
-			sb.WriteString(" ") // standard space (no color)
-		} else {
-			sb.WriteString(c.Color)
-			sb.WriteRune(c.Char)
-			sb.WriteString(ColorReset)
-		}
-	}
+	setChar(commitLaneIdx*2, commitNodeIndicator, commitLaneIdx)
 
 	// Update State for next iteration ("Snap" happens here implicitly)
 	g.currentLanes = nextLanes
 
-	return strings.TrimRight(sb.String(), " "), nodeColor
+	return cells, commitLaneIdx
 }
 
 func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash string) []string {

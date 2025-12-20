@@ -51,8 +51,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 	m.DetailComponentPanelInfoFetchCancelFunc = cancel
 	go func(ctx context.Context) {
 		defer func() {
-			m.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 			cancel()
+			m.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 		}()
 
 		var contentLine string
@@ -119,8 +119,10 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 		return "", "", shouldRenderDetailComponentPanelTwo
 	}
 
-	vpLine1 := fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname)
-	var vpLine2 string
+	var vpLine1 strings.Builder
+	vpLine1.WriteString(fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname))
+
+	var vpLine2 strings.Builder
 	var fileDiffLines1 []string
 	var fileDiffLines2 []string
 	getDiffTypeForVpLine1 := git.GETCOMBINEDDIFF
@@ -128,40 +130,40 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 	// indicating that the file is not in conflict state and have both staged and unstaged changes
 	if !fileStatus.HasConflict && fileStatus.IndexState != " " && fileStatus.WorkTree != " " {
 		shouldRenderDetailComponentPanelTwo = true
-		vpLine2 = fmt.Sprintf("%s\n\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.UnstagedTitle, fileStatus.FilePathname)
+		vpLine2.WriteString(fmt.Sprintf("%s\n\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.UnstagedTitle, fileStatus.FilePathname))
 		fileDiffLines2 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, git.GETUNSTAGEDDIFF)
 
 		if fileDiffLines2 == nil {
-			vpLine2 += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
+			vpLine2.WriteString(i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview)
 		} else {
 			for _, line := range fileDiffLines2 {
 				line = style.NewStyle.Render(line)
-				vpLine2 += line + "\n"
+				vpLine2.WriteString(line + "\n")
 			}
 		}
 
 		getDiffTypeForVpLine1 = git.GETSTAGEDDIFF
-		vpLine1 = fmt.Sprintf("%s\n\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.StagedTitle, fileStatus.FilePathname)
+		vpLine1.WriteString(fmt.Sprintf("%s\n\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.StagedTitle, fileStatus.FilePathname))
 	}
 
 	fileDiffLines1 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, getDiffTypeForVpLine1)
 	if fileDiffLines1 == nil {
-		vpLine1 += i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview
+		vpLine1.WriteString(i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview)
 	} else {
 		for _, line := range fileDiffLines1 {
 			line = style.NewStyle.Render(line)
-			vpLine1 += line + "\n"
+			vpLine1.WriteString(line + "\n")
 		}
 	}
 
-	return vpLine1, vpLine2, shouldRenderDetailComponentPanelTwo
+	return vpLine1.String(), vpLine2.String(), shouldRenderDetailComponentPanelTwo
 }
 
 // for commit log detail panel view
 func generateCommitLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
 	var commitLogItem commitlog.GitCommitLogItem
-	var vpLine string
+	var vpLine strings.Builder
 	if currentSelectedCommitLog != nil {
 		commitLogItem = currentSelectedCommitLog.(commitlog.GitCommitLogItem)
 	} else {
@@ -175,9 +177,9 @@ func generateCommitLogDetailPanelContent(ctx context.Context, m *types.GittiMode
 
 	for _, Line := range commitLogDetail {
 		line := style.NewStyle.Render(Line)
-		vpLine += line + "\n"
+		vpLine.WriteString(line + "\n")
 	}
-	return vpLine
+	return vpLine.String()
 }
 
 // for stash detail panel view
@@ -190,11 +192,12 @@ func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) s
 		return ""
 	}
 
-	vpLine := fmt.Sprintf(
+	var vpLine strings.Builder
+	vpLine.WriteString(fmt.Sprintf(
 		"[%s]\n[%s]\n\n",
 		style.StashIdStyle.Render(stashItem.Id),
 		style.StashMessageStyle.Render(stashItem.Message),
-	)
+	))
 
 	stashDetail := m.GitOperations.GitStash.GitStashDetail(ctx, stashItem.Id)
 	if len(stashDetail) < 1 {
@@ -203,20 +206,20 @@ func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) s
 
 	for _, Line := range stashDetail {
 		line := style.NewStyle.Render(Line)
-		vpLine += line + "\n"
+		vpLine.WriteString(line + "\n")
 	}
-	return vpLine
+	return vpLine.String()
 }
 
 // for about gitti content
 func generateAboutGittiContent() string {
-	var vpLine string
+	var vpLine strings.Builder
 
 	logoLineArray := style.GradientLines(constant.GittiAsciiArtLogo)
 	aboutLines := i18n.LANGUAGEMAPPING.AboutGitti
 
-	vpLine += strings.Join(logoLineArray, "\n") + "\n"
-	vpLine += strings.Join(aboutLines, "\n")
+	vpLine.WriteString(strings.Join(logoLineArray, "\n") + "\n")
+	vpLine.WriteString(strings.Join(aboutLines, "\n"))
 
-	return vpLine
+	return vpLine.String()
 }

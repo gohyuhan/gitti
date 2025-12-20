@@ -2,6 +2,7 @@ package style
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 
 	"charm.land/lipgloss/v2"
@@ -89,6 +90,28 @@ var (
 	ErrorStyle = NewStyle.
 			Foreground(ColorError)
 )
+
+var Palette = []color.Color{
+	lipgloss.Color("#5fafff"), // Deep Sky Blue (75)
+	lipgloss.Color("#87afff"), // Sky Blue 2 (111)
+	lipgloss.Color("#8787ff"), // Light Slate Blue (105)
+	lipgloss.Color("#afafff"), // Light Steel Blue (147)
+	lipgloss.Color("#af87ff"), // Medium Purple 1 (141)
+	lipgloss.Color("#af5fff"), // Medium Purple (135)
+	lipgloss.Color("#d787ff"), // Lavender (177)
+	lipgloss.Color("#d75fff"), // Medium Orchid 1 (171)
+	lipgloss.Color("#ff5fff"), // Medium Orchid (207)
+	lipgloss.Color("#ff87ff"), // Orchid (213)
+	lipgloss.Color("#ffafff"), // Hot Pink (219)
+	lipgloss.Color("#ffd7ff"), // Light Pink (225)
+}
+
+func GetColor(colorID int) color.Color {
+	if colorID < 0 {
+		return lipgloss.NoColor{}
+	}
+	return Palette[colorID%len(Palette)]
+}
 
 func GradientLines(lines []string) []string {
 	colored := make([]string, len(lines))

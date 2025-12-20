@@ -21,7 +21,6 @@ type GitCommit struct {
 	gitRemotePushOutputMu sync.RWMutex
 	updateChannel         chan string
 	gitProcessLock        *GitProcessLock
-	remote                []GitRemote
 }
 
 type LatestCommitMsgAndDesc struct {

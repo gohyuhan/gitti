@@ -18,15 +18,20 @@ import (
 // for list component of git branch
 //
 // ---------------------------------
+type Cell struct {
+	Char    rune
+	ColorID int
+}
+
 type (
 	GitCommitLogItemDelegate struct{}
 	GitCommitLogItem         struct {
-		Hash       string
-		Parents    []string
-		Message    string
-		Author     string
-		LaneString string
-		Color      string
+		Hash         string
+		Parents      []string
+		Message      string
+		Author       string
+		LaneCharList []Cell
+		ColorID      int
 	}
 )
 
@@ -57,16 +62,24 @@ func (d GitCommitLogItemDelegate) Render(w io.Writer, m list.Model, index int, l
 	}
 	nameShortForm := sb.String()
 
-	strContent := lipgloss.JoinHorizontal(
-		lipgloss.Top,
-		style.NewStyle.Foreground(style.ColorYellowWarm).Render(i.Hash[:7]),
-		" ",
-		style.NewStyle.Render(fmt.Sprintf("%s%-*s", i.Color, 3, nameShortForm)),
-		" ",
-		style.NewStyle.Render(i.LaneString),
-		"  ",
-		style.NewStyle.Render(i.Message),
-	)
+	var commitGraphLine strings.Builder
+
+	for _, char := range i.LaneCharList {
+		commitGraphLine.WriteString(
+			style.NewStyle.Foreground(style.GetColor(char.ColorID)).Render(string(char.Char)),
+		)
+	}
+
+	var lineBuilder strings.Builder
+	lineBuilder.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(i.Hash[:7]))
+	lineBuilder.WriteString(" ")
+	lineBuilder.WriteString(style.NewStyle.Foreground(style.GetColor(i.ColorID)).Render(fmt.Sprintf("%-*s", 3, nameShortForm)))
+	lineBuilder.WriteString(" ")
+	lineBuilder.WriteString(commitGraphLine.String())
+	lineBuilder.WriteString(" ")
+	lineBuilder.WriteString(style.NewStyle.Render(i.Message))
+
+	strContent := lineBuilder.String()
 
 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 	needTruncate := false

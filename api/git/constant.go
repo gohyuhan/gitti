@@ -1,8 +1,6 @@
 package git
 
 // --- ANSI Colors ---
-const ColorReset = "\033[0m"
-
 const (
 	PUSH               = "PUSH"
 	FORCEPUSHSAFE      = "FORCEPUSHSAFE"

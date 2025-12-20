@@ -19,7 +19,22 @@ func InitGitCommitLogList(m *types.GittiModel) bool {
 	var latestGitCommitLogItemArray []list.Item
 
 	for _, commitLog := range latestGitCommitLog {
-		latestGitCommitLogItemArray = append(latestGitCommitLogItemArray, GitCommitLogItem(commitLog))
+		laneCharList := make([]Cell, len(commitLog.LaneCharInfo))
+		for i, c := range commitLog.LaneCharInfo {
+			laneCharList[i] = Cell{
+				Char:    c.Char,
+				ColorID: c.ColorID,
+			}
+		}
+
+		latestGitCommitLogItemArray = append(latestGitCommitLogItemArray, GitCommitLogItem{
+			Hash:         commitLog.Hash,
+			Parents:      commitLog.Parents,
+			Message:      commitLog.Message,
+			Author:       commitLog.Author,
+			LaneCharList: laneCharList,
+			ColorID:      commitLog.ColorID,
+		})
 	}
 
 	// get the previous selected commit log and see if it was within the new list if yes get the latest position of the previous selected file
