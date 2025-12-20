@@ -92,18 +92,29 @@ var (
 )
 
 var Palette = []color.Color{
-	lipgloss.Color("#5fafff"), // Deep Sky Blue (75)
-	lipgloss.Color("#87afff"), // Sky Blue 2 (111)
-	lipgloss.Color("#8787ff"), // Light Slate Blue (105)
-	lipgloss.Color("#afafff"), // Light Steel Blue (147)
-	lipgloss.Color("#af87ff"), // Medium Purple 1 (141)
-	lipgloss.Color("#af5fff"), // Medium Purple (135)
-	lipgloss.Color("#d787ff"), // Lavender (177)
-	lipgloss.Color("#d75fff"), // Medium Orchid 1 (171)
-	lipgloss.Color("#ff5fff"), // Medium Orchid (207)
-	lipgloss.Color("#ff87ff"), // Orchid (213)
-	lipgloss.Color("#ffafff"), // Hot Pink (219)
-	lipgloss.Color("#ffd7ff"), // Light Pink (225)
+	// --- BLUE LAYER ---
+	lipgloss.Color("#0087ff"), // Deep Sky Blue (Deep, saturated base)
+	lipgloss.Color("#87d7ff"), // Light Sky Blue (Bright & airy, clear jump from 1)
+
+	// --- PURPLE/SLATE LAYER ---
+	lipgloss.Color("#5f5fff"), // Royal Purple-Blue (Much darker/richer than the sky blue)
+	lipgloss.Color("#afafff"), // Lavender Mist (Very light, creates a "highlight" layer)
+
+	// --- VIBRANT PURPLE LAYER ---
+	lipgloss.Color("#8700ff"), // Vivid Violet (Strong hue shift)
+	lipgloss.Color("#af5fff"), // Medium Purple (Softer, but clearly different)
+
+	// --- MAGENTA LAYER ---
+	lipgloss.Color("#d75fff"), // Medium Orchid (The transition to pink)
+	lipgloss.Color("#ff00ff"), // Pure Magenta (High saturation "pop" color)
+
+	// --- PINK/ROSE LAYER ---
+	lipgloss.Color("#ff5faf"), // Deep Rose (A darker, warm pink)
+	lipgloss.Color("#ff87ff"), // Light Orchid (Bright and glowing)
+
+	// --- HIGHLIGHT LAYER ---
+	lipgloss.Color("#ffafff"), // Hot Pink (Very bright)
+	lipgloss.Color("#ffd7ff"), // Pale Pink (Almost white, the final highlight)
 }
 
 func GetColor(colorID int) color.Color {
