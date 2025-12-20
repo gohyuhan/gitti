@@ -66,6 +66,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = branch.RenderGitDeleteBranchConfirmPromptPopUp(m)
 	case constant.GitDeleteBranchOutputPopUp:
 		popUp = branch.RenderGitDeleteBranchOutputPopUp(m)
+	case constant.CreateBranchBasedOnRemotePopUp:
+		popUp = branch.RenderCreateBranchBasedOnRemotePopUp(m)
+	case constant.CreateBranchBasedOnRemoteOutputPopUp:
+		popUp = branch.RenderCreateBranchBasedOnRemoteOutputPopUp(m)
 	}
 	return popUp
 }

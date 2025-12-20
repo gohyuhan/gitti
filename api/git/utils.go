@@ -173,3 +173,14 @@ func isFilesInConflictState(indexState string, workTree string) bool {
 	}
 	return false
 }
+
+// ----------------------------------
+//
+//	Related to Git Fetch
+//
+// ----------------------------------
+func gitFetch() {
+	gitArgs := []string{"fetch"}
+	fetchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	fetchCmdExecutor.Run()
+}

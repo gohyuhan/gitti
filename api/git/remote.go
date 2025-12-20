@@ -83,17 +83,6 @@ func (gr *GitRemote) CurrentBranchUpStream() string {
 
 // ----------------------------------
 //
-//	Related to Git Fetch
-//
-// ----------------------------------
-func (gr *GitRemote) GitFetch() {
-	gitArgs := []string{"fetch"}
-	fetchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	fetchCmdExecutor.Run()
-}
-
-// ----------------------------------
-//
 //	Related to Git Remote
 //
 // ----------------------------------
@@ -172,7 +161,7 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool) {
 	gr.currentBranchUpStream = upstream
 
 	if needFetch {
-		gr.GitFetch()
+		gitFetch()
 	}
 
 	gitArgs := []string{"rev-list", "--left-right", "--count", "HEAD...@{upstream}"}

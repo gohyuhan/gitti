@@ -199,6 +199,12 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
+		case constant.CreateBranchBasedOnRemoteOutputPopUp:
+			if branchPopup, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
 		}
 	}
 	return gAM, tea.Batch(cmds...)

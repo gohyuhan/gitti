@@ -172,6 +172,37 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 
 // ----------------------------------
 //
+//	Related to Create New Branch based on a remote branch
+//
+// ----------------------------------
+func (gb *GitBranch) GitCreateNewBranchBasedOnRemote(remoteName string, branchName string) ([]string, bool) {
+	success := false
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, success
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
+	gitFetch()
+
+	remoteBranchName := fmt.Sprintf("%s/%s", remoteName, branchName)
+
+	createBranchBasedOnRemoteGitArgs := []string{"branch", branchName, remoteBranchName}
+	createBranchBasedOnRemoteCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(createBranchBasedOnRemoteGitArgs, false)
+	createBranchBasedOnRemoteOutput, createBranchBasedOnRemoteErr := createBranchBasedOnRemoteCmdExecutor.CombinedOutput()
+
+	parsedCreateBranchBasedOnRemoteOutput := processGeneralGitOpsOutputIntoStringArray(createBranchBasedOnRemoteOutput)
+
+	if createBranchBasedOnRemoteErr != nil {
+		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE BRANCH BASED ON REMOTE ERROR]: %w", createBranchBasedOnRemoteErr))
+	} else {
+		success = true
+	}
+
+	return parsedCreateBranchBasedOnRemoteOutput, success
+}
+
+// ----------------------------------
+//
 //	Related to Switch Branch ( Does not bring the changes over )
 //
 // ----------------------------------

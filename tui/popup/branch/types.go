@@ -96,6 +96,29 @@ type (
 	}
 )
 
+// ---------------------------------
+//
+// for create mew branch based of a remote branch
+//
+// ---------------------------------
+type CreateBranchBasedOnRemotePopUpModel struct {
+	RemoteOrigin          string // remote origin name
+	RemoteBranchNameInput textinput.Model
+}
+
+// ---------------------------------
+//
+// for showing result/output of create mew branch based of a remote branch
+//
+// ---------------------------------
+type CreateBranchBasedOnRemoteOutputPopUpModel struct {
+	CreateBranchBasedOnRemoteOutputViewport viewport.Model // to log out the output from git operation
+	Spinner                                 spinner.Model  // spinner for showing processing state
+	IsProcessing                            atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                                atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess                          atomic.Bool    // has the process sucessfuly executed
+}
+
 func (i GitNewBranchTypeOptionItem) FilterValue() string {
 	return i.Name
 }

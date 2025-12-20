@@ -40,6 +40,11 @@ func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchAndSwitchDescription,
 			NewBranchType: git.NEWBRANCHANDSWITCH,
 		},
+		{
+			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteTitle,
+			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteDescription,
+			NewBranchType: git.NEWBRANCHBASEDONREMOTE,
+		},
 	}
 
 	items := make([]list.Item, 0, len(newBranchTypeOption))
@@ -150,6 +155,45 @@ func InitGitDeleteBranchOutputPopUpModel(m *types.GittiModel) {
 	popUpModel := &GitDeleteBranchOutputPopUpModel{
 		BranchDeleteOutputViewport: vp,
 		Spinner:                    s,
+	}
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+
+	m.PopUpModel = popUpModel
+}
+
+func InitCreateBranchBasedOnRemotePopUp(m *types.GittiModel, remoteOrigin string) {
+	remoteBranchNameInput := textinput.New()
+	remoteBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.EnterRemoteBranchPrompt
+	remoteBranchNameInput.Focus()
+	remoteBranchNameInput.SetVirtualCursor(true)
+
+	remoteBranchNameInput.SetWidth(min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	popUpModel := &CreateBranchBasedOnRemotePopUpModel{
+		RemoteOrigin:          remoteOrigin,
+		RemoteBranchNameInput: remoteBranchNameInput,
+	}
+
+	m.PopUpModel = popUpModel
+}
+
+func InitCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpCreateBranchBasedOnRemoteOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxCreateBranchBasedOnRemoteOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &CreateBranchBasedOnRemoteOutputPopUpModel{
+		CreateBranchBasedOnRemoteOutputViewport: vp,
+		Spinner:                                 s,
 	}
 	popUpModel.IsProcessing.Store(false)
 	popUpModel.HasError.Store(false)
