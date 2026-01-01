@@ -104,6 +104,7 @@ var eN = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
+		"[R] reset the latest commit",
 		"[?] global key binding",
 	},
 	KeyBindingKeyDetailComponent: []string{
@@ -213,6 +214,15 @@ var eN = LanguageMapping{
 	KeyBindingForCreateBranchBasedOnRemoteOutputPopUp: []string{
 		"[esc] close",
 	},
+	KeyBindingForGitResetLatestCommitTypeOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select reset option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitResetLatestCommitConfirmPromptPopUp: []string{
+		"[enter] reset",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -307,6 +317,16 @@ var eN = LanguageMapping{
 	GitDeleteBranchTitle:                                     "Delete Branch",
 	GitDeleteBranchComfirmPrompt:                             "Are you sure to delete the following branch \n [%s]",
 	DeletingBranch:                                           "Deleting branch...",
+	GitResetLatestCommitTypeOptionTitle:                      "Reset Latest Commit",
+	GitResetSoft:                                             "Soft reset",
+	GitResetHard:                                             "Hard reset",
+	GitResetMixed:                                            "Mixed reset",
+	GitResetSoftInfo:                                         "Undo commits, keep all changes staged",
+	GitResetHardInfo:                                         "Undo commits, permanently DISCARD ALL changes",
+	GitResetMixedInfo:                                        "Undo commits, keep changes but unstage them",
+	GitResetLatestCommitSoftConfirmation:                     "Are you sure to soft reset the latest commit?",
+	GitResetLatestCommitHardConfirmation:                     "Are you sure to hard reset the latest commit?",
+	GitResetLatestCommitMixedConfirmation:                    "Are you sure to mixed reset the latest commit?",
 }
 
 // for about gitti

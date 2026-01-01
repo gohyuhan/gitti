@@ -1,6 +1,7 @@
 package commit
 
 import (
+	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
@@ -141,6 +142,50 @@ func RenderGitAmendCommitPopUp(m *types.GittiModel) string {
 					logViewPort,
 				)
 			}
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For reset latest commit reset type selection pop up
+//
+// ------------------------------------
+func RenderGitResetLatestCommitTypeOptionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitResetLatestCommitTypeOptionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitResetLatestCommitTypeOptionPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitResetLatestCommitTypeOptionTitle)
+		popUp.ResetLatestCommitTypeOptionList.SetWidth(popUpWidth - 4)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.ResetLatestCommitTypeOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For reset latest commit confirmation prompt
+//
+// ------------------------------------
+func RenderGitResetLatestCommitConfirmPromptPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitResetLatestCommitConfirmPromptPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitResetLatestCommitConfirmPromptPopUpWidth, int(float64(m.Width)*0.8))
+		var content string
+		switch popUp.GitResetLatestCommitType {
+		case git.RESETSOFT:
+			content = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitResetLatestCommitSoftConfirmation)
+		case git.RESETHARD:
+			content = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitResetLatestCommitHardConfirmation)
+		case git.RESETMIXED:
+			content = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitResetLatestCommitMixedConfirmation)
 		}
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}

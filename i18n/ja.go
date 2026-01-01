@@ -104,6 +104,7 @@ var jA = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
+		"[R] 最新のコミットをリセット",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingKeyDetailComponent: []string{
@@ -213,6 +214,15 @@ var jA = LanguageMapping{
 	KeyBindingForCreateBranchBasedOnRemoteOutputPopUp: []string{
 		"[esc] 閉じる",
 	},
+	KeyBindingForGitResetLatestCommitTypeOptionPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] リセットオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitResetLatestCommitConfirmPromptPopUp: []string{
+		"[enter] 実行",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -307,6 +317,16 @@ var jA = LanguageMapping{
 	GitDeleteBranchTitle:                                     "ブランチを削除",
 	GitDeleteBranchComfirmPrompt:                             "以下のブランチを削除してもよろしいですか \n [%s]",
 	DeletingBranch:                                           "ブランチを削除中...",
+	GitResetLatestCommitTypeOptionTitle:                      "最新のコミットをリセット",
+	GitResetSoft:                                             "ソフトリセット",
+	GitResetHard:                                             "ハードリセット",
+	GitResetMixed:                                            "ミックスリセット",
+	GitResetSoftInfo:                                         "コミットを取り消し、すべての変更をステージしたままにする",
+	GitResetHardInfo:                                         "コミットを取り消し、すべての変更を永久に破棄する",
+	GitResetMixedInfo:                                        "コミットを取り消し、変更を保持するがアンステージする",
+	GitResetLatestCommitSoftConfirmation:                     "最新のコミットをソフトリセットしてもよろしいですか？",
+	GitResetLatestCommitHardConfirmation:                     "最新のコミットをハードリセットしてもよろしいですか？",
+	GitResetLatestCommitMixedConfirmation:                    "最新のコミットをミックスリセットしてもよろしいですか？",
 }
 
 // for about gitti

@@ -306,3 +306,34 @@ func (gc *GitCommit) ClearGitRemotePushOutput() {
 	defer gc.gitRemotePushOutputMu.Unlock()
 	gc.gitRemotePushOutput = []string{}
 }
+
+// ----------------------------------
+//
+//	Related to Git Commit RESET (apply to the latest commit only)
+//
+// ----------------------------------
+func (gc *GitCommit) GitResetLatestCommit(resetType string) {
+	if !gc.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer func() {
+		gc.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	var gitArgs []string
+
+	switch resetType {
+	case RESETSOFT:
+		gitArgs = []string{"reset", "--soft", "HEAD~1"}
+	case RESETHARD:
+		gitArgs = []string{"reset", "--hard", "HEAD~1"}
+	case RESETMIXED:
+		gitArgs = []string{"reset", "--mixed", "HEAD~1"}
+	default:
+		// we default to reset mixed as default option for reset
+		gitArgs = []string{"reset", "--mixed", "HEAD~1"}
+	}
+
+	commitLatestResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_ = commitLatestResetCmdExecutor.Run()
+}

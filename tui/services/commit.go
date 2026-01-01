@@ -162,3 +162,14 @@ func GitAmendCommitCancelService(m *types.GittiModel) {
 		popUp.ProcessSuccess.Store(false)
 	}
 }
+
+// ------------------------------------
+//
+//	For Git Reset Commit Service (apply to latest commit only)
+//
+// ------------------------------------
+func GitResetLatestCommitService(m *types.GittiModel, resetType string) {
+	go func() {
+		m.GitOperations.GitCommit.GitResetLatestCommit(resetType)
+	}()
+}

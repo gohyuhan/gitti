@@ -79,40 +79,42 @@ type LanguageMapping struct {
 	StagedTitle                string
 	UnstagedTitle              string
 	// for Key Bindings
-	KeyBindingForGitStatusComponent                   []string
-	KeyBindingLocalBranchComponentIsCheckOut          []string
-	KeyBindingLocalBranchComponentDefault             []string
-	KeyBindingLocalBranchComponentNone                []string
-	KeyBindingModifiedFilesComponentConflict          []string
-	KeyBindingModifiedFilesComponentIsStaged          []string
-	KeyBindingModifiedFilesComponentDefault           []string
-	KeyBindingModifiedFilesComponentNone              []string
-	KeyBindingCommitLogComponent                      []string
-	KeyBindingKeyDetailComponent                      []string
-	KeyBindingKeyStashComponent                       []string
-	KeyBindingKeyStashComponentNone                   []string
-	KeyBindingForCommitPopUp                          []string
-	KeyBindingForAmendCommitPopUp                     []string
-	KeyBindingForAddRemotePromptPopUp                 []string
-	KeyBindingForGitRemotePushPopUp                   []string
-	KeyBindingForChooseRemotePopUp                    []string
-	KeyBindingForChoosePushTypePopUp                  []string
-	KeyBindingForChooseNewBranchTypePopUp             []string
-	KeyBindingForCreateNewBranchPopUp                 []string
-	KeyBindingForChooseSwitchBranchTypePopUp          []string
-	KeyBindingForSwitchBranchOutputPopUp              []string
-	KeyBindingForChooseGitPullTypePopUp               []string
-	KeyBindingForGitPullOutputPopUp                   []string
-	KeyBindingForGitStashMessagePopUp                 []string
-	KeyBindingForGitDiscardTypeOptionPopUp            []string
-	KeyBindingForGitDiscardConfirmPromptPopUp         []string
-	KeyBindingForGitStashOperationOutputPopUp         []string
-	KeyBindingForGitStashConfirmPromptPopUp           []string
-	KeyBindingForGitDeleteBranchOutputPopUp           []string
-	KeyBindingForGitDeleteBranchConfirmPromptPopUp    []string
-	KeyBindingForCreateBranchBasedOnRemotePopUp       []string
-	KeyBindingForCreateBranchBasedOnRemoteOutputPopUp []string
-	KeyBindingForGlobalKeyBindingPopUp                []string
+	KeyBindingForGitStatusComponent                     []string
+	KeyBindingLocalBranchComponentIsCheckOut            []string
+	KeyBindingLocalBranchComponentDefault               []string
+	KeyBindingLocalBranchComponentNone                  []string
+	KeyBindingModifiedFilesComponentConflict            []string
+	KeyBindingModifiedFilesComponentIsStaged            []string
+	KeyBindingModifiedFilesComponentDefault             []string
+	KeyBindingModifiedFilesComponentNone                []string
+	KeyBindingCommitLogComponent                        []string
+	KeyBindingKeyDetailComponent                        []string
+	KeyBindingKeyStashComponent                         []string
+	KeyBindingKeyStashComponentNone                     []string
+	KeyBindingForCommitPopUp                            []string
+	KeyBindingForAmendCommitPopUp                       []string
+	KeyBindingForAddRemotePromptPopUp                   []string
+	KeyBindingForGitRemotePushPopUp                     []string
+	KeyBindingForChooseRemotePopUp                      []string
+	KeyBindingForChoosePushTypePopUp                    []string
+	KeyBindingForChooseNewBranchTypePopUp               []string
+	KeyBindingForCreateNewBranchPopUp                   []string
+	KeyBindingForChooseSwitchBranchTypePopUp            []string
+	KeyBindingForSwitchBranchOutputPopUp                []string
+	KeyBindingForChooseGitPullTypePopUp                 []string
+	KeyBindingForGitPullOutputPopUp                     []string
+	KeyBindingForGitStashMessagePopUp                   []string
+	KeyBindingForGitDiscardTypeOptionPopUp              []string
+	KeyBindingForGitDiscardConfirmPromptPopUp           []string
+	KeyBindingForGitStashOperationOutputPopUp           []string
+	KeyBindingForGitStashConfirmPromptPopUp             []string
+	KeyBindingForGitDeleteBranchOutputPopUp             []string
+	KeyBindingForGitDeleteBranchConfirmPromptPopUp      []string
+	KeyBindingForCreateBranchBasedOnRemotePopUp         []string
+	KeyBindingForCreateBranchBasedOnRemoteOutputPopUp   []string
+	KeyBindingForGitResetLatestCommitTypeOptionPopUp    []string
+	KeyBindingForGitResetLatestCommitConfirmPromptPopUp []string
+	KeyBindingForGlobalKeyBindingPopUp                  []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -228,4 +230,15 @@ type LanguageMapping struct {
 	GitDeleteBranchTitle         string
 	GitDeleteBranchComfirmPrompt string
 	DeletingBranch               string
+	// for git reset latest commit
+	GitResetLatestCommitTypeOptionTitle   string
+	GitResetSoft                          string
+	GitResetHard                          string
+	GitResetMixed                         string
+	GitResetSoftInfo                      string
+	GitResetHardInfo                      string
+	GitResetMixedInfo                     string
+	GitResetLatestCommitSoftConfirmation  string
+	GitResetLatestCommitHardConfirmation  string
+	GitResetLatestCommitMixedConfirmation string
 }
