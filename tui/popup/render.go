@@ -70,6 +70,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = branch.RenderCreateBranchBasedOnRemotePopUp(m)
 	case constant.CreateBranchBasedOnRemoteOutputPopUp:
 		popUp = branch.RenderCreateBranchBasedOnRemoteOutputPopUp(m)
+	case constant.GitResetLatestCommitTypeOptionPopUp:
+		popUp = commit.RenderGitResetLatestCommitTypeOptionPopUp(m)
+	case constant.GitResetLatestCommitConfirmPromptPopUp:
+		popUp = commit.RenderGitResetLatestCommitConfirmPromptPopUp(m)
 	}
 	return popUp
 }

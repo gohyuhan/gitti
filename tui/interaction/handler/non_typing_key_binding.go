@@ -295,6 +295,21 @@ func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingRKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.CommitLogComponent:
+			if m.CurrentRepoCommitLogInfoList.SelectedItem() != nil {
+				commitPopUp.InitGitResetLatestCommitTypeOptionPopUpModel(m)
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.GitResetLatestCommitTypeOptionPopUp
+			}
+		}
+	}
+	return m, nil
+}
+
 func handleNonTypingsKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
 		currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -542,6 +557,30 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					return m, popUp.Spinner.Tick
 				}
 			}
+		case constant.GitResetLatestCommitTypeOptionPopUp:
+			popUp, ok := m.PopUpModel.(*commitPopUp.GitResetLatestCommitTypeOptionPopUpModel)
+			if ok {
+				selectedResetLatestCommitType := popUp.ResetLatestCommitTypeOptionList.SelectedItem()
+				if selectedResetLatestCommitType != nil {
+					resetType := selectedResetLatestCommitType.(commitPopUp.GitResetLatestCommitTypeOptionItem).ResetType
+					commitPopUp.InitGitResetLatestCommitConfirmPromptPopUpModel(m, resetType)
+					_, ok = m.PopUpModel.(*commitPopUp.GitResetLatestCommitConfirmPromptPopUpModel)
+					if ok {
+						m.PopUpType = constant.GitResetLatestCommitConfirmPromptPopUp
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+					}
+				}
+			}
+		case constant.GitResetLatestCommitConfirmPromptPopUp:
+			popUp, ok := m.PopUpModel.(*commitPopUp.GitResetLatestCommitConfirmPromptPopUpModel)
+			if ok {
+				selectedResetLatestCommitType := popUp.GitResetLatestCommitType
+				services.GitResetLatestCommitService(m, selectedResetLatestCommitType)
+				m.PopUpType = constant.NoPopUp
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+			}
 		}
 	}
 	return m, nil
@@ -697,6 +736,16 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
+		case constant.GitResetLatestCommitTypeOptionPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		case constant.GitResetLatestCommitConfirmPromptPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
 		}
 
 		return m, nil

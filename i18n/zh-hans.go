@@ -104,6 +104,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下移动",
 		"[enter] 查看提交日志内容",
+		"[R] 重置最新提交",
 		"[?] 全局快捷键",
 	},
 	KeyBindingKeyDetailComponent: []string{
@@ -213,6 +214,15 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForCreateBranchBasedOnRemoteOutputPopUp: []string{
 		"[esc] 关闭",
 	},
+	KeyBindingForGitResetLatestCommitTypeOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择重置选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForGitResetLatestCommitConfirmPromptPopUp: []string{
+		"[enter] 重置",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -307,6 +317,16 @@ var zH_HANS = LanguageMapping{
 	GitDeleteBranchTitle:                                     "删除分支",
 	GitDeleteBranchComfirmPrompt:                             "您确定要删除以下分支吗 \n [%s]",
 	DeletingBranch:                                           "正在删除分支...",
+	GitResetLatestCommitTypeOptionTitle:                      "重置最新提交",
+	GitResetSoft:                                             "软重置",
+	GitResetHard:                                             "硬重置",
+	GitResetMixed:                                            "混合重置",
+	GitResetSoftInfo:                                         "撤销提交，保留并暂存所有更改",
+	GitResetHardInfo:                                         "撤销提交，永久丢弃所有更改",
+	GitResetMixedInfo:                                        "撤销提交，保留更改但取消暂存",
+	GitResetLatestCommitSoftConfirmation:                     "您确定要软重置最新提交吗？",
+	GitResetLatestCommitHardConfirmation:                     "您确定要硬重置最新提交吗？",
+	GitResetLatestCommitMixedConfirmation:                    "您确定要混合重置最新提交吗？",
 }
 
 // for about gitti

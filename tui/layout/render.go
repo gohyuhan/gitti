@@ -233,7 +233,10 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					keys = []string{"..."} // nothing can be done during stash operation, only force quit gitti is possible
 				}
 			}
-
+		case constant.GitResetLatestCommitTypeOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitResetLatestCommitTypeOptionPopUp
+		case constant.GitResetLatestCommitConfirmPromptPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitResetLatestCommitConfirmPromptPopUp
 		}
 	} else {
 		//-----------------------------

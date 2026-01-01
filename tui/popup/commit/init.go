@@ -1,15 +1,18 @@
 package commit
 
 import (
+	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/spinner"
 	"charm.land/bubbles/v2/textarea"
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
 
+	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // init the popup model for git commit
@@ -106,5 +109,58 @@ func InitGitAmendCommitPopUpModel(m *types.GittiModel) {
 	popUpModel.HasError.Store(false)
 	popUpModel.ProcessSuccess.Store(false)
 	popUpModel.IsCancelled.Store(false)
+	m.PopUpModel = popUpModel
+}
+
+// for reset latest commit option list popup
+func InitGitResetLatestCommitTypeOptionPopUpModel(m *types.GittiModel) {
+	gitResetLatestCommitTypeOption := []GitResetLatestCommitTypeOptionItem{
+		{
+			Name:      i18n.LANGUAGEMAPPING.GitResetSoft,
+			Info:      i18n.LANGUAGEMAPPING.GitResetSoftInfo,
+			ResetType: git.RESETSOFT,
+		},
+		{
+			Name:      i18n.LANGUAGEMAPPING.GitResetHard,
+			Info:      i18n.LANGUAGEMAPPING.GitResetHardInfo,
+			ResetType: git.RESETHARD,
+		},
+		{
+			Name:      i18n.LANGUAGEMAPPING.GitResetMixed,
+			Info:      i18n.LANGUAGEMAPPING.GitResetMixedInfo,
+			ResetType: git.RESETMIXED,
+		},
+	}
+
+	items := make([]list.Item, 0, len(gitResetLatestCommitTypeOption))
+	for _, resetOption := range gitResetLatestCommitTypeOption {
+		items = append(items, GitResetLatestCommitTypeOptionItem(resetOption))
+	}
+
+	width := (min(constant.MaxGitResetLatestCommitTypeOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	gRLCTOL := list.New(items, GitResetLatestCommitTypeOptionDelegate{}, width, constant.PopUpGitResetLatestCommitTypeOptionHeight)
+	gRLCTOL.SetShowPagination(false)
+	gRLCTOL.SetShowStatusBar(false)
+	gRLCTOL.SetFilteringEnabled(false)
+	gRLCTOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	gRLCTOL.SetShowHelp(true)
+	gRLCTOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	gRLCTOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	gRLCTOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &gRLCTOL, constant.MaxGitResetLatestCommitTypeOptionPopUpWidth)
+
+	popUpModel := &GitResetLatestCommitTypeOptionPopUpModel{
+		ResetLatestCommitTypeOptionList: gRLCTOL,
+	}
+
+	m.PopUpModel = popUpModel
+}
+
+// for git reset latest commit confirmation prompt
+func InitGitResetLatestCommitConfirmPromptPopUpModel(m *types.GittiModel, resetType string) {
+	popUpModel := &GitResetLatestCommitConfirmPromptPopUpModel{
+		GitResetLatestCommitType: resetType,
+	}
 	m.PopUpModel = popUpModel
 }

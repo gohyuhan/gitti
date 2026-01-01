@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/tui/constant"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
+	"github.com/gohyuhan/gitti/tui/popup/commit"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
@@ -145,6 +146,24 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 				}
 			}
 			popUp.ResolveConflictOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.ResolveConflictOptionList, constant.MaxGitResolveConflictOptionPopUpWidth)
+			return m, nil
+		}
+	case constant.GitResetLatestCommitTypeOptionPopUp:
+		popUp, ok := m.PopUpModel.(*commit.GitResetLatestCommitTypeOptionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.ResetLatestCommitTypeOptionList.Index() > 0 {
+					latestIndex := popUp.ResetLatestCommitTypeOptionList.Index() - 1
+					popUp.ResetLatestCommitTypeOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.ResetLatestCommitTypeOptionList.Index() < len(popUp.ResetLatestCommitTypeOptionList.Items())-1 {
+					latestIndex := popUp.ResetLatestCommitTypeOptionList.Index() + 1
+					popUp.ResetLatestCommitTypeOptionList.Select(latestIndex)
+				}
+			}
+			popUp.ResetLatestCommitTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.ResetLatestCommitTypeOptionList, constant.MaxGitResolveConflictOptionPopUpWidth)
 			return m, nil
 		}
 
