@@ -383,7 +383,12 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "3",
-		TitleOrInfoLine: "naviagte to stash component",
+		TitleOrInfoLine: "navigate to commit log component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "4",
+		TitleOrInfoLine: "navigate to stash component",
 		LineType:        INFO,
 	},
 	{
@@ -404,6 +409,11 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+l",
 		TitleOrInfoLine: "go to author linkedin in browser [!!]",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "c",
+		TitleOrInfoLine: "commit changes",
 		LineType:        INFO,
 	},
 	{

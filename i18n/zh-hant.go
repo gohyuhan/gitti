@@ -384,6 +384,11 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "3",
+		TitleOrInfoLine: "切換到提交記錄元件",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "4",
 		TitleOrInfoLine: "切換到暫存元件",
 		LineType:        INFO,
 	},

@@ -384,6 +384,11 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "3",
+		TitleOrInfoLine: "切换到提交记录组件",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "4",
 		TitleOrInfoLine: "切换到暂存组件",
 		LineType:        INFO,
 	},

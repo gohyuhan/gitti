@@ -385,6 +385,11 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "3",
+		TitleOrInfoLine: "コミットログコンポーネントに移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "4",
 		TitleOrInfoLine: "スタッシュコンポーネントに移動",
 		LineType:        INFO,
 	},
