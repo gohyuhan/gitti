@@ -2,6 +2,8 @@
 
 A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 
+![Demo](demo_assets/demo.gif)
+
 > ⚠️ **Development Status**: Gitti is actively under development. Features, APIs, and behaviors may change significantly. Development is driven by personal needs first, with additional features planned afterward. Not all majority used Git operations are currently supported.
 
 ## Description
@@ -183,6 +185,19 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+
+### [v0.2.0]
+
+- Added a new component to display a summary list of commits with a commit branching graph
+- The details component now shows comprehensive information, including specific changes and diffs for each commit
+- Implemented Hard, Soft, and Mixed reset functionality. New keybindings: `R` (reset latest commit) and `r` (reset selected commit)
+- Added item counters to all popup lists for better visibility
+- Introduced real-time adjustment of the left panel width using the `-` and `+` keys
+- Added support for creating/pulling from remote branches and deleting local branches. New keybinding: `d` (delete local branch)
+- Implemented a split view in the detail component for staged and unstaged changes. New keybindings: `[` and `]` (navigate between panels)
+- Added an 'edit' feature to open specific files directly in the terminal or external IDE based on configuration. New keybinding: `e` (edit file)
+- New feature to pull and create branch based of a remote branch
+
 ### [v0.1.3]
 
 - hotfix: irrelevant git events trigger update and add control for git fetch

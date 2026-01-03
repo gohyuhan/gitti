@@ -1,5 +1,5 @@
 # .pre-commit-config.yaml
- repos:
+repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
@@ -7,6 +7,7 @@
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+        args: ["--maxkb=1536"]
       - id: check-merge-conflict
       - id: check-case-conflict
 
