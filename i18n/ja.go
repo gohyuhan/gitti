@@ -104,6 +104,7 @@ var jA = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
+		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[?] グローバルキー操作",
 	},
@@ -223,6 +224,15 @@ var jA = LanguageMapping{
 		"[enter] 実行",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitResetToSelectedCommitTypeOptionPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] リセットオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitResetToSelectedCommitConfirmPromptPopUp: []string{
+		"[enter] 実行",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -327,6 +337,13 @@ var jA = LanguageMapping{
 	GitResetLatestCommitSoftConfirmation:                     "最新のコミットをソフトリセットしてもよろしいですか？",
 	GitResetLatestCommitHardConfirmation:                     "最新のコミットをハードリセットしてもよろしいですか？",
 	GitResetLatestCommitMixedConfirmation:                    "最新のコミットをミックスリセットしてもよろしいですか？",
+	GitResetToSelectedCommitTypeOptionTitle:                  "選択したコミットにリセット [ %s ]",
+	GitResetToSelectedCommitSoftInfo:                         "コミットを取り消し、変更をステージングに維持",
+	GitResetToSelectedCommitHardInfo:                         "コミットを取り消し、すべての変更を完全に破棄",
+	GitResetToSelectedCommitMixedInfo:                        "コミットを取り消し、変更を維持するがステージング解除",
+	GitResetToSelectedCommitSoftConfirmation:                 "選択したコミットにソフトリセットしてもよろしいですか？",
+	GitResetToSelectedCommitHardConfirmation:                 "選択したコミットにハードリセットしてもよろしいですか？",
+	GitResetToSelectedCommitMixedConfirmation:                "選択したコミットにミックスリセットしてもよろしいですか？",
 }
 
 // for about gitti

@@ -5,6 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -290,6 +291,20 @@ func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				m.PopUpType = constant.GitResolveConflictOptionPopUp
 				resolvePopUp.InitGitResolveConflictOptionPopUpModel(m, currentSelectedFile.FilePathname)
 			}
+		case constant.CommitLogComponent:
+			selectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
+			if m.CurrentRepoCommitLogInfoList.Items() != nil {
+				parsedCommit := selectedCommit.(commitlog.GitCommitLogItem)
+				commitPopUp.InitGitResetToSelectedCommitTypeOptionPopUpModel(
+					m,
+					parsedCommit.Hash,
+					parsedCommit.Message,
+					parsedCommit.Author,
+				)
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.GitResetToSelectedCommitTypeOptionPopUp
+			}
 		}
 	}
 	return m, nil
@@ -299,7 +314,7 @@ func handleNonTypingRKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.CommitLogComponent:
-			if m.CurrentRepoCommitLogInfoList.SelectedItem() != nil {
+			if len(m.CurrentRepoCommitLogInfoList.Items()) > 1 {
 				commitPopUp.InitGitResetLatestCommitTypeOptionPopUpModel(m)
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
@@ -581,6 +596,30 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 			}
+		case constant.GitResetToSelectedCommitTypeOptionPopUp:
+			popUp, ok := m.PopUpModel.(*commitPopUp.GitResetToSelectedCommitTypeOptionPopUpModel)
+			if ok {
+				selectedResetToSelectedCommitType := popUp.ResetToSelectedCommitTypeOptionList.SelectedItem()
+				if selectedResetToSelectedCommitType != nil {
+					resetType := selectedResetToSelectedCommitType.(commitPopUp.GitResetToSelectedCommitTypeOptionItem).ResetType
+					commitPopUp.InitGitResetToSelectedCommitConfirmPromptPopUpModel(m, resetType, popUp.SelectedCommitHash, popUp.CommitInfoMessage, popUp.CommitInfoAuthor)
+					_, ok = m.PopUpModel.(*commitPopUp.GitResetToSelectedCommitConfirmPromptPopUpModel)
+					if ok {
+						m.PopUpType = constant.GitResetToSelectedCommitConfirmPromptPopUp
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+					}
+				}
+			}
+		case constant.GitResetToSelectedCommitConfirmPromptPopUp:
+			popUp, ok := m.PopUpModel.(*commitPopUp.GitResetToSelectedCommitConfirmPromptPopUpModel)
+			if ok {
+				selectedResetToSelectedCommitType := popUp.GitResetToSelectedCommitType
+				services.GitResetToSelectedCommitService(m, selectedResetToSelectedCommitType, popUp.SelectedCommitHash)
+				m.PopUpType = constant.NoPopUp
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+			}
 		}
 	}
 	return m, nil
@@ -742,6 +781,16 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			m.PopUpType = constant.NoPopUp
 			m.PopUpModel = nil
 		case constant.GitResetLatestCommitConfirmPromptPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		case constant.GitResetToSelectedCommitTypeOptionPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		case constant.GitResetToSelectedCommitConfirmPromptPopUp:
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp

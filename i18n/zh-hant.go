@@ -104,6 +104,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下移動",
 		"[enter] 查看提交日誌內容",
+		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[?] 全域快捷鍵",
 	},
@@ -223,6 +224,15 @@ var zH_HANT = LanguageMapping{
 		"[enter] 重置",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForGitResetToSelectedCommitTypeOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇重置選項",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForGitResetToSelectedCommitConfirmPromptPopUp: []string{
+		"[enter] 重置",
+		"[esc] 取消 / 關閉",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 關閉",
 	},
@@ -327,6 +337,13 @@ var zH_HANT = LanguageMapping{
 	GitResetLatestCommitSoftConfirmation:                     "您確定要軟重置最新提交嗎？",
 	GitResetLatestCommitHardConfirmation:                     "您確定要硬重置最新提交嗎？",
 	GitResetLatestCommitMixedConfirmation:                    "您確定要混合重置最新提交嗎？",
+	GitResetToSelectedCommitTypeOptionTitle:                  "重置到所選提交 [ %s ]",
+	GitResetToSelectedCommitSoftInfo:                         "撤銷提交，保留所有已暫存的更改",
+	GitResetToSelectedCommitHardInfo:                         "撤銷提交，永久放棄所有更改",
+	GitResetToSelectedCommitMixedInfo:                        "撤銷提交，保留更改但取消暫存",
+	GitResetToSelectedCommitSoftConfirmation:                 "確定要軟重置（Soft Reset）到以下提交嗎？",
+	GitResetToSelectedCommitHardConfirmation:                 "確定要硬重置（Hard Reset）到以下提交嗎？",
+	GitResetToSelectedCommitMixedConfirmation:                "確定要混合重置（Mixed Reset）到以下提交嗎？",
 }
 
 // for about gitti

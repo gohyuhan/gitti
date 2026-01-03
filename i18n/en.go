@@ -104,6 +104,7 @@ var eN = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
+		"[r] reset to this commit",
 		"[R] reset the latest commit",
 		"[?] global key binding",
 	},
@@ -223,6 +224,15 @@ var eN = LanguageMapping{
 		"[enter] reset",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitResetToSelectedCommitTypeOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select reset option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitResetToSelectedCommitConfirmPromptPopUp: []string{
+		"[enter] reset",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -327,6 +337,13 @@ var eN = LanguageMapping{
 	GitResetLatestCommitSoftConfirmation:                     "Are you sure to soft reset the latest commit?",
 	GitResetLatestCommitHardConfirmation:                     "Are you sure to hard reset the latest commit?",
 	GitResetLatestCommitMixedConfirmation:                    "Are you sure to mixed reset the latest commit?",
+	GitResetToSelectedCommitTypeOptionTitle:                  "Reset To Selected Commit [ %s ]",
+	GitResetToSelectedCommitSoftInfo:                         "Undo commits, keep all changes staged",
+	GitResetToSelectedCommitHardInfo:                         "Undo commits, permanently DISCARD ALL changes",
+	GitResetToSelectedCommitMixedInfo:                        "Undo commits, keep changes but unstage them",
+	GitResetToSelectedCommitSoftConfirmation:                 "Are you sure to soft reset to following commit?",
+	GitResetToSelectedCommitHardConfirmation:                 "Are you sure to hard reset to following commit?",
+	GitResetToSelectedCommitMixedConfirmation:                "Are you sure to mixed reset to following commit?",
 }
 
 // for about gitti

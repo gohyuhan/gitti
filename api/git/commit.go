@@ -337,3 +337,34 @@ func (gc *GitCommit) GitResetLatestCommit(resetType string) {
 	commitLatestResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	_ = commitLatestResetCmdExecutor.Run()
 }
+
+// ----------------------------------
+//
+//	Related to Git Commit RESET (apply to selected commit [using commit hash])
+//
+// ----------------------------------
+func (gc *GitCommit) GitResetToSelectedCommit(resetType string, commitHash string) {
+	if !gc.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer func() {
+		gc.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	var gitArgs []string
+
+	switch resetType {
+	case RESETSOFT:
+		gitArgs = []string{"reset", "--soft", commitHash}
+	case RESETHARD:
+		gitArgs = []string{"reset", "--hard", commitHash}
+	case RESETMIXED:
+		gitArgs = []string{"reset", "--mixed", commitHash}
+	default:
+		// we default to reset mixed as default option for reset
+		gitArgs = []string{"reset", "--mixed", commitHash}
+	}
+
+	resetToSelectedCommitCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_ = resetToSelectedCommitCmdExecutor.Run()
+}

@@ -1,6 +1,8 @@
 package commit
 
 import (
+	"fmt"
+
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -187,6 +189,61 @@ func RenderGitResetLatestCommitConfirmPromptPopUp(m *types.GittiModel) string {
 		case git.RESETMIXED:
 			content = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitResetLatestCommitMixedConfirmation)
 		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For reset selected commit reset type selection pop up
+//
+// ------------------------------------
+func RenderGitResetToSelectedCommitTypeOptionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitResetToSelectedCommitTypeOptionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitResetToSelectedCommitTypeOptionPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResetToSelectedCommitTypeOptionTitle, popUp.SelectedCommitHash))
+		popUp.ResetToSelectedCommitTypeOptionList.SetWidth(popUpWidth - 4)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.ResetToSelectedCommitTypeOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For reset selected commit confirmation prompt
+//
+// ------------------------------------
+func RenderGitResetToSelectedCommitConfirmPromptPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitResetToSelectedCommitConfirmPromptPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitResetToSelectedCommitConfirmPromptPopUpWidth, int(float64(m.Width)*0.8))
+		var content string
+		var title string
+		switch popUp.GitResetToSelectedCommitType {
+		case git.RESETSOFT:
+			title = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitResetToSelectedCommitSoftConfirmation)
+		case git.RESETHARD:
+			title = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitResetToSelectedCommitHardConfirmation)
+		case git.RESETMIXED:
+			title = style.NewStyle.Render(i18n.LANGUAGEMAPPING.GitResetToSelectedCommitMixedConfirmation)
+		}
+
+		content = lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(popUp.SelectedCommitHash),
+			style.NewStyle.Foreground(style.ColorYellowSoft).Render(popUp.CommitInfoAuthor),
+			style.NewStyle.Foreground(style.ColorYellowWarm).Render(popUp.CommitInfoMessage),
+		)
+
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
