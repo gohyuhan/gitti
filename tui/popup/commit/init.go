@@ -164,3 +164,62 @@ func InitGitResetLatestCommitConfirmPromptPopUpModel(m *types.GittiModel, resetT
 	}
 	m.PopUpModel = popUpModel
 }
+
+// for reset selected commit option list popup
+func InitGitResetToSelectedCommitTypeOptionPopUpModel(m *types.GittiModel, selectedCommitHash string, commitInfoMessage string, commitInfoAuthor string) {
+	gitResetToSelectedCommitTypeOption := []GitResetToSelectedCommitTypeOptionItem{
+		{
+			Name:      i18n.LANGUAGEMAPPING.GitResetSoft,
+			Info:      i18n.LANGUAGEMAPPING.GitResetSoftInfo,
+			ResetType: git.RESETSOFT,
+		},
+		{
+			Name:      i18n.LANGUAGEMAPPING.GitResetHard,
+			Info:      i18n.LANGUAGEMAPPING.GitResetHardInfo,
+			ResetType: git.RESETHARD,
+		},
+		{
+			Name:      i18n.LANGUAGEMAPPING.GitResetMixed,
+			Info:      i18n.LANGUAGEMAPPING.GitResetMixedInfo,
+			ResetType: git.RESETMIXED,
+		},
+	}
+
+	items := make([]list.Item, 0, len(gitResetToSelectedCommitTypeOption))
+	for _, resetOption := range gitResetToSelectedCommitTypeOption {
+		items = append(items, GitResetToSelectedCommitTypeOptionItem(resetOption))
+	}
+
+	width := (min(constant.MaxGitResetToSelectedCommitTypeOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	gRSCTOL := list.New(items, GitResetToSelectedCommitTypeOptionDelegate{}, width, constant.PopUpGitResetToSelectedCommitTypeOptionHeight)
+	gRSCTOL.SetShowPagination(false)
+	gRSCTOL.SetShowStatusBar(false)
+	gRSCTOL.SetFilteringEnabled(false)
+	gRSCTOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	gRSCTOL.SetShowHelp(true)
+	gRSCTOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	gRSCTOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	gRSCTOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &gRSCTOL, constant.MaxGitResetToSelectedCommitTypeOptionPopUpWidth)
+
+	popUpModel := &GitResetToSelectedCommitTypeOptionPopUpModel{
+		ResetToSelectedCommitTypeOptionList: gRSCTOL,
+		SelectedCommitHash:                  selectedCommitHash,
+		CommitInfoMessage:                   commitInfoMessage,
+		CommitInfoAuthor:                    commitInfoAuthor,
+	}
+
+	m.PopUpModel = popUpModel
+}
+
+// for git reset selected commit confirmation prompt
+func InitGitResetToSelectedCommitConfirmPromptPopUpModel(m *types.GittiModel, resetType string, selectedCommitHash string, commitInfoMessage string, commitInfoAuthor string) {
+	popUpModel := &GitResetToSelectedCommitConfirmPromptPopUpModel{
+		GitResetToSelectedCommitType: resetType,
+		SelectedCommitHash:           selectedCommitHash,
+		CommitInfoMessage:            commitInfoMessage,
+		CommitInfoAuthor:             commitInfoAuthor,
+	}
+	m.PopUpModel = popUpModel
+}

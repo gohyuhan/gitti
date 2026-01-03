@@ -132,3 +132,84 @@ func (d GitResetLatestCommitTypeOptionDelegate) Render(w io.Writer, m list.Model
 
 	fmt.Fprint(w, fn(fullStr))
 }
+
+// ---------------------------------
+//
+// # A pop up to prompt for git reset type that will apply for selected commit
+//
+// ---------------------------------
+type GitResetToSelectedCommitTypeOptionPopUpModel struct {
+	ResetToSelectedCommitTypeOptionList list.Model
+	SelectedCommitHash                  string
+	CommitInfoMessage                   string
+	CommitInfoAuthor                    string
+}
+
+// ---------------------------------
+//
+// # To prompt user for confirmation for reset type on the selected commit
+//
+// ---------------------------------
+type GitResetToSelectedCommitConfirmPromptPopUpModel struct {
+	GitResetToSelectedCommitType string
+	SelectedCommitHash           string
+	CommitInfoMessage            string
+	CommitInfoAuthor             string
+}
+
+// ---------------------------------
+//
+// for reset selected commit option selection option
+//
+// ---------------------------------
+type (
+	GitResetToSelectedCommitTypeOptionDelegate struct{}
+	GitResetToSelectedCommitTypeOptionItem     struct {
+		Name      string
+		Info      string
+		ResetType string
+	}
+)
+
+func (i GitResetToSelectedCommitTypeOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// for reset laytes commit type selection
+func (d GitResetToSelectedCommitTypeOptionDelegate) Height() int  { return 1 }
+func (d GitResetToSelectedCommitTypeOptionDelegate) Spacing() int { return 0 }
+func (d GitResetToSelectedCommitTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
+	return nil
+}
+
+func (d GitResetToSelectedCommitTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(GitResetToSelectedCommitTypeOptionItem)
+	if !ok {
+		return
+	}
+
+	nameStr := fmt.Sprintf("   %s", i.Name)
+	infoStr := fmt.Sprintf("    %s", i.Info)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
+
+	nameStr = utils.TruncateString(nameStr, componentWidth)
+	infoStr = utils.TruncateString(infoStr, componentWidth)
+
+	nameRendered := style.ItemStyle.Render(nameStr)
+	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
+	fullStr := nameRendered + "\n" + "  " + infoRendered
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(fullStr))
+}

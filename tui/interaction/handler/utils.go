@@ -163,7 +163,25 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 					popUp.ResetLatestCommitTypeOptionList.Select(latestIndex)
 				}
 			}
-			popUp.ResetLatestCommitTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.ResetLatestCommitTypeOptionList, constant.MaxGitResolveConflictOptionPopUpWidth)
+			popUp.ResetLatestCommitTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.ResetLatestCommitTypeOptionList, constant.MaxGitResetLatestCommitTypeOptionPopUpWidth)
+			return m, nil
+		}
+	case constant.GitResetToSelectedCommitTypeOptionPopUp:
+		popUp, ok := m.PopUpModel.(*commit.GitResetToSelectedCommitTypeOptionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.ResetToSelectedCommitTypeOptionList.Index() > 0 {
+					latestIndex := popUp.ResetToSelectedCommitTypeOptionList.Index() - 1
+					popUp.ResetToSelectedCommitTypeOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.ResetToSelectedCommitTypeOptionList.Index() < len(popUp.ResetToSelectedCommitTypeOptionList.Items())-1 {
+					latestIndex := popUp.ResetToSelectedCommitTypeOptionList.Index() + 1
+					popUp.ResetToSelectedCommitTypeOptionList.Select(latestIndex)
+				}
+			}
+			popUp.ResetToSelectedCommitTypeOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.ResetToSelectedCommitTypeOptionList, constant.MaxGitResetToSelectedCommitTypeOptionPopUpWidth)
 			return m, nil
 		}
 

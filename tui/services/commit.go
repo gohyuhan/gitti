@@ -173,3 +173,14 @@ func GitResetLatestCommitService(m *types.GittiModel, resetType string) {
 		m.GitOperations.GitCommit.GitResetLatestCommit(resetType)
 	}()
 }
+
+// ------------------------------------
+//
+//	For Git Reset Commit Service (apply to selected commit [using commit hash])
+//
+// ------------------------------------
+func GitResetToSelectedCommitService(m *types.GittiModel, resetType string, commitHash string) {
+	go func() {
+		m.GitOperations.GitCommit.GitResetToSelectedCommit(resetType, commitHash)
+	}()
+}

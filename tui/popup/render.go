@@ -74,6 +74,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = commit.RenderGitResetLatestCommitTypeOptionPopUp(m)
 	case constant.GitResetLatestCommitConfirmPromptPopUp:
 		popUp = commit.RenderGitResetLatestCommitConfirmPromptPopUp(m)
+	case constant.GitResetToSelectedCommitTypeOptionPopUp:
+		popUp = commit.RenderGitResetToSelectedCommitTypeOptionPopUp(m)
+	case constant.GitResetToSelectedCommitConfirmPromptPopUp:
+		popUp = commit.RenderGitResetToSelectedCommitConfirmPromptPopUp(m)
 	}
 	return popUp
 }
