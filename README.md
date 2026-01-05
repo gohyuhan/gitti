@@ -186,6 +186,10 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.2.1]
+
+- Address a fix for CLRF (^M) that break detail view panel UI layout
+
 ### [v0.2.0]
 
 - Added a new component to display a summary list of commits with a commit branching graph
