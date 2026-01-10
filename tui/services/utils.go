@@ -127,8 +127,8 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 	var fileDiffLines2 []string
 	getDiffTypeForVpLine1 := git.GETCOMBINEDDIFF
 
-	// indicating that the file is not in conflict state and have both staged and unstaged changes
-	if !fileStatus.HasConflict && fileStatus.IndexState != " " && fileStatus.WorkTree != " " {
+	// indicating that the file is not in conflict state and have both staged and unstaged changes and they are not in "?" for both index and worktree
+	if !fileStatus.HasConflict && fileStatus.IndexState != " " && fileStatus.WorkTree != " " && fileStatus.IndexState != "?" && fileStatus.WorkTree != "?" {
 		shouldRenderDetailComponentPanelTwo = true
 		vpLine2.WriteString(fmt.Sprintf("%s\n\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.UnstagedTitle, fileStatus.FilePathname))
 		fileDiffLines2 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, git.GETUNSTAGEDDIFF)
