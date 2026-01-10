@@ -25,6 +25,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
 
@@ -88,9 +89,24 @@ func main() {
 			updater.AutoUpdater()
 		}
 
+		lastMouseSignal := time.Now()
+		mouseThrottleFrequency := 8 * time.Millisecond
+
+		// throttle the mouse signal to ~120 fps
+		mouseThrottle := func(m tea.Model, msg tea.Msg) tea.Msg {
+			if _, ok := msg.(tea.MouseMsg); ok {
+				if time.Since(lastMouseSignal) < mouseThrottleFrequency {
+					return nil // Drop the message entirely
+				}
+				lastMouseSignal = time.Now()
+			}
+			return msg
+		}
+
 		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, repoPath, gitRepoPathInfo.RepoName, gitOperations)
 		gitti := tea.NewProgram(
 			gittiAppModel,
+			tea.WithFilter(mouseThrottle),
 		)
 
 		tui.StartGitUpdateListener(gitti, gitUpdateChannel)
