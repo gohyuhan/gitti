@@ -57,6 +57,7 @@ var eN = LanguageMapping{
 	Loading:                             "Loading...",
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
+	LineStagingModeTitle:                "In Line Staging Mode",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},
@@ -111,7 +112,15 @@ var eN = LanguageMapping{
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
+		"[L] enter line staging mode",
 		"[esc] back",
+		"[?] global key binding",
+	},
+	KeyBindingKeyDetailComponentLineStaging: []string{
+		"[←/→] move left and right",
+		"[↑/↓] to next/previous stageble or unstageble line",
+		"[space] stage/unstage",
+		"[esc] exit line staging mode",
 		"[?] global key binding",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -475,7 +484,7 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "- / +",
-		TitleOrInfoLine: "increase or decrease the left panel width ratio [!!]",
+		TitleOrInfoLine: "increase or decrease the left panel width ratio",
 		LineType:        INFO,
 	},
 }

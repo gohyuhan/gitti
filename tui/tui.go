@@ -37,43 +37,59 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	vpTwo.SetHorizontalStep(1)
 	vpTwo.MouseWheelDelta = 1
 
+	lineStagingIndexCursorVp := viewport.New()
+	lineStagingIndexCursorVp.SoftWrap = false
+	lineStagingIndexCursorVp.MouseWheelEnabled = false
+	lineStagingIndexCursorVp.SetHorizontalStep(0)
+	lineStagingIndexCursorVp.MouseWheelDelta = 0
+
+	lineStagingIndexCursorVpTwo := viewport.New()
+	lineStagingIndexCursorVpTwo.SoftWrap = false
+	lineStagingIndexCursorVpTwo.MouseWheelEnabled = false
+	lineStagingIndexCursorVpTwo.SetHorizontalStep(0)
+	lineStagingIndexCursorVpTwo.MouseWheelDelta = 0
+
 	gittiModel := &types.GittiModel{
-		TuiUpdateChannel:                 tuiUpdateChannel,
-		UserSetEditor:                    settings.GITTICONFIGSETTINGS.Editor,
-		CurrentSelectedComponent:         constant.ModifiedFilesComponent,
-		CurrentSelectedComponentIndex:    2,
-		TotalComponentCount:              4,
-		RepoPath:                         repoPath,
-		RepoName:                         repoName,
-		CheckOutBranch:                   "",
-		RemoteSyncLocalState:             "",
-		RemoteSyncRemoteState:            "",
-		BranchUpStream:                   "",
-		TrackedUpstreamOrBranchIcon:      "",
-		Width:                            0,
-		Height:                           0,
-		WindowLeftPanelRatio:             settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio,
-		CurrentRepoBranchesInfoList:      list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfoList: list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
-		CurrentRepoCommitLogInfoList:     list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
-		CurrentRepoStashInfoList:         list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
-		DetailPanelParentComponent:       "",
-		DetailPanelViewport:              vp,
-		DetailPanelViewportOffset:        0,
-		DetailPanelTwoViewport:           vpTwo,
-		DetailPanelTwoViewportOffset:     0,
-		DetailComponentPanelLayout:       constant.HORIZONTAL,
-		ListNavigationIndexPosition:      types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
-		PopUpType:                        constant.NoPopUp,
-		PopUpModel:                       struct{}{},
-		GitOperations:                    gitOperations,
-		GlobalKeyBindingKeyMapLargestLen: 0,
+		TuiUpdateChannel:                  tuiUpdateChannel,
+		UserSetEditor:                     settings.GITTICONFIGSETTINGS.Editor,
+		CurrentSelectedComponent:          constant.ModifiedFilesComponent,
+		CurrentSelectedComponentIndex:     2,
+		TotalComponentCount:               4,
+		RepoPath:                          repoPath,
+		RepoName:                          repoName,
+		CheckOutBranch:                    "",
+		RemoteSyncLocalState:              "",
+		RemoteSyncRemoteState:             "",
+		BranchUpStream:                    "",
+		TrackedUpstreamOrBranchIcon:       "",
+		Width:                             0,
+		Height:                            0,
+		WindowLeftPanelRatio:              settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio,
+		CurrentRepoBranchesInfoList:       list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfoList:  list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
+		CurrentRepoCommitLogInfoList:      list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
+		CurrentRepoStashInfoList:          list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
+		DetailPanelParentComponent:        "",
+		DetailPanelViewport:               vp,
+		DetailPanelViewportOffset:         0,
+		DetailPanelTwoViewport:            vpTwo,
+		DetailPanelTwoViewportOffset:      0,
+		DetailComponentPanelLayout:        constant.HORIZONTAL,
+		ListNavigationIndexPosition:       types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
+		PopUpType:                         constant.NoPopUp,
+		PopUpModel:                        struct{}{},
+		GitOperations:                     gitOperations,
+		GlobalKeyBindingKeyMapLargestLen:  0,
+		LineStagingIndexPositionAndInfo:   types.GittiLineStagingIndexPositionAndInfo{},
+		LineStagingIndexCursorViewport:    lineStagingIndexCursorVp,
+		LineStagingIndexCursorTwoViewport: lineStagingIndexCursorVpTwo,
 	}
 	gittiModel.IsRenderInit.Store(false)
 	gittiModel.ShowPopUp.Store(false)
 	gittiModel.IsTyping.Store(false)
 	gittiModel.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 	gittiModel.ShowDetailPanelTwo.Store(false)
+	gittiModel.IsLineStagingState.Store(false)
 
 	return &GittiAppModel{model: gittiModel}
 }
@@ -121,7 +137,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case git.GIT_FILES_STATUS_UPDATE:
 			needReinit := filesComponent.InitModifiedFilesList(m)
-			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent || m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_LOG_UPDATE:
@@ -144,6 +160,9 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			pullPopUp.UpdatePopUpGitPullOutputViewport(m)
 		case git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE:
 			gAM.updateGitRemoteStatusSyncLineStringAndUpStream()
+		case git.GIT_STAGE_UNSTAGE_LINE_DETAILS_AND_FILES_UPDATE:
+			needReinit := filesComponent.InitModifiedFilesList(m)
+			services.FetchDetailComponentPanelInfoService(m, needReinit)
 		}
 		return gAM, nil
 	case types.EditorFinishedMsg:

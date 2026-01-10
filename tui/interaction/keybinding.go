@@ -2,10 +2,8 @@ package interaction
 
 import (
 	"github.com/gohyuhan/gitti/api"
-	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/interaction/handler"
-	"github.com/gohyuhan/gitti/tui/layout"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/utils"
@@ -33,14 +31,6 @@ func GittiKeyInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel
 		return m, nil
 	case "ctrl+l":
 		utils.OpenBrowser(constant.AUTHOR_LINKEDIN)
-		return m, nil
-	case "-":
-		m.WindowLeftPanelRatio = max(settings.MINLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio-0.01)
-		layout.TuiWindowSizing(m)
-		return m, nil
-	case "+":
-		m.WindowLeftPanelRatio = min(settings.MAXLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio+0.01)
-		layout.TuiWindowSizing(m)
 		return m, nil
 	}
 

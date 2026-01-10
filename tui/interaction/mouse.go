@@ -30,24 +30,30 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 
 	case "wheelup":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedComponent == constant.DetailComponentTwo {
-				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
-			} else {
-				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+			if !m.IsLineStagingState.Load() {
+				if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
+				} else {
+					m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+				}
+				return m, cmd
 			}
-			return m, cmd
+			return m, nil
 		} else {
 			return handler.UpDownMouseMsgUpdateForPopUp(msg, m)
 		}
 
 	case "wheeldown":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedComponent == constant.DetailComponentTwo {
-				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
-			} else {
-				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+			if !m.IsLineStagingState.Load() {
+				if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
+				} else {
+					m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+				}
+				return m, cmd
 			}
-			return m, cmd
+			return m, nil
 		} else {
 			return handler.UpDownMouseMsgUpdateForPopUp(msg, m)
 		}

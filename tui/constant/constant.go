@@ -131,6 +131,12 @@ const (
 	VERTICAL   = "VERTICAL"
 )
 
+const (
+	STAGE         = "STAGE"
+	UNSTAGE       = "UNSTAGE"
+	NOSTAGESTATUS = "NOSTAGESTATUS"
+)
+
 // action
 const (
 	PUSHACTION                = "PUSHACTION"

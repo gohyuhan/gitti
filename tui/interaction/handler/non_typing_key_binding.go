@@ -203,6 +203,13 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	// enter line stage state
+	services.EnterOrReinitLineStagingStateService(m)
+	m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
+	return m, nil
+}
+
 func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent == constant.LocalBranchComponent {
@@ -666,6 +673,15 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
 			}
+		case constant.DetailComponent, constant.DetailComponentTwo:
+			if m.IsLineStagingState.Load() {
+				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+				var filePathName string
+				if currentSelectedModifiedFile != nil {
+					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+					services.GitStageLineOrUnstageLineService(m, filePathName)
+				}
+			}
 		}
 	}
 	return m, nil
@@ -801,11 +817,21 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 	} else {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponent:
-			m.CurrentSelectedComponent = m.DetailPanelParentComponent
-			m.DetailPanelParentComponent = ""
+			if m.IsLineStagingState.Load() {
+				m.IsLineStagingState.Store(false)
+				m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
+			} else {
+				m.CurrentSelectedComponent = m.DetailPanelParentComponent
+				m.DetailPanelParentComponent = ""
+			}
 		case constant.DetailComponentTwo:
-			m.CurrentSelectedComponent = m.DetailPanelParentComponent
-			m.DetailPanelParentComponent = ""
+			if m.IsLineStagingState.Load() {
+				m.IsLineStagingState.Store(false)
+				m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
+			} else {
+				m.CurrentSelectedComponent = m.DetailPanelParentComponent
+				m.DetailPanelParentComponent = ""
+			}
 		}
 	}
 	return m, nil
@@ -848,11 +874,31 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		case constant.DetailComponent:
-			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
-			return m, cmd
+			if m.IsLineStagingState.Load() {
+				m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex = max(0, m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex-1)
+				if m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition < 1 {
+					m.DetailPanelViewport.ScrollUp(1)
+				} else {
+					m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition -= 1
+				}
+				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+			} else {
+				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+				return m, cmd
+			}
 		case constant.DetailComponentTwo:
-			m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
-			return m, cmd
+			if m.IsLineStagingState.Load() {
+				m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex = max(0, m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex-1)
+				if m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition < 1 {
+					m.DetailPanelTwoViewport.ScrollUp(1)
+				} else {
+					m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition -= 1
+				}
+				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+			} else {
+				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
+				return m, cmd
+			}
 		}
 	} else {
 		return UpDownKeyMsgUpdateForPopUp(msg, m)
@@ -897,11 +943,31 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		case constant.DetailComponent:
-			m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
-			return m, cmd
+			if m.IsLineStagingState.Load() {
+				m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex = min(m.DetailPanelViewport.TotalLineCount()-1, m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex+1)
+				if m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition >= m.DetailPanelViewport.VisibleLineCount()-1 {
+					m.DetailPanelViewport.ScrollDown(1)
+				} else {
+					m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition += 1
+				}
+				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+			} else {
+				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+				return m, cmd
+			}
 		case constant.DetailComponentTwo:
-			m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
-			return m, cmd
+			if m.IsLineStagingState.Load() {
+				m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex = min(m.DetailPanelTwoViewport.TotalLineCount()-1, m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex+1)
+				if m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition >= m.DetailPanelTwoViewport.VisibleLineCount()-1 {
+					m.DetailPanelTwoViewport.ScrollDown(1)
+				} else {
+					m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition += 1
+				}
+				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+			} else {
+				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
+				return m, cmd
+			}
 		}
 	} else {
 		return UpDownKeyMsgUpdateForPopUp(msg, m)

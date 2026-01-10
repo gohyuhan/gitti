@@ -57,6 +57,7 @@ var jA = LanguageMapping{
 	Loading:                             "読み込み中...",
 	StagedTitle:                         "ステージされた変更",
 	UnstagedTitle:                       "ステージされていない変更",
+	LineStagingModeTitle:                "行ステージングモード",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] グローバルキー操作",
 	},
@@ -111,7 +112,15 @@ var jA = LanguageMapping{
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右に移動",
 		"[↑/↓] 上下に移動",
+		"[L] 行ステージングモードに入る",
 		"[esc] 戻る",
+		"[?] グローバルキー操作",
+	},
+	KeyBindingKeyDetailComponentLineStaging: []string{
+		"[←/→] 左右に移動",
+		"[↑/↓] 次/前のステージ可能・解除可能な行へ",
+		"[space] ステージ/アンステージ",
+		"[esc] 行ステージングモードを終了",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -477,7 +486,7 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "- / +",
-		TitleOrInfoLine: "左パネルの幅の比率を増減 [!!]",
+		TitleOrInfoLine: "左パネルの幅の比率を増減",
 		LineType:        INFO,
 	},
 }

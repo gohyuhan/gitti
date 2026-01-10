@@ -101,10 +101,19 @@ func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) s
 
 // Render the detail component part at the right of the window,
 // however the content within it will be dynamic based on the current selected component
+// ------------------------------------
+//
+//			For Render Detail Component Panel
+//		  * this will render the detail component panel
+//	   * it will handle the layout for both line staging mode and normal mode
+//	   * it will also handle the split view for line staging mode (one for staged, one for unstaged)
+//
+// ------------------------------------
 func renderDetailComponentPanel(width int, height int, m *types.GittiModel) string {
 	detailComponentBorderStyle := style.PanelBorderStyle
 	detailComponentTwoBorderStyle := style.PanelBorderStyle
 
+	// determine the border style based on the current selected component
 	if m.CurrentSelectedComponent == constant.DetailComponent {
 		detailComponentBorderStyle = style.SelectedBorderStyle
 	} else if m.CurrentSelectedComponent == constant.DetailComponentTwo {
@@ -112,29 +121,108 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 	}
 
 	var content string
-	detailPanelWidth := width
-	detailPanelHeight := height
+	ogHeight := height
+	ogWidth := width
 
-	if m.ShowDetailPanelTwo.Load() {
-		detailPanelHeight = int(height / 2)
-		detailPanelWidth = int(width / 2)
-		if m.DetailComponentPanelLayout == constant.HORIZONTAL {
+	// if it is in line staging mode, we need to minus 3 for the title
+	if m.IsLineStagingState.Load() {
+		ogHeight = height - 3
+	}
+
+	if m.IsLineStagingState.Load() {
+		// we first define the border height
+		borderHeight := 2
+		if m.ShowDetailPanelTwo.Load() {
+			detailPanelHeight := int(ogHeight / 2)
+			detailPanelWidth := int(ogWidth / 2)
+			if m.DetailComponentPanelLayout == constant.HORIZONTAL {
+				// Horizontal Split Layout for Line Staging
+				// Join Cursor Viewport + Content Viewport for Panel 1
+				detailPanelViewportContent := lipgloss.JoinHorizontal(
+					lipgloss.Top,
+					style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineStagingIndexCursorViewport.View()),
+					style.NewStyle.Width(detailPanelWidth-3).Height(ogHeight-borderHeight).Render(m.DetailPanelViewport.View()),
+				)
+				// Join Cursor Viewport + Content Viewport for Panel 2
+				detailPanelTwoViewportContent := lipgloss.JoinHorizontal(
+					lipgloss.Top,
+					style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineStagingIndexCursorTwoViewport.View()),
+					style.NewStyle.Width(detailPanelWidth-3).Height(ogHeight-borderHeight).Render(m.DetailPanelTwoViewport.View()),
+				)
+
+				// Combine both panels horizontally
+				content = lipgloss.JoinHorizontal(
+					lipgloss.Top,
+					detailComponentBorderStyle.Width(detailPanelWidth).Height(ogHeight).Render(detailPanelViewportContent),
+					detailComponentTwoBorderStyle.Width(width-detailPanelWidth).Height(ogHeight).Render(detailPanelTwoViewportContent),
+				)
+			} else {
+				// Vertical Split Layout for Line Staging
+				// Join Cursor + Content for Panel 1 (Top)
+				detailPanelViewportContent := lipgloss.JoinHorizontal(
+					lipgloss.Top,
+					style.NewStyle.Width(3).Height(detailPanelHeight-borderHeight).Render(m.LineStagingIndexCursorViewport.View()),
+					style.NewStyle.Width(ogWidth-3).Height(detailPanelHeight-borderHeight).Render(m.DetailPanelViewport.View()),
+				)
+				// Join Cursor + Content for Panel 2 (Bottom)
+				detailPanelTwoViewportContent := lipgloss.JoinHorizontal(
+					lipgloss.Top,
+					style.NewStyle.Width(3).Height(ogHeight-detailPanelHeight-borderHeight).Render(m.LineStagingIndexCursorTwoViewport.View()),
+					style.NewStyle.Width(ogWidth-3).Height(ogHeight-detailPanelHeight-borderHeight).Render(m.DetailPanelTwoViewport.View()),
+				)
+
+				// Combine both panels vertically
+				content = lipgloss.JoinVertical(
+					lipgloss.Left,
+					detailComponentBorderStyle.Width(ogWidth).Height(detailPanelHeight).Render(detailPanelViewportContent),
+					detailComponentTwoBorderStyle.Width(ogWidth).Height(ogHeight-detailPanelHeight).Render(detailPanelTwoViewportContent),
+				)
+			}
+		} else {
+			// Single Panel Layout for Line Staging
+			detailPanelViewportContent := lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineStagingIndexCursorViewport.View()),
+				style.NewStyle.Width(ogWidth-3).Height(ogHeight-borderHeight).Render(m.DetailPanelViewport.View()),
+			)
 			content = lipgloss.JoinHorizontal(
 				lipgloss.Top,
-				detailComponentBorderStyle.Width(detailPanelWidth).Height(height).Render(m.DetailPanelViewport.View()),
-				detailComponentTwoBorderStyle.Width(width-detailPanelWidth).Height(height).Render(m.DetailPanelTwoViewport.View()),
-			)
-		} else {
-			content = lipgloss.JoinVertical(
-				lipgloss.Left,
-				detailComponentBorderStyle.Width(width).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
-				detailComponentTwoBorderStyle.Width(width).Height(height-detailPanelHeight).Render(m.DetailPanelTwoViewport.View()),
+				detailComponentBorderStyle.Width(ogWidth).Height(ogHeight).Render(detailPanelViewportContent),
 			)
 		}
 	} else {
-		content = lipgloss.JoinHorizontal(
+		// Standard Rendering (Not Line Staging Mode)
+		if m.ShowDetailPanelTwo.Load() {
+			detailPanelHeight := int(ogHeight / 2)
+			detailPanelWidth := int(ogWidth / 2)
+			if m.DetailComponentPanelLayout == constant.HORIZONTAL {
+				content = lipgloss.JoinHorizontal(
+					lipgloss.Top,
+					detailComponentBorderStyle.Width(detailPanelWidth).Height(ogHeight).Render(m.DetailPanelViewport.View()),
+					detailComponentTwoBorderStyle.Width(width-detailPanelWidth).Height(ogHeight).Render(m.DetailPanelTwoViewport.View()),
+				)
+			} else {
+				content = lipgloss.JoinVertical(
+					lipgloss.Left,
+					detailComponentBorderStyle.Width(ogWidth).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
+					detailComponentTwoBorderStyle.Width(ogWidth).Height(ogHeight-detailPanelHeight).Render(m.DetailPanelTwoViewport.View()),
+				)
+			}
+		} else {
+			content = lipgloss.JoinHorizontal(
+				lipgloss.Top,
+				detailComponentBorderStyle.Width(ogWidth).Height(ogHeight).Render(m.DetailPanelViewport.View()),
+			)
+		}
+	}
+
+	// Add Title Block for Line Staging Mode
+	if m.IsLineStagingState.Load() {
+		inLineStagingModeNotifyBlock := style.PanelBorderStyle.Width(ogWidth).Render(utils.TruncateString(i18n.LANGUAGEMAPPING.LineStagingModeTitle, ogWidth-4))
+		content = lipgloss.JoinVertical(
 			lipgloss.Top,
-			detailComponentBorderStyle.Width(detailPanelWidth).Height(detailPanelHeight).Render(m.DetailPanelViewport.View()),
+			inLineStagingModeNotifyBlock,
+			content,
 		)
 	}
 
@@ -290,9 +378,17 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.CommitLogComponent:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
 		case constant.DetailComponent:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
+			if m.IsLineStagingState.Load() {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStaging
+			} else {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
+			}
 		case constant.DetailComponentTwo:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
+			if m.IsLineStagingState.Load() {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStaging
+			} else {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
+			}
 		case constant.StashComponent:
 			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyStashComponent

@@ -1,6 +1,9 @@
 package services
 
 import (
+	"regexp"
+
+	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -36,4 +39,51 @@ func GitUnstageAllChangesService(m *types.GittiModel) {
 	go func() {
 		m.GitOperations.GitFiles.UnstageAllChanges()
 	}()
+}
+
+func stripAnsi(strArray []string) []string {
+	const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntgry=><~]))"
+	var re = regexp.MustCompile(ansi)
+	for i, str := range strArray {
+		strArray[i] = re.ReplaceAllString(str, "")
+	}
+	return strArray
+}
+
+func GitStageLineOrUnstageLineService(m *types.GittiModel, filePathName string) {
+	if m.CurrentSelectedComponent == constant.DetailComponent {
+		contentArray := stripAnsi(m.DetailPanelViewportOGStringArray)
+		overflowIndexCount := m.LineStagingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount
+		actualCurrentIndex := m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
+
+		switch m.LineStagingIndexPositionAndInfo.DetailPanelViewportStageType {
+		case constant.STAGE:
+			go func() {
+				m.GitOperations.GitFiles.UnstageLine(filePathName, contentArray, overflowIndexCount, actualCurrentIndex)
+			}()
+		case constant.UNSTAGE:
+			go func() {
+				m.GitOperations.GitFiles.StageLine(filePathName, contentArray, overflowIndexCount, actualCurrentIndex)
+			}()
+		default:
+			return
+		}
+	} else if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+		contentArray := stripAnsi(m.DetailPanelTwoViewportOGStringArray)
+		overflowIndexCount := m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount
+		actualCurrentIndex := m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
+
+		switch m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportStageType {
+		case constant.STAGE:
+			go func() {
+				m.GitOperations.GitFiles.UnstageLine(filePathName, contentArray, overflowIndexCount, actualCurrentIndex)
+			}()
+		case constant.UNSTAGE:
+			go func() {
+				m.GitOperations.GitFiles.StageLine(filePathName, contentArray, overflowIndexCount, actualCurrentIndex)
+			}()
+		default:
+			return
+		}
+	}
 }

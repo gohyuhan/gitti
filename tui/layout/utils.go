@@ -2,6 +2,7 @@ package layout
 
 import (
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -25,6 +26,10 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.DetailPanelViewport.SetYOffset(m.DetailPanelViewport.YOffset())
 	m.DetailPanelTwoViewport.SetXOffset(m.DetailPanelTwoViewportOffset)
 	m.DetailPanelTwoViewport.SetYOffset(m.DetailPanelTwoViewport.YOffset())
+
+	if m.IsLineStagingState.Load() {
+		services.EnterOrReinitLineStagingStateService(m)
+	}
 }
 
 func LeftPanelDynamicResize(m *types.GittiModel) {
@@ -93,30 +98,75 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)
 }
 
+// ------------------------------------
+//
+//			For Update Detail Component Viewport Layout
+//		  * this was to update the layout for detail component viewport
+//	   * it will handle the layout for both line staging mode and normal mode
+//	   * it will also handle the split view for line staging mode (one for staged, one for unstaged)
+//
+// ------------------------------------
 func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
+	availableHeight := m.DetailComponentPanelHeight
+	// set the cursor viewport width
+	m.LineStagingIndexCursorViewport.SetWidth(3)
+	m.LineStagingIndexCursorTwoViewport.SetWidth(3)
+
+	// if it is in line staging mode, we need to minus 3 for the title
+	if m.IsLineStagingState.Load() {
+		availableHeight -= 3
+	}
+
 	if m.ShowDetailPanelTwo.Load() {
 		// vertical layout
 		// Since terminal characters are usually about twice as tall as they are wide,
 		// we weight the height by 2 to approximate visual "squareness".
-		splitHeight := int(m.DetailComponentPanelHeight / 2)
+		splitHeight := int(availableHeight / 2)
 		splitWidth := int(m.DetailComponentPanelWidth / 2)
 
-		if m.DetailComponentPanelHeight*2 > m.DetailComponentPanelWidth {
+		if availableHeight*2 > m.DetailComponentPanelWidth {
+			// Vertical split (Top/Bottom)
 			m.DetailComponentPanelLayout = constant.VERTICAL
 			m.DetailPanelViewport.SetHeight(splitHeight - 1)
-			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
-			m.DetailPanelTwoViewport.SetHeight(m.DetailComponentPanelHeight - splitHeight - 1)
-			m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+			m.DetailPanelTwoViewport.SetHeight(availableHeight - splitHeight - 1)
+			m.LineStagingIndexCursorViewport.SetHeight(splitHeight - 1)
+			m.LineStagingIndexCursorTwoViewport.SetHeight(availableHeight - splitHeight - 1)
+
+			// Adjust width based on mode
+			if m.IsLineStagingState.Load() {
+				m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2 - 3)
+				m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - 2 - 3)
+			} else {
+				m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+				m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+			}
 		} else {
-			// horizontal layout
+			// Horizontal split (Left/Right)
 			m.DetailComponentPanelLayout = constant.HORIZONTAL
-			m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight)
-			m.DetailPanelViewport.SetWidth(splitWidth - 2)
-			m.DetailPanelTwoViewport.SetHeight(m.DetailComponentPanelHeight)
-			m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - splitWidth - 2)
+			m.DetailPanelViewport.SetHeight(availableHeight)
+			m.DetailPanelTwoViewport.SetHeight(availableHeight)
+			m.LineStagingIndexCursorViewport.SetHeight(availableHeight)
+			m.LineStagingIndexCursorTwoViewport.SetHeight(availableHeight)
+
+			// Adjust width based on mode
+			if m.IsLineStagingState.Load() {
+				m.DetailPanelViewport.SetWidth(splitWidth - 2 - 3)
+				m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - splitWidth - 2 - 3)
+			} else {
+				m.DetailPanelViewport.SetWidth(splitWidth - 2)
+				m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - splitWidth - 2)
+			}
 		}
 	} else {
-		m.DetailPanelViewport.SetHeight(m.DetailComponentPanelHeight)
-		m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+		// Single Panel View
+		m.DetailPanelViewport.SetHeight(availableHeight)
+		m.LineStagingIndexCursorViewport.SetHeight(availableHeight)
+
+		// Adjust width based on mode
+		if m.IsLineStagingState.Load() {
+			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2 - 3)
+		} else {
+			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+		}
 	}
 }
