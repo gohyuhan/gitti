@@ -574,9 +574,9 @@ func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) 
 		switch resolveType {
 		case RESETCONFLICT:
 			gitArgs = []string{"checkout", "-m", "--", filePathName}
-		case CONFLICTACCEPTLOCALCHANGES:
+		case CONFLICTACCEPTOURSCHANGES:
 			gitArgs = []string{"checkout", "--ours", "--", filePathName}
-		case CONFLICTACCEPTINCOMINGCHANGES:
+		case CONFLICTACCEPTTHEIRSCHANGES:
 			gitArgs = []string{"checkout", "--theirs", "--", filePathName}
 		}
 		changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)

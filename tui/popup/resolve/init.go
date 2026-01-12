@@ -21,14 +21,14 @@ func InitGitResolveConflictOptionPopUpModel(m *types.GittiModel, filePathName st
 			ResolveType: git.RESETCONFLICT,
 		},
 		{
-			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictAcceptLocalChanges,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptLocalChangesInfo, filePathName),
-			ResolveType: git.CONFLICTACCEPTLOCALCHANGES,
+			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictAcceptOursChanges,
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptOursChangesInfo, filePathName),
+			ResolveType: git.CONFLICTACCEPTOURSCHANGES,
 		},
 		{
-			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictAcceptIncomingChanges,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptIncomingChangesInfo, filePathName),
-			ResolveType: git.CONFLICTACCEPTINCOMINGCHANGES,
+			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictAcceptTheirsChanges,
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptTheirsChangesInfo, filePathName),
+			ResolveType: git.CONFLICTACCEPTTHEIRSCHANGES,
 		},
 	}
 

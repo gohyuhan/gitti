@@ -223,13 +223,13 @@ type LanguageMapping struct {
 	GitDropStashConfirmation  string
 	GitPopStashConfirmation   string
 	// for resolve conflict option list
-	GitResolveConflictOptionTitle               string
-	GitResolveConflictReset                     string
-	GitResolveConflictAcceptLocalChanges        string
-	GitResolveConflictAcceptIncomingChanges     string
-	GitResolveConflictResetInfo                 string
-	GitResolveConflictAcceptLocalChangesInfo    string
-	GitResolveConflictAcceptIncomingChangesInfo string
+	GitResolveConflictOptionTitle             string
+	GitResolveConflictReset                   string
+	GitResolveConflictAcceptOursChanges       string
+	GitResolveConflictAcceptTheirsChanges     string
+	GitResolveConflictResetInfo               string
+	GitResolveConflictAcceptOursChangesInfo   string
+	GitResolveConflictAcceptTheirsChangesInfo string
 	// for git delete branch
 	GitDeleteBranchTitle         string
 	GitDeleteBranchComfirmPrompt string
