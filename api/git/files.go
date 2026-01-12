@@ -3,6 +3,7 @@ package git
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -47,8 +48,7 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 
 // ----------------------------------
 //
-//		Retrieve File Status
-//	 * Passive, this should only be trigger by system
+//	Retrieve File Status
 //
 // ----------------------------------
 func (gf *GitFiles) GetGitFilesStatus() {
@@ -102,16 +102,15 @@ func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus,
 	var gitArgs []string
 	switch DiffType {
 	case GETSTAGEDDIFF:
-		gitArgs = []string{"diff", "--cached", filePathName}
+		gitArgs = []string{"diff", "--cached", "--", filePathName}
 	case GETUNSTAGEDDIFF:
-		gitArgs = []string{"diff", filePathName}
+		gitArgs = []string{"diff", "--", filePathName}
 	case GETCOMBINEDDIFF:
 		gitArgs = []string{"diff", "HEAD", "--", filePathName}
 	}
 	// the file is untracked
 	isNewFile := fileStatus.WorkTree == "?" ||
 		fileStatus.IndexState == "?" ||
-		fileStatus.IndexState == "A" ||
 		(fileStatus.IndexState == "U" && fileStatus.WorkTree == "A")
 
 	if isNewFile {
@@ -211,6 +210,261 @@ func (gf *GitFiles) UnstageAllChanges() {
 	gitArgs := []string{"reset"}
 	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stageCmdExecutor.Run()
+}
+
+// ----------------------------------
+//
+//	Stage line
+//
+// ----------------------------------
+func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []string, startFromIndex int, stageLineIndex int) {
+	// Acquire Git process lock to ensure no other Git operations are running concurrently.
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
+
+	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	if fileIndexExist {
+		file := gf.filesStatus[fileIndex]
+		// "old -> new" format for both Renamed (R) and Copied (C)
+		// This covers IndexState R/C and the rare WorkTree R/C
+		if strings.Contains(filePathName, "->") &&
+			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
+			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+		}
+
+		// Create a temporary patch file.
+		// This file will hold the unified diff content for the specific line we want to stage.
+		tempPatchFile, err := os.CreateTemp("", "gitti-patch-stage-*")
+		if err != nil {
+			return
+		}
+		// Ensure the file is cleaned up (deleted) after function exits
+		defer os.Remove(tempPatchFile.Name())
+
+		var gitArgs []string
+		// Generate and write the patch content.
+		// We generate a custom patch that isolates the specific line change and write it to the temp file.
+		_, writeErr := tempPatchFile.WriteString(generateStageLinePatchString(diffContentStringArray, startFromIndex, stageLineIndex, filePathName))
+		if writeErr != nil {
+			tempPatchFile.Close() // Close before return
+			return
+		}
+		// Close the file descriptor so Git can read it safely
+		closeErr := tempPatchFile.Close()
+		if closeErr != nil {
+			return
+		}
+
+		// Apply the patch to the index.
+		// We use `git apply --cached` to apply the patch to the staging area only.
+		// --recount: Allow overlapping hunks if offsets change.
+		// --whitespace=nowarn: Ignore whitespace warnings.
+		gitArgs = []string{"apply", "--cached", "--recount", "--whitespace=nowarn", tempPatchFile.Name()}
+		stageLineCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+		stageLineCmdExecutor.Run()
+
+		// Update file status to reflect changes
+		gf.GetGitFilesStatus()
+		gf.updateChannel <- GIT_STAGE_UNSTAGE_LINE_DETAILS_AND_FILES_UPDATE
+	}
+}
+
+// generateStageLinePatchString creates a patch string for a single line from a larger diff.
+// It keeps the target line as a change, converts other changes in the same context to "context lines",
+// and preserves existing context lines. This effectively isolates the chosen line for staging/unstaging.
+func generateStageLinePatchString(diffContentStringArray []string, startFromIndex int, stageLineIndex int, filePathName string) string {
+	var stageLinePatchString strings.Builder
+	// Calculate the index of the line relative to the start of the diff chunk we are processing
+	actualStageLineIndex := stageLineIndex - startFromIndex
+
+	// We need to track if the previous line was skipped to handle "\ No newline" markers correctly.
+	lastLineWasSkipped := false
+
+	for index, diffLine := range diffContentStringArray {
+		if len(diffLine) > 0 {
+			// ---------------------------------------------------------
+			// HANDLE SPECIAL MARKERS (\ No newline)
+			// ---------------------------------------------------------
+			// If the previous line was skipped (e.g. an unstaged addition),
+			// we likely need to skip this marker too, otherwise it might attach
+			// to a context line that shouldn't have it.
+			if strings.HasPrefix(diffLine, "\\ No newline") {
+				if lastLineWasSkipped {
+					continue
+				}
+				stageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				continue
+			}
+			if strings.HasPrefix(diffLine, "deleted file mode") {
+				continue
+			}
+			if strings.HasPrefix(diffLine, "+++ /dev/null") {
+				stageLinePatchString.WriteString(fmt.Sprintf("+++ b/%s\n", filePathName))
+				lastLineWasSkipped = false
+				continue
+			}
+			// If this is the line we want to stage, include it exactly as is (e.g., "+ line" or "- line").
+			if index == actualStageLineIndex {
+				stageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				lastLineWasSkipped = false
+				continue
+			}
+			// For other lines in the diff hunk:
+			if strings.HasPrefix(diffLine, "-") && !strings.HasPrefix(diffLine, "---") {
+				// If it's a deletion line ("- content"), convert it to a context line ("  content").
+				// This means "treat this as existing unchanged content" in the patch context.
+				if len(diffLine) > 1 {
+					stageLinePatchString.WriteString(fmt.Sprintf(" %s\n", diffLine[1:]))
+				} else {
+					stageLinePatchString.WriteString(" \n")
+				}
+				lastLineWasSkipped = false
+			} else if strings.HasPrefix(diffLine, "+") && !strings.HasPrefix(diffLine, "+++") {
+				// If it's an addition line ("+ content"), skip it.
+				// We don't want to include other additions in this specific single-line patch.
+				lastLineWasSkipped = true
+				continue
+			} else {
+				// For context lines (starting with space) or header lines, keep them as is.
+				stageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				lastLineWasSkipped = false
+			}
+		} else {
+			stageLinePatchString.WriteString("\n")
+			lastLineWasSkipped = false
+		}
+	}
+	return stageLinePatchString.String()
+}
+
+// ----------------------------------
+//
+//	Unstage line
+//
+// ----------------------------------
+func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []string, startFromIndex int, unStageLineIndex int) {
+	// Acquire Git process lock.
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
+
+	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	if fileIndexExist {
+		file := gf.filesStatus[fileIndex]
+		// "old -> new" format for both Renamed (R) and Copied (C)
+		// This covers IndexState R/C and the rare WorkTree R/C
+		if strings.Contains(filePathName, "->") &&
+			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
+			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
+		}
+
+		if file.IndexState == "?" && file.WorkTree == "?" {
+			// not tracked
+			return
+		}
+
+		// Create a temporary patch file.
+		tempPatchFile, err := os.CreateTemp("", "gitti-patch-unstage-*")
+		if err != nil {
+			return
+		}
+		// Ensure the file is cleaned up (deleted) after function exits
+		defer os.Remove(tempPatchFile.Name())
+
+		var gitArgs []string
+		// Generate and write the patch content.
+		// We reuse generateStageLinePatchString because the patch structure is the same.
+		// The difference is in how we apply it (using --reverse).
+		_, writeErr := tempPatchFile.WriteString(generateUnstageLinePatchString(diffContentStringArray, startFromIndex, unStageLineIndex, filePathName))
+		if writeErr != nil {
+			tempPatchFile.Close() // Close before return
+			return
+		}
+		// Close the file descriptor so Git can read it safely
+		closeErr := tempPatchFile.Close()
+		if closeErr != nil {
+			return
+		}
+
+		// Apply the patch in reverse to the index.
+		// `git apply --reverse` effectively undoes the change described in the patch.
+		// Since the patch describes adding/removing the line, reversing it unstages that change.
+		gitArgs = []string{"apply", "--cached", "--recount", "--reverse", "--whitespace=nowarn", tempPatchFile.Name()}
+		unStageLineCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+		unStageLineCmdExecutor.Run()
+
+		// Update file status to reflect changes
+		gf.GetGitFilesStatus()
+		gf.updateChannel <- GIT_STAGE_UNSTAGE_LINE_DETAILS_AND_FILES_UPDATE
+	}
+}
+
+func generateUnstageLinePatchString(diffContentStringArray []string, startFromIndex int, unStageLineIndex int, filePathName string) string {
+	var unStageLinePatchString strings.Builder
+	// Calculate the index of the line relative to the start of the diff chunk we are processing
+	actualUnStageLineIndex := unStageLineIndex - startFromIndex
+	lastLineWasSkipped := false
+
+	for index, diffLine := range diffContentStringArray {
+		if len(diffLine) > 0 {
+			// ---------------------------------------------------------
+			// HANDLE SPECIAL MARKERS (\ No newline)
+			// ---------------------------------------------------------
+			if strings.HasPrefix(diffLine, "\\ No newline") {
+				if lastLineWasSkipped {
+					continue
+				}
+				unStageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				continue
+			}
+			// This is the specific line the user wants to UNSTAGE.
+			// Keep it exactly as is (+ or -). The --reverse flag in the command will flip it.
+			if index == actualUnStageLineIndex {
+				unStageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				lastLineWasSkipped = false
+				continue
+			}
+
+			if strings.HasPrefix(diffLine, "new file mode") {
+				continue
+			}
+			if strings.HasPrefix(diffLine, "--- /dev/null") {
+				unStageLinePatchString.WriteString(fmt.Sprintf("--- a/%s\n", filePathName))
+				lastLineWasSkipped = false
+				continue
+			}
+
+			// Handle unselected lines
+			if strings.HasPrefix(diffLine, "+") && !strings.HasPrefix(diffLine, "+++") {
+				// This is a staged addition. It IS currently in the Index.
+				// We convert it to a context line (starts with space) so Git can anchor the patch.
+				if len(diffLine) > 1 {
+					unStageLinePatchString.WriteString(fmt.Sprintf(" %s\n", diffLine[1:]))
+				} else {
+					unStageLinePatchString.WriteString(" \n")
+				}
+				lastLineWasSkipped = false
+			} else if strings.HasPrefix(diffLine, "-") && !strings.HasPrefix(diffLine, "---") {
+				// This is a staged deletion. It IS NOT in the Index anymore.
+				// We must discard it entirely or the patch will fail to find the anchor.
+				lastLineWasSkipped = true
+				continue
+
+			} else {
+				// Keep Headers (diff, index, ---, +++, @@) and existing Context lines.
+				unStageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				lastLineWasSkipped = false
+			}
+		} else {
+			// Handle empty lines in the source code
+			unStageLinePatchString.WriteString("\n")
+			lastLineWasSkipped = false
+		}
+	}
+	return unStageLinePatchString.String()
 }
 
 // ----------------------------------

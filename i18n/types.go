@@ -78,6 +78,7 @@ type LanguageMapping struct {
 	Loading                    string
 	StagedTitle                string
 	UnstagedTitle              string
+	LineStagingModeTitle       string
 	// for Key Bindings
 	KeyBindingForGitStatusComponent                         []string
 	KeyBindingLocalBranchComponentIsCheckOut                []string
@@ -89,6 +90,7 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentNone                    []string
 	KeyBindingCommitLogComponent                            []string
 	KeyBindingKeyDetailComponent                            []string
+	KeyBindingKeyDetailComponentLineStaging                 []string
 	KeyBindingKeyStashComponent                             []string
 	KeyBindingKeyStashComponentNone                         []string
 	KeyBindingForCommitPopUp                                []string

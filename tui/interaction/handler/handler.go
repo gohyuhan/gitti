@@ -2,7 +2,9 @@ package handler
 
 import (
 	tea "charm.land/bubbletea/v2"
+	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
@@ -136,6 +138,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 	case "e":
 		return handleNonTypingeKeyBindingInteraction(m)
 
+	case "L":
+		return handleNonTypingLKeyBindingInteraction(m)
+
 	case "n":
 		return handleNonTypingnKeyBindingInteraction(m)
 
@@ -198,6 +203,14 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 
 	case "right", "l":
 		return handleNonTypingRightlKeyBindingInteraction(msg, m)
+	case "-":
+		m.WindowLeftPanelRatio = max(settings.MINLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio-0.01)
+		layout.TuiWindowSizing(m)
+		return m, nil
+	case "+":
+		m.WindowLeftPanelRatio = min(settings.MAXLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio+0.01)
+		layout.TuiWindowSizing(m)
+		return m, nil
 	}
 	return m, nil
 }

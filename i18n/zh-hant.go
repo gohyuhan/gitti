@@ -57,6 +57,7 @@ var zH_HANT = LanguageMapping{
 	Loading:                             "載入中...",
 	StagedTitle:                         "已暫存的變更",
 	UnstagedTitle:                       "未暫存的變更",
+	LineStagingModeTitle:                "行暫存模式",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全域快捷鍵",
 	},
@@ -111,7 +112,15 @@ var zH_HANT = LanguageMapping{
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右移動",
 		"[↑/↓] 上下移動",
+		"[L] 進入行暫存模式",
 		"[esc] 返回",
+		"[?] 全域快捷鍵",
+	},
+	KeyBindingKeyDetailComponentLineStaging: []string{
+		"[←/→] 左右移動",
+		"[↑/↓] 跳轉到下/上一個可暫存或可取消暫存的行",
+		"[space] 暫存/取消暫存",
+		"[esc] 退出行暫存模式",
 		"[?] 全域快捷鍵",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -476,7 +485,7 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "- / +",
-		TitleOrInfoLine: "增大或減小左側面板寬度比例 [!!]",
+		TitleOrInfoLine: "增大或減小左側面板寬度比例",
 		LineType:        INFO,
 	},
 }

@@ -54,6 +54,12 @@ type GittiModel struct {
 	GlobalKeyBindingKeyMapLargestLen          int                // this was use for global key binding pop up styling, we save it once so we don't have to recompute
 	DetailComponentPanelInfoFetchCancelFunc   context.CancelFunc // this was to cancel the fetch detail oepration
 	IsDetailComponentPanelInfoFetchProcessing atomic.Bool
+	IsLineStagingState                        atomic.Bool
+	LineStagingIndexPositionAndInfo           GittiLineStagingIndexPositionAndInfo
+	LineStagingIndexCursorViewport            viewport.Model
+	LineStagingIndexCursorTwoViewport         viewport.Model
+	DetailPanelViewportOGStringArray          []string
+	DetailPanelTwoViewportOGStringArray       []string
 }
 
 // ---------------------------------
@@ -66,6 +72,22 @@ type GittiComponentsCurrentListNavigationIndexPosition struct {
 	ModifiedFilesComponent int
 	CommitLogComponent     int
 	StashComponent         int
+}
+
+// ---------------------------------
+//
+// to record the current navigation on detail component for line staging purpose
+//
+// ---------------------------------
+type GittiLineStagingIndexPositionAndInfo struct {
+	DetailPanelViewportIndexPosition         int    // for staged or unstaged panel (depends if there are both staged and unstaged changes)
+	DetailPanelTwoViewportIndexPosition      int    // for unstaged panel
+	DetailPanelViewportStageType             string // to tell it was currently showing staged or unstaged changes
+	DetailPanelTwoViewportStageType          string // to tell it was currently showing staged or unstaged changes
+	DetailPanelViewportActualCurrentIndex    int    // this is the actual current index of the viewport
+	DetailPanelTwoViewportActualCurrentIndex int    // this is the actual current index of the viewport
+	DetailPanelViewportOverflowIndexCount    int    // we need to record this as well as to calculate the actual current index due to we have added extra info at the top of the viewport
+	DetailPanelTwoViewportOverflowIndexCount int    // we need to record this as well as to calculate the actual current index due to we have added extra info at the top of the viewport
 }
 
 // ---------------------------------

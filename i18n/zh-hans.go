@@ -57,6 +57,7 @@ var zH_HANS = LanguageMapping{
 	Loading:                             "加载中...",
 	StagedTitle:                         "已暂存的更改",
 	UnstagedTitle:                       "未暂存的更改",
+	LineStagingModeTitle:                "行暂存模式",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全局快捷键",
 	},
@@ -111,7 +112,15 @@ var zH_HANS = LanguageMapping{
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",
+		"[L] 进入行暂存模式",
 		"[esc] 返回",
+		"[?] 全局快捷键",
+	},
+	KeyBindingKeyDetailComponentLineStaging: []string{
+		"[←/→] 左右移动",
+		"[↑/↓] 跳转到下/上一个可暂存或可取消暂存的行",
+		"[space] 暂存/取消暂存",
+		"[esc] 退出行暂存模式",
 		"[?] 全局快捷键",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -476,7 +485,7 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "- / +",
-		TitleOrInfoLine: "增大或减小左侧面板宽度比例 [!!]",
+		TitleOrInfoLine: "增大或减小左侧面板宽度比例",
 		LineType:        INFO,
 	},
 }
