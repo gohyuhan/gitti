@@ -204,12 +204,16 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 	case "right", "l":
 		return handleNonTypingRightlKeyBindingInteraction(msg, m)
 	case "-":
-		m.WindowLeftPanelRatio = max(settings.MINLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio-0.01)
-		layout.TuiWindowSizing(m)
+		if !m.ShowPopUp.Load() {
+			m.WindowLeftPanelRatio = max(settings.MINLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio-0.01)
+			layout.TuiWindowSizing(m)
+		}
 		return m, nil
 	case "+":
-		m.WindowLeftPanelRatio = min(settings.MAXLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio+0.01)
-		layout.TuiWindowSizing(m)
+		if !m.ShowPopUp.Load() {
+			m.WindowLeftPanelRatio = min(settings.MAXLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio+0.01)
+			layout.TuiWindowSizing(m)
+		}
 		return m, nil
 	}
 	return m, nil
