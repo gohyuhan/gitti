@@ -21,6 +21,7 @@ type GittiModel struct {
 	CheckOutBranch                            string
 	RemoteSyncLocalState                      string
 	RemoteSyncRemoteState                     string
+	CurrentGitRepoStatus                      string
 	BranchUpStream                            string
 	TrackedUpstreamOrBranchIcon               string
 	Width                                     int

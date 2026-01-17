@@ -44,6 +44,7 @@ var jA = LanguageMapping{
 	GitNotInitPrompt:                    "現在のディレクトリは Git リポジトリとして初期化されていません. 初期化しますか？ (y/n): ",
 	GitInitRefuse:                       "Gitti 終了。Gitti は Git 初期化済みリポジトリでのみ動作します.",
 	GitInitPromptInvalidInput:           "無効な入力です. [Y/y] または [N/n] を入力してください.",
+	GitCertainStateStillInProgress:      "%s 進行中",
 	Branches:                            "ブランチ",
 	ModifiedFiles:                       "変更されたファイル",
 	CommitLog:                           "コミットログ",
@@ -487,6 +488,16 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "- / +",
 		TitleOrInfoLine: "左パネルの幅の比率を増減",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "C",
+		TitleOrInfoLine: "一時停止中のGit操作（リベース、マージ、チェリーピックなど）を再開",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+a",
+		TitleOrInfoLine: "一時停止中のGit操作（リベース、マージ、チェリーピックなど）を中止",
 		LineType:        INFO,
 	},
 }

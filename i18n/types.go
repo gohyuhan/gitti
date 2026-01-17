@@ -60,10 +60,11 @@ type LanguageMapping struct {
 	EditorSetError    string
 	EditorSetSuccess  string
 	// Gitti terminal text
-	GitNotInstalledError      string
-	GitNotInitPrompt          string
-	GitInitRefuse             string
-	GitInitPromptInvalidInput string
+	GitNotInstalledError           string
+	GitNotInitPrompt               string
+	GitInitRefuse                  string
+	GitInitPromptInvalidInput      string
+	GitCertainStateStillInProgress string
 	// Gitti UI text
 	Branches                   string
 	ModifiedFiles              string

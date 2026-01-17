@@ -60,7 +60,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperatio
 	// after we successfully get the gitRepoPathInfo back we need to update the current cmd executor dir
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
-	gitOperations := api.InitGitOperations(updateChannel)
+	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel)
 	// git.InitGitCommitLog(false) // not included in v0.1.x
 	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations)
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -183,4 +184,16 @@ func gitFetch() {
 	gitArgs := []string{"fetch"}
 	fetchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	fetchCmdExecutor.Run()
+}
+
+// checkIfFileExistWithinDotGitFolder verifies if a specific file (e.g., MERGE_HEAD) exists in the .git directory.
+// This is useful for determining the current state of the repository (e.g., merging, rebasing).
+func checkIfFileExistWithinDotGitFolder(absolutePath string, fileName string) bool {
+	// Join the provided absolute path with the path returned by git to check existence.
+	filePath := filepath.Join(absolutePath, fileName)
+	_, err := os.Stat(filePath)
+	if err == nil {
+		return true // Path exists
+	}
+	return false
 }

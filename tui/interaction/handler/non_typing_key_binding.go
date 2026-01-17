@@ -110,6 +110,13 @@ func handleNonTypingcKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingCKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		services.GitStateUniversalUtilsContinueService(m)
+	}
+	return m, nil
+}
+
 func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1041,6 +1048,13 @@ func handleNonTypingRightBracketKeyBindingInteraction(m *types.GittiModel) (*typ
 		if m.CurrentSelectedComponent == constant.DetailComponent && m.ShowDetailPanelTwo.Load() {
 			m.CurrentSelectedComponent = constant.DetailComponentTwo
 		}
+	}
+	return m, nil
+}
+
+func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		services.GitStateUniversalUtilsAbortService(m)
 	}
 	return m, nil
 }

@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"os"
 	"os/exec"
 )
 
@@ -24,11 +25,14 @@ func (c *CmdExecutor) RunGitCmd(gitArgs []string, colorized bool) *exec.Cmd {
 	gitArgs = append([]string{
 		"-c", "core.whitespace=cr-at-eol",
 		"-c", "diff.ignore-cr-at-eol=true",
+		// SUPPRESS EDITOR (No interactive message editing)
+		"-c", "core.editor=true",
 		"--no-optional-locks",
 	}, gitArgs...)
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = c.repoPath
 
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 	return cmd
 }
 
@@ -41,10 +45,14 @@ func (c *CmdExecutor) RunGitCmdWithContext(ctx context.Context, gitArgs []string
 	gitArgs = append([]string{
 		"-c", "core.whitespace=cr-at-eol",
 		"-c", "diff.ignore-cr-at-eol=true",
+		// SUPPRESS EDITOR (No interactive message editing)
+		"-c", "core.editor=true",
 		"--no-optional-locks",
 	}, gitArgs...)
 	cmd := exec.CommandContext(ctx, "git", gitArgs...)
 	cmd.Dir = c.repoPath
+
+	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
 
 	return cmd
 }
