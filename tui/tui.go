@@ -60,6 +60,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		CheckOutBranch:                    "",
 		RemoteSyncLocalState:              "",
 		RemoteSyncRemoteState:             "",
+		CurrentGitRepoStatus:              "",
 		BranchUpStream:                    "",
 		TrackedUpstreamOrBranchIcon:       "",
 		Width:                             0,
@@ -140,6 +141,8 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.CurrentSelectedComponent == constant.ModifiedFilesComponent || m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
+		case git.GIT_STATE_UPDATE:
+			gAM.updateGitRepoState()
 		case git.GIT_LOG_UPDATE:
 			needReinit := commitlogComponent.InitGitCommitLogList(m)
 			if m.CurrentSelectedComponent == constant.CommitLogComponent {
@@ -247,4 +250,9 @@ func (gAM *GittiAppModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
 	remoteSynsStatusInfo := m.GitOperations.GitRemote.RemoteSyncStatus()
 	m.RemoteSyncLocalState = remoteSynsStatusInfo.Local
 	m.RemoteSyncRemoteState = remoteSynsStatusInfo.Remote
+}
+
+func (gAM *GittiAppModel) updateGitRepoState() {
+	m := gAM.model
+	m.CurrentGitRepoStatus = m.GitOperations.GitStateUniversalUtils.GetCurrentGitState()
 }

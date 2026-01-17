@@ -32,35 +32,45 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 	if m.CurrentSelectedComponent == constant.GitStatusComponent {
 		borderStyle = style.SelectedBorderStyle
 	}
+	if m.CurrentGitRepoStatus == "" {
+		var remoteSyncStateLineString string
+		additionalWidth := 0
 
-	var remoteSyncStateLineString string
-	additionalWidth := 0
+		if m.RemoteSyncLocalState == "" || m.RemoteSyncRemoteState == "" {
+			remoteSyncStateLineString = style.ErrorStyle.Render("\uf00d")
+			additionalWidth += 1
+		} else {
+			local := style.LocalStatusStyle.Render(fmt.Sprintf("%s↑", m.RemoteSyncLocalState))
+			remote := style.RemoteStatusStyle.Render(fmt.Sprintf("%s↓", m.RemoteSyncRemoteState))
 
-	if m.RemoteSyncLocalState == "" || m.RemoteSyncRemoteState == "" {
-		remoteSyncStateLineString = style.ErrorStyle.Render("\uf00d")
-		additionalWidth += 1
+			remoteSyncStateLineString = local + " " + remote
+			additionalWidth += 3 + lipgloss.Width(m.RemoteSyncLocalState) + lipgloss.Width(m.RemoteSyncRemoteState)
+		}
+
+		trackedUpStreamOrBranchName := m.CheckOutBranch
+		if m.BranchUpStream != "" {
+			trackedUpStreamOrBranchName = m.BranchUpStream
+		}
+
+		repoTrackBranchName := fmt.Sprintf(" %s -> %s %s", m.RepoName, m.TrackedUpstreamOrBranchIcon, trackedUpStreamOrBranchName)
+
+		// the max width is the window width - padding - the length of RemoteSyncStateLineString
+		repoTrackBranchName = utils.TruncateString(repoTrackBranchName, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-additionalWidth)
+
+		return borderStyle.
+			Width(m.WindowLeftPanelWidth).
+			Height(1).
+			Render(fmt.Sprintf("%s%s", remoteSyncStateLineString, repoTrackBranchName))
 	} else {
-		local := style.LocalStatusStyle.Render(fmt.Sprintf("%s↑", m.RemoteSyncLocalState))
-		remote := style.RemoteStatusStyle.Render(fmt.Sprintf("%s↓", m.RemoteSyncRemoteState))
+		var gitStateInProgress string
 
-		remoteSyncStateLineString = local + " " + remote
-		additionalWidth += 3 + lipgloss.Width(m.RemoteSyncLocalState) + lipgloss.Width(m.RemoteSyncRemoteState)
+		gitStateInProgress = utils.TruncateString(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitCertainStateStillInProgress, m.CurrentGitRepoStatus), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+
+		return borderStyle.
+			Width(m.WindowLeftPanelWidth).
+			Height(1).
+			Render(fmt.Sprintf("%s %s", lipgloss.NewStyle().Foreground(style.ColorError).Render("!"), gitStateInProgress))
 	}
-
-	trackedUpStreamOrBranchName := m.CheckOutBranch
-	if m.BranchUpStream != "" {
-		trackedUpStreamOrBranchName = m.BranchUpStream
-	}
-
-	repoTrackBranchName := fmt.Sprintf(" %s -> %s %s", m.RepoName, m.TrackedUpstreamOrBranchIcon, trackedUpStreamOrBranchName)
-
-	// the max width is the window width - padding - the length of RemoteSyncStateLineString
-	repoTrackBranchName = utils.TruncateString(repoTrackBranchName, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-additionalWidth)
-
-	return borderStyle.
-		Width(m.WindowLeftPanelWidth).
-		Height(1).
-		Render(fmt.Sprintf("%s%s", remoteSyncStateLineString, repoTrackBranchName))
 }
 
 // Render the Local Branches panel

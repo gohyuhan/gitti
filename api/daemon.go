@@ -123,9 +123,10 @@ func (gd *GitDaemon) Start() {
 					if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
 						// Mark as running
 						defer gd.isGitFilesPassiveActiveRunning.Store(false)
-
 						gd.gitOperations.GitFiles.GetGitFilesStatus()
+						gd.gitOperations.GitStateUniversalUtils.CheckCurrentGitState()
 						gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
+						gd.updateChannel <- git.GIT_STATE_UPDATE
 					}
 				}()
 			case <-gd.gitRemoteSyncStatusActiveTimer.C:
@@ -161,7 +162,9 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 		if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitFilesPassiveActiveRunning.Store(false)
 			gd.gitOperations.GitFiles.GetGitFilesStatus()
+			gd.gitOperations.GitStateUniversalUtils.CheckCurrentGitState()
 			gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
+			gd.updateChannel <- git.GIT_STATE_UPDATE
 		}
 	}()
 	go func() {

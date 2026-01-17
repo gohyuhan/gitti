@@ -44,6 +44,7 @@ var eN = LanguageMapping{
 	GitNotInitPrompt:                    "Current Directory was not git initialzed, would you like to initialze it? (y/n): ",
 	GitInitRefuse:                       "Gitti Exited, gitti will only work on git initialized repo",
 	GitInitPromptInvalidInput:           "Invalid input, please enter [Y/y] or [N/n].",
+	GitCertainStateStillInProgress:      "%s IN PROGRESS",
 	Branches:                            "Branches",
 	ModifiedFiles:                       "Modified Files",
 	CommitLog:                           "Commit Log",
@@ -485,6 +486,16 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "- / +",
 		TitleOrInfoLine: "increase or decrease the left panel width ratio",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "C",
+		TitleOrInfoLine: "Universal Continue for paused Git Operation (Rebase, Merge, Cherry-pick, etc.)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+a",
+		TitleOrInfoLine: "Universal Abort for paused Git Operation (Rebase, Merge, Cherry-pick, etc.)",
 		LineType:        INFO,
 	},
 }

@@ -44,6 +44,7 @@ var zH_HANT = LanguageMapping{
 	GitNotInitPrompt:                    "目前目錄尚未初始化為 Git 儲存庫，是否要初始化？(y/n)：",
 	GitInitRefuse:                       "Gitti 已結束, Gitti 僅能在已初始化的 Git 儲存庫中運作.",
 	GitInitPromptInvalidInput:           "輸入無效, 請輸入 [Y/y] 或 [N/n].",
+	GitCertainStateStillInProgress:      "%s 進行中",
 	Branches:                            "分支",
 	ModifiedFiles:                       "已修改的檔案",
 	CommitLog:                           "提交記錄",
@@ -486,6 +487,16 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "- / +",
 		TitleOrInfoLine: "增大或減小左側面板寬度比例",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "C",
+		TitleOrInfoLine: "繼續進行已暫停的 Git 操作 (Rebase, Merge, Cherry-pick 等)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+a",
+		TitleOrInfoLine: "終止已暫停的 Git 操作 (Rebase, Merge, Cherry-pick 等)",
 		LineType:        INFO,
 	},
 }

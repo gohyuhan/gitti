@@ -44,6 +44,7 @@ var zH_HANS = LanguageMapping{
 	GitNotInitPrompt:                    "当前目录尚未初始化为 Git 仓库，是否要进行初始化？(y/n)：",
 	GitInitRefuse:                       "Gitti 已退出，Gitti 只能在已初始化的 Git 仓库中运行.",
 	GitInitPromptInvalidInput:           "输入无效, 请输入 [Y/y] 或 [N/n].",
+	GitCertainStateStillInProgress:      "%s 进行中",
 	Branches:                            "分支",
 	ModifiedFiles:                       "已修改的文件",
 	CommitLog:                           "提交记录",
@@ -486,6 +487,16 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "- / +",
 		TitleOrInfoLine: "增大或减小左侧面板宽度比例",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "C",
+		TitleOrInfoLine: "继续进行已暂停的 Git 操作 (Rebase, Merge, Cherry-pick 等)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+a",
+		TitleOrInfoLine: "终止已暂停的 Git 操作 (Rebase, Merge, Cherry-pick 等)",
 		LineType:        INFO,
 	},
 }
