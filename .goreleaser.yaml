@@ -53,32 +53,30 @@ changelog:
       - "(?i)^Revert"
       - "(?i)^release:?"
   groups:
-    # 1. Features (The Catch-All)
+    # 1. Features
     # Display Order: 0 (Top)
-    # Logic: Any commit that does NOT match Fixes or Optimization falls here.
     - title: "🚀 Features"
-      regexp: "(?i)^.*(feature|feat|new|add|impl)"
+      regexp: "(?i)^(feature|feat|new|add|impl)(\\(.*\\))?!?:"
       order: 0
 
     # 2. Optimization
     # Display Order: 1
-    # Regex: Case insensitive (?i).
-    # Matches:
-    #  - 'opt' (covers 'opt:', 'optimize:', 'Optimization:', 'Optimisation:')
-    #  - 'refactor' (covers 'refactor:', 'Refactoring:')
-    #  - 'perf' (covers 'perf:', 'Performance:')
-    #  - 'style'
     - title: "♻️ Optimization"
-      regexp: "(?i)^.*(refactor|opt|perf|style)"
+      regexp: "(?i)^(refactor|opt|perf|style|performance)(\\(.*\\))?!?:"
       order: 1
 
     # 3. Bug Fixes
     # Display Order: 2
-    # Regex: Case insensitive (?i). Matches 'fix', 'fixes', 'hotfix', 'bug'...
     - title: "🐛 Bug Fixes"
-      regexp: "(?i)^.*(fix|hotfix|bug)"
+      regexp: "(?i)^(fix|hotfix|bug|fixes|hotfixes)(\\(.*\\))?!?:"
       order: 2
 
+    # 4. Others
+    # Display Order: 3
+    # Logic: Catch-all for anything else.
+    - title: "Others"
+      regexp: ".*"
+      order: 3
 
 release:
   github:
