@@ -66,20 +66,23 @@ type LanguageMapping struct {
 	GitInitPromptInvalidInput      string
 	GitCertainStateStillInProgress string
 	// Gitti UI text
-	Branches                   string
-	ModifiedFiles              string
-	CommitLog                  string
-	Stash                      string
-	FileTypeUnSupportedPreview string
-	TerminalSizeWarning        string
-	CurrentTerminalHeight      string
-	MinimumTerminalHeight      string
-	CurrentTerminalWidth       string
-	MinimumTerminalWidth       string
-	Loading                    string
-	StagedTitle                string
-	UnstagedTitle              string
-	LineStagingModeTitle       string
+	Branches                    string
+	ModifiedFiles               string
+	CommitLog                   string
+	Stash                       string
+	FileTypeUnSupportedPreview  string
+	TerminalSizeWarning         string
+	CurrentTerminalHeight       string
+	MinimumTerminalHeight       string
+	CurrentTerminalWidth        string
+	MinimumTerminalWidth        string
+	Loading                     string
+	StagedTitle                 string
+	UnstagedTitle               string
+	LineStagingModeTitle        string
+	CherryPickTitle             string
+	EditCherryPickTitle         string
+	CherryPickOpsSelectionTitle string
 	// for Key Bindings
 	KeyBindingForGitStatusComponent                         []string
 	KeyBindingLocalBranchComponentIsCheckOut                []string
@@ -119,6 +122,9 @@ type LanguageMapping struct {
 	KeyBindingForGitResetLatestCommitConfirmPromptPopUp     []string
 	KeyBindingForGitResetToSelectedCommitTypeOptionPopUp    []string
 	KeyBindingForGitResetToSelectedCommitConfirmPromptPopUp []string
+	KeyBindingForGitCherryPickOptionSelectionPopUp          []string
+	KeyBindingForGitCherryPickPopUp                         []string
+	KeyBindingForGitEditCherryPickPopUp                     []string
 	KeyBindingForGlobalKeyBindingPopUp                      []string
 	// -----------------
 	//  For Pop Up
@@ -253,4 +259,9 @@ type LanguageMapping struct {
 	GitResetToSelectedCommitSoftConfirmation  string
 	GitResetToSelectedCommitHardConfirmation  string
 	GitResetToSelectedCommitMixedConfirmation string
+	// for cherry pick
+	CherryPickOpsTitle           string
+	CherryPickOpsDescription     string
+	EditCherryPickOpsTitle       string
+	EditCherryPickOpsDescription string
 }

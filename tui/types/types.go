@@ -63,7 +63,7 @@ type GittiModel struct {
 	DetailPanelViewportOGStringArray          []string
 	DetailPanelTwoViewportOGStringArray       []string
 	CherryPickedCommitLogList                 []git.CherryPickedCommitLog
-	CherryPickedCommitMap                     map[string]struct{}
+	CherryPickedCommitMap                     map[string]string
 }
 
 // ---------------------------------

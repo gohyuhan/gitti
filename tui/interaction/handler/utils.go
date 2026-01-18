@@ -8,6 +8,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
+	"github.com/gohyuhan/gitti/tui/popup/log"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
@@ -185,6 +186,60 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 			return m, nil
 		}
 
+	case constant.GitCherryPickOptionSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*log.GitCherryPickOptionSelectionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.CherryPickedOpsOption.Index() > 0 {
+					latestIndex := popUp.CherryPickedOpsOption.Index() - 1
+					popUp.CherryPickedOpsOption.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.CherryPickedOpsOption.Index() < len(popUp.CherryPickedOpsOption.Items())-1 {
+					latestIndex := popUp.CherryPickedOpsOption.Index() + 1
+					popUp.CherryPickedOpsOption.Select(latestIndex)
+				}
+			}
+			popUp.CherryPickedOpsOption.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CherryPickedOpsOption, constant.MaxGitCherryPickOptionSelectionPopUpWidth)
+			return m, nil
+		}
+	case constant.GitCherryPickPopUp:
+		popUp, ok := m.PopUpModel.(*log.GitCherryPickPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.CurrentBranchCherryPickCommitLog.Index() > 0 {
+					latestIndex := popUp.CurrentBranchCherryPickCommitLog.Index() - 1
+					popUp.CurrentBranchCherryPickCommitLog.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.CurrentBranchCherryPickCommitLog.Index() < len(popUp.CurrentBranchCherryPickCommitLog.Items())-1 {
+					latestIndex := popUp.CurrentBranchCherryPickCommitLog.Index() + 1
+					popUp.CurrentBranchCherryPickCommitLog.Select(latestIndex)
+				}
+			}
+			popUp.CurrentBranchCherryPickCommitLog.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CurrentBranchCherryPickCommitLog, constant.MaxGitCherryPickPopUpWidth)
+			return m, nil
+		}
+	case constant.GitEditCherryPickPopUp:
+		popUp, ok := m.PopUpModel.(*log.GitEditCherryPickPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.CherryPickedCommitLog.Index() > 0 {
+					latestIndex := popUp.CherryPickedCommitLog.Index() - 1
+					popUp.CherryPickedCommitLog.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.CherryPickedCommitLog.Index() < len(popUp.CherryPickedCommitLog.Items())-1 {
+					latestIndex := popUp.CherryPickedCommitLog.Index() + 1
+					popUp.CherryPickedCommitLog.Select(latestIndex)
+				}
+			}
+			popUp.CherryPickedCommitLog.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CherryPickedCommitLog, constant.MaxGitEditCherryPickPopUpWidth)
+			return m, nil
+		}
 	// following is for viewport
 	case constant.GlobalKeyBindingPopUp:
 		popUp, ok := m.PopUpModel.(*keybindingPopUp.GlobalKeyBindingPopUpModel)

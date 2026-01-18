@@ -59,6 +59,9 @@ var zH_HANS = LanguageMapping{
 	StagedTitle:                         "已暂存的更改",
 	UnstagedTitle:                       "未暂存的更改",
 	LineStagingModeTitle:                "行暂存模式",
+	CherryPickTitle:                     "从分支遴选: \n %s",
+	EditCherryPickTitle:                 "编辑遴选",
+	CherryPickOpsSelectionTitle:         "遴选操作选择",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全局快捷键",
 	},
@@ -243,6 +246,21 @@ var zH_HANS = LanguageMapping{
 		"[enter] 重置",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitCherryPickOptionSelectionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择遴选选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForGitCherryPickPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[space] 选择进行遴选",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForGitEditCherryPickPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[backspace] 移除选择",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -354,6 +372,10 @@ var zH_HANS = LanguageMapping{
 	GitResetToSelectedCommitSoftConfirmation:                 "确定要软重置（Soft Reset）到以下提交吗？",
 	GitResetToSelectedCommitHardConfirmation:                 "确定要硬重置（Hard Reset）到以下提交吗？",
 	GitResetToSelectedCommitMixedConfirmation:                "确定要混合重置（Mixed Reset）到以下提交吗？",
+	CherryPickOpsTitle:                                       "遴选 (Cherry Pick)",
+	CherryPickOpsDescription:                                 "选择将要应用到遴选操作的提交",
+	EditCherryPickOpsTitle:                                   "编辑遴选",
+	EditCherryPickOpsDescription:                             "编辑已遴选的提交 (例如：移除选择)",
 }
 
 // for about gitti

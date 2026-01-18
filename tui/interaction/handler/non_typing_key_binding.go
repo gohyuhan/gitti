@@ -14,6 +14,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
+	logPopUp "github.com/gohyuhan/gitti/tui/popup/log"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
@@ -690,6 +691,24 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				}
 			}
 		}
+	} else {
+		switch m.PopUpType {
+		case constant.GitCherryPickPopUp:
+			popUp, ok := m.PopUpModel.(*logPopUp.GitCherryPickPopUpModel)
+			if ok {
+				selectedCommitLog := popUp.CurrentBranchCherryPickCommitLog.SelectedItem()
+				if selectedCommitLog != nil {
+					cherryPickedCommitLog := selectedCommitLog.(logPopUp.GitCherryPickItem)
+					m.CherryPickedCommitLogList = append(m.CherryPickedCommitLogList, git.CherryPickedCommitLog{
+						Hash:       cherryPickedCommitLog.Hash,
+						Message:    cherryPickedCommitLog.Message,
+						Author:     cherryPickedCommitLog.Author,
+						FromBranch: cherryPickedCommitLog.FromBranch,
+					})
+					m.CherryPickedCommitMap[cherryPickedCommitLog.Hash] = cherryPickedCommitLog.Hash
+				}
+			}
+		}
 	}
 	return m, nil
 }
@@ -814,6 +833,21 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			m.PopUpType = constant.NoPopUp
 			m.PopUpModel = nil
 		case constant.GitResetToSelectedCommitConfirmPromptPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		case constant.GitCherryPickPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		case constant.GitEditCherryPickPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		case constant.GitCherryPickOptionSelectionPopUp:
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp
@@ -1055,6 +1089,21 @@ func handleNonTypingRightBracketKeyBindingInteraction(m *types.GittiModel) (*typ
 func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		services.GitStateUniversalUtilsAbortService(m)
+	}
+	return m, nil
+}
+
+func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		if m.CurrentSelectedComponent == constant.CommitLogComponent || m.DetailPanelParentComponent == constant.CommitLogComponent {
+			if len(m.CherryPickedCommitLogList) < 1 {
+				m.ShowPopUp.Store(true)
+				m.PopUpType = constant.GitCherryPickPopUp
+				m.IsTyping.Store(false)
+				logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+			} else {
+			}
+		}
 	}
 	return m, nil
 }

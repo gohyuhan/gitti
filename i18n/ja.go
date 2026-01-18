@@ -59,6 +59,9 @@ var jA = LanguageMapping{
 	StagedTitle:                         "ステージされた変更",
 	UnstagedTitle:                       "ステージされていない変更",
 	LineStagingModeTitle:                "行ステージングモード",
+	CherryPickTitle:                     "ブランチからチェリーピック: \n %s",
+	EditCherryPickTitle:                 "チェリーピックを編集",
+	CherryPickOpsSelectionTitle:         "チェリーピック操作の選択",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] グローバルキー操作",
 	},
@@ -243,6 +246,21 @@ var jA = LanguageMapping{
 		"[enter] 実行",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitCherryPickOptionSelectionPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] チェリーピックオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitCherryPickPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[space] チェリーピック対象を選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitEditCherryPickPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[backspace] 選択を解除",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -354,6 +372,10 @@ var jA = LanguageMapping{
 	GitResetToSelectedCommitSoftConfirmation:                 "選択したコミットにソフトリセットしてもよろしいですか？",
 	GitResetToSelectedCommitHardConfirmation:                 "選択したコミットにハードリセットしてもよろしいですか？",
 	GitResetToSelectedCommitMixedConfirmation:                "選択したコミットにミックスリセットしてもよろしいですか？",
+	CherryPickOpsTitle:                                       "チェリーピック",
+	CherryPickOpsDescription:                                 "チェリーピック操作に適用するコミットを選択します",
+	EditCherryPickOpsTitle:                                   "チェリーピックを編集",
+	EditCherryPickOpsDescription:                             "チェリーピックされたコミットを編集します (例: 選択の解除)",
 }
 
 // for about gitti

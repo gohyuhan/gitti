@@ -59,6 +59,9 @@ var eN = LanguageMapping{
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
 	LineStagingModeTitle:                "In Line Staging Mode",
+	CherryPickTitle:                     "Cherry Pick from Branch: \n %s",
+	EditCherryPickTitle:                 "Edit Cherry Pick",
+	CherryPickOpsSelectionTitle:         "Cherry Pick Operation Selection",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},
@@ -243,6 +246,21 @@ var eN = LanguageMapping{
 		"[enter] reset",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitCherryPickOptionSelectionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select cherry pick option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitCherryPickPopUp: []string{
+		"[↑/↓] move up and down",
+		"[space] select for cherry pick",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitEditCherryPickPopUp: []string{
+		"[↑/↓] move up and down",
+		"[backspace] remove selection",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -354,6 +372,10 @@ var eN = LanguageMapping{
 	GitResetToSelectedCommitSoftConfirmation:                 "Are you sure to soft reset to following commit?",
 	GitResetToSelectedCommitHardConfirmation:                 "Are you sure to hard reset to following commit?",
 	GitResetToSelectedCommitMixedConfirmation:                "Are you sure to mixed reset to following commit?",
+	CherryPickOpsTitle:                                       "Cherry Pick",
+	CherryPickOpsDescription:                                 "Choose commits that will then be applied to cherry pick operation",
+	EditCherryPickOpsTitle:                                   "Edit Cherry Pick",
+	EditCherryPickOpsDescription:                             "Edit cherry picked commits (eg. remove a selection)",
 }
 
 // for about gitti

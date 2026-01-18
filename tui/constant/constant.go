@@ -101,6 +101,8 @@ const (
 	PopUpGitResetLatestCommitTypeOptionHeight          = 6
 	PopUpGitResetToSelectedCommitTypeOptionHeight      = 6
 	PopUpGitCherryPickOptionSelectionHeight            = 4
+	PopUpGitCherryPickPopUpHeight                      = 10
+	PopUpGitEditCherryPickPopUpHeight                  = 10
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -148,4 +150,10 @@ const (
 const (
 	PUSHACTION                = "PUSHACTION"
 	CREATEBRANCHBASEDONREMOTE = "CREATEBRANCHBASEDONREMOTE"
+)
+
+// cherry pick ops options
+const (
+	CHERRYPICK     = "CHERRYPICK"
+	EDITCHERRYPICk = "EDITCHERRYPICk"
 )

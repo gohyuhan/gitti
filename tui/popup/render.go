@@ -6,6 +6,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	"github.com/gohyuhan/gitti/tui/popup/discard"
 	"github.com/gohyuhan/gitti/tui/popup/keybinding"
+	"github.com/gohyuhan/gitti/tui/popup/log"
 	"github.com/gohyuhan/gitti/tui/popup/pull"
 	"github.com/gohyuhan/gitti/tui/popup/push"
 	"github.com/gohyuhan/gitti/tui/popup/remote"
@@ -78,6 +79,12 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = commit.RenderGitResetToSelectedCommitTypeOptionPopUp(m)
 	case constant.GitResetToSelectedCommitConfirmPromptPopUp:
 		popUp = commit.RenderGitResetToSelectedCommitConfirmPromptPopUp(m)
+	case constant.GitCherryPickOptionSelectionPopUp:
+		popUp = log.RenderGitCherryPickOptionSelectionPopUp(m)
+	case constant.GitCherryPickPopUp:
+		popUp = log.RenderGitCherryPickPopUp(m)
+	case constant.GitEditCherryPickPopUp:
+		popUp = log.RenderGitEditCherryPickPopUp(m)
 	}
 	return popUp
 }

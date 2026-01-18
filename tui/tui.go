@@ -85,7 +85,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		LineStagingIndexCursorViewport:    lineStagingIndexCursorVp,
 		LineStagingIndexCursorTwoViewport: lineStagingIndexCursorVpTwo,
 		CherryPickedCommitLogList:         []git.CherryPickedCommitLog{},
-		CherryPickedCommitMap:             make(map[string]struct{}),
+		CherryPickedCommitMap:             make(map[string]string),
 	}
 	gittiModel.IsRenderInit.Store(false)
 	gittiModel.ShowPopUp.Store(false)
