@@ -7,6 +7,7 @@ import (
 	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/viewport"
 	"github.com/gohyuhan/gitti/api"
+	"github.com/gohyuhan/gitti/api/git"
 )
 
 type GittiModel struct {
@@ -61,6 +62,8 @@ type GittiModel struct {
 	LineStagingIndexCursorTwoViewport         viewport.Model
 	DetailPanelViewportOGStringArray          []string
 	DetailPanelTwoViewportOGStringArray       []string
+	CherryPickedCommitLogList                 []git.CherryPickedCommitLog
+	CherryPickedCommitMap                     map[string]struct{}
 }
 
 // ---------------------------------

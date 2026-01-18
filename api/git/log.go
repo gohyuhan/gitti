@@ -13,6 +13,14 @@ import (
 	"github.com/gohyuhan/gitti/executor"
 )
 
+// represent the info of commit that got cherry picked
+type CherryPickedCommitLog struct {
+	Hash       string
+	Message    string
+	Author     string
+	FromBranch string
+}
+
 // Commit represents a single git commit with all necessary graph information
 type CommitLog struct {
 	Hash         string
