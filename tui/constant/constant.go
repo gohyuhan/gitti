@@ -100,7 +100,7 @@ const (
 	PopUpCreateBranchBasedOnRemoteOutputViewportHeight = 4
 	PopUpGitResetLatestCommitTypeOptionHeight          = 6
 	PopUpGitResetToSelectedCommitTypeOptionHeight      = 6
-	PopUpGitCherryPickOptionSelectionHeight            = 4
+	PopUpGitCherryPickOptionSelectionHeight            = 6
 	PopUpGitCherryPickPopUpHeight                      = 10
 	PopUpGitEditCherryPickPopUpHeight                  = 10
 )
@@ -154,6 +154,7 @@ const (
 
 // cherry pick ops options
 const (
-	CHERRYPICK     = "CHERRYPICK"
-	EDITCHERRYPICk = "EDITCHERRYPICk"
+	CHERRYPICK      = "CHERRYPICK"
+	EDITCHERRYPICK  = "EDITCHERRYPICK"
+	APPLYCHERRYPICK = "APPLYCHERRYPICK"
 )

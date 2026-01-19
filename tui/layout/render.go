@@ -396,12 +396,17 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.DetailComponent:
 			if m.IsLineStagingState.Load() {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStaging
+			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStagingEligible
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 			}
+
 		case constant.DetailComponentTwo:
 			if m.IsLineStagingState.Load() {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStaging
+			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStagingEligible
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 			}

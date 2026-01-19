@@ -82,6 +82,7 @@ type LanguageMapping struct {
 	LineStagingModeTitle        string
 	CherryPickTitle             string
 	EditCherryPickTitle         string
+	ApplyCherryPickTitle        string
 	CherryPickOpsSelectionTitle string
 	// for Key Bindings
 	KeyBindingForGitStatusComponent                         []string
@@ -94,6 +95,7 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentNone                    []string
 	KeyBindingCommitLogComponent                            []string
 	KeyBindingKeyDetailComponent                            []string
+	KeyBindingKeyDetailComponentLineStagingEligible         []string
 	KeyBindingKeyDetailComponentLineStaging                 []string
 	KeyBindingKeyStashComponent                             []string
 	KeyBindingKeyStashComponentNone                         []string
@@ -260,8 +262,11 @@ type LanguageMapping struct {
 	GitResetToSelectedCommitHardConfirmation  string
 	GitResetToSelectedCommitMixedConfirmation string
 	// for cherry pick
-	CherryPickOpsTitle           string
-	CherryPickOpsDescription     string
-	EditCherryPickOpsTitle       string
-	EditCherryPickOpsDescription string
+	CherryPickOpsTitle            string
+	CherryPickOpsDescription      string
+	EditCherryPickOpsTitle        string
+	EditCherryPickOpsDescription  string
+	ApplyCherryPickOpsTitle       string
+	ApplyCherryPickOpsDescription string
+	CherryPickedFromBranch        string
 }

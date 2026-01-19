@@ -38,6 +38,7 @@ func handleNonTyping1KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		if m.CurrentSelectedComponent != constant.LocalBranchComponent {
 			m.CurrentSelectedComponent = constant.LocalBranchComponent
 			m.CurrentSelectedComponentIndex = 1
+			m.DetailPanelParentComponent = ""
 			layout.LeftPanelDynamicResize(m)
 			services.FetchDetailComponentPanelInfoService(m, true)
 		}
@@ -50,6 +51,7 @@ func handleNonTyping2KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		if m.CurrentSelectedComponent != constant.ModifiedFilesComponent {
 			m.CurrentSelectedComponent = constant.ModifiedFilesComponent
 			m.CurrentSelectedComponentIndex = 2
+			m.DetailPanelParentComponent = ""
 			layout.LeftPanelDynamicResize(m)
 			services.FetchDetailComponentPanelInfoService(m, true)
 		}
@@ -62,6 +64,7 @@ func handleNonTyping3KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		if m.CurrentSelectedComponent != constant.CommitLogComponent {
 			m.CurrentSelectedComponent = constant.CommitLogComponent
 			m.CurrentSelectedComponentIndex = 3
+			m.DetailPanelParentComponent = ""
 			layout.LeftPanelDynamicResize(m)
 			services.FetchDetailComponentPanelInfoService(m, true)
 		}
@@ -74,6 +77,7 @@ func handleNonTyping4KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		if m.CurrentSelectedComponent != constant.StashComponent {
 			m.CurrentSelectedComponent = constant.StashComponent
 			m.CurrentSelectedComponentIndex = 4
+			m.DetailPanelParentComponent = ""
 			layout.LeftPanelDynamicResize(m)
 			services.FetchDetailComponentPanelInfoService(m, true)
 		}
@@ -182,6 +186,31 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					// tracked file with only unstaged modification
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 					discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
+				}
+			}
+		}
+	} else {
+		switch m.PopUpType {
+		case constant.GitEditCherryPickPopUp:
+			popUp, ok := m.PopUpModel.(*logPopUp.GitEditCherryPickPopUpModel)
+			if ok {
+				selectedCherryPickedCommiyLogItem := popUp.CherryPickedCommitLog.SelectedItem()
+				if selectedCherryPickedCommiyLogItem != nil {
+					selectedCherryPickedCommiyLogHash := selectedCherryPickedCommiyLogItem.(logPopUp.GitEditCherryPickItem).Hash
+					_, exist := m.CherryPickedCommitInfo.CherryPickedCommitMap[selectedCherryPickedCommiyLogHash]
+					if exist {
+						delete(m.CherryPickedCommitInfo.CherryPickedCommitMap, selectedCherryPickedCommiyLogHash)
+					}
+					if len(m.CherryPickedCommitInfo.CherryPickedCommitMap) < 1 {
+						utils.ReinitCherryPickedCommitInfo(m)
+						m.ShowPopUp.Store(false)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.NoPopUp
+						m.PopUpModel = nil
+					} else {
+						// reinit the list after a removal
+						logPopUp.InitGitEditCherryPickPopUp(m, popUp.CherryPickedCommitLog.Index())
+					}
 				}
 			}
 		}
@@ -393,6 +422,18 @@ func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.
 			m.PopUpType = constant.GitStashConfirmPromptPopUp
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
+		}
+	} else if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.GitEditCherryPickPopUp:
+			_, ok := m.PopUpModel.(*logPopUp.GitEditCherryPickPopUpModel)
+			if ok {
+				utils.ReinitCherryPickedCommitInfo(m)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
 		}
 	}
 	return m, nil
@@ -635,6 +676,27 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 			}
+		case constant.GitCherryPickOptionSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*logPopUp.GitCherryPickOptionSelectionPopUpModel)
+			if ok {
+				selectedCherryPickType := popUp.CherryPickedOpsOption.SelectedItem()
+				if selectedCherryPickType != nil {
+					cherryPickType := selectedCherryPickType.(logPopUp.CherryPickOpsOptionItem).CherryPickOpsType
+					switch cherryPickType {
+					case constant.CHERRYPICK:
+						m.PopUpType = constant.GitCherryPickPopUp
+						logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+					case constant.EDITCHERRYPICK:
+						m.PopUpType = constant.GitEditCherryPickPopUp
+						logPopUp.InitGitEditCherryPickPopUp(m, 0)
+					case constant.APPLYCHERRYPICK:
+						// m.PopUpType = constant.GitApplyCherryPickPopUp
+						// logPopUp.InitGitApplyCherryPickPopUp(m)
+					}
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+				}
+			}
 		}
 	}
 	return m, nil
@@ -645,6 +707,7 @@ func handleNonTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 	if nextNavigation < len(constant.ComponentNavigationList) {
 		m.CurrentSelectedComponentIndex = nextNavigation
 		m.CurrentSelectedComponent = constant.ComponentNavigationList[nextNavigation]
+		m.DetailPanelParentComponent = ""
 		layout.LeftPanelDynamicResize(m)
 		services.FetchDetailComponentPanelInfoService(m, true)
 	}
@@ -656,6 +719,7 @@ func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.G
 	if previousNavigation >= 0 {
 		m.CurrentSelectedComponentIndex = previousNavigation
 		m.CurrentSelectedComponent = constant.ComponentNavigationList[previousNavigation]
+		m.DetailPanelParentComponent = ""
 		layout.LeftPanelDynamicResize(m)
 		services.FetchDetailComponentPanelInfoService(m, true)
 	}
@@ -699,13 +763,22 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				selectedCommitLog := popUp.CurrentBranchCherryPickCommitLog.SelectedItem()
 				if selectedCommitLog != nil {
 					cherryPickedCommitLog := selectedCommitLog.(logPopUp.GitCherryPickItem)
-					m.CherryPickedCommitLogList = append(m.CherryPickedCommitLogList, git.CherryPickedCommitLog{
-						Hash:       cherryPickedCommitLog.Hash,
-						Message:    cherryPickedCommitLog.Message,
-						Author:     cherryPickedCommitLog.Author,
-						FromBranch: cherryPickedCommitLog.FromBranch,
-					})
-					m.CherryPickedCommitMap[cherryPickedCommitLog.Hash] = cherryPickedCommitLog.Hash
+					CherryPickedCommitLogItem, ok := m.CherryPickedCommitInfo.CherryPickedCommitMap[cherryPickedCommitLog.Hash]
+					if ok {
+						delete(m.CherryPickedCommitInfo.CherryPickedCommitMap, CherryPickedCommitLogItem.Hash)
+						if len(m.CherryPickedCommitInfo.CherryPickedCommitMap) < 1 {
+							utils.ReinitCherryPickedCommitInfo(m)
+						}
+					} else {
+						m.CherryPickedCommitInfo.CherryPickedCommitMap[cherryPickedCommitLog.Hash] = git.CherryPickedCommitLog{
+							Hash:                 cherryPickedCommitLog.Hash,
+							Message:              cherryPickedCommitLog.Message,
+							Author:               cherryPickedCommitLog.Author,
+							FromBranch:           cherryPickedCommitLog.FromBranch,
+							UserSelectedSequence: m.CherryPickedCommitInfo.LatestSequenceCounter,
+						}
+						m.CherryPickedCommitInfo.LatestSequenceCounter++
+					}
 				}
 			}
 		}
@@ -1096,12 +1169,16 @@ func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent == constant.CommitLogComponent || m.DetailPanelParentComponent == constant.CommitLogComponent {
-			if len(m.CherryPickedCommitLogList) < 1 {
+			if len(m.CherryPickedCommitInfo.CherryPickedCommitMap) < 1 {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.GitCherryPickPopUp
 				m.IsTyping.Store(false)
 				logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
 			} else {
+				m.ShowPopUp.Store(true)
+				m.PopUpType = constant.GitCherryPickOptionSelectionPopUp
+				m.IsTyping.Store(false)
+				logPopUp.InitGitCherryPickOptionSelectionPopUp(m)
 			}
 		}
 	}

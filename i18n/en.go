@@ -23,7 +23,7 @@ var eN = LanguageMapping{
 	UpdaterAutoUpdaterSetError:          "Invalid input, please enter `true` to enable auto updater or `false` to disable auto updater",
 	FlagVersion:                         "Display version of gitti",
 	FlagLangCode:                        "set the language code, e.g. 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
-	FlagInitDefaultBranch:               "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
+	FlagInitDefaultBranch:               "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag (only works on git version >= 2.28)",
 	FlagAutoUpdate:                      "set to allow auto check for latest version",
 	FlagUpdate:                          "prompt gitti to update to latest version",
 	FlagGlobal:                          "also apply to system git if supported",
@@ -61,6 +61,7 @@ var eN = LanguageMapping{
 	LineStagingModeTitle:                "In Line Staging Mode",
 	CherryPickTitle:                     "Cherry Pick from Branch: \n %s",
 	EditCherryPickTitle:                 "Edit Cherry Pick",
+	ApplyCherryPickTitle:                "Apply Cherry Pick to Current Branch: \n %s",
 	CherryPickOpsSelectionTitle:         "Cherry Pick Operation Selection",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
@@ -111,9 +112,16 @@ var eN = LanguageMapping{
 		"[enter] view commit log content",
 		"[r] reset to this commit",
 		"[R] reset the latest commit",
+		"[ctrl+p] cherry pick ops",
 		"[?] global key binding",
 	},
 	KeyBindingKeyDetailComponent: []string{
+		"[←/→] move left and right",
+		"[↑/↓] move up and down",
+		"[esc] back",
+		"[?] global key binding",
+	},
+	KeyBindingKeyDetailComponentLineStagingEligible: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
 		"[L] enter line staging mode",
@@ -253,12 +261,13 @@ var eN = LanguageMapping{
 	},
 	KeyBindingForGitCherryPickPopUp: []string{
 		"[↑/↓] move up and down",
-		"[space] select for cherry pick",
+		"[space] select/unselect for cherry pick",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGitEditCherryPickPopUp: []string{
 		"[↑/↓] move up and down",
-		"[backspace] remove selection",
+		"[d] remove selection",
+		"[backspace] remove all selection",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -376,6 +385,9 @@ var eN = LanguageMapping{
 	CherryPickOpsDescription:                                 "Choose commits that will then be applied to cherry pick operation",
 	EditCherryPickOpsTitle:                                   "Edit Cherry Pick",
 	EditCherryPickOpsDescription:                             "Edit cherry picked commits (eg. remove a selection)",
+	ApplyCherryPickOpsTitle:                                  "Apply Cherry Pick",
+	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
+	CherryPickedFromBranch:                                   "Cherry picked from branch: %s",
 }
 
 // for about gitti

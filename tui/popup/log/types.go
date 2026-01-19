@@ -8,6 +8,7 @@ import (
 	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/utils"
@@ -48,8 +49,7 @@ type GitCherryPickOptionSelectionPopUpModel struct {
 // ---------------------------------
 type (
 	GitCherryPickDelegate struct {
-		CherryPickedCommit *[]git.CherryPickedCommitLog
-		CherryPickedMap    *map[string]string
+		CherryPickedMap *map[string]git.CherryPickedCommitLog
 	}
 	GitCherryPickItem struct {
 		Hash       string
@@ -90,9 +90,65 @@ func (d GitCherryPickDelegate) Render(w io.Writer, m list.Model, index int, list
 	}
 
 	firstStr = utils.TruncateString(firstStr, componentWidth)
-	secondStr = utils.TruncateString(fmt.Sprintf("       %s", i.Message), componentWidth)
+	secondStr = utils.TruncateString(fmt.Sprintf("         %s", i.Message), componentWidth)
 
 	str = fmt.Sprintf("%s\n%s", firstStr, secondStr)
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(str))
+}
+
+// ---------------------------------
+//
+// bubble tea list for editing commit log for cherry pick (mainly just for removal)
+//
+// ---------------------------------
+type (
+	GitEditCherryPickDelegate struct{}
+	GitEditCherryPickItem     struct {
+		Hash       string
+		Message    string
+		Author     string
+		FromBranch string
+	}
+)
+
+func (i GitEditCherryPickItem) FilterValue() string {
+	return i.Hash
+}
+
+// for list component of Git branch
+func (d GitEditCherryPickDelegate) Height() int                             { return 1 }
+func (d GitEditCherryPickDelegate) Spacing() int                            { return 0 }
+func (d GitEditCherryPickDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d GitEditCherryPickDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(GitEditCherryPickItem)
+	if !ok {
+		return
+	}
+
+	var firstStr string
+	var secondStr string
+	var thirdStr string
+	var str string
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+
+	firstStr = utils.TruncateString(fmt.Sprintf("%s  |  %s", i.Hash[:7], i.Author), componentWidth)
+	secondStr = utils.TruncateString(fmt.Sprintf("    %s", i.Message), componentWidth)
+	thirdStr = utils.TruncateString(fmt.Sprintf("    %s %s", i18n.LANGUAGEMAPPING.CherryPickedFromBranch, i.FromBranch), componentWidth)
+
+	str = fmt.Sprintf("%s\n%s\n%s", firstStr, secondStr, thirdStr)
 
 	var fn func(...string) string
 	if index == m.Index() {

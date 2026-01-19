@@ -23,7 +23,7 @@ var zH_HANS = LanguageMapping{
 	UpdaterAutoUpdaterSetError:          "输入无效，请输入 `true` 以启用自动更新，或输入 `false` 以禁用自动更新",
 	FlagVersion:                         "显示 gitti 的版本",
 	FlagLangCode:                        "设置语言代码，例如: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
-	FlagInitDefaultBranch:               "设置 git init 的默认分支.\n此设置仅影响通过 gitti 执行的 git init.\n若要让 git 自身默认使用此分支名称，请同时添加 '--global' 参数.",
+	FlagInitDefaultBranch:               "设置 git init 的默认分支.\n此设置仅影响通过 gitti 执行的 git init.\n若要让 git 自身默认使用此分支名称，请同时添加 '--global' 参数 (仅适用于 git 版本 >= 2.28)",
 	FlagAutoUpdate:                      "设置为允许自动检查最新版本",
 	FlagUpdate:                          "将 gitti 更新至最新版本",
 	FlagGlobal:                          "同时应用到系统 git（如果支持）",
@@ -61,6 +61,7 @@ var zH_HANS = LanguageMapping{
 	LineStagingModeTitle:                "行暂存模式",
 	CherryPickTitle:                     "从分支遴选: \n %s",
 	EditCherryPickTitle:                 "编辑遴选",
+	ApplyCherryPickTitle:                "将遴选应用到当前分支: \n %s",
 	CherryPickOpsSelectionTitle:         "遴选操作选择",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全局快捷键",
@@ -111,9 +112,16 @@ var zH_HANS = LanguageMapping{
 		"[enter] 查看提交日志内容",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
+		"[ctrl+p] 遴选操作",
 		"[?] 全局快捷键",
 	},
 	KeyBindingKeyDetailComponent: []string{
+		"[←/→] 左右移动",
+		"[↑/↓] 上下移动",
+		"[esc] 返回",
+		"[?] 全局快捷键",
+	},
+	KeyBindingKeyDetailComponentLineStagingEligible: []string{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",
 		"[L] 进入行暂存模式",
@@ -253,12 +261,13 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingForGitCherryPickPopUp: []string{
 		"[↑/↓] 上下移动",
-		"[space] 选择进行遴选",
+		"[space] 选择/取消选择进行遴选",
 		"[esc] 取消 / 关闭",
 	},
 	KeyBindingForGitEditCherryPickPopUp: []string{
 		"[↑/↓] 上下移动",
-		"[backspace] 移除选择",
+		"[d] 移除选择",
+		"[backspace] 移除所有选择",
 		"[esc] 取消 / 关闭",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -376,6 +385,9 @@ var zH_HANS = LanguageMapping{
 	CherryPickOpsDescription:                                 "选择将要应用到遴选操作的提交",
 	EditCherryPickOpsTitle:                                   "编辑遴选",
 	EditCherryPickOpsDescription:                             "编辑已遴选的提交 (例如：移除选择)",
+	ApplyCherryPickOpsTitle:                                  "应用遴选",
+	ApplyCherryPickOpsDescription:                            "将已遴选的提交应用到当前检出的分支",
+	CherryPickedFromBranch:                                   "遴选自分支: %s",
 }
 
 // for about gitti

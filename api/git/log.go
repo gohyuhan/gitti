@@ -15,10 +15,11 @@ import (
 
 // represent the info of commit that got cherry picked
 type CherryPickedCommitLog struct {
-	Hash       string
-	Message    string
-	Author     string
-	FromBranch string
+	Hash                 string
+	Message              string
+	Author               string
+	FromBranch           string
+	UserSelectedSequence int
 }
 
 // Commit represents a single git commit with all necessary graph information

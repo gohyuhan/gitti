@@ -30,16 +30,17 @@ func RenderGitCherryPickPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCherryPickPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitCherryPickPopUpWidth, int(float64(m.Width)*0.8))
-		popUpHeight := max(constant.PopUpGitCherryPickPopUpHeight, int(float64(m.Height)*0.5)-3)
+		// we are dividing by 2 because the list is a single string that have 1 \n that break into 2 line
+		popUpHeight := max(constant.PopUpGitCherryPickPopUpHeight, int((float64(m.Height)*0.8)/2))
 		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.CherryPickTitle, popUp.CurrentBranchName))
 		popUp.CurrentBranchCherryPickCommitLog.SetWidth(popUpWidth - 4)
-		popUp.CurrentBranchCherryPickCommitLog.SetHeight(popUpHeight)
+		popUp.CurrentBranchCherryPickCommitLog.SetHeight(popUpHeight - 3)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			popUp.CurrentBranchCherryPickCommitLog.View(),
 		)
-		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+		return style.PopUpBorderStyle.Width(popUpWidth).Height(popUpHeight).Render(content)
 	}
 	return ""
 }
@@ -48,16 +49,17 @@ func RenderGitEditCherryPickPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitEditCherryPickPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitEditCherryPickPopUpWidth, int(float64(m.Width)*0.8))
-		popUpHeight := max(constant.PopUpGitEditCherryPickPopUpHeight, int(float64(m.Height)*0.5)-3)
+		// we are dividing by 3 because the list is a single string that have 2 \n that break into 3 line
+		popUpHeight := max(constant.PopUpGitEditCherryPickPopUpHeight, int((float64(m.Height)*0.8)/3))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.EditCherryPickTitle)
 		popUp.CherryPickedCommitLog.SetWidth(popUpWidth - 4)
-		popUp.CherryPickedCommitLog.SetHeight(popUpHeight)
+		popUp.CherryPickedCommitLog.SetHeight(popUpHeight - 3)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			popUp.CherryPickedCommitLog.View(),
 		)
-		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+		return style.PopUpBorderStyle.Width(popUpWidth).Height(popUpHeight).Render(content)
 	}
 	return ""
 }

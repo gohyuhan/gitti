@@ -23,7 +23,7 @@ var jA = LanguageMapping{
 	UpdaterAutoUpdaterSetError:          "無効な入力です. 自動更新を有効にするには `true`, 無効にするには `false` を入力してください",
 	FlagVersion:                         "gittiバージョンを表示する",
 	FlagLangCode:                        "言語コードを設定します. 例: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
-	FlagInitDefaultBranch:               "git init のデフォルトブランチを設定します.\nこれは gitti を通して行われる git init にのみ影響します.\ngit 自体のデフォルトブランチ名を変更するには、'--global' フラグも追加してください.",
+	FlagInitDefaultBranch:               "git init のデフォルトブランチを設定します.\nこれは gitti を通して行われる git init にのみ影響します.\ngit 自体のデフォルトブランチ名を変更するには、'--global' フラグも追加してください (git バージョン >= 2.28 のみ有効)",
 	FlagAutoUpdate:                      "最新バージョンの自動チェックを有効にする",
 	FlagUpdate:                          "gittiを最新バージョンに更新する",
 	FlagGlobal:                          "システムの git にも適用します（対応している場合）",
@@ -61,6 +61,7 @@ var jA = LanguageMapping{
 	LineStagingModeTitle:                "行ステージングモード",
 	CherryPickTitle:                     "ブランチからチェリーピック: \n %s",
 	EditCherryPickTitle:                 "チェリーピックを編集",
+	ApplyCherryPickTitle:                "現在のブランチにチェリーピックを適用: \n %s",
 	CherryPickOpsSelectionTitle:         "チェリーピック操作の選択",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] グローバルキー操作",
@@ -111,9 +112,16 @@ var jA = LanguageMapping{
 		"[enter] コミットログの内容を表示",
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
+		"[ctrl+p] チェリーピック操作",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingKeyDetailComponent: []string{
+		"[←/→] 左右に移動",
+		"[↑/↓] 上下に移動",
+		"[esc] 戻る",
+		"[?] グローバルキー操作",
+	},
+	KeyBindingKeyDetailComponentLineStagingEligible: []string{
 		"[←/→] 左右に移動",
 		"[↑/↓] 上下に移動",
 		"[L] 行ステージングモードに入る",
@@ -253,12 +261,13 @@ var jA = LanguageMapping{
 	},
 	KeyBindingForGitCherryPickPopUp: []string{
 		"[↑/↓] 上下に移動",
-		"[space] チェリーピック対象を選択",
+		"[space] チェリーピック対象を選択/解除",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForGitEditCherryPickPopUp: []string{
 		"[↑/↓] 上下に移動",
-		"[backspace] 選択を解除",
+		"[d] 選択を解除",
+		"[backspace] すべての選択を解除",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -376,6 +385,9 @@ var jA = LanguageMapping{
 	CherryPickOpsDescription:                                 "チェリーピック操作に適用するコミットを選択します",
 	EditCherryPickOpsTitle:                                   "チェリーピックを編集",
 	EditCherryPickOpsDescription:                             "チェリーピックされたコミットを編集します (例: 選択の解除)",
+	ApplyCherryPickOpsTitle:                                  "チェリーピックを適用",
+	ApplyCherryPickOpsDescription:                            "チェリーピックされたコミットを現在のチェックアウトブランチに適用します",
+	CherryPickedFromBranch:                                   "チェリーピック元のブランチ: %s",
 }
 
 // for about gitti

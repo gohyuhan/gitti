@@ -6,6 +6,11 @@ A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 
 > ⚠️ **Development Status**: Gitti is actively under development. Features, APIs, and behaviors may change significantly. Development is driven by personal needs first, with additional features planned afterward. Not all majority used Git operations are currently supported.
 
+## Requirements
+
+- **Git 2.13.0+** - Core functionality
+- **Git 2.28.0+** - Optional, for `gitti --init-dbranch <name> --global`
+
 ## Description
 
 Gitti is a visual Git client built for developers who live in the terminal. It provides an intuitive TUI (Terminal User Interface) for common Git operations without the overhead of traditional GUI applications or the verbosity of CLI commands.

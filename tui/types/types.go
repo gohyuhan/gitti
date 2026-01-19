@@ -62,8 +62,17 @@ type GittiModel struct {
 	LineStagingIndexCursorTwoViewport         viewport.Model
 	DetailPanelViewportOGStringArray          []string
 	DetailPanelTwoViewportOGStringArray       []string
-	CherryPickedCommitLogList                 []git.CherryPickedCommitLog
-	CherryPickedCommitMap                     map[string]string
+	CherryPickedCommitInfo                    CherryPickedCommitInfo
+}
+
+// ---------------------------------
+//
+// to record the cherry picked commit info like the sequence counter and the map of cherry picked commit
+//
+// ---------------------------------
+type CherryPickedCommitInfo struct {
+	LatestSequenceCounter int // this counter will only increase or reinit to 0, this help us to sort the Map when showing in the UI (doesn't mean will apply to cherry pick in the order)
+	CherryPickedCommitMap map[string]git.CherryPickedCommitLog
 }
 
 // ---------------------------------

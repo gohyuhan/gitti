@@ -8,6 +8,7 @@ import (
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
 
+	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
 	"golang.org/x/text/width"
@@ -124,4 +125,9 @@ func ReturnEditorLaunchCommand(fileName string, userSetEditor string) (*exec.Cmd
 
 	cmd := exec.Command(editorCommand, []string{filepath}...)
 	return cmd, isNonTerminalEditor
+}
+
+func ReinitCherryPickedCommitInfo(m *types.GittiModel) {
+	m.CherryPickedCommitInfo.LatestSequenceCounter = 0
+	m.CherryPickedCommitInfo.CherryPickedCommitMap = make(map[string]git.CherryPickedCommitLog)
 }
