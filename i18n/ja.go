@@ -262,12 +262,16 @@ var jA = LanguageMapping{
 	KeyBindingForGitCherryPickPopUp: []string{
 		"[↑/↓] 上下に移動",
 		"[space] チェリーピック対象を選択/解除",
+		"[e] チェリーピックされたコミットを編集",
+		"[a] チェリーピックされたコミットを適用",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForGitEditCherryPickPopUp: []string{
 		"[↑/↓] 上下に移動",
 		"[d] 選択を解除",
 		"[backspace] すべての選択を解除",
+		"[ctrl+p] 現在のブランチからコミットをチェリーピック",
+		"[a] チェリーピックされたコミットを適用",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -387,7 +391,7 @@ var jA = LanguageMapping{
 	EditCherryPickOpsDescription:                             "チェリーピックされたコミットを編集します (例: 選択の解除)",
 	ApplyCherryPickOpsTitle:                                  "チェリーピックを適用",
 	ApplyCherryPickOpsDescription:                            "チェリーピックされたコミットを現在のチェックアウトブランチに適用します",
-	CherryPickedFromBranch:                                   "チェリーピック元のブランチ: %s",
+	CherryPickedFromBranch:                                   "チェリーピック元のブランチ ~>",
 }
 
 // for about gitti
@@ -510,7 +514,7 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "space",
+		KeyBindingLine:  "A",
 		TitleOrInfoLine: "コミットを修正（最新のコミットを更新）",
 		LineType:        INFO,
 	},

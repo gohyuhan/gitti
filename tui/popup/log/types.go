@@ -92,6 +92,9 @@ func (d GitCherryPickDelegate) Render(w io.Writer, m list.Model, index int, list
 	firstStr = utils.TruncateString(firstStr, componentWidth)
 	secondStr = utils.TruncateString(fmt.Sprintf("         %s", i.Message), componentWidth)
 
+	// except for the first string, all other string should be faded
+	secondStr = style.ItemStyle.Faint(true).Render(secondStr)
+
 	str = fmt.Sprintf("%s\n%s", firstStr, secondStr)
 
 	var fn func(...string) string
@@ -146,7 +149,11 @@ func (d GitEditCherryPickDelegate) Render(w io.Writer, m list.Model, index int, 
 
 	firstStr = utils.TruncateString(fmt.Sprintf("%s  |  %s", i.Hash[:7], i.Author), componentWidth)
 	secondStr = utils.TruncateString(fmt.Sprintf("    %s", i.Message), componentWidth)
-	thirdStr = utils.TruncateString(fmt.Sprintf("    %s %s", i18n.LANGUAGEMAPPING.CherryPickedFromBranch, i.FromBranch), componentWidth)
+	thirdStr = utils.TruncateString(fmt.Sprintf("    %s  %s", i18n.LANGUAGEMAPPING.CherryPickedFromBranch, i.FromBranch), componentWidth)
+
+	// except for the first string, all other string should be faded
+	secondStr = style.ItemStyle.Faint(true).Render(secondStr)
+	thirdStr = style.ItemStyle.Faint(true).Render(thirdStr)
 
 	str = fmt.Sprintf("%s\n%s\n%s", firstStr, secondStr, thirdStr)
 

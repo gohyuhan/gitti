@@ -85,7 +85,7 @@ func handleNonTyping4KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
-func handleNonTypingaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingAKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		m.ShowPopUp.Store(true)
 		m.PopUpType = constant.AmendCommitPopUp
@@ -219,21 +219,30 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 }
 
 func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
-
-		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-		if currentSelectedFileItem != nil {
-			currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
-			cmd, isNonEditorEditor := utils.ReturnEditorLaunchCommand(currentSelectedFile.FilePathname, m.UserSetEditor)
-			if isNonEditorEditor {
-				cmd.Start()
-				return m, nil
-			} else {
-				return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
-					return types.EditorFinishedMsg{
-						Err: err,
-					}
-				})
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.GitCherryPickPopUp:
+			m.PopUpType = constant.GitEditCherryPickPopUp
+			logPopUp.InitGitEditCherryPickPopUp(m, 0)
+			m.ShowPopUp.Store(true)
+			m.IsTyping.Store(false)
+		}
+	} else {
+		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+			if currentSelectedFileItem != nil {
+				currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
+				cmd, isNonEditorEditor := utils.ReturnEditorLaunchCommand(currentSelectedFile.FilePathname, m.UserSetEditor)
+				if isNonEditorEditor {
+					cmd.Start()
+					return m, nil
+				} else {
+					return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
+						return types.EditorFinishedMsg{
+							Err: err,
+						}
+					})
+				}
 			}
 		}
 	}
@@ -1167,8 +1176,17 @@ func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 }
 
 func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	if !m.ShowPopUp.Load() {
-		if m.CurrentSelectedComponent == constant.CommitLogComponent || m.DetailPanelParentComponent == constant.CommitLogComponent {
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.GitEditCherryPickPopUp:
+			m.PopUpType = constant.GitCherryPickPopUp
+			logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+			m.ShowPopUp.Store(true)
+			m.IsTyping.Store(false)
+		}
+	} else {
+		if (m.CurrentSelectedComponent == constant.CommitLogComponent || m.DetailPanelParentComponent == constant.CommitLogComponent) &&
+			len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
 			if len(m.CherryPickedCommitInfo.CherryPickedCommitMap) < 1 {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.GitCherryPickPopUp

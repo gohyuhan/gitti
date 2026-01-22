@@ -262,12 +262,16 @@ var eN = LanguageMapping{
 	KeyBindingForGitCherryPickPopUp: []string{
 		"[↑/↓] move up and down",
 		"[space] select/unselect for cherry pick",
+		"[e] edit cherry picked commit(s)",
+		"[a] apply cherry picked commit(s)",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGitEditCherryPickPopUp: []string{
 		"[↑/↓] move up and down",
 		"[d] remove selection",
 		"[backspace] remove all selection",
+		"[ctrl+p] cherry pick commit from current branch",
+		"[a] apply cherry picked commit(s)",
 		"[esc] cancel / close",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -387,7 +391,7 @@ var eN = LanguageMapping{
 	EditCherryPickOpsDescription:                             "Edit cherry picked commits (eg. remove a selection)",
 	ApplyCherryPickOpsTitle:                                  "Apply Cherry Pick",
 	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
-	CherryPickedFromBranch:                                   "Cherry picked from branch: %s",
+	CherryPickedFromBranch:                                   "Cherry picked from branch ~>",
 }
 
 // for about gitti
@@ -508,7 +512,7 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "space",
+		KeyBindingLine:  "A",
 		TitleOrInfoLine: "amend commit (modifies the latest commit)",
 		LineType:        INFO,
 	},

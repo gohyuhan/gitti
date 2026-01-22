@@ -17,10 +17,6 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// for bubbletea list component, we can't get rid of the "No items." natively for now as there was no exposed api
-// see https://github.com/charmbracelet/bubbles/blob/master/list/list.go#L1222
-// we are using ReplaceAll as a hack for now to replace "No items." with ""
-
 // -----------------------------------------------------------------------------
 //
 //	Functions that help construct the view
@@ -82,7 +78,7 @@ func renderLocalBranchesComponentPanel(width int, height int, m *types.GittiMode
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(strings.ReplaceAll(m.CurrentRepoBranchesInfoList.View(), "No items.", ""))
+		Render(m.CurrentRepoBranchesInfoList.View())
 }
 
 // Render the Changed Files panel
@@ -94,7 +90,7 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(strings.ReplaceAll(m.CurrentRepoModifiedFilesInfoList.View(), "No items.", ""))
+		Render(m.CurrentRepoModifiedFilesInfoList.View())
 }
 
 // Render the Changed Files panel
@@ -106,7 +102,7 @@ func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) s
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(strings.ReplaceAll(m.CurrentRepoCommitLogInfoList.View(), "No items.", ""))
+		Render(m.CurrentRepoCommitLogInfoList.View())
 }
 
 // Render the detail component part at the right of the window,
@@ -250,7 +246,7 @@ func renderStashComponentPanel(width int, height int, m *types.GittiModel) strin
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(strings.ReplaceAll(m.CurrentRepoStashInfoList.View(), "No items.", ""))
+		Render(m.CurrentRepoStashInfoList.View())
 }
 
 func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {

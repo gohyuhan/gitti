@@ -262,12 +262,16 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForGitCherryPickPopUp: []string{
 		"[↑/↓] 上下移動",
 		"[space] 選擇/取消選擇進行揀選",
+		"[e] 編輯已揀選的提交",
+		"[a] 應用已揀選的提交",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGitEditCherryPickPopUp: []string{
 		"[↑/↓] 上下移動",
 		"[d] 移除選擇",
 		"[backspace] 移除所有選擇",
+		"[ctrl+p] 從當前分支揀選提交",
+		"[a] 應用已揀選的提交",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
@@ -387,7 +391,7 @@ var zH_HANT = LanguageMapping{
 	EditCherryPickOpsDescription:                             "編輯已揀選的提交 (例如：移除選擇)",
 	ApplyCherryPickOpsTitle:                                  "應用揀選",
 	ApplyCherryPickOpsDescription:                            "將已揀選的提交應用到當前檢出的分支",
-	CherryPickedFromBranch:                                   "揀選自分支: %s",
+	CherryPickedFromBranch:                                   "揀選自分支 ~>",
 }
 
 // for about gitti
@@ -509,7 +513,7 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "space",
+		KeyBindingLine:  "A",
 		TitleOrInfoLine: "修改提交（僅修改最近一次提交）",
 		LineType:        INFO,
 	},
