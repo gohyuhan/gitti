@@ -32,7 +32,7 @@ func RenderGitCherryPickPopUp(m *types.GittiModel) string {
 		popUpWidth := min(constant.MaxGitCherryPickPopUpWidth, int(float64(m.Width)*0.8))
 		// we are dividing by 2 because the list is a single string that have 1 \n that break into 2 line
 		popUpHeight := max(constant.PopUpGitCherryPickPopUpHeight, int((float64(m.Height)*0.8)/2))
-		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.CherryPickTitle, popUp.CurrentBranchName))
+		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.CherryPickTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(popUp.CurrentBranchName)))
 		popUp.CurrentBranchCherryPickCommitLog.SetWidth(popUpWidth - 4)
 		popUp.CurrentBranchCherryPickCommitLog.SetHeight(popUpHeight - 3)
 		content := lipgloss.JoinVertical(
@@ -62,4 +62,15 @@ func RenderGitEditCherryPickPopUp(m *types.GittiModel) string {
 		return style.PopUpBorderStyle.Width(popUpWidth).Height(popUpHeight).Render(content)
 	}
 	return ""
+}
+
+func RenderGitCherryPickApplyConfirmPopUp(m *types.GittiModel) string {
+	popUpWidth := min(constant.MaxGitCherryPickApplyConfirmPopUpWidth, int(float64(m.Width)*0.8))
+	confirmMessage := fmt.Sprintf(i18n.LANGUAGEMAPPING.CherryPickApplyConfirmTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(m.CheckOutBranch))
+	title := style.TitleStyle.Render(confirmMessage)
+	content := lipgloss.JoinVertical(
+		lipgloss.Left,
+		title,
+	)
+	return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 }

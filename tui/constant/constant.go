@@ -37,6 +37,7 @@ const (
 	GitCherryPickOptionSelectionPopUp          = "GitCherryPickOptionSelectionPopUp"          // IsTyping will be false
 	GitCherryPickPopUp                         = "GitCherryPickPopUp"                         // IsTyping will be false
 	GitEditCherryPickPopUp                     = "GitEditCherryPickPopUp"                     // IsTyping will be false
+	GitCherryPickApplyConfirmPopUp             = "GitCherryPickApplyConfirmPopUp"             // IsTyping will be false
 )
 
 const SelectedLeftPanelComponentHeightRatio = 0.4
@@ -80,6 +81,7 @@ const (
 	MaxGitCherryPickOptionSelectionPopUpWidth          = 150
 	MaxGitCherryPickPopUpWidth                         = 150
 	MaxGitEditCherryPickPopUpWidth                     = 150
+	MaxGitCherryPickApplyConfirmPopUpWidth             = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 30
 	PopUpGitCommitOutputViewPortHeight                 = 10

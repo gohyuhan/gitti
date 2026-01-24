@@ -84,6 +84,7 @@ type LanguageMapping struct {
 	EditCherryPickTitle         string
 	ApplyCherryPickTitle        string
 	CherryPickOpsSelectionTitle string
+	CherryPickApplyConfirmTitle string
 	// for Key Bindings
 	KeyBindingForGitStatusComponent                         []string
 	KeyBindingLocalBranchComponentIsCheckOut                []string
@@ -127,6 +128,7 @@ type LanguageMapping struct {
 	KeyBindingForGitCherryPickOptionSelectionPopUp          []string
 	KeyBindingForGitCherryPickPopUp                         []string
 	KeyBindingForGitEditCherryPickPopUp                     []string
+	KeyBindingForGitCherryPickApplyConfirmPopUp             []string
 	KeyBindingForGlobalKeyBindingPopUp                      []string
 	// -----------------
 	//  For Pop Up

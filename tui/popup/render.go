@@ -85,6 +85,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = log.RenderGitCherryPickPopUp(m)
 	case constant.GitEditCherryPickPopUp:
 		popUp = log.RenderGitEditCherryPickPopUp(m)
+	case constant.GitCherryPickApplyConfirmPopUp:
+		popUp = log.RenderGitCherryPickApplyConfirmPopUp(m)
 	}
 	return popUp
 }

@@ -1,7 +1,7 @@
 package log
 
 import (
-	"sort"
+	"slices"
 
 	"charm.land/bubbles/v2/list"
 	"github.com/gohyuhan/gitti/api/git"
@@ -100,8 +100,8 @@ func InitGitEditCherryPickPopUp(m *types.GittiModel, selectionIndex int) {
 	for _, commitItem := range m.CherryPickedCommitInfo.CherryPickedCommitMap {
 		sortedCommits = append(sortedCommits, commitItem)
 	}
-	sort.Slice(sortedCommits, func(i, j int) bool {
-		return sortedCommits[i].UserSelectedSequence < sortedCommits[j].UserSelectedSequence
+	slices.SortFunc(sortedCommits, func(a, b git.CherryPickedCommitLog) int {
+		return a.UserSelectedSequence - b.UserSelectedSequence
 	})
 	for _, commitItem := range sortedCommits {
 		items = append(items, GitEditCherryPickItem{

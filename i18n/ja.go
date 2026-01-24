@@ -63,6 +63,7 @@ var jA = LanguageMapping{
 	EditCherryPickTitle:                 "チェリーピックを編集",
 	ApplyCherryPickTitle:                "現在のブランチにチェリーピックを適用: \n %s",
 	CherryPickOpsSelectionTitle:         "チェリーピック操作の選択",
+	CherryPickApplyConfirmTitle:         "チェリーピックされたコミットを現在のチェックアウト中のブランチに適用してもよろしいですか: \n %s",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] グローバルキー操作",
 	},
@@ -274,6 +275,12 @@ var jA = LanguageMapping{
 		"[a] チェリーピックされたコミットを適用",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitCherryPickApplyConfirmPopUp: []string{
+		"[e] チェリーピックされたコミットを編集",
+		"[ctrl+p] 現在のブランチからコミットをチェリーピック",
+		"[enter] チェリーピックされたコミットを適用",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -391,7 +398,7 @@ var jA = LanguageMapping{
 	EditCherryPickOpsDescription:                             "チェリーピックされたコミットを編集します (例: 選択の解除)",
 	ApplyCherryPickOpsTitle:                                  "チェリーピックを適用",
 	ApplyCherryPickOpsDescription:                            "チェリーピックされたコミットを現在のチェックアウトブランチに適用します",
-	CherryPickedFromBranch:                                   "チェリーピック元のブランチ ~>",
+	CherryPickedFromBranch:                                   "チェリーピック元のブランチ  ~>",
 }
 
 // for about gitti

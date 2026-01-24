@@ -63,6 +63,7 @@ var eN = LanguageMapping{
 	EditCherryPickTitle:                 "Edit Cherry Pick",
 	ApplyCherryPickTitle:                "Apply Cherry Pick to Current Branch: \n %s",
 	CherryPickOpsSelectionTitle:         "Cherry Pick Operation Selection",
+	CherryPickApplyConfirmTitle:         "Are you sure you want to apply cherry picked commit to current checked out branch: \n %s",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},
@@ -274,6 +275,12 @@ var eN = LanguageMapping{
 		"[a] apply cherry picked commit(s)",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitCherryPickApplyConfirmPopUp: []string{
+		"[e] edit cherry picked commit(s)",
+		"[ctrl+p] cherry pick commit from current branch",
+		"[enter] apply cherry picked commit(s)",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -391,7 +398,7 @@ var eN = LanguageMapping{
 	EditCherryPickOpsDescription:                             "Edit cherry picked commits (eg. remove a selection)",
 	ApplyCherryPickOpsTitle:                                  "Apply Cherry Pick",
 	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
-	CherryPickedFromBranch:                                   "Cherry picked from branch ~>",
+	CherryPickedFromBranch:                                   "Cherry picked from branch  ~>",
 }
 
 // for about gitti

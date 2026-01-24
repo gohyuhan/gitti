@@ -63,6 +63,7 @@ var zH_HANT = LanguageMapping{
 	EditCherryPickTitle:                 "編輯揀選",
 	ApplyCherryPickTitle:                "將揀選應用到當前分支: \n %s",
 	CherryPickOpsSelectionTitle:         "揀選操作選擇",
+	CherryPickApplyConfirmTitle:         "您確定要將挑選的提交套用到目前簽出的分支嗎: \n %s",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全域快捷鍵",
 	},
@@ -274,6 +275,12 @@ var zH_HANT = LanguageMapping{
 		"[a] 應用已揀選的提交",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForGitCherryPickApplyConfirmPopUp: []string{
+		"[e] 編輯已揀選的提交",
+		"[ctrl+p] 從目前分支揀選提交",
+		"[enter] 應用已揀選的提交",
+		"[esc] 取消 / 關閉",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 關閉",
 	},
@@ -391,7 +398,7 @@ var zH_HANT = LanguageMapping{
 	EditCherryPickOpsDescription:                             "編輯已揀選的提交 (例如：移除選擇)",
 	ApplyCherryPickOpsTitle:                                  "應用揀選",
 	ApplyCherryPickOpsDescription:                            "將已揀選的提交應用到當前檢出的分支",
-	CherryPickedFromBranch:                                   "揀選自分支 ~>",
+	CherryPickedFromBranch:                                   "揀選自分支  ~>",
 }
 
 // for about gitti

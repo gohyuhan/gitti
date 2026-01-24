@@ -85,6 +85,24 @@ func handleNonTyping4KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.GitCherryPickPopUp:
+			m.ShowPopUp.Store(true)
+			m.PopUpType = constant.GitCherryPickApplyConfirmPopUp
+			m.PopUpModel = nil // we don't need to initialize the pop up model, as we are just showing the pop up and we don't need to hold any state or info
+			m.IsTyping.Store(false)
+		case constant.GitEditCherryPickPopUp:
+			m.ShowPopUp.Store(true)
+			m.PopUpType = constant.GitCherryPickApplyConfirmPopUp
+			m.PopUpModel = nil // we don't need to initialize the pop up model, as we are just showing the pop up and we don't need to hold any state or info
+			m.IsTyping.Store(false)
+		}
+	}
+	return m, nil
+}
+
 func handleNonTypingAKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		m.ShowPopUp.Store(true)
@@ -222,6 +240,11 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.GitCherryPickPopUp:
+			m.PopUpType = constant.GitEditCherryPickPopUp
+			logPopUp.InitGitEditCherryPickPopUp(m, 0)
+			m.ShowPopUp.Store(true)
+			m.IsTyping.Store(false)
+		case constant.GitCherryPickApplyConfirmPopUp:
 			m.PopUpType = constant.GitEditCherryPickPopUp
 			logPopUp.InitGitEditCherryPickPopUp(m, 0)
 			m.ShowPopUp.Store(true)
@@ -699,13 +722,21 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.PopUpType = constant.GitEditCherryPickPopUp
 						logPopUp.InitGitEditCherryPickPopUp(m, 0)
 					case constant.APPLYCHERRYPICK:
-						// m.PopUpType = constant.GitApplyCherryPickPopUp
-						// logPopUp.InitGitApplyCherryPickPopUp(m)
+						m.ShowPopUp.Store(true)
+						m.PopUpType = constant.GitCherryPickApplyConfirmPopUp
+						m.PopUpModel = nil // we don't need to initialize the pop up model, as we are just showing the pop up and we don't need to hold any state or info
+						m.IsTyping.Store(false)
 					}
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
 				}
 			}
+		case constant.GitCherryPickApplyConfirmPopUp:
+			services.GitCherryPickService(m, m.CherryPickedCommitInfo.CherryPickedCommitMap)
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpModel = nil
+			m.PopUpType = constant.NoPopUp
 		}
 	}
 	return m, nil
@@ -934,8 +965,12 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp
 			m.PopUpModel = nil
+		case constant.GitCherryPickApplyConfirmPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
 		}
-
 		return m, nil
 	} else {
 		switch m.CurrentSelectedComponent {
@@ -1179,6 +1214,11 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.GitEditCherryPickPopUp:
+			m.PopUpType = constant.GitCherryPickPopUp
+			logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+			m.ShowPopUp.Store(true)
+			m.IsTyping.Store(false)
+		case constant.GitCherryPickApplyConfirmPopUp:
 			m.PopUpType = constant.GitCherryPickPopUp
 			logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
 			m.ShowPopUp.Store(true)
