@@ -5,6 +5,7 @@ import (
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string]git.CherryPickedCommitLog) {
@@ -27,5 +28,6 @@ func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string
 		}
 
 		m.GitOperations.GitCommitLog.GitCherryPick(cherryPickedCommitHashes)
+		utils.ReinitCherryPickedCommitInfo(m)
 	}()
 }
