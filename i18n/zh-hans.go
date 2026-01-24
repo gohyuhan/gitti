@@ -23,7 +23,7 @@ var zH_HANS = LanguageMapping{
 	UpdaterAutoUpdaterSetError:          "输入无效，请输入 `true` 以启用自动更新，或输入 `false` 以禁用自动更新",
 	FlagVersion:                         "显示 gitti 的版本",
 	FlagLangCode:                        "设置语言代码，例如: 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
-	FlagInitDefaultBranch:               "设置 git init 的默认分支.\n此设置仅影响通过 gitti 执行的 git init.\n若要让 git 自身默认使用此分支名称，请同时添加 '--global' 参数.",
+	FlagInitDefaultBranch:               "设置 git init 的默认分支.\n此设置仅影响通过 gitti 执行的 git init.\n若要让 git 自身默认使用此分支名称，请同时添加 '--global' 参数 (仅适用于 git 版本 >= 2.28)",
 	FlagAutoUpdate:                      "设置为允许自动检查最新版本",
 	FlagUpdate:                          "将 gitti 更新至最新版本",
 	FlagGlobal:                          "同时应用到系统 git（如果支持）",
@@ -59,6 +59,11 @@ var zH_HANS = LanguageMapping{
 	StagedTitle:                         "已暂存的更改",
 	UnstagedTitle:                       "未暂存的更改",
 	LineStagingModeTitle:                "行暂存模式",
+	CherryPickTitle:                     "从分支遴选: \n %s",
+	EditCherryPickTitle:                 "编辑遴选",
+	ApplyCherryPickTitle:                "将遴选应用到当前分支: \n %s",
+	CherryPickOpsSelectionTitle:         "遴选操作选择",
+	CherryPickApplyConfirmTitle:         "您确定要将遴选的提交应用到当前检出的分支吗: \n %s",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] 全局快捷键",
 	},
@@ -108,9 +113,16 @@ var zH_HANS = LanguageMapping{
 		"[enter] 查看提交日志内容",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
+		"[ctrl+p] 遴选操作",
 		"[?] 全局快捷键",
 	},
 	KeyBindingKeyDetailComponent: []string{
+		"[←/→] 左右移动",
+		"[↑/↓] 上下移动",
+		"[esc] 返回",
+		"[?] 全局快捷键",
+	},
+	KeyBindingKeyDetailComponentLineStagingEligible: []string{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",
 		"[L] 进入行暂存模式",
@@ -243,6 +255,32 @@ var zH_HANS = LanguageMapping{
 		"[enter] 重置",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitCherryPickOptionSelectionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择遴选选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForGitCherryPickPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[space] 选择/取消选择进行遴选",
+		"[e] 编辑已遴选的提交",
+		"[a] 应用已遴选的提交",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForGitEditCherryPickPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[d] 移除选择",
+		"[backspace] 移除所有选择",
+		"[ctrl+p] 从当前分支遴选提交",
+		"[a] 应用已遴选的提交",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForGitCherryPickApplyConfirmPopUp: []string{
+		"[e] 编辑已遴选的提交",
+		"[ctrl+p] 从当前分支遴选提交",
+		"[enter] 应用已遴选的提交",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -354,6 +392,13 @@ var zH_HANS = LanguageMapping{
 	GitResetToSelectedCommitSoftConfirmation:                 "确定要软重置（Soft Reset）到以下提交吗？",
 	GitResetToSelectedCommitHardConfirmation:                 "确定要硬重置（Hard Reset）到以下提交吗？",
 	GitResetToSelectedCommitMixedConfirmation:                "确定要混合重置（Mixed Reset）到以下提交吗？",
+	CherryPickOpsTitle:                                       "遴选 (Cherry Pick)",
+	CherryPickOpsDescription:                                 "选择将要应用到遴选操作的提交",
+	EditCherryPickOpsTitle:                                   "编辑遴选",
+	EditCherryPickOpsDescription:                             "编辑已遴选的提交 (例如：移除选择)",
+	ApplyCherryPickOpsTitle:                                  "应用遴选",
+	ApplyCherryPickOpsDescription:                            "将已遴选的提交应用到当前检出的分支",
+	CherryPickedFromBranch:                                   "遴选自分支  ~>",
 }
 
 // for about gitti
@@ -475,7 +520,7 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "space",
+		KeyBindingLine:  "A",
 		TitleOrInfoLine: "修改提交（仅修改最近一次提交）",
 		LineType:        INFO,
 	},

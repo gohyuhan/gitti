@@ -245,12 +245,20 @@ func generateAboutGittiContent() string {
 //
 // ------------------------------------
 func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
+	if !((m.CurrentSelectedComponent == constant.DetailComponent || m.CurrentSelectedComponent == constant.DetailComponentTwo) && m.DetailPanelParentComponent == constant.ModifiedFilesComponent && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil) {
+		// we are eligible to be in line staging mode, so we need to reset the state
+		m.IsLineStagingState.Store(false)
+		// reinit the index position
+		m.LineStagingIndexPositionAndInfo = types.GittiLineStagingIndexPositionAndInfo{}
+		return
+	}
+
 	detailPanelViewportVisibleIndex := m.DetailPanelViewport.VisibleLineCount()
 	detailPanelTwoViewportVisibleIndex := m.DetailPanelTwoViewport.VisibleLineCount()
 	detailPanelViewportTotalIndex := m.DetailPanelViewport.TotalLineCount()
 	detailPanelTwoViewportTotalIndex := m.DetailPanelTwoViewport.TotalLineCount()
 
-	if !m.IsLineStagingState.Load() && (m.CurrentSelectedComponent == constant.DetailComponent || m.CurrentSelectedComponent == constant.DetailComponentTwo) && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil {
+	if !m.IsLineStagingState.Load() {
 		// we first confirm that we are not in line staging mode yet, but we are supposed to be
 		// so we need to init the line staging state
 		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -310,7 +318,7 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 
 		// set the cursor viewport
 		SetLineStagingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
-	} else if m.IsLineStagingState.Load() && (m.CurrentSelectedComponent == constant.DetailComponent || m.CurrentSelectedComponent == constant.DetailComponentTwo) && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil {
+	} else if m.IsLineStagingState.Load() {
 		// we are already in line staging mode, so we need to update the state
 		// this usually happens when we resize the window or similar event
 		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -432,11 +440,6 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 
 		// set the cursor viewport
 		SetLineStagingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
-	} else {
-		// we are not in line staging mode, so we need to reset the state
-		m.IsLineStagingState.Store(false)
-		// reinit the index position
-		m.LineStagingIndexPositionAndInfo = types.GittiLineStagingIndexPositionAndInfo{}
 	}
 }
 

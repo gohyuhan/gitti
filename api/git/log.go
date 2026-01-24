@@ -13,6 +13,15 @@ import (
 	"github.com/gohyuhan/gitti/executor"
 )
 
+// represent the info of commit that got cherry picked
+type CherryPickedCommitLog struct {
+	Hash                 string
+	Message              string
+	Author               string
+	FromBranch           string
+	UserSelectedSequence int
+}
+
 // Commit represents a single git commit with all necessary graph information
 type CommitLog struct {
 	Hash         string
@@ -478,4 +487,50 @@ func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
 	}
 
 	return filesChanged > fileThreshold
+}
+
+// ----------------------------------
+//
+// # Commit cherry pick
+//
+// ----------------------------------
+func (gCL *GitCommitLog) GitCherryPick(cherryPickedCommitHashes []string) {
+	topoOrderedCherryPickedCommitHashes := gCL.topoOrderCherryPickedCommit(cherryPickedCommitHashes)
+	gitArgs := []string{"cherry-pick"}
+	gitArgs = append(gitArgs, topoOrderedCherryPickedCommitHashes...)
+
+	cherryPickCmdExec := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	_, cherryPickErr := cherryPickCmdExec.Output()
+	if cherryPickErr != nil {
+		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT CHERRY PICKED ERROR]: %s", cherryPickErr.Error()))
+	}
+}
+
+// ----------------------------------
+//
+// Helper to topo order cherry picked commit to prevent cherry pick conflict
+// (this only to commits that are from the same branch or related, else it will be in the sequence of how user cherry oicked it)
+//
+// ----------------------------------
+func (gCL *GitCommitLog) topoOrderCherryPickedCommit(cherryPickedCommitHashes []string) []string {
+	// if the cherry picked commit hash is less than 1, we don't have to even order it
+	if len(cherryPickedCommitHashes) <= 1 {
+		return cherryPickedCommitHashes
+	}
+
+	var topoOrderedCherryPickedCommitHashes []string
+	gitArgs := []string{"rev-list", "--topo-order", "--reverse", "--no-walk"}
+	gitArgs = append(gitArgs, cherryPickedCommitHashes...)
+
+	topoOrderCherryPickedCommitHashesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	topoOrderCherryPiCkedCommitHashesOutput, topoOrderCherryPiCkedCommitHashesErr := topoOrderCherryPickedCommitHashesCmdExecutor.Output()
+	if topoOrderCherryPiCkedCommitHashesErr != nil {
+		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT TOPO ORDER CHERRY PICKED COMMIT HASHES ERROR]: %s", topoOrderCherryPiCkedCommitHashesErr.Error()))
+		// will default to current cherry picked commit hashes sequencees by user
+		return cherryPickedCommitHashes
+	}
+
+	topoOrderedCherryPickedCommitHashes = processGeneralGitOpsOutputIntoStringArray(topoOrderCherryPiCkedCommitHashesOutput)
+
+	return topoOrderedCherryPickedCommitHashes
 }

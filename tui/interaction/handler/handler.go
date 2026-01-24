@@ -126,8 +126,11 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 	case "4":
 		return handleNonTyping4KeyBindingInteraction(m)
 
-	case "A":
+	case "a":
 		return handleNonTypingaKeyBindingInteraction(m)
+
+	case "A":
+		return handleNonTypingAKeyBindingInteraction(m)
 
 	case "c":
 		return handleNonTypingcKeyBindingInteraction(m)
@@ -221,6 +224,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 
 	case "ctrl+a":
 		return handleNonTypingCtrlaKeyBindingInteraction(m)
+	case "ctrl+p":
+		return handleNonTypingCtrlpKeyBindingInteraction(m)
+
 	}
 	return m, nil
 }

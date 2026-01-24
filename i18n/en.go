@@ -23,7 +23,7 @@ var eN = LanguageMapping{
 	UpdaterAutoUpdaterSetError:          "Invalid input, please enter `true` to enable auto updater or `false` to disable auto updater",
 	FlagVersion:                         "Display version of gitti",
 	FlagLangCode:                        "set the language code, e.g. 'EN', 'JA', 'ZH-HANS', 'ZH-HANT'...",
-	FlagInitDefaultBranch:               "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag",
+	FlagInitDefaultBranch:               "set the default branch for git init.\nThis only affect the git init done through gitti.\nFor git to default to use the configure branch name please also add a '--global' flag (only works on git version >= 2.28)",
 	FlagAutoUpdate:                      "set to allow auto check for latest version",
 	FlagUpdate:                          "prompt gitti to update to latest version",
 	FlagGlobal:                          "also apply to system git if supported",
@@ -59,6 +59,11 @@ var eN = LanguageMapping{
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
 	LineStagingModeTitle:                "In Line Staging Mode",
+	CherryPickTitle:                     "Cherry Pick from Branch: \n %s",
+	EditCherryPickTitle:                 "Edit Cherry Pick",
+	ApplyCherryPickTitle:                "Apply Cherry Pick to Current Branch: \n %s",
+	CherryPickOpsSelectionTitle:         "Cherry Pick Operation Selection",
+	CherryPickApplyConfirmTitle:         "Are you sure you want to apply cherry picked commit to current checked out branch: \n %s",
 	KeyBindingForGitStatusComponent: []string{
 		"[?] global key binding",
 	},
@@ -108,9 +113,16 @@ var eN = LanguageMapping{
 		"[enter] view commit log content",
 		"[r] reset to this commit",
 		"[R] reset the latest commit",
+		"[ctrl+p] cherry pick ops",
 		"[?] global key binding",
 	},
 	KeyBindingKeyDetailComponent: []string{
+		"[←/→] move left and right",
+		"[↑/↓] move up and down",
+		"[esc] back",
+		"[?] global key binding",
+	},
+	KeyBindingKeyDetailComponentLineStagingEligible: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
 		"[L] enter line staging mode",
@@ -243,6 +255,32 @@ var eN = LanguageMapping{
 		"[enter] reset",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitCherryPickOptionSelectionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select cherry pick option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitCherryPickPopUp: []string{
+		"[↑/↓] move up and down",
+		"[space] select/unselect for cherry pick",
+		"[e] edit cherry picked commit(s)",
+		"[a] apply cherry picked commit(s)",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitEditCherryPickPopUp: []string{
+		"[↑/↓] move up and down",
+		"[d] remove selection",
+		"[backspace] remove all selection",
+		"[ctrl+p] cherry pick commit from current branch",
+		"[a] apply cherry picked commit(s)",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitCherryPickApplyConfirmPopUp: []string{
+		"[e] edit cherry picked commit(s)",
+		"[ctrl+p] cherry pick commit from current branch",
+		"[enter] apply cherry picked commit(s)",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -354,6 +392,13 @@ var eN = LanguageMapping{
 	GitResetToSelectedCommitSoftConfirmation:                 "Are you sure to soft reset to following commit?",
 	GitResetToSelectedCommitHardConfirmation:                 "Are you sure to hard reset to following commit?",
 	GitResetToSelectedCommitMixedConfirmation:                "Are you sure to mixed reset to following commit?",
+	CherryPickOpsTitle:                                       "Cherry Pick",
+	CherryPickOpsDescription:                                 "Choose commits that will then be applied to cherry pick operation",
+	EditCherryPickOpsTitle:                                   "Edit Cherry Pick",
+	EditCherryPickOpsDescription:                             "Edit cherry picked commits (eg. remove a selection)",
+	ApplyCherryPickOpsTitle:                                  "Apply Cherry Pick",
+	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
+	CherryPickedFromBranch:                                   "Cherry picked from branch  ~>",
 }
 
 // for about gitti
@@ -474,7 +519,7 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "space",
+		KeyBindingLine:  "A",
 		TitleOrInfoLine: "amend commit (modifies the latest commit)",
 		LineType:        INFO,
 	},

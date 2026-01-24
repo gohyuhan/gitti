@@ -34,6 +34,10 @@ const (
 	GitResetLatestCommitConfirmPromptPopUp     = "GitResetLatestCommitConfirmPromptPopUp"     // IsTyping will be false
 	GitResetToSelectedCommitTypeOptionPopUp    = "GitResetToSelectedCommitTypeOptionPopUp"    // IsTyping will be false
 	GitResetToSelectedCommitConfirmPromptPopUp = "GitResetToSelectedCommitConfirmPromptPopUp" // IsTyping will be false
+	GitCherryPickOptionSelectionPopUp          = "GitCherryPickOptionSelectionPopUp"          // IsTyping will be false
+	GitCherryPickPopUp                         = "GitCherryPickPopUp"                         // IsTyping will be false
+	GitEditCherryPickPopUp                     = "GitEditCherryPickPopUp"                     // IsTyping will be false
+	GitCherryPickApplyConfirmPopUp             = "GitCherryPickApplyConfirmPopUp"             // IsTyping will be false
 )
 
 const SelectedLeftPanelComponentHeightRatio = 0.4
@@ -74,6 +78,10 @@ const (
 	MaxGitResetLatestCommitConfirmPromptPopUpWidth     = 150
 	MaxGitResetToSelectedCommitTypeOptionPopUpWidth    = 150
 	MaxGitResetToSelectedCommitConfirmPromptPopUpWidth = 150
+	MaxGitCherryPickOptionSelectionPopUpWidth          = 150
+	MaxGitCherryPickPopUpWidth                         = 150
+	MaxGitEditCherryPickPopUpWidth                     = 150
+	MaxGitCherryPickApplyConfirmPopUpWidth             = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 30
 	PopUpGitCommitOutputViewPortHeight                 = 10
@@ -94,6 +102,9 @@ const (
 	PopUpCreateBranchBasedOnRemoteOutputViewportHeight = 4
 	PopUpGitResetLatestCommitTypeOptionHeight          = 6
 	PopUpGitResetToSelectedCommitTypeOptionHeight      = 6
+	PopUpGitCherryPickOptionSelectionHeight            = 6
+	PopUpGitCherryPickPopUpHeight                      = 10
+	PopUpGitEditCherryPickPopUpHeight                  = 10
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -141,4 +152,11 @@ const (
 const (
 	PUSHACTION                = "PUSHACTION"
 	CREATEBRANCHBASEDONREMOTE = "CREATEBRANCHBASEDONREMOTE"
+)
+
+// cherry pick ops options
+const (
+	CHERRYPICK      = "CHERRYPICK"
+	EDITCHERRYPICK  = "EDITCHERRYPICK"
+	APPLYCHERRYPICK = "APPLYCHERRYPICK"
 )
