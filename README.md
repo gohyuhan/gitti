@@ -8,7 +8,7 @@ A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 
 ## Requirements
 
-- **Git 2.13.0+** - Core functionality
+- **Git 2.23.0+** - Core functionality
 - **Git 2.28.0+** - Optional, for `gitti --init-dbranch <name> --global`
 
 ## Description

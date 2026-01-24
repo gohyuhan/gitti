@@ -13,3 +13,9 @@ func GitStateUniversalUtilsAbortService(m *types.GittiModel) {
 		m.GitOperations.GitStateUniversalUtils.GitUniversalAbort()
 	}()
 }
+
+func GitStateUniversalUtilsSkipService(m *types.GittiModel) {
+	go func() {
+		m.GitOperations.GitStateUniversalUtils.GitUniversalSkip()
+	}()
+}

@@ -1210,6 +1210,13 @@ func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+func handleNonTypingCtrlkKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		services.GitStateUniversalUtilsSkipService(m)
+	}
+	return m, nil
+}
+
 func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
