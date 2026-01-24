@@ -191,6 +191,10 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.3.1]
+
+- fix: fix for cherry pick selection reinit after applying cherry pick git operation is executed
+
 ### [v0.3.0]
 
 - fix: scrolling problem that will cause UI fix due to overscrolling by adding throttle for scrolling
