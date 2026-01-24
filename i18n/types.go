@@ -43,6 +43,7 @@ type LanguageMapping struct {
 	FlagUpdate            string
 	FlagGlobal            string
 	FlagEditor            string
+	FlagMaxCommitLogCount string
 	// Run Error
 	FailToGetCWD                string
 	TuiRunFail                  string
@@ -65,6 +66,8 @@ type LanguageMapping struct {
 	GitInitRefuse                  string
 	GitInitPromptInvalidInput      string
 	GitCertainStateStillInProgress string
+	MaxCommitLogCountSet           string
+	MaxCommitLogCountSetError      string
 	// Gitti UI text
 	Branches                    string
 	ModifiedFiles               string

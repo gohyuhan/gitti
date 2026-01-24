@@ -55,6 +55,7 @@ func main() {
 	updatePrompt := flag.Bool("update", false, i18n.LANGUAGEMAPPING.FlagUpdate)
 	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
 	setEditor := flag.Bool("editor", false, i18n.LANGUAGEMAPPING.FlagEditor)
+	setMaxCommitLogCount := flag.Int("max-commit-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxCommitLogCount)
 
 	flag.Parse()
 
@@ -76,6 +77,8 @@ func main() {
 		updater.Update()
 	case *setEditor:
 		config.ChooseAndSetEditor()
+	case *setMaxCommitLogCount > 0:
+		config.SetMaxCommitLogCount(*setMaxCommitLogCount)
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string)

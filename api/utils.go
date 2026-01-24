@@ -72,7 +72,7 @@ func InitGitOperations(absolutePath string, updateChannel chan string) *GitOpera
 		GitPull:                git.InitGitPull(updateChannel, gitProcessLock),
 		GitStash:               git.InitGitStash(gitProcessLock),
 		GitRemote:              git.InitGitRemote(updateChannel, gitProcessLock),
-		GitCommitLog:           git.InitGitCommitLog(updateChannel, gitProcessLock),
+		GitCommitLog:           git.InitGitCommitLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount),
 		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock),
 	}
 }

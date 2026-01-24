@@ -52,6 +52,17 @@ func SetGlobalInitBranch(branchName string, cwd string) {
 	os.Exit(0)
 }
 
+// set the max commit log count to be retrieve and display
+func SetMaxCommitLogCount(maxCommitLogCount int) {
+	if maxCommitLogCount < 10 {
+		fmt.Println(i18n.LANGUAGEMAPPING.MaxCommitLogCountSetError)
+		os.Exit(1)
+	}
+	settings.UpdateMaxCommitLogCount(maxCommitLogCount)
+	fmt.Printf(i18n.LANGUAGEMAPPING.MaxCommitLogCountSet+"\n", maxCommitLogCount)
+	os.Exit(0)
+}
+
 func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperations, api.GitRepoPath) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
@@ -61,7 +72,6 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperatio
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
 	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel)
-	// git.InitGitCommitLog(false) // not included in v0.1.x
 	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations)
 
 	return gitOperations, gitRepoPathInfo
