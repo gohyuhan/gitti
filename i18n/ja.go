@@ -545,4 +545,9 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "一時停止中のGit操作（リベース、マージ、チェリーピックなど）を中止",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "ctrl+k",
+		TitleOrInfoLine: "一時停止中のGit操作（リベース、チェリーピックなど）をスキップ",
+		LineType:        INFO,
+	},
 }

@@ -122,6 +122,44 @@ func (gSUU *GitStateUniversalUtils) GitUniversalAbort() {
 
 // --------------------------------
 //
+// GitUniversalSkip skip the current Git operation (rebase, cherry-pick, am, etc.)
+// by detecting the state files within the .git folder.
+//
+// --------------------------------
+func (gSUU *GitStateUniversalUtils) GitUniversalSkip() {
+	if !gSUU.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer func() {
+		gSUU.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	var gitArgs []string
+
+	if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "rebase-apply/applying") {
+		gitArgs = []string{"am", "--skip"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "rebase-merge") {
+		gitArgs = []string{"rebase", "--skip"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "rebase-apply") {
+		gitArgs = []string{"rebase", "--skip"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "CHERRY_PICK_HEAD") {
+		gitArgs = []string{"cherry-pick", "--skip"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "REVERT_HEAD") {
+		gitArgs = []string{"revert", "--skip"}
+	}
+
+	if len(gitArgs) < 1 {
+		return
+	}
+
+	skipCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	skipCmdExecutor.Run()
+
+	return
+}
+
+// --------------------------------
+//
 // CheckCurrentGitState updates the currentGitState field by checking the existence of
 // specific state files inside the .git directory.
 //

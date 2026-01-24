@@ -544,4 +544,9 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "終止已暫停的 Git 操作 (Rebase, Merge, Cherry-pick 等)",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "ctrl+k",
+		TitleOrInfoLine: "跳過已暫停的 Git 操作 (Rebase, Cherry-pick 等)",
+		LineType:        INFO,
+	},
 }

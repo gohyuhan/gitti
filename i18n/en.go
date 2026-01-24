@@ -543,4 +543,9 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "Universal Abort for paused Git Operation (Rebase, Merge, Cherry-pick, etc.)",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "ctrl+k",
+		TitleOrInfoLine: "Universal Skip for paused Git Operation (Rebase, revert, Cherry-pick, etc.)",
+		LineType:        INFO,
+	},
 }
