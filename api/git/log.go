@@ -36,6 +36,7 @@ type GitCommitLog struct {
 	errorLog           []error
 	gitCommitLogOutput []CommitLog
 	updateChannel      chan string
+	maxCommitLogCount  string
 	gitProcessLock     *GitProcessLock
 }
 
@@ -44,11 +45,13 @@ type GitCommitLog struct {
 //	Init Git Commit Log
 //
 // ----------------------------------
-func InitGitCommitLog(updateChannel chan string, gitProcessLock *GitProcessLock) *GitCommitLog {
+func InitGitCommitLog(updateChannel chan string, gitProcessLock *GitProcessLock, maxCommitLogCountInt int) *GitCommitLog {
+	maxCommitLogCount := strconv.Itoa(maxCommitLogCountInt)
 	gitCommitLog := GitCommitLog{
 		gitCommitLogOutput: make([]CommitLog, 0),
 		gitProcessLock:     gitProcessLock,
 		updateChannel:      updateChannel,
+		maxCommitLogCount:  maxCommitLogCount,
 	}
 	return &gitCommitLog
 }
@@ -74,8 +77,11 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 	gitArgs := []string{
 		"log",
 		"--topo-order",
+		"--no-decorate",
+		"--no-notes",
 		"--pretty=format:%H|%P|%s|%an",
-		"-n", "2500",
+		"-n", gCL.maxCommitLogCount,
+		"--",
 	}
 
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)

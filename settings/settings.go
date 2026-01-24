@@ -33,6 +33,7 @@ type GittiConfigSettings struct {
 	LastUpdateCheckTime             time.Time `json:"last_update_check_time"`
 	AutoUpdate                      bool      `json:"auto_update"`
 	Editor                          string    `json:"editor"`
+	MaxCommitLogCount               int       `json:"max_commit_log_count"`
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
@@ -46,6 +47,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	LastUpdateCheckTime:             time.Now().UTC(),
 	AutoUpdate:                      true,
 	Editor:                          "vim",
+	MaxCommitLogCount:               2500,
 }
 
 // getConfigPath returns the config.json path (creates directories if needed)
@@ -207,6 +209,14 @@ func UpdateAutoUpdate(autoUpdate bool) {
 
 func UpdateEditor(editor string) {
 	GITTICONFIGSETTINGS.Editor = editor
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
+
+func UpdateMaxCommitLogCount(maxCount int) {
+	GITTICONFIGSETTINGS.MaxCommitLogCount = maxCount
 	cfgPath, err := getConfigPath()
 	if err == nil {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
