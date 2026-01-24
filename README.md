@@ -191,6 +191,15 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.3.0]
+
+- fix: scrolling problem that will cause UI fix due to overscrolling by adding throttle for scrolling
+- fix: unnecessary split when the files indexstate and worktree is both “?”
+- fix: -/+ key conflict during typing mode by restricting -/+ key for left panel adjustments when in typing mode
+- feature: introduce keybinding for universal `--continue` and universal `--abort` for git operation that accept this flag. e.g, cherry pick, merge etc
+- feature: introduce individual line staging and unstaging
+- feature: introduce cherry-pick
+
 ### [v0.2.1]
 
 - Address a fix for CLRF (^M) that break detail view panel UI layout
