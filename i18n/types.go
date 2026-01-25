@@ -36,14 +36,15 @@ type LanguageMapping struct {
 	UpdaterAutoUpdaterDisable           string
 	UpdaterAutoUpdaterSetError          string
 	// flag expalnation
-	FlagVersion           string
-	FlagLangCode          string
-	FlagInitDefaultBranch string
-	FlagAutoUpdate        string
-	FlagUpdate            string
-	FlagGlobal            string
-	FlagEditor            string
-	FlagMaxCommitLogCount string
+	FlagVersion               string
+	FlagLangCode              string
+	FlagInitDefaultBranch     string
+	FlagAutoUpdate            string
+	FlagUpdate                string
+	FlagGlobal                string
+	FlagEditor                string
+	FlagMaxCommitLogCount     string
+	FlagAllowCommitGraphWrite string
 	// Run Error
 	FailToGetCWD                string
 	TuiRunFail                  string
@@ -68,6 +69,9 @@ type LanguageMapping struct {
 	GitCertainStateStillInProgress string
 	MaxCommitLogCountSet           string
 	MaxCommitLogCountSetError      string
+	AllowCommitGraphWriteEnabled   string
+	AllowCommitGraphWriteDisabled  string
+	AllowCommitGraphWriteSetError  string
 	// Gitti UI text
 	Branches                    string
 	ModifiedFiles               string

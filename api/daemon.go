@@ -33,11 +33,12 @@ type GitDaemon struct {
 	errorLog                            []error
 	updateChannel                       chan string // to communicate back to main thread for an update event
 	gitOperations                       *GitOperations
+	allowCommitGraphWrite               bool
 }
 
 var GITDAEMON *GitDaemon
 
-func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations) {
+func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations, allowCommitGraphWrite bool) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		// Log the critical error - this means file watching won't work
@@ -63,6 +64,7 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 		errorLog:                            make([]error, 0),
 		updateChannel:                       updateChannel,
 		gitOperations:                       gitOperations,
+		allowCommitGraphWrite:               allowCommitGraphWrite,
 	}
 	gd.isGitFilesPassiveActiveRunning.Store(false)
 	gd.isGitRemoteSyncStatusActiveRunning.Store(false)
@@ -104,6 +106,10 @@ func (gd *GitDaemon) Start() {
 		}
 		gd.gitFilesActiveTimer.Reset(gd.gitFilesActiveRefreshDur)
 		gd.gitRemoteSyncStatusActiveTimer.Reset(gd.gitRemoteSyncStatusActiveRefreshDur)
+
+		// commit graph write once when started (if enabled)
+		gd.commitGraphWriteOnce()
+
 		// loop to stay active
 		for {
 			select {
@@ -232,6 +238,14 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 	}
 
 	return false
+}
+
+func (gd *GitDaemon) commitGraphWriteOnce() {
+	go func() {
+		if gd.allowCommitGraphWrite {
+			gd.gitOperations.GitCommitLog.WriteCommitGraph()
+		}
+	}()
 }
 
 func (gd *GitDaemon) Stop() {

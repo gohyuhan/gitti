@@ -540,3 +540,14 @@ func (gCL *GitCommitLog) topoOrderCherryPickedCommit(cherryPickedCommitHashes []
 
 	return topoOrderedCherryPickedCommitHashes
 }
+
+// ----------------------------------
+//
+// # Helper to write commit graph that improve performance of git log retrieval
+//
+// ----------------------------------
+func (gCL *GitCommitLog) WriteCommitGraph() {
+	gitArgs := []string{"commit-graph", "write", "--reachable", "--split"}
+	writeCommitGraphCmdExec := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	writeCommitGraphCmdExec.Run()
+}
