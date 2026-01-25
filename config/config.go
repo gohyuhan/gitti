@@ -63,6 +63,21 @@ func SetMaxCommitLogCount(maxCommitLogCount int) {
 	os.Exit(0)
 }
 
+func SetAllowCommitGraphWrite(allow string) {
+	if strings.ToLower(allow) == "true" {
+		settings.UpdateAllowCommitGraphWrite(true)
+		fmt.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteEnabled)
+		os.Exit(0)
+	} else if strings.ToLower(allow) == "false" {
+		settings.UpdateAllowCommitGraphWrite(false)
+		fmt.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteDisabled)
+		os.Exit(0)
+	} else {
+		fmt.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteSetError)
+		os.Exit(1)
+	}
+}
+
 func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperations, api.GitRepoPath) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
@@ -72,7 +87,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperatio
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
 	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel)
-	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations)
+	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations, settings.GITTICONFIGSETTINGS.AllowCommitGraphWrite)
 
 	return gitOperations, gitRepoPathInfo
 }

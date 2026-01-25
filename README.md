@@ -1,15 +1,29 @@
+<p align="center">
+  <img src="assets/gitti.png" alt="gitti logo" width="150">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go">
+  <img src="https://img.shields.io/github/v/release/gohyuhan/gitti?style=for-the-badge" alt="Release">
+  <img src="https://img.shields.io/github/license/gohyuhan/gitti?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/github/actions/workflow/status/gohyuhan/gitti/release.yml?style=for-the-badge&label=Release" alt="Release">
+</p>
+
+<p align="center">
+  <strong>A fast, lightweight terminal UI for Git operations that keeps you in your flow.</strong><br>
+</p>
+
 # Gitti
 
 A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 
-![Demo](demo_assets/demo.gif)
+![Demo](assets/demo.gif)
 
 > ⚠️ **Development Status**: Gitti is actively under development. Features, APIs, and behaviors may change significantly. Development is driven by personal needs first, with additional features planned afterward. Not all majority used Git operations are currently supported.
 
 ## Requirements
 
-- **Git 2.23.0+** - Core functionality
-- **Git 2.28.0+** - Optional, for `gitti --init-dbranch <name> --global`
+- **Git 2.32+**
 
 ## Description
 

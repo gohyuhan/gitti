@@ -56,6 +56,7 @@ func main() {
 	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
 	setEditor := flag.Bool("editor", false, i18n.LANGUAGEMAPPING.FlagEditor)
 	setMaxCommitLogCount := flag.Int("max-commit-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxCommitLogCount)
+	allowCommitGraphWrite := flag.String("allow-commit-graph-write", "", i18n.LANGUAGEMAPPING.FlagAllowCommitGraphWrite)
 
 	flag.Parse()
 
@@ -79,6 +80,8 @@ func main() {
 		config.ChooseAndSetEditor()
 	case *setMaxCommitLogCount > 0:
 		config.SetMaxCommitLogCount(*setMaxCommitLogCount)
+	case *allowCommitGraphWrite != "":
+		config.SetAllowCommitGraphWrite(*allowCommitGraphWrite)
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string)
