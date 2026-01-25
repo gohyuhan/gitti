@@ -65,7 +65,7 @@ var eN = LanguageMapping{
 	Loading:                             "Loading...",
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
-	LineStagingModeTitle:                "In Line Staging Mode",
+	LineEditingModeTitle:                "In Line Editing Mode",
 	CherryPickTitle:                     "Cherry Pick from Branch: \n %s",
 	EditCherryPickTitle:                 "Edit Cherry Pick",
 	ApplyCherryPickTitle:                "Apply Cherry Pick to Current Branch: \n %s",
@@ -129,18 +129,18 @@ var eN = LanguageMapping{
 		"[esc] back",
 		"[?] global key binding",
 	},
-	KeyBindingKeyDetailComponentLineStagingEligible: []string{
+	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
-		"[L] enter line staging mode",
+		"[L] enter line editing mode",
 		"[esc] back",
 		"[?] global key binding",
 	},
-	KeyBindingKeyDetailComponentLineStaging: []string{
+	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] move left and right",
-		"[↑/↓] to next/previous stageble or unstageble line",
+		"[↑/↓] to next/previous line",
 		"[space] stage/unstage",
-		"[esc] exit line staging mode",
+		"[esc] exit line editing mode",
 		"[?] global key binding",
 	},
 	KeyBindingKeyStashComponent: []string{

@@ -267,7 +267,7 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 
 		// Update file status to reflect changes
 		gf.GetGitFilesStatus()
-		gf.updateChannel <- GIT_STAGE_UNSTAGE_LINE_DETAILS_AND_FILES_UPDATE
+		gf.updateChannel <- GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE
 	}
 }
 
@@ -294,20 +294,24 @@ func generateStageLinePatchString(diffContentStringArray []string, startFromInde
 				if lastLineWasSkipped {
 					continue
 				}
-				stageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				stageLinePatchString.WriteString(diffLine)
+				stageLinePatchString.WriteString("\n")
 				continue
 			}
 			if strings.HasPrefix(diffLine, "deleted file mode") {
 				continue
 			}
 			if strings.HasPrefix(diffLine, "+++ /dev/null") {
-				stageLinePatchString.WriteString(fmt.Sprintf("+++ b/%s\n", filePathName))
+				stageLinePatchString.WriteString("+++ b/")
+				stageLinePatchString.WriteString(filePathName)
+				stageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue
 			}
 			// If this is the line we want to stage, include it exactly as is (e.g., "+ line" or "- line").
 			if index == actualStageLineIndex {
-				stageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				stageLinePatchString.WriteString(diffLine)
+				stageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue
 			}
@@ -316,7 +320,9 @@ func generateStageLinePatchString(diffContentStringArray []string, startFromInde
 				// If it's a deletion line ("- content"), convert it to a context line ("  content").
 				// This means "treat this as existing unchanged content" in the patch context.
 				if len(diffLine) > 1 {
-					stageLinePatchString.WriteString(fmt.Sprintf(" %s\n", diffLine[1:]))
+					stageLinePatchString.WriteString(" ")
+					stageLinePatchString.WriteString(diffLine[1:])
+					stageLinePatchString.WriteString("\n")
 				} else {
 					stageLinePatchString.WriteString(" \n")
 				}
@@ -328,7 +334,8 @@ func generateStageLinePatchString(diffContentStringArray []string, startFromInde
 				continue
 			} else {
 				// For context lines (starting with space) or header lines, keep them as is.
-				stageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				stageLinePatchString.WriteString(diffLine)
+				stageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 			}
 		} else {
@@ -398,7 +405,7 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 
 		// Update file status to reflect changes
 		gf.GetGitFilesStatus()
-		gf.updateChannel <- GIT_STAGE_UNSTAGE_LINE_DETAILS_AND_FILES_UPDATE
+		gf.updateChannel <- GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE
 	}
 }
 
@@ -417,13 +424,15 @@ func generateUnstageLinePatchString(diffContentStringArray []string, startFromIn
 				if lastLineWasSkipped {
 					continue
 				}
-				unStageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				unStageLinePatchString.WriteString(diffLine)
+				unStageLinePatchString.WriteString("\n")
 				continue
 			}
 			// This is the specific line the user wants to UNSTAGE.
 			// Keep it exactly as is (+ or -). The --reverse flag in the command will flip it.
 			if index == actualUnStageLineIndex {
-				unStageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				unStageLinePatchString.WriteString(diffLine)
+				unStageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue
 			}
@@ -432,7 +441,9 @@ func generateUnstageLinePatchString(diffContentStringArray []string, startFromIn
 				continue
 			}
 			if strings.HasPrefix(diffLine, "--- /dev/null") {
-				unStageLinePatchString.WriteString(fmt.Sprintf("--- a/%s\n", filePathName))
+				unStageLinePatchString.WriteString("--- a/")
+				unStageLinePatchString.WriteString(filePathName)
+				unStageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue
 			}
@@ -442,7 +453,9 @@ func generateUnstageLinePatchString(diffContentStringArray []string, startFromIn
 				// This is a staged addition. It IS currently in the Index.
 				// We convert it to a context line (starts with space) so Git can anchor the patch.
 				if len(diffLine) > 1 {
-					unStageLinePatchString.WriteString(fmt.Sprintf(" %s\n", diffLine[1:]))
+					unStageLinePatchString.WriteString(" ")
+					unStageLinePatchString.WriteString(diffLine[1:])
+					unStageLinePatchString.WriteString("\n")
 				} else {
 					unStageLinePatchString.WriteString(" \n")
 				}
@@ -455,7 +468,8 @@ func generateUnstageLinePatchString(diffContentStringArray []string, startFromIn
 
 			} else {
 				// Keep Headers (diff, index, ---, +++, @@) and existing Context lines.
-				unStageLinePatchString.WriteString(fmt.Sprintf("%s\n", diffLine))
+				unStageLinePatchString.WriteString(diffLine)
+				unStageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 			}
 		} else {

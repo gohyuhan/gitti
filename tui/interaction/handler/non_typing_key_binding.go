@@ -274,7 +274,7 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 
 func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	// enter line stage state
-	services.EnterOrReinitLineStagingStateService(m)
+	services.EnterOrReinitLineEditingStateService(m)
 	m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
 	return m, nil
 }
@@ -786,7 +786,7 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.IsTyping.Store(false)
 			}
 		case constant.DetailComponent, constant.DetailComponentTwo:
-			if m.IsLineStagingState.Load() {
+			if m.IsLineEditingState.Load() {
 				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				var filePathName string
 				if currentSelectedModifiedFile != nil {
@@ -975,16 +975,16 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 	} else {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponent:
-			if m.IsLineStagingState.Load() {
-				m.IsLineStagingState.Store(false)
+			if m.IsLineEditingState.Load() {
+				m.IsLineEditingState.Store(false)
 				m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
 			} else {
 				m.CurrentSelectedComponent = m.DetailPanelParentComponent
 				m.DetailPanelParentComponent = ""
 			}
 		case constant.DetailComponentTwo:
-			if m.IsLineStagingState.Load() {
-				m.IsLineStagingState.Store(false)
+			if m.IsLineEditingState.Load() {
+				m.IsLineEditingState.Store(false)
 				m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
 			} else {
 				m.CurrentSelectedComponent = m.DetailPanelParentComponent
@@ -1032,27 +1032,27 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		case constant.DetailComponent:
-			if m.IsLineStagingState.Load() {
-				m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex = max(0, m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex-1)
-				if m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition < 1 {
+			if m.IsLineEditingState.Load() {
+				m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex = max(0, m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex-1)
+				if m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition < 1 {
 					m.DetailPanelViewport.ScrollUp(1)
 				} else {
-					m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition -= 1
+					m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition -= 1
 				}
-				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
 			}
 		case constant.DetailComponentTwo:
-			if m.IsLineStagingState.Load() {
-				m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex = max(0, m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex-1)
-				if m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition < 1 {
+			if m.IsLineEditingState.Load() {
+				m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex = max(0, m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex-1)
+				if m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition < 1 {
 					m.DetailPanelTwoViewport.ScrollUp(1)
 				} else {
-					m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition -= 1
+					m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition -= 1
 				}
-				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				return m, cmd
@@ -1101,27 +1101,27 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		case constant.DetailComponent:
-			if m.IsLineStagingState.Load() {
-				m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex = min(m.DetailPanelViewport.TotalLineCount()-1, m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex+1)
-				if m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition >= m.DetailPanelViewport.VisibleLineCount()-1 {
+			if m.IsLineEditingState.Load() {
+				m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex = min(m.DetailPanelViewport.TotalLineCount()-1, m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex+1)
+				if m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition >= m.DetailPanelViewport.VisibleLineCount()-1 {
 					m.DetailPanelViewport.ScrollDown(1)
 				} else {
-					m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition += 1
+					m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition += 1
 				}
-				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
 			}
 		case constant.DetailComponentTwo:
-			if m.IsLineStagingState.Load() {
-				m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex = min(m.DetailPanelTwoViewport.TotalLineCount()-1, m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex+1)
-				if m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition >= m.DetailPanelTwoViewport.VisibleLineCount()-1 {
+			if m.IsLineEditingState.Load() {
+				m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex = min(m.DetailPanelTwoViewport.TotalLineCount()-1, m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex+1)
+				if m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition >= m.DetailPanelTwoViewport.VisibleLineCount()-1 {
 					m.DetailPanelTwoViewport.ScrollDown(1)
 				} else {
-					m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition += 1
+					m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition += 1
 				}
-				services.SetLineStagingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				return m, cmd

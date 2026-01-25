@@ -27,8 +27,8 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.DetailPanelTwoViewport.SetXOffset(m.DetailPanelTwoViewportOffset)
 	m.DetailPanelTwoViewport.SetYOffset(m.DetailPanelTwoViewport.YOffset())
 
-	if m.IsLineStagingState.Load() {
-		services.EnterOrReinitLineStagingStateService(m)
+	if m.IsLineEditingState.Load() {
+		services.EnterOrReinitLineEditingStateService(m)
 	}
 }
 
@@ -102,18 +102,18 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 //
 //			For Update Detail Component Viewport Layout
 //		  * this was to update the layout for detail component viewport
-//	   * it will handle the layout for both line staging mode and normal mode
-//	   * it will also handle the split view for line staging mode (one for staged, one for unstaged)
+//	   * it will handle the layout for both line editing mode and normal mode
+//	   * it will also handle the split view for line editing mode (one for staged, one for unstaged)
 //
 // ------------------------------------
 func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 	availableHeight := m.DetailComponentPanelHeight
 	// set the cursor viewport width
-	m.LineStagingIndexCursorViewport.SetWidth(3)
-	m.LineStagingIndexCursorTwoViewport.SetWidth(3)
+	m.LineEditingIndexCursorViewport.SetWidth(3)
+	m.LineEditingIndexCursorTwoViewport.SetWidth(3)
 
-	// if it is in line staging mode, we need to minus 3 for the title
-	if m.IsLineStagingState.Load() {
+	// if it is in line editing mode, we need to minus 3 for the title
+	if m.IsLineEditingState.Load() {
 		availableHeight -= 3
 	}
 
@@ -129,11 +129,11 @@ func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 			m.DetailComponentPanelLayout = constant.VERTICAL
 			m.DetailPanelViewport.SetHeight(splitHeight - 1)
 			m.DetailPanelTwoViewport.SetHeight(availableHeight - splitHeight - 1)
-			m.LineStagingIndexCursorViewport.SetHeight(splitHeight - 1)
-			m.LineStagingIndexCursorTwoViewport.SetHeight(availableHeight - splitHeight - 1)
+			m.LineEditingIndexCursorViewport.SetHeight(splitHeight - 1)
+			m.LineEditingIndexCursorTwoViewport.SetHeight(availableHeight - splitHeight - 1)
 
 			// Adjust width based on mode
-			if m.IsLineStagingState.Load() {
+			if m.IsLineEditingState.Load() {
 				m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2 - 3)
 				m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - 2 - 3)
 			} else {
@@ -145,11 +145,11 @@ func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 			m.DetailComponentPanelLayout = constant.HORIZONTAL
 			m.DetailPanelViewport.SetHeight(availableHeight)
 			m.DetailPanelTwoViewport.SetHeight(availableHeight)
-			m.LineStagingIndexCursorViewport.SetHeight(availableHeight)
-			m.LineStagingIndexCursorTwoViewport.SetHeight(availableHeight)
+			m.LineEditingIndexCursorViewport.SetHeight(availableHeight)
+			m.LineEditingIndexCursorTwoViewport.SetHeight(availableHeight)
 
 			// Adjust width based on mode
-			if m.IsLineStagingState.Load() {
+			if m.IsLineEditingState.Load() {
 				m.DetailPanelViewport.SetWidth(splitWidth - 2 - 3)
 				m.DetailPanelTwoViewport.SetWidth(m.DetailComponentPanelWidth - splitWidth - 2 - 3)
 			} else {
@@ -160,10 +160,10 @@ func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 	} else {
 		// Single Panel View
 		m.DetailPanelViewport.SetHeight(availableHeight)
-		m.LineStagingIndexCursorViewport.SetHeight(availableHeight)
+		m.LineEditingIndexCursorViewport.SetHeight(availableHeight)
 
 		// Adjust width based on mode
-		if m.IsLineStagingState.Load() {
+		if m.IsLineEditingState.Load() {
 			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2 - 3)
 		} else {
 			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)

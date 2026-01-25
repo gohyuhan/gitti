@@ -86,7 +86,7 @@ type LanguageMapping struct {
 	Loading                     string
 	StagedTitle                 string
 	UnstagedTitle               string
-	LineStagingModeTitle        string
+	LineEditingModeTitle        string
 	CherryPickTitle             string
 	EditCherryPickTitle         string
 	ApplyCherryPickTitle        string
@@ -103,8 +103,8 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentNone                    []string
 	KeyBindingCommitLogComponent                            []string
 	KeyBindingKeyDetailComponent                            []string
-	KeyBindingKeyDetailComponentLineStagingEligible         []string
-	KeyBindingKeyDetailComponentLineStaging                 []string
+	KeyBindingKeyDetailComponentLineEditingEligible         []string
+	KeyBindingKeyDetailComponentLineEditing                 []string
 	KeyBindingKeyStashComponent                             []string
 	KeyBindingKeyStashComponentNone                         []string
 	KeyBindingForCommitPopUp                                []string

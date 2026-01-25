@@ -37,17 +37,17 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	vpTwo.SetHorizontalStep(1)
 	vpTwo.MouseWheelDelta = 1
 
-	lineStagingIndexCursorVp := viewport.New()
-	lineStagingIndexCursorVp.SoftWrap = false
-	lineStagingIndexCursorVp.MouseWheelEnabled = false
-	lineStagingIndexCursorVp.SetHorizontalStep(0)
-	lineStagingIndexCursorVp.MouseWheelDelta = 0
+	lineEditingIndexCursorVp := viewport.New()
+	lineEditingIndexCursorVp.SoftWrap = false
+	lineEditingIndexCursorVp.MouseWheelEnabled = false
+	lineEditingIndexCursorVp.SetHorizontalStep(0)
+	lineEditingIndexCursorVp.MouseWheelDelta = 0
 
-	lineStagingIndexCursorVpTwo := viewport.New()
-	lineStagingIndexCursorVpTwo.SoftWrap = false
-	lineStagingIndexCursorVpTwo.MouseWheelEnabled = false
-	lineStagingIndexCursorVpTwo.SetHorizontalStep(0)
-	lineStagingIndexCursorVpTwo.MouseWheelDelta = 0
+	lineEditingIndexCursorVpTwo := viewport.New()
+	lineEditingIndexCursorVpTwo.SoftWrap = false
+	lineEditingIndexCursorVpTwo.MouseWheelEnabled = false
+	lineEditingIndexCursorVpTwo.SetHorizontalStep(0)
+	lineEditingIndexCursorVpTwo.MouseWheelDelta = 0
 
 	gittiModel := &types.GittiModel{
 		TuiUpdateChannel:                  tuiUpdateChannel,
@@ -81,9 +81,9 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		PopUpModel:                        struct{}{},
 		GitOperations:                     gitOperations,
 		GlobalKeyBindingKeyMapLargestLen:  0,
-		LineStagingIndexPositionAndInfo:   types.GittiLineStagingIndexPositionAndInfo{},
-		LineStagingIndexCursorViewport:    lineStagingIndexCursorVp,
-		LineStagingIndexCursorTwoViewport: lineStagingIndexCursorVpTwo,
+		LineEditingIndexPositionAndInfo:   types.GittiLineEditingIndexPositionAndInfo{},
+		LineEditingIndexCursorViewport:    lineEditingIndexCursorVp,
+		LineEditingIndexCursorTwoViewport: lineEditingIndexCursorVpTwo,
 		CherryPickedCommitInfo:            types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)},
 	}
 	gittiModel.IsRenderInit.Store(false)
@@ -91,7 +91,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	gittiModel.IsTyping.Store(false)
 	gittiModel.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 	gittiModel.ShowDetailPanelTwo.Store(false)
-	gittiModel.IsLineStagingState.Store(false)
+	gittiModel.IsLineEditingState.Store(false)
 
 	return &GittiAppModel{model: gittiModel}
 }
@@ -164,7 +164,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			pullPopUp.UpdatePopUpGitPullOutputViewport(m)
 		case git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE:
 			gAM.updateGitRemoteStatusSyncLineStringAndUpStream()
-		case git.GIT_STAGE_UNSTAGE_LINE_DETAILS_AND_FILES_UPDATE:
+		case git.GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE:
 			needReinit := filesComponent.InitModifiedFilesList(m)
 			services.FetchDetailComponentPanelInfoService(m, needReinit)
 		}
