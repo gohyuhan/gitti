@@ -34,6 +34,14 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 	// because input mostly will no involve `enter` for change line, so `enter` can be safely used for submitting
 	case "enter":
 		return handleTypingEnterKeyBindingInteraction(m)
+
+	// to paste clipboard content into the current input field
+	case "ctrl+p":
+		return handleTypingCtrlpKeyBindingInteraction(m)
+
+		// to copy content from current input field to clipboard
+	case "ctrl+y":
+		return handleTypingCtrlyKeyBindingInteraction(m)
 	}
 
 	// for input typing update
@@ -104,7 +112,6 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 			popUp.RemoteBranchNameInput, cmd = popUp.RemoteBranchNameInput.Update(msg)
 			return m, cmd
 		}
-
 	}
 	return m, nil
 }

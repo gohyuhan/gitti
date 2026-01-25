@@ -555,4 +555,14 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "Universal Skip for paused Git Operation (Rebase, revert, Cherry-pick, etc.)",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "put (paste) clipboard content into the current input field",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+y",
+		TitleOrInfoLine: "yank (copy) content from current input field to clipboard",
+		LineType:        INFO,
+	},
 }

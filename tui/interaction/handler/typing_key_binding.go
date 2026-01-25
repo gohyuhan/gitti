@@ -2,6 +2,7 @@ package handler
 
 import (
 	tea "charm.land/bubbletea/v2"
+	"github.com/atotto/clipboard"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -241,5 +242,142 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 		}
 
 	}
+	return m, nil
+}
+
+func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	content, err := clipboard.ReadAll()
+	if err != nil {
+		return m, nil
+	}
+	msg := tea.PasteMsg{
+		Content: content,
+	}
+	switch m.PopUpType {
+	case constant.CommitPopUp:
+		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+	case constant.AmendCommitPopUp:
+		popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+	case constant.AddRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.RemoteNameTextInput, cmd = popUp.RemoteNameTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.RemoteUrlTextInput, cmd = popUp.RemoteUrlTextInput.Update(msg)
+				return m, cmd
+			}
+		}
+	case constant.CreateNewBranchPopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.CreateNewBranchPopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.NewBranchNameInput, cmd = popUp.NewBranchNameInput.Update(msg)
+			return m, cmd
+		}
+	case constant.GitStashMessagePopUp:
+		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashMessagePopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.StashMessageInput, cmd = popUp.StashMessageInput.Update(msg)
+			return m, cmd
+		}
+	case constant.CreateBranchBasedOnRemotePopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemotePopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.RemoteBranchNameInput, cmd = popUp.RemoteBranchNameInput.Update(msg)
+			return m, cmd
+		}
+	}
+	return m, nil
+}
+
+func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	var content string
+	switch m.PopUpType {
+	case constant.CommitPopUp:
+		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.MessageTextInput.Value()
+			case 2:
+				content = popUp.DescriptionTextAreaInput.Value()
+			}
+		}
+	case constant.AmendCommitPopUp:
+		popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.MessageTextInput.Value()
+			case 2:
+				content = popUp.DescriptionTextAreaInput.Value()
+			}
+		}
+	case constant.AddRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.RemoteNameTextInput.Value()
+			case 2:
+				content = popUp.RemoteUrlTextInput.Value()
+			}
+		}
+	case constant.CreateNewBranchPopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.CreateNewBranchPopUpModel)
+		if ok {
+			content = popUp.NewBranchNameInput.Value()
+		}
+	case constant.GitStashMessagePopUp:
+		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashMessagePopUpModel)
+		if ok {
+			content = popUp.StashMessageInput.Value()
+		}
+	case constant.CreateBranchBasedOnRemotePopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemotePopUpModel)
+		if ok {
+			content = popUp.RemoteBranchNameInput.Value()
+		}
+	}
+
+	err := clipboard.WriteAll(content)
+	if err != nil {
+		// TODO: log this error, this will be for a future implementation on the logging system we will introduce in a later version
+	}
+
 	return m, nil
 }
