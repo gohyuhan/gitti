@@ -24,6 +24,7 @@ A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 ## Requirements
 
 - **Git 2.32+**
+- **xclip** or **xsel** (for linux only)
 
 ## Description
 

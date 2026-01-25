@@ -557,4 +557,14 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "一時停止中のGit操作（リベース、チェリーピックなど）をスキップ",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "クリップボードの内容を現在の入力フィールドに貼り付け",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+y",
+		TitleOrInfoLine: "現在の入力フィールドの内容をクリップボードにコピー",
+		LineType:        INFO,
+	},
 }

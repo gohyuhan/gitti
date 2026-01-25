@@ -556,4 +556,14 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "跳過已暫停的 Git 操作 (Rebase, Cherry-pick 等)",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "將剪貼板內容貼到目前輸入框",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+y",
+		TitleOrInfoLine: "將目前輸入框的內容複製到剪貼板",
+		LineType:        INFO,
+	},
 }
