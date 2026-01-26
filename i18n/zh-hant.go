@@ -139,6 +139,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] 左右移動",
 		"[↑/↓] 跳轉到下/上一行",
+		"[d] 捨棄行變更",
 		"[space] 暫存/取消暫存",
 		"[esc] 退出行編輯模式",
 		"[?] 全域快捷鍵",

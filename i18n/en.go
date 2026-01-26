@@ -139,6 +139,7 @@ var eN = LanguageMapping{
 	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] move left and right",
 		"[↑/↓] to next/previous line",
+		"[d] discard line change",
 		"[space] stage/unstage",
 		"[esc] exit line editing mode",
 		"[?] global key binding",

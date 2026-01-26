@@ -43,7 +43,7 @@ func GitUnstageAllChangesService(m *types.GittiModel) {
 
 func stripAnsi(strArray []string) []string {
 	const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntgry=><~]))"
-	var re = regexp.MustCompile(ansi)
+	re := regexp.MustCompile(ansi)
 	for i, str := range strArray {
 		strArray[i] = re.ReplaceAllString(str, "")
 	}

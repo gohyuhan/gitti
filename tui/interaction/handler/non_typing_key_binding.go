@@ -206,6 +206,15 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
 				}
 			}
+		case constant.DetailComponent, constant.DetailComponentTwo:
+			if m.IsLineEditingState.Load() {
+				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+				var filePathName string
+				if currentSelectedModifiedFile != nil {
+					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+					services.GitRemoveLineFileChangesService(m, filePathName)
+				}
+			}
 		}
 	} else {
 		switch m.PopUpType {

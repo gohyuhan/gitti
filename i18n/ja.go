@@ -139,6 +139,7 @@ var jA = LanguageMapping{
 	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] 左右に移動",
 		"[↑/↓] 次/前の行へ",
+		"[d] 行の変更を破棄",
 		"[space] ステージ/アンステージ",
 		"[esc] 行編集モードを終了",
 		"[?] グローバルキー操作",

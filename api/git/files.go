@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/executor"
 )
@@ -224,6 +225,20 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 	}
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
+	// Calculate the index of the line relative to the start of the diff chunk
+	actualStageLineIndex := stageLineIndex - startFromIndex
+
+	// Bounds check to prevent panic and ensure we only process modified lines (+/-)
+	if actualStageLineIndex < 0 || actualStageLineIndex >= len(diffContentStringArray) {
+		return
+	}
+	selectedLine := diffContentStringArray[actualStageLineIndex]
+	isAddition := strings.HasPrefix(selectedLine, "+") && !strings.HasPrefix(selectedLine, "+++")
+	isDeletion := strings.HasPrefix(selectedLine, "-") && !strings.HasPrefix(selectedLine, "---")
+	if !isAddition && !isDeletion {
+		return
+	}
+
 	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
@@ -246,7 +261,7 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 		var gitArgs []string
 		// Generate and write the patch content.
 		// We generate a custom patch that isolates the specific line change and write it to the temp file.
-		_, writeErr := tempPatchFile.WriteString(generateStageLinePatchString(diffContentStringArray, startFromIndex, stageLineIndex, filePathName))
+		_, writeErr := tempPatchFile.WriteString(generateStageLinePatchString(diffContentStringArray, actualStageLineIndex, filePathName))
 		if writeErr != nil {
 			tempPatchFile.Close() // Close before return
 			return
@@ -274,16 +289,13 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 // generateStageLinePatchString creates a patch string for a single line from a larger diff.
 // It keeps the target line as a change, converts other changes in the same context to "context lines",
 // and preserves existing context lines. This effectively isolates the chosen line for staging/unstaging.
-func generateStageLinePatchString(diffContentStringArray []string, startFromIndex int, stageLineIndex int, filePathName string) string {
+func generateStageLinePatchString(diffContentStringArray []string, actualStageLineIndex int, filePathName string) string {
 	var stageLinePatchString strings.Builder
-	// Calculate the index of the line relative to the start of the diff chunk we are processing
-	actualStageLineIndex := stageLineIndex - startFromIndex
-
 	// We need to track if the previous line was skipped to handle "\ No newline" markers correctly.
 	lastLineWasSkipped := false
 
 	for index, diffLine := range diffContentStringArray {
-		if len(diffLine) > 0 {
+		if utf8.RuneCountInString(diffLine) > 0 {
 			// ---------------------------------------------------------
 			// HANDLE SPECIAL MARKERS (\ No newline)
 			// ---------------------------------------------------------
@@ -319,7 +331,7 @@ func generateStageLinePatchString(diffContentStringArray []string, startFromInde
 			if strings.HasPrefix(diffLine, "-") && !strings.HasPrefix(diffLine, "---") {
 				// If it's a deletion line ("- content"), convert it to a context line ("  content").
 				// This means "treat this as existing unchanged content" in the patch context.
-				if len(diffLine) > 1 {
+				if utf8.RuneCountInString(diffLine) > 1 {
 					stageLinePatchString.WriteString(" ")
 					stageLinePatchString.WriteString(diffLine[1:])
 					stageLinePatchString.WriteString("\n")
@@ -358,6 +370,20 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 	}
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
+	// Calculate the index of the line relative to the start of the diff chunk
+	actualUnStageLineIndex := unStageLineIndex - startFromIndex
+
+	// Bounds check to prevent panic and ensure we only process modified lines (+/-)
+	if actualUnStageLineIndex < 0 || actualUnStageLineIndex >= len(diffContentStringArray) {
+		return
+	}
+	selectedLine := diffContentStringArray[actualUnStageLineIndex]
+	isAddition := strings.HasPrefix(selectedLine, "+") && !strings.HasPrefix(selectedLine, "+++")
+	isDeletion := strings.HasPrefix(selectedLine, "-") && !strings.HasPrefix(selectedLine, "---")
+	if !isAddition && !isDeletion {
+		return
+	}
+
 	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
@@ -385,7 +411,7 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 		// Generate and write the patch content.
 		// We reuse generateStageLinePatchString because the patch structure is the same.
 		// The difference is in how we apply it (using --reverse).
-		_, writeErr := tempPatchFile.WriteString(generateUnstageLinePatchString(diffContentStringArray, startFromIndex, unStageLineIndex, filePathName))
+		_, writeErr := tempPatchFile.WriteString(generateUnstageLinePatchString(diffContentStringArray, actualUnStageLineIndex, filePathName))
 		if writeErr != nil {
 			tempPatchFile.Close() // Close before return
 			return
@@ -409,14 +435,12 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 	}
 }
 
-func generateUnstageLinePatchString(diffContentStringArray []string, startFromIndex int, unStageLineIndex int, filePathName string) string {
+func generateUnstageLinePatchString(diffContentStringArray []string, actualUnStageLineIndex int, filePathName string) string {
 	var unStageLinePatchString strings.Builder
-	// Calculate the index of the line relative to the start of the diff chunk we are processing
-	actualUnStageLineIndex := unStageLineIndex - startFromIndex
 	lastLineWasSkipped := false
 
 	for index, diffLine := range diffContentStringArray {
-		if len(diffLine) > 0 {
+		if utf8.RuneCountInString(diffLine) > 0 {
 			// ---------------------------------------------------------
 			// HANDLE SPECIAL MARKERS (\ No newline)
 			// ---------------------------------------------------------
@@ -452,7 +476,7 @@ func generateUnstageLinePatchString(diffContentStringArray []string, startFromIn
 			if strings.HasPrefix(diffLine, "+") && !strings.HasPrefix(diffLine, "+++") {
 				// This is a staged addition. It IS currently in the Index.
 				// We convert it to a context line (starts with space) so Git can anchor the patch.
-				if len(diffLine) > 1 {
+				if utf8.RuneCountInString(diffLine) > 1 {
 					unStageLinePatchString.WriteString(" ")
 					unStageLinePatchString.WriteString(diffLine[1:])
 					unStageLinePatchString.WriteString("\n")
@@ -596,4 +620,160 @@ func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) 
 		changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 		changesDiscardCmdExecutor.Run()
 	}
+}
+
+// ----------------------------------
+//
+//		          Remove Changes
+//	  * GitRemoveFileLineChanges removes a specific line change from either the Index (unstage) or the Worktree (discard).
+//	    It works by generating a "reverse patch" for that specific line and applying it via 'git apply'.
+//
+// ----------------------------------
+func (gf *GitFiles) GitRemoveFileLineChanges(filePathName string, diffContentStringArray []string, startFromIndex int, removeLineIndex int, stageStatus string) {
+	// Acquire Git process lock to ensure no other Git operations are running concurrently.
+	if !gf.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gf.gitProcessLock.ReleaseGitOpsLock()
+
+	// Calculate the index of the line relative to the start of the diff chunk
+	actualRemoveLineIndex := removeLineIndex - startFromIndex
+
+	// Bounds check to prevent panic and ensure we only process modified lines (+/-)
+	if actualRemoveLineIndex < 0 || actualRemoveLineIndex >= len(diffContentStringArray) {
+		return
+	}
+	selectedLine := diffContentStringArray[actualRemoveLineIndex]
+	isAddition := strings.HasPrefix(selectedLine, "+") && !strings.HasPrefix(selectedLine, "+++")
+	isDeletion := strings.HasPrefix(selectedLine, "-") && !strings.HasPrefix(selectedLine, "---")
+	if !isAddition && !isDeletion {
+		return
+	}
+
+	_, fileIndexExist := gf.filesPosition[filePathName]
+	if fileIndexExist {
+		// Create a temporary patch file.
+		// This file will hold the unified diff content for the specific line we want to reverse.
+		tempPatchFile, err := os.CreateTemp("", "gitti-patch-remove-changes-*")
+		if err != nil {
+			return
+		}
+		// Ensure the file is cleaned up (deleted) after function exits
+		defer os.Remove(tempPatchFile.Name())
+
+		var gitArgs []string
+		var writeErr error
+
+		// Generate and write the patch content.
+		// We reuse generateStageLinePatchString because the patch structure is the same.
+		_, writeErr = tempPatchFile.WriteString(generateRemoveLinePatchString(diffContentStringArray, actualRemoveLineIndex))
+		if writeErr != nil {
+			tempPatchFile.Close() // Close before return
+			return
+		}
+		// Close the file descriptor so Git can read it safely
+		closeErr := tempPatchFile.Close()
+		if closeErr != nil {
+			return
+		}
+
+		switch stageStatus {
+		case STAGE:
+			// "Removing" a change that is already STAGED means unstaging it.
+			// We apply the reverse patch to the index (--cached).
+			gitArgs = []string{"apply", "--cached", "--unidiff-zero", "--recount", "--whitespace=nowarn", tempPatchFile.Name()}
+		case UNSTAGE:
+			// "Removing" a change that is UNSTAGED (only in worktree) means discarding it from the worktree.
+			gitArgs = []string{"apply", "--unidiff-zero", "--recount", "--whitespace=nowarn", tempPatchFile.Name()}
+		}
+
+		removeLineCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+		removeLineCmdExecutor.Run()
+		// Update file status to reflect changes
+		gf.GetGitFilesStatus()
+		gf.updateChannel <- GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE
+
+	}
+}
+
+// generateRemoveLinePatchString constructs a unified diff patch that inverses the change of a single line.
+// To make the patch apply cleanly even if there are other changes in the same chunk:
+// 1. The TARGET line's operator is swapped (+ becomes -, - becomes +) to "undo" it.
+// 2. OTHER added lines (+) are converted to context space (' ') because they already exist in the target state.
+// 3. OTHER deleted lines (-) are skipped because they do not exist in the target state.
+func generateRemoveLinePatchString(diffContentStringArray []string, actualRemoveLineIndex int) string {
+	var removeLinePatchString strings.Builder
+
+	lastLineWasSkipped := false
+	for index, diffLine := range diffContentStringArray {
+		if utf8.RuneCountInString(diffLine) > 0 {
+			// Handle special markers
+			if strings.HasPrefix(diffLine, "\\ No newline") {
+				if lastLineWasSkipped {
+					continue
+				}
+				removeLinePatchString.WriteString(diffLine)
+				removeLinePatchString.WriteString("\n")
+				continue
+			}
+			// TARGET LINE: Swap the operator to reverse the change
+			if index == actualRemoveLineIndex {
+				if utf8.RuneCountInString(diffLine) > 1 {
+					if strings.HasPrefix(diffLine, "-") && !strings.HasPrefix(diffLine, "---") {
+						// Undoing a deletion means adding it back
+						removeLinePatchString.WriteString("+")
+						removeLinePatchString.WriteString(diffLine[1:])
+						removeLinePatchString.WriteString("\n")
+					} else if strings.HasPrefix(diffLine, "+") && !strings.HasPrefix(diffLine, "+++") {
+						// Undoing an addition means removing it
+						removeLinePatchString.WriteString("-")
+						removeLinePatchString.WriteString(diffLine[1:])
+						removeLinePatchString.WriteString("\n")
+					} else {
+						removeLinePatchString.WriteString(diffLine)
+						removeLinePatchString.WriteString("\n")
+					}
+				} else {
+					// Handle empty lines with just the +/- operator
+					if strings.HasPrefix(diffLine, "-") && !strings.HasPrefix(diffLine, "---") {
+						removeLinePatchString.WriteString("+\n")
+					} else if strings.HasPrefix(diffLine, "+") && !strings.HasPrefix(diffLine, "+++") {
+						removeLinePatchString.WriteString("-\n")
+					} else {
+						removeLinePatchString.WriteString(" \n")
+					}
+				}
+				lastLineWasSkipped = false
+			} else {
+				// OTHER LINES in the chunk: We "normalize" them so the patch only targets our line.
+				if strings.HasPrefix(diffLine, "+") && !strings.HasPrefix(diffLine, "+++") {
+					// Convert addition to context: this line is already in the file/index, so
+					// for the patch to apply, it should be treated as existing context.
+					if utf8.RuneCountInString(diffLine) > 1 {
+						removeLinePatchString.WriteString(" ")
+						removeLinePatchString.WriteString(diffLine[1:])
+						removeLinePatchString.WriteString("\n")
+					} else {
+						removeLinePatchString.WriteString(" \n")
+					}
+					lastLineWasSkipped = false
+				} else if strings.HasPrefix(diffLine, "-") && !strings.HasPrefix(diffLine, "---") {
+					// Skip deletion: this line is already gone in the file/index, so it
+					// doesn't exist to be used as context or modified.
+					lastLineWasSkipped = true
+					continue
+				} else {
+					// Keep existing context lines as is.
+					removeLinePatchString.WriteString(diffLine)
+					removeLinePatchString.WriteString("\n")
+					lastLineWasSkipped = false
+				}
+			}
+		} else {
+			removeLinePatchString.WriteString("\n")
+			lastLineWasSkipped = false
+		}
+	}
+
+	return removeLinePatchString.String()
 }
