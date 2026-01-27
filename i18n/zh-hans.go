@@ -289,6 +289,10 @@ var zH_HANS = LanguageMapping{
 		"[enter] 应用已遴选的提交",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp: []string{
+		"[enter] 确认丢弃",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -407,6 +411,7 @@ var zH_HANS = LanguageMapping{
 	ApplyCherryPickOpsTitle:                                  "应用遴选",
 	ApplyCherryPickOpsDescription:                            "将已遴选的提交应用到当前检出的分支",
 	CherryPickedFromBranch:                                   "遴选自分支  ~>",
+	GitDiscardFileLineChangeConfirmTitle:                     "您确定要丢弃以下行更改吗？",
 }
 
 // for about gitti

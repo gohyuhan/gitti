@@ -289,6 +289,10 @@ var jA = LanguageMapping{
 		"[enter] チェリーピックされたコミットを適用",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp: []string{
+		"[enter] 破棄を確定",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -407,6 +411,7 @@ var jA = LanguageMapping{
 	ApplyCherryPickOpsTitle:                                  "チェリーピックを適用",
 	ApplyCherryPickOpsDescription:                            "チェリーピックされたコミットを現在のチェックアウトブランチに適用します",
 	CherryPickedFromBranch:                                   "チェリーピック元のブランチ  ~>",
+	GitDiscardFileLineChangeConfirmTitle:                     "以下の行の変更を破棄してもよろしいですか？",
 }
 
 // for about gitti

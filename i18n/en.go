@@ -289,6 +289,10 @@ var eN = LanguageMapping{
 		"[enter] apply cherry picked commit(s)",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp: []string{
+		"[enter] confirm discard",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -407,6 +411,7 @@ var eN = LanguageMapping{
 	ApplyCherryPickOpsTitle:                                  "Apply Cherry Pick",
 	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
 	CherryPickedFromBranch:                                   "Cherry picked from branch  ~>",
+	GitDiscardFileLineChangeConfirmTitle:                     "Are you sure you want to discard the following line change?",
 }
 
 // for about gitti

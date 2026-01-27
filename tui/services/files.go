@@ -6,7 +6,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-func GitRemoveLineFileChangesService(m *types.GittiModel, filePathName string) {
+func GitDiscardLineFileChangeService(m *types.GittiModel, filePathName string) {
 	switch m.CurrentSelectedComponent {
 	case constant.DetailComponent:
 		contentArray := stripAnsi(m.DetailPanelViewportOGStringArray)
@@ -16,11 +16,11 @@ func GitRemoveLineFileChangesService(m *types.GittiModel, filePathName string) {
 		switch m.LineEditingIndexPositionAndInfo.DetailPanelViewportStageType {
 		case constant.STAGE:
 			go func() {
-				m.GitOperations.GitFiles.GitRemoveFileLineChanges(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.STAGE)
+				m.GitOperations.GitFiles.GitDiscardFileLineChange(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.STAGE)
 			}()
 		case constant.UNSTAGE:
 			go func() {
-				m.GitOperations.GitFiles.GitRemoveFileLineChanges(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.UNSTAGE)
+				m.GitOperations.GitFiles.GitDiscardFileLineChange(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.UNSTAGE)
 			}()
 		default:
 			return
@@ -34,11 +34,11 @@ func GitRemoveLineFileChangesService(m *types.GittiModel, filePathName string) {
 		switch m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportStageType {
 		case constant.STAGE:
 			go func() {
-				m.GitOperations.GitFiles.GitRemoveFileLineChanges(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.STAGE)
+				m.GitOperations.GitFiles.GitDiscardFileLineChange(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.STAGE)
 			}()
 		case constant.UNSTAGE:
 			go func() {
-				m.GitOperations.GitFiles.GitRemoveFileLineChanges(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.UNSTAGE)
+				m.GitOperations.GitFiles.GitDiscardFileLineChange(filePathName, contentArray, overflowIndexCount, actualCurrentIndex, git.UNSTAGE)
 			}()
 		default:
 			return

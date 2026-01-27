@@ -13,6 +13,7 @@ import (
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
+	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	logPopUp "github.com/gohyuhan/gitti/tui/popup/log"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
@@ -211,8 +212,33 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				var filePathName string
 				if currentSelectedModifiedFile != nil {
-					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
-					services.GitRemoveLineFileChangesService(m, filePathName)
+					promptForDiscardLineChangeConfirm := false
+					switch m.CurrentSelectedComponent {
+					case constant.DetailComponent:
+						switch m.LineEditingIndexPositionAndInfo.DetailPanelViewportStageType {
+						case constant.STAGE:
+							promptForDiscardLineChangeConfirm = false
+						case constant.UNSTAGE:
+							promptForDiscardLineChangeConfirm = true
+						}
+					case constant.DetailComponentTwo:
+						switch m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportStageType {
+						case constant.STAGE:
+							promptForDiscardLineChangeConfirm = false
+						case constant.UNSTAGE:
+							promptForDiscardLineChangeConfirm = true
+						}
+					}
+
+					if promptForDiscardLineChangeConfirm {
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.GitDiscardFileLineChangeConfirmPopUp
+						filesPopUp.InitGitDiscardFileLineChangeConfirmPopUp(m)
+					} else {
+						filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+						services.GitDiscardLineFileChangeService(m, filePathName)
+					}
 				}
 			}
 		}
@@ -746,6 +772,19 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			m.IsTyping.Store(false)
 			m.PopUpModel = nil
 			m.PopUpType = constant.NoPopUp
+		case constant.GitDiscardFileLineChangeConfirmPopUp:
+			if m.IsLineEditingState.Load() {
+				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+				var filePathName string
+				if currentSelectedModifiedFile != nil {
+					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+					services.GitDiscardLineFileChangeService(m, filePathName)
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpModel = nil
+					m.PopUpType = constant.NoPopUp
+				}
+			}
 		}
 	}
 	return m, nil
@@ -979,6 +1018,11 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp
 			m.PopUpModel = nil
+		case constant.GitDiscardFileLineChangeConfirmPopUp:
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
 		}
 		return m, nil
 	} else {
@@ -1161,6 +1205,11 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 				popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
 				return m, cmd
 			}
+		case constant.GitDiscardFileLineChangeConfirmPopUp:
+			popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
+			if ok {
+				popUp.DiscardFileLineChangeViewport.ScrollLeft(1)
+			}
 		}
 	}
 	return m, nil
@@ -1184,6 +1233,11 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			if ok {
 				popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
 				return m, cmd
+			}
+		case constant.GitDiscardFileLineChangeConfirmPopUp:
+			popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
+			if ok {
+				popUp.DiscardFileLineChangeViewport.ScrollRight(1)
 			}
 		}
 	}

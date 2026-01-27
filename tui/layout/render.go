@@ -343,6 +343,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitEditCherryPickPopUp
 		case constant.GitCherryPickApplyConfirmPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitCherryPickApplyConfirmPopUp
+		case constant.GitDiscardFileLineChangeConfirmPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardFileLineChangeConfirmPopUp
 		}
 	} else {
 		//-----------------------------

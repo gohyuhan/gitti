@@ -97,10 +97,10 @@ type GittiLineEditingIndexPositionAndInfo struct {
 	DetailPanelTwoViewportIndexPosition      int    // for unstaged panel
 	DetailPanelViewportStageType             string // to tell it was currently showing staged or unstaged changes
 	DetailPanelTwoViewportStageType          string // to tell it was currently showing staged or unstaged changes
-	DetailPanelViewportActualCurrentIndex    int    // this is the actual current index of the viewport
-	DetailPanelTwoViewportActualCurrentIndex int    // this is the actual current index of the viewport
-	DetailPanelViewportOverflowIndexCount    int    // we need to record this as well as to calculate the actual current index due to we have added extra info at the top of the viewport
-	DetailPanelTwoViewportOverflowIndexCount int    // we need to record this as well as to calculate the actual current index due to we have added extra info at the top of the viewport
+	DetailPanelViewportActualCurrentIndex    int    // this is the actual current index of the viewport (including overflow)
+	DetailPanelTwoViewportActualCurrentIndex int    // this is the actual current index of the viewport (including overflow)
+	DetailPanelViewportOverflowIndexCount    int    // we need to record this as well as to calculate the actual current index due to we have added extra info at the top of the viewport that we added ourselves which is not from git
+	DetailPanelTwoViewportOverflowIndexCount int    // we need to record this as well as to calculate the actual current index due to we have added extra info at the top of the viewport that we added ourselves which is not from git
 }
 
 // ---------------------------------

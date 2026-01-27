@@ -5,6 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	"github.com/gohyuhan/gitti/tui/popup/discard"
+	"github.com/gohyuhan/gitti/tui/popup/files"
 	"github.com/gohyuhan/gitti/tui/popup/keybinding"
 	"github.com/gohyuhan/gitti/tui/popup/log"
 	"github.com/gohyuhan/gitti/tui/popup/pull"
@@ -87,6 +88,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = log.RenderGitEditCherryPickPopUp(m)
 	case constant.GitCherryPickApplyConfirmPopUp:
 		popUp = log.RenderGitCherryPickApplyConfirmPopUp(m)
+	case constant.GitDiscardFileLineChangeConfirmPopUp:
+		popUp = files.RenderGitDiscardFileLineChangeConfirmPopUp(m)
 	}
 	return popUp
 }

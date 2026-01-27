@@ -136,6 +136,7 @@ type LanguageMapping struct {
 	KeyBindingForGitCherryPickPopUp                         []string
 	KeyBindingForGitEditCherryPickPopUp                     []string
 	KeyBindingForGitCherryPickApplyConfirmPopUp             []string
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp       []string
 	KeyBindingForGlobalKeyBindingPopUp                      []string
 	// -----------------
 	//  For Pop Up
@@ -278,4 +279,6 @@ type LanguageMapping struct {
 	ApplyCherryPickOpsTitle       string
 	ApplyCherryPickOpsDescription string
 	CherryPickedFromBranch        string
+	// for discard file line change
+	GitDiscardFileLineChangeConfirmTitle string
 }
