@@ -38,6 +38,7 @@ const (
 	GitCherryPickPopUp                         = "GitCherryPickPopUp"                         // IsTyping will be false
 	GitEditCherryPickPopUp                     = "GitEditCherryPickPopUp"                     // IsTyping will be false
 	GitCherryPickApplyConfirmPopUp             = "GitCherryPickApplyConfirmPopUp"             // IsTyping will be false
+	GitDiscardFileLineChangeConfirmPopUp       = "GitDiscardFileLineChangeConfirmPopUp"       // IsTyping will be false
 )
 
 const SelectedLeftPanelComponentHeightRatio = 0.4
@@ -82,6 +83,7 @@ const (
 	MaxGitCherryPickPopUpWidth                         = 150
 	MaxGitEditCherryPickPopUpWidth                     = 150
 	MaxGitCherryPickApplyConfirmPopUpWidth             = 150
+	MaxGitDiscardFileLineChangeConfirmPopUpWidth       = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 30
 	PopUpGitCommitOutputViewPortHeight                 = 10
@@ -105,6 +107,7 @@ const (
 	PopUpGitCherryPickOptionSelectionHeight            = 6
 	PopUpGitCherryPickPopUpHeight                      = 10
 	PopUpGitEditCherryPickPopUpHeight                  = 10
+	PopUpGitDiscardFileLineChangeViewportHeight        = 1
 )
 
 // variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/interaction/handler"
+	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -17,6 +18,14 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 			} else {
 				m.DetailPanelViewport.ScrollLeft(1)
 			}
+		} else {
+			switch m.PopUpType {
+			case constant.GitDiscardFileLineChangeConfirmPopUp:
+				popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
+				if ok {
+					popUp.DiscardFileLineChangeViewport.ScrollLeft(1)
+				}
+			}
 		}
 
 	case "wheelright":
@@ -26,11 +35,19 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 			} else {
 				m.DetailPanelViewport.ScrollRight(1)
 			}
+		} else {
+			switch m.PopUpType {
+			case constant.GitDiscardFileLineChangeConfirmPopUp:
+				popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
+				if ok {
+					popUp.DiscardFileLineChangeViewport.ScrollRight(1)
+				}
+			}
 		}
 
 	case "wheelup":
 		if !m.ShowPopUp.Load() {
-			if !m.IsLineStagingState.Load() {
+			if !m.IsLineEditingState.Load() {
 				if m.CurrentSelectedComponent == constant.DetailComponentTwo {
 					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				} else {
@@ -45,7 +62,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 
 	case "wheeldown":
 		if !m.ShowPopUp.Load() {
-			if !m.IsLineStagingState.Load() {
+			if !m.IsLineEditingState.Load() {
 				if m.CurrentSelectedComponent == constant.DetailComponentTwo {
 					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				} else {

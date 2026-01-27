@@ -65,7 +65,7 @@ var zH_HANT = LanguageMapping{
 	Loading:                             "載入中...",
 	StagedTitle:                         "已暫存的變更",
 	UnstagedTitle:                       "未暫存的變更",
-	LineStagingModeTitle:                "行暫存模式",
+	LineEditingModeTitle:                "行編輯模式",
 	CherryPickTitle:                     "從分支揀選: \n %s",
 	EditCherryPickTitle:                 "編輯揀選",
 	ApplyCherryPickTitle:                "將揀選應用到當前分支: \n %s",
@@ -129,18 +129,19 @@ var zH_HANT = LanguageMapping{
 		"[esc] 返回",
 		"[?] 全域快捷鍵",
 	},
-	KeyBindingKeyDetailComponentLineStagingEligible: []string{
+	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] 左右移動",
 		"[↑/↓] 上下移動",
-		"[L] 進入行暫存模式",
+		"[L] 進入行編輯模式",
 		"[esc] 返回",
 		"[?] 全域快捷鍵",
 	},
-	KeyBindingKeyDetailComponentLineStaging: []string{
+	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] 左右移動",
-		"[↑/↓] 跳轉到下/上一個可暫存或可取消暫存的行",
+		"[↑/↓] 跳轉到下/上一行",
+		"[d] 捨棄行變更",
 		"[space] 暫存/取消暫存",
-		"[esc] 退出行暫存模式",
+		"[esc] 退出行編輯模式",
 		"[?] 全域快捷鍵",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -288,6 +289,10 @@ var zH_HANT = LanguageMapping{
 		"[enter] 應用已揀選的提交",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp: []string{
+		"[enter] 確認捨棄",
+		"[esc] 取消 / 關閉",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 關閉",
 	},
@@ -406,6 +411,7 @@ var zH_HANT = LanguageMapping{
 	ApplyCherryPickOpsTitle:                                  "應用揀選",
 	ApplyCherryPickOpsDescription:                            "將已揀選的提交應用到當前檢出的分支",
 	CherryPickedFromBranch:                                   "揀選自分支  ~>",
+	GitDiscardFileLineChangeConfirmTitle:                     "您確定要捨棄以下行變更嗎？",
 }
 
 // for about gitti

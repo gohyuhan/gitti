@@ -488,7 +488,7 @@ func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
 
 	filesChanged, err := strconv.Atoi(matches[1])
 	if err != nil {
-		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG CHECK LARGE COMMIT ERROR]: %s", cmdErr.Error()))
+		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG CHECK LARGE COMMIT ERROR]: %s", err.Error()))
 		return true
 	}
 

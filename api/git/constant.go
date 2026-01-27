@@ -61,3 +61,8 @@ const (
 	RESETHARD  = "RESETHARD"
 	RESETMIXED = "RESETMIXED"
 )
+
+const (
+	STAGE   = "STAGE"
+	UNSTAGE = "UNSTAGE"
+)

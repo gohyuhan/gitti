@@ -107,8 +107,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 					m.CurrentSelectedComponent = constant.DetailComponent
 				}
 			}
-			if m.IsLineStagingState.Load() {
-				EnterOrReinitLineStagingStateService(m)
+			if m.IsLineEditingState.Load() {
+				EnterOrReinitLineEditingStateService(m)
 			}
 			m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
 			return
@@ -237,19 +237,19 @@ func generateAboutGittiContent() string {
 
 // ------------------------------------
 //
-//			For Enter Line Staging State Service
-//		  * this was to enter or reinit the line staging state
+//			For Enter Line Editing State Service
+//		  * this was to enter or reinit the line editing state
 //		  * it will calculate the index position for both visible and actual content
 //	   * it will also determine if the current file selected has staged/unstaged changes or both
 //	   * lastly it will set the cursor viewport content
 //
 // ------------------------------------
-func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
+func EnterOrReinitLineEditingStateService(m *types.GittiModel) {
 	if !((m.CurrentSelectedComponent == constant.DetailComponent || m.CurrentSelectedComponent == constant.DetailComponentTwo) && m.DetailPanelParentComponent == constant.ModifiedFilesComponent && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil) {
-		// we are eligible to be in line staging mode, so we need to reset the state
-		m.IsLineStagingState.Store(false)
+		// we are eligible to be in line editing mode, so we need to reset the state
+		m.IsLineEditingState.Store(false)
 		// reinit the index position
-		m.LineStagingIndexPositionAndInfo = types.GittiLineStagingIndexPositionAndInfo{}
+		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{}
 		return
 	}
 
@@ -258,9 +258,9 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 	detailPanelViewportTotalIndex := m.DetailPanelViewport.TotalLineCount()
 	detailPanelTwoViewportTotalIndex := m.DetailPanelTwoViewport.TotalLineCount()
 
-	if !m.IsLineStagingState.Load() {
-		// we first confirm that we are not in line staging mode yet, but we are supposed to be
-		// so we need to init the line staging state
+	if !m.IsLineEditingState.Load() {
+		// we first confirm that we are not in line editing mode yet, but we are supposed to be
+		// so we need to init the line editing state
 		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 		currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
 
@@ -270,12 +270,12 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 		detailPanelTwoViewportOverflowIndexCount := 0
 
 		if currentSelectedFile.HasConflict {
-			// if the file is in conflict state, we cannot do line staging
-			m.IsLineStagingState.Store(false)
+			// if the file is in conflict state, we cannot do line editing
+			m.IsLineEditingState.Store(false)
 			detailPanelViewportStageType = ""
 			detailPanelTwoViewportStageType = ""
 		} else {
-			m.IsLineStagingState.Store(true)
+			m.IsLineEditingState.Store(true)
 			// determine the pop up state
 			if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
 				// newly added untracked file
@@ -305,7 +305,7 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 		}
 
 		// reinit the index position
-		m.LineStagingIndexPositionAndInfo = types.GittiLineStagingIndexPositionAndInfo{
+		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{
 			DetailPanelViewportIndexPosition:         0,
 			DetailPanelTwoViewportIndexPosition:      0,
 			DetailPanelViewportStageType:             detailPanelViewportStageType,
@@ -317,9 +317,9 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 		}
 
 		// set the cursor viewport
-		SetLineStagingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
-	} else if m.IsLineStagingState.Load() {
-		// we are already in line staging mode, so we need to update the state
+		SetLineEditingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
+	} else if m.IsLineEditingState.Load() {
+		// we are already in line editing mode, so we need to update the state
 		// this usually happens when we resize the window or similar event
 		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 		currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
@@ -335,12 +335,12 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 		var detailPanelTwoViewportOverflowIndexCount int
 
 		if currentSelectedFile.HasConflict {
-			// if the file is in conflict state, we cannot do line staging
-			m.IsLineStagingState.Store(false)
+			// if the file is in conflict state, we cannot do line editing
+			m.IsLineEditingState.Store(false)
 			detailPanelViewportStageType = ""
 			detailPanelTwoViewportStageType = ""
 		} else {
-			m.IsLineStagingState.Store(true)
+			m.IsLineEditingState.Store(true)
 			// determine the pop up state
 			if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
 				// newly added untracked file
@@ -370,14 +370,14 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 		}
 
 		// recalculate the actual position
-		detailPanelViewportActualCurrentIndex = m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
-		detailPanelTwoViewportActualCurrentIndex = m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
-		if detailPanelViewportOverflowIndexCount < m.LineStagingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount < m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
+		detailPanelViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
+		detailPanelTwoViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
+		if detailPanelViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
+			detailPanelTwoViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
 			detailPanelViewportActualCurrentIndex -= 1
 			detailPanelTwoViewportActualCurrentIndex -= 1
-		} else if detailPanelViewportOverflowIndexCount > m.LineStagingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount > m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
+		} else if detailPanelViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
+			detailPanelTwoViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
 			detailPanelViewportActualCurrentIndex += 1
 			detailPanelTwoViewportActualCurrentIndex += 1
 		}
@@ -427,7 +427,7 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 		}
 
 		// reinit the index position
-		m.LineStagingIndexPositionAndInfo = types.GittiLineStagingIndexPositionAndInfo{
+		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{
 			DetailPanelViewportIndexPosition:         detailPanelViewportIndexPosition,
 			DetailPanelTwoViewportIndexPosition:      detailPanelTwoViewportIndexPosition,
 			DetailPanelViewportStageType:             detailPanelViewportStageType,
@@ -439,23 +439,23 @@ func EnterOrReinitLineStagingStateService(m *types.GittiModel) {
 		}
 
 		// set the cursor viewport
-		SetLineStagingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
+		SetLineEditingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
 	}
 }
 
 // ------------------------------------
 //
-//			For Set Line Staging Cursor Viewport Content
+//			For Set Line Editing Cursor Viewport Content
 //		  * this was to set the cursor viewport content
-//	   * needed because we are using a dual viewport setup for line staging mode (one for cursor, one for content)
+//	   * needed because we are using a dual viewport setup for line editing mode (one for cursor, one for content)
 //
 // ------------------------------------
-func SetLineStagingCursorViewportContent(m *types.GittiModel, detailPanelViewportVisibleIndex int, detailPanelTwoViewportVisibleIndex int) {
+func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewportVisibleIndex int, detailPanelTwoViewportVisibleIndex int) {
 	// set the cursor viewport
 	var cursorVpLine strings.Builder
 	var cursorVpTwoLine strings.Builder
 	for index := range detailPanelViewportVisibleIndex {
-		if index == m.LineStagingIndexPositionAndInfo.DetailPanelViewportIndexPosition {
+		if index == m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition {
 			cursorVpLine.WriteString(style.SelectedItemStyle.Render("❯  ") + "\n")
 		} else {
 			cursorVpLine.WriteString(style.NewStyle.Render("   ") + "\n")
@@ -463,12 +463,12 @@ func SetLineStagingCursorViewportContent(m *types.GittiModel, detailPanelViewpor
 	}
 
 	for index := range detailPanelTwoViewportVisibleIndex {
-		if index == m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
+		if index == m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
 			cursorVpTwoLine.WriteString(style.SelectedItemStyle.Render("❯  ") + "\n")
 		} else {
 			cursorVpTwoLine.WriteString(style.NewStyle.Render("   ") + "\n")
 		}
 	}
-	m.LineStagingIndexCursorViewport.SetContent(cursorVpLine.String())
-	m.LineStagingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
+	m.LineEditingIndexCursorViewport.SetContent(cursorVpLine.String())
+	m.LineEditingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
 }

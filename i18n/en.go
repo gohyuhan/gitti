@@ -65,7 +65,7 @@ var eN = LanguageMapping{
 	Loading:                             "Loading...",
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
-	LineStagingModeTitle:                "In Line Staging Mode",
+	LineEditingModeTitle:                "In Line Editing Mode",
 	CherryPickTitle:                     "Cherry Pick from Branch: \n %s",
 	EditCherryPickTitle:                 "Edit Cherry Pick",
 	ApplyCherryPickTitle:                "Apply Cherry Pick to Current Branch: \n %s",
@@ -129,18 +129,19 @@ var eN = LanguageMapping{
 		"[esc] back",
 		"[?] global key binding",
 	},
-	KeyBindingKeyDetailComponentLineStagingEligible: []string{
+	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
-		"[L] enter line staging mode",
+		"[L] enter line editing mode",
 		"[esc] back",
 		"[?] global key binding",
 	},
-	KeyBindingKeyDetailComponentLineStaging: []string{
+	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] move left and right",
-		"[↑/↓] to next/previous stageble or unstageble line",
+		"[↑/↓] to next/previous line",
+		"[d] discard line change",
 		"[space] stage/unstage",
-		"[esc] exit line staging mode",
+		"[esc] exit line editing mode",
 		"[?] global key binding",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -288,6 +289,10 @@ var eN = LanguageMapping{
 		"[enter] apply cherry picked commit(s)",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp: []string{
+		"[enter] confirm discard",
+		"[esc] cancel / close",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] close",
 	},
@@ -406,6 +411,7 @@ var eN = LanguageMapping{
 	ApplyCherryPickOpsTitle:                                  "Apply Cherry Pick",
 	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
 	CherryPickedFromBranch:                                   "Cherry picked from branch  ~>",
+	GitDiscardFileLineChangeConfirmTitle:                     "Are you sure you want to discard the following line change?",
 }
 
 // for about gitti

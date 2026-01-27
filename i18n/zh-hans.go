@@ -65,7 +65,7 @@ var zH_HANS = LanguageMapping{
 	Loading:                             "加载中...",
 	StagedTitle:                         "已暂存的更改",
 	UnstagedTitle:                       "未暂存的更改",
-	LineStagingModeTitle:                "行暂存模式",
+	LineEditingModeTitle:                "行编辑模式",
 	CherryPickTitle:                     "从分支遴选: \n %s",
 	EditCherryPickTitle:                 "编辑遴选",
 	ApplyCherryPickTitle:                "将遴选应用到当前分支: \n %s",
@@ -129,18 +129,19 @@ var zH_HANS = LanguageMapping{
 		"[esc] 返回",
 		"[?] 全局快捷键",
 	},
-	KeyBindingKeyDetailComponentLineStagingEligible: []string{
+	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",
-		"[L] 进入行暂存模式",
+		"[L] 进入行编辑模式",
 		"[esc] 返回",
 		"[?] 全局快捷键",
 	},
-	KeyBindingKeyDetailComponentLineStaging: []string{
+	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] 左右移动",
-		"[↑/↓] 跳转到下/上一个可暂存或可取消暂存的行",
+		"[↑/↓] 跳转到下/上一行",
+		"[d] 舍弃行更改",
 		"[space] 暂存/取消暂存",
-		"[esc] 退出行暂存模式",
+		"[esc] 退出行编辑模式",
 		"[?] 全局快捷键",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -288,6 +289,10 @@ var zH_HANS = LanguageMapping{
 		"[enter] 应用已遴选的提交",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp: []string{
+		"[enter] 确认丢弃",
+		"[esc] 取消 / 关闭",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 关闭",
 	},
@@ -406,6 +411,7 @@ var zH_HANS = LanguageMapping{
 	ApplyCherryPickOpsTitle:                                  "应用遴选",
 	ApplyCherryPickOpsDescription:                            "将已遴选的提交应用到当前检出的分支",
 	CherryPickedFromBranch:                                   "遴选自分支  ~>",
+	GitDiscardFileLineChangeConfirmTitle:                     "您确定要丢弃以下行更改吗？",
 }
 
 // for about gitti

@@ -43,7 +43,7 @@ func GitUnstageAllChangesService(m *types.GittiModel) {
 
 func stripAnsi(strArray []string) []string {
 	const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntgry=><~]))"
-	var re = regexp.MustCompile(ansi)
+	re := regexp.MustCompile(ansi)
 	for i, str := range strArray {
 		strArray[i] = re.ReplaceAllString(str, "")
 	}
@@ -53,10 +53,10 @@ func stripAnsi(strArray []string) []string {
 func GitStageLineOrUnstageLineService(m *types.GittiModel, filePathName string) {
 	if m.CurrentSelectedComponent == constant.DetailComponent {
 		contentArray := stripAnsi(m.DetailPanelViewportOGStringArray)
-		overflowIndexCount := m.LineStagingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount
-		actualCurrentIndex := m.LineStagingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
+		overflowIndexCount := m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount
+		actualCurrentIndex := m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
 
-		switch m.LineStagingIndexPositionAndInfo.DetailPanelViewportStageType {
+		switch m.LineEditingIndexPositionAndInfo.DetailPanelViewportStageType {
 		case constant.STAGE:
 			go func() {
 				m.GitOperations.GitFiles.UnstageLine(filePathName, contentArray, overflowIndexCount, actualCurrentIndex)
@@ -70,10 +70,10 @@ func GitStageLineOrUnstageLineService(m *types.GittiModel, filePathName string) 
 		}
 	} else if m.CurrentSelectedComponent == constant.DetailComponentTwo {
 		contentArray := stripAnsi(m.DetailPanelTwoViewportOGStringArray)
-		overflowIndexCount := m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount
-		actualCurrentIndex := m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
+		overflowIndexCount := m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount
+		actualCurrentIndex := m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
 
-		switch m.LineStagingIndexPositionAndInfo.DetailPanelTwoViewportStageType {
+		switch m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportStageType {
 		case constant.STAGE:
 			go func() {
 				m.GitOperations.GitFiles.UnstageLine(filePathName, contentArray, overflowIndexCount, actualCurrentIndex)

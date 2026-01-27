@@ -6,13 +6,13 @@ require (
 	charm.land/bubbles/v2 v2.0.0-rc.1
 	charm.land/bubbletea/v2 v2.0.0-rc.2
 	charm.land/lipgloss/v2 v2.0.0-beta.3.0.20251106192539-4b304240aab7
+	github.com/atotto/clipboard v0.1.4
 	github.com/fsnotify/fsnotify v1.9.0
 	golang.org/x/mod v0.30.0
 	golang.org/x/text v0.3.8
 )
 
 require (
-	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/charmbracelet/colorprofile v0.3.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20251116181749-377898bcce38 // indirect
 	github.com/charmbracelet/x/ansi v0.11.1 // indirect

@@ -65,7 +65,7 @@ var jA = LanguageMapping{
 	Loading:                             "読み込み中...",
 	StagedTitle:                         "ステージされた変更",
 	UnstagedTitle:                       "ステージされていない変更",
-	LineStagingModeTitle:                "行ステージングモード",
+	LineEditingModeTitle:                "行編集モード",
 	CherryPickTitle:                     "ブランチからチェリーピック: \n %s",
 	EditCherryPickTitle:                 "チェリーピックを編集",
 	ApplyCherryPickTitle:                "現在のブランチにチェリーピックを適用: \n %s",
@@ -129,18 +129,19 @@ var jA = LanguageMapping{
 		"[esc] 戻る",
 		"[?] グローバルキー操作",
 	},
-	KeyBindingKeyDetailComponentLineStagingEligible: []string{
+	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] 左右に移動",
 		"[↑/↓] 上下に移動",
-		"[L] 行ステージングモードに入る",
+		"[L] 行編集モードに入る",
 		"[esc] 戻る",
 		"[?] グローバルキー操作",
 	},
-	KeyBindingKeyDetailComponentLineStaging: []string{
+	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] 左右に移動",
-		"[↑/↓] 次/前のステージ可能・解除可能な行へ",
+		"[↑/↓] 次/前の行へ",
+		"[d] 行の変更を破棄",
 		"[space] ステージ/アンステージ",
-		"[esc] 行ステージングモードを終了",
+		"[esc] 行編集モードを終了",
 		"[?] グローバルキー操作",
 	},
 	KeyBindingKeyStashComponent: []string{
@@ -288,6 +289,10 @@ var jA = LanguageMapping{
 		"[enter] チェリーピックされたコミットを適用",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitDiscardFileLineChangeConfirmPopUp: []string{
+		"[enter] 破棄を確定",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForGlobalKeyBindingPopUp: []string{
 		"[esc] 閉じる",
 	},
@@ -406,6 +411,7 @@ var jA = LanguageMapping{
 	ApplyCherryPickOpsTitle:                                  "チェリーピックを適用",
 	ApplyCherryPickOpsDescription:                            "チェリーピックされたコミットを現在のチェックアウトブランチに適用します",
 	CherryPickedFromBranch:                                   "チェリーピック元のブランチ  ~>",
+	GitDiscardFileLineChangeConfirmTitle:                     "以下の行の変更を破棄してもよろしいですか？",
 }
 
 // for about gitti

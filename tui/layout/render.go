@@ -111,8 +111,8 @@ func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) s
 //
 //			For Render Detail Component Panel
 //		  * this will render the detail component panel
-//	   * it will handle the layout for both line staging mode and normal mode
-//	   * it will also handle the split view for line staging mode (one for staged, one for unstaged)
+//	   * it will handle the layout for both line editing mode and normal mode
+//	   * it will also handle the split view for line editing mode (one for staged, one for unstaged)
 //
 // ------------------------------------
 func renderDetailComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -130,29 +130,29 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 	ogHeight := height
 	ogWidth := width
 
-	// if it is in line staging mode, we need to minus 3 for the title
-	if m.IsLineStagingState.Load() {
+	// if it is in line editing mode, we need to minus 3 for the title
+	if m.IsLineEditingState.Load() {
 		ogHeight = height - 3
 	}
 
-	if m.IsLineStagingState.Load() {
+	if m.IsLineEditingState.Load() {
 		// we first define the border height
 		borderHeight := 2
 		if m.ShowDetailPanelTwo.Load() {
 			detailPanelHeight := int(ogHeight / 2)
 			detailPanelWidth := int(ogWidth / 2)
 			if m.DetailComponentPanelLayout == constant.HORIZONTAL {
-				// Horizontal Split Layout for Line Staging
+				// Horizontal Split Layout for Line Editing
 				// Join Cursor Viewport + Content Viewport for Panel 1
 				detailPanelViewportContent := lipgloss.JoinHorizontal(
 					lipgloss.Top,
-					style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineStagingIndexCursorViewport.View()),
+					style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineEditingIndexCursorViewport.View()),
 					style.NewStyle.Width(detailPanelWidth-3).Height(ogHeight-borderHeight).Render(m.DetailPanelViewport.View()),
 				)
 				// Join Cursor Viewport + Content Viewport for Panel 2
 				detailPanelTwoViewportContent := lipgloss.JoinHorizontal(
 					lipgloss.Top,
-					style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineStagingIndexCursorTwoViewport.View()),
+					style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineEditingIndexCursorTwoViewport.View()),
 					style.NewStyle.Width(detailPanelWidth-3).Height(ogHeight-borderHeight).Render(m.DetailPanelTwoViewport.View()),
 				)
 
@@ -163,17 +163,17 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 					detailComponentTwoBorderStyle.Width(width-detailPanelWidth).Height(ogHeight).Render(detailPanelTwoViewportContent),
 				)
 			} else {
-				// Vertical Split Layout for Line Staging
+				// Vertical Split Layout for Line Editing
 				// Join Cursor + Content for Panel 1 (Top)
 				detailPanelViewportContent := lipgloss.JoinHorizontal(
 					lipgloss.Top,
-					style.NewStyle.Width(3).Height(detailPanelHeight-borderHeight).Render(m.LineStagingIndexCursorViewport.View()),
+					style.NewStyle.Width(3).Height(detailPanelHeight-borderHeight).Render(m.LineEditingIndexCursorViewport.View()),
 					style.NewStyle.Width(ogWidth-3).Height(detailPanelHeight-borderHeight).Render(m.DetailPanelViewport.View()),
 				)
 				// Join Cursor + Content for Panel 2 (Bottom)
 				detailPanelTwoViewportContent := lipgloss.JoinHorizontal(
 					lipgloss.Top,
-					style.NewStyle.Width(3).Height(ogHeight-detailPanelHeight-borderHeight).Render(m.LineStagingIndexCursorTwoViewport.View()),
+					style.NewStyle.Width(3).Height(ogHeight-detailPanelHeight-borderHeight).Render(m.LineEditingIndexCursorTwoViewport.View()),
 					style.NewStyle.Width(ogWidth-3).Height(ogHeight-detailPanelHeight-borderHeight).Render(m.DetailPanelTwoViewport.View()),
 				)
 
@@ -185,10 +185,10 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 				)
 			}
 		} else {
-			// Single Panel Layout for Line Staging
+			// Single Panel Layout for Line Editing
 			detailPanelViewportContent := lipgloss.JoinHorizontal(
 				lipgloss.Top,
-				style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineStagingIndexCursorViewport.View()),
+				style.NewStyle.Width(3).Height(ogHeight-borderHeight).Render(m.LineEditingIndexCursorViewport.View()),
 				style.NewStyle.Width(ogWidth-3).Height(ogHeight-borderHeight).Render(m.DetailPanelViewport.View()),
 			)
 			content = lipgloss.JoinHorizontal(
@@ -197,7 +197,7 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 			)
 		}
 	} else {
-		// Standard Rendering (Not Line Staging Mode)
+		// Standard Rendering (Not Line Editing Mode)
 		if m.ShowDetailPanelTwo.Load() {
 			detailPanelHeight := int(ogHeight / 2)
 			detailPanelWidth := int(ogWidth / 2)
@@ -222,12 +222,12 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 		}
 	}
 
-	// Add Title Block for Line Staging Mode
-	if m.IsLineStagingState.Load() {
-		inLineStagingModeNotifyBlock := style.PanelBorderStyle.Width(ogWidth).Render(utils.TruncateString(i18n.LANGUAGEMAPPING.LineStagingModeTitle, ogWidth-4))
+	// Add Title Block for Line Editing Mode
+	if m.IsLineEditingState.Load() {
+		inLineEditingModeNotifyBlock := style.PanelBorderStyle.Width(ogWidth).Render(utils.TruncateString(i18n.LANGUAGEMAPPING.LineEditingModeTitle, ogWidth-4))
 		content = lipgloss.JoinVertical(
 			lipgloss.Top,
-			inLineStagingModeNotifyBlock,
+			inLineEditingModeNotifyBlock,
 			content,
 		)
 	}
@@ -343,6 +343,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitEditCherryPickPopUp
 		case constant.GitCherryPickApplyConfirmPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitCherryPickApplyConfirmPopUp
+		case constant.GitDiscardFileLineChangeConfirmPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardFileLineChangeConfirmPopUp
 		}
 	} else {
 		//-----------------------------
@@ -392,19 +394,19 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.CommitLogComponent:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
 		case constant.DetailComponent:
-			if m.IsLineStagingState.Load() {
-				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStaging
+			if m.IsLineEditingState.Load() {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditing
 			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
-				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStagingEligible
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditingEligible
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 			}
 
 		case constant.DetailComponentTwo:
-			if m.IsLineStagingState.Load() {
-				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStaging
+			if m.IsLineEditingState.Load() {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditing
 			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
-				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineStagingEligible
+				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditingEligible
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 			}
