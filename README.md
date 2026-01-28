@@ -42,8 +42,8 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 💬 **Commit Interface** - Write commits with a dedicated UI
 - 🚀 **Push/Pull Operations** - Manage remote operations seamlessly
 - 💿 **Changes Stash Operations** - Manage stash operations seamlessly
-- � **Conflict Resolution** - Detect and resolve merge conflicts with interactive options
-- �📦 **Basic Submodule Support** - Work with Git submodules in your repositories
+- 🔀 **Conflict Resolution** - Detect and resolve merge conflicts with interactive options
+- 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
 - 🌍 **Multi-language Support** - English, Japanese, 简体中文, 繁體中文
 - ⚡ **Real-time Updates** - File system monitoring for instant status updates
 - ⌨️ **Keyboard-driven** - Efficient navigation without touching the mouse
