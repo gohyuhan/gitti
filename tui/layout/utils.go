@@ -13,12 +13,12 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.DetailComponentPanelWidth = m.Width - m.WindowLeftPanelWidth
 
 	m.WindowCoreContentHeight = m.Height - constant.MainPageKeyBindingLayoutPanelHeight - 2*constant.Padding
-	m.DetailComponentPanelHeight = m.WindowCoreContentHeight
+	m.DetailComponentPanelHeight = m.WindowCoreContentHeight - 2*constant.Padding - constant.MaxLogComponentHeight
 
 	// update the dynamic size of the left panel
 	LeftPanelDynamicResize(m)
 
-	// update viewport
+	// update viewport of detail panel
 	UpdateDetailComponentViewportLayout(m)
 	m.DetailPanelViewportOffset = max(0, int(m.DetailPanelViewport.HorizontalScrollPercent()*float64(m.DetailPanelViewportOffset))-1)
 	m.DetailPanelTwoViewportOffset = max(0, int(m.DetailPanelTwoViewport.HorizontalScrollPercent()*float64(m.DetailPanelTwoViewportOffset))-1)
@@ -27,9 +27,15 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.DetailPanelTwoViewport.SetXOffset(m.DetailPanelTwoViewportOffset)
 	m.DetailPanelTwoViewport.SetYOffset(m.DetailPanelTwoViewport.YOffset())
 
+	// to recalculate the viewport of detail panel if it was in line editing mode so that
+	// it matches exactly the position of the selected line in the viewport
 	if m.IsLineEditingState.Load() {
 		services.EnterOrReinitLineEditingStateService(m)
 	}
+
+	// log panel (the height is fixed)
+	m.CurrentLogComponentViewport.SetWidth(m.DetailComponentPanelWidth - 2)
+	m.CurrentLogComponentViewport.SetHeight(constant.MaxLogComponentHeight)
 }
 
 func LeftPanelDynamicResize(m *types.GittiModel) {

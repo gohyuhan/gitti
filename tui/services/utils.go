@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
+	"github.com/gohyuhan/gitti/tui/component/log"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
@@ -83,6 +84,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			contentLine = generateCommitLogDetailPanelContent(ctx, m)
 		case constant.StashComponent:
 			contentLine = generateStashDetailPanelContent(ctx, m)
+		case constant.LogComponent:
+			contentLine = generateLogDetailPanelContent(ctx, m)
 		default:
 			contentLine = generateAboutGittiContent()
 		}
@@ -91,11 +94,17 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		case <-ctx.Done():
 			return
 		default:
+			needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponent
 			if contentLine == "" {
 				// if the content will be empty, render about gitti for detail panel
 				contentLine = generateAboutGittiContent()
+				needToScrollToBottom = false
 			}
 			m.DetailPanelViewport.SetContent(contentLine)
+
+			if needToScrollToBottom {
+				m.DetailPanelViewport.GotoBottom()
+			}
 
 			if setForDetailComponentTwo {
 				m.DetailPanelTwoViewport.SetContent(contentLine2)
@@ -220,6 +229,11 @@ func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) s
 		vpLine.WriteString(line + "\n")
 	}
 	return vpLine.String()
+}
+
+func generateLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
+	vpLine := log.InitGittiLogViewport(m, false, ctx)
+	return vpLine
 }
 
 // for about gitti content

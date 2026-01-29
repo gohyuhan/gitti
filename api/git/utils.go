@@ -149,9 +149,9 @@ func hasUpstreamWithIcon() (string, string, bool) {
 	} else if strings.Contains(parsedUpstreamUrl, "gitlab.com") {
 		remoteIcon = "\ue7eb"
 	} else if strings.Contains(parsedUpstreamUrl, "gitea.com") {
-		remoteIcon = "\ue703"
-	} else if strings.Contains(parsedUpstreamUrl, "bitbucket.org") {
 		remoteIcon = "\uf339"
+	} else if strings.Contains(parsedUpstreamUrl, "bitbucket.org") {
+		remoteIcon = "\ue703"
 	} else if strings.Contains(parsedUpstreamUrl, "source.developers.google.com") {
 		remoteIcon = "\ue7f0"
 	} else if strings.Contains(parsedUpstreamUrl, "dev.azure.com") {

@@ -123,6 +123,9 @@ var eN = LanguageMapping{
 		"[ctrl+p] cherry pick ops",
 		"[?] global key binding",
 	},
+	KeyBindingLogComponent: []string{
+		"[enter] view log content",
+	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",

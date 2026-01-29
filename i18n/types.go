@@ -102,6 +102,7 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentDefault                 []string
 	KeyBindingModifiedFilesComponentNone                    []string
 	KeyBindingCommitLogComponent                            []string
+	KeyBindingLogComponent                                  []string
 	KeyBindingKeyDetailComponent                            []string
 	KeyBindingKeyDetailComponentLineEditingEligible         []string
 	KeyBindingKeyDetailComponentLineEditing                 []string

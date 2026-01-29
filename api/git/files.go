@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type FileStatus struct {
@@ -22,16 +23,17 @@ type FileStatus struct {
 type GitFiles struct {
 	filesStatus    []FileStatus
 	filesPosition  map[string]int
-	errorLog       []error
 	gitProcessLock *GitProcessLock
 	updateChannel  chan string
+	logging        *logging.GittiLogging
 }
 
-func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock) *GitFiles {
+func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitFiles {
 	gitFiles := GitFiles{
 		filesStatus:    make([]FileStatus, 0),
 		gitProcessLock: gitProcessLock,
 		updateChannel:  updateChannel,
+		logging:        logging,
 	}
 	return &gitFiles
 }
@@ -58,7 +60,8 @@ func (gf *GitFiles) GetGitFilesStatus() {
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmdExecutor.Output()
 	if err != nil {
-		gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES ERROR]: %w", err))
+		gf.logging.RegisterNewLog(logging.FILES_STATUS_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.FILES_STATUS_OPS, err.Error()), true)
+		return
 	}
 
 	files := strings.Split(strings.TrimRight(string(gitOutput), "\n"), "\n")
@@ -128,17 +131,17 @@ func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus,
 	if err != nil {
 		if ctx.Err() != nil {
 			// This catches context.Canceled
-			gf.errorLog = append(gf.errorLog, fmt.Errorf("[FILE DIFF OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+			gf.logging.RegisterNewLog(logging.FILE_DIFF_OPS, "", logging.WARN, fmt.Sprintf("[%s CANCELLED]", logging.FILE_DIFF_OPS), true)
 			return nil
 		}
 		exitError, ok := err.(*exec.ExitError)
 		if ok {
 			if exitError.ExitCode() != 1 {
-				gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
+				gf.logging.RegisterNewLog(logging.FILE_DIFF_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.FILE_DIFF_OPS, err.Error()), true)
 				return nil
 			}
 		} else {
-			gf.errorLog = append(gf.errorLog, fmt.Errorf("[GIT FILES DIFF ERROR]: %w", err))
+			gf.logging.RegisterNewLog(logging.FILE_DIFF_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.FILE_DIFF_OPS, err.Error()), true)
 			return nil
 		}
 	}
@@ -167,26 +170,25 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
 			gitArgs = []string{"add", "--", filePathName}
-			stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree != " " {
 			// staged but have modification later
 			gitArgs = []string{"add", "--", filePathName}
-			stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			stageCmdExecutor.Run()
 		} else if file.IndexState != " " && file.WorkTree == " " {
 			// staged and no latest modification, so we need to unstage it or revert back
 			gitArgs = []string{"reset", "--", filePathName}
 			if file.IndexState == "A" {
 				gitArgs = []string{"rm", "--cached", "--force", "--", filePathName}
 			}
-			unstageCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			unstageCmd.Run()
 		} else if file.IndexState == " " && file.WorkTree != " " {
 			// tracked but not staged
 			gitArgs = []string{"add", "--", filePathName}
-			stageCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			stageCmd.Run()
+		}
+
+		stageOrUnstageFileCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+		err := stageOrUnstageFileCmdExecutor.Run()
+		gf.logging.RegisterNewLog(logging.STAGE_OR_UNSTAGE_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+		if err != nil {
+			gf.logging.RegisterNewLog(logging.STAGE_OR_UNSTAGE_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STAGE_OR_UNSTAGE_FILE_OPS, err.Error()), true)
 		}
 	}
 }
@@ -198,8 +200,12 @@ func (gf *GitFiles) StageAllChanges() {
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"add", "."}
-	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	stageCmdExecutor.Run()
+	stageAllCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	err := stageAllCmdExecutor.Run()
+	gf.logging.RegisterNewLog(logging.STAGE_ALL_CHANGES_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gf.logging.RegisterNewLog(logging.STAGE_ALL_CHANGES_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STAGE_ALL_CHANGES_OPS, err.Error()), true)
+	}
 }
 
 func (gf *GitFiles) UnstageAllChanges() {
@@ -209,8 +215,12 @@ func (gf *GitFiles) UnstageAllChanges() {
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
 	gitArgs := []string{"reset"}
-	stageCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	stageCmdExecutor.Run()
+	unstageAllCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	err := unstageAllCmdExecutor.Run()
+	gf.logging.RegisterNewLog(logging.UNSTAGE_ALL_CHANGES_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gf.logging.RegisterNewLog(logging.UNSTAGE_ALL_CHANGES_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.UNSTAGE_ALL_CHANGES_OPS, err.Error()), true)
+	}
 }
 
 // ----------------------------------
@@ -230,12 +240,14 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 
 	// Bounds check to prevent panic and ensure we only process modified lines (+/-)
 	if actualStageLineIndex < 0 || actualStageLineIndex >= len(diffContentStringArray) {
+		gf.logging.RegisterNewLog(logging.STAGE_LINE_OPS, "", logging.WARN, "Invalid line index which will cause panic", false)
 		return
 	}
 	selectedLine := diffContentStringArray[actualStageLineIndex]
 	isAddition := strings.HasPrefix(selectedLine, "+") && !strings.HasPrefix(selectedLine, "+++")
 	isDeletion := strings.HasPrefix(selectedLine, "-") && !strings.HasPrefix(selectedLine, "---")
 	if !isAddition && !isDeletion {
+		gf.logging.RegisterNewLog(logging.STAGE_LINE_OPS, "", logging.WARN, "Selected line is not a changes", false)
 		return
 	}
 
@@ -253,6 +265,7 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 		// This file will hold the unified diff content for the specific line we want to stage.
 		tempPatchFile, err := os.CreateTemp("", "gitti-patch-stage-*")
 		if err != nil {
+			gf.logging.RegisterNewLog(logging.STAGE_LINE_OPS, "", logging.ERROR, fmt.Sprintf("[CREATE TEMP FILE ERROR]: %s", err.Error()), false)
 			return
 		}
 		// Ensure the file is cleaned up (deleted) after function exits
@@ -264,11 +277,13 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 		_, writeErr := tempPatchFile.WriteString(generateStageLinePatchString(diffContentStringArray, actualStageLineIndex, filePathName))
 		if writeErr != nil {
 			tempPatchFile.Close() // Close before return
+			gf.logging.RegisterNewLog(logging.STAGE_LINE_OPS, "", logging.ERROR, fmt.Sprintf("[WRITE PATCH ERROR]: %s", writeErr.Error()), false)
 			return
 		}
 		// Close the file descriptor so Git can read it safely
 		closeErr := tempPatchFile.Close()
 		if closeErr != nil {
+			gf.logging.RegisterNewLog(logging.STAGE_LINE_OPS, "", logging.ERROR, fmt.Sprintf("[CLOSE TEMP FILE ERROR]: %s", closeErr.Error()), false)
 			return
 		}
 
@@ -278,7 +293,11 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 		// --whitespace=nowarn: Ignore whitespace warnings.
 		gitArgs = []string{"apply", "--cached", "--recount", "--whitespace=nowarn", tempPatchFile.Name()}
 		stageLineCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-		stageLineCmdExecutor.Run()
+		err = stageLineCmdExecutor.Run()
+		gf.logging.RegisterNewLog(logging.STAGE_LINE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+		if err != nil {
+			gf.logging.RegisterNewLog(logging.STAGE_LINE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STAGE_LINE_OPS, err.Error()), true)
+		}
 
 		// Update file status to reflect changes
 		gf.GetGitFilesStatus()
@@ -375,12 +394,14 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 
 	// Bounds check to prevent panic and ensure we only process modified lines (+/-)
 	if actualUnStageLineIndex < 0 || actualUnStageLineIndex >= len(diffContentStringArray) {
+		gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, "", logging.WARN, "Invalid line index which will cause panic", false)
 		return
 	}
 	selectedLine := diffContentStringArray[actualUnStageLineIndex]
 	isAddition := strings.HasPrefix(selectedLine, "+") && !strings.HasPrefix(selectedLine, "+++")
 	isDeletion := strings.HasPrefix(selectedLine, "-") && !strings.HasPrefix(selectedLine, "---")
 	if !isAddition && !isDeletion {
+		gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, "", logging.WARN, "Selected line is not a changes", false)
 		return
 	}
 
@@ -396,12 +417,14 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
+			gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, "", logging.WARN, "Selected file is not tracked", false)
 			return
 		}
 
 		// Create a temporary patch file.
 		tempPatchFile, err := os.CreateTemp("", "gitti-patch-unstage-*")
 		if err != nil {
+			gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, "", logging.ERROR, fmt.Sprintf("[CREATE TEMP FILE ERROR]: %s", err.Error()), false)
 			return
 		}
 		// Ensure the file is cleaned up (deleted) after function exits
@@ -413,12 +436,14 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 		// The difference is in how we apply it (using --reverse).
 		_, writeErr := tempPatchFile.WriteString(generateUnstageLinePatchString(diffContentStringArray, actualUnStageLineIndex, filePathName))
 		if writeErr != nil {
+			gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, "", logging.ERROR, fmt.Sprintf("[WRITE TEMP FILE ERROR]: %s", writeErr.Error()), false)
 			tempPatchFile.Close() // Close before return
 			return
 		}
 		// Close the file descriptor so Git can read it safely
 		closeErr := tempPatchFile.Close()
 		if closeErr != nil {
+			gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, "", logging.ERROR, fmt.Sprintf("[CLOSE TEMP FILE ERROR]: %s", closeErr.Error()), false)
 			return
 		}
 
@@ -427,7 +452,11 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 		// Since the patch describes adding/removing the line, reversing it unstages that change.
 		gitArgs = []string{"apply", "--cached", "--recount", "--reverse", "--whitespace=nowarn", tempPatchFile.Name()}
 		unStageLineCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-		unStageLineCmdExecutor.Run()
+		err = unStageLineCmdExecutor.Run()
+		gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+		if err != nil {
+			gf.logging.RegisterNewLog(logging.UNSTAGE_LINE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.UNSTAGE_LINE_OPS, err.Error()), true)
+		}
 
 		// Update file status to reflect changes
 		gf.GetGitFilesStatus()
@@ -562,27 +591,52 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 			// retrieve back the original file
 			gitArgs = []string{"reset", "--", oldFilePathName}
 			oldFileResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			oldFileResetCmdExecutor.Run()
+			err := oldFileResetCmdExecutor.Run()
+			gf.logging.RegisterNewLog(logging.RETRIEVE_ORIGINAL_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+			if err != nil {
+				gf.logging.RegisterNewLog(logging.RETRIEVE_ORIGINAL_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RETRIEVE_ORIGINAL_FILE_OPS, err.Error()), true)
+				return
+			}
 
+			// revert the original file
 			gitArgs = []string{"checkout", "--", oldFilePathName}
 			oldFileRevertCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			oldFileRevertCmdExecutor.Run()
+			err = oldFileRevertCmdExecutor.Run()
+			gf.logging.RegisterNewLog(logging.REVERT_ORIGINAL_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+			if err != nil {
+				gf.logging.RegisterNewLog(logging.REVERT_ORIGINAL_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REVERT_ORIGINAL_FILE_OPS, err.Error()), true)
+				return
+			}
 
 			// revert and remove the "newly named" file
 			gitArgs = []string{"reset", "--", newFilePathName}
 			newFileResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			newFileResetCmdExecutor.Run()
+			err = newFileResetCmdExecutor.Run()
+			gf.logging.RegisterNewLog(logging.REVERT_NEWLY_NAMED_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+			if err != nil {
+				gf.logging.RegisterNewLog(logging.REVERT_NEWLY_NAMED_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REVERT_NEWLY_NAMED_FILE_OPS, err.Error()), true)
+				return
+			}
 
+			// remove the "newly named" file
 			gitArgs = []string{"clean", "-f", "--", newFilePathName}
 			newFileDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			newFileDiscardCmdExecutor.Run()
-
+			err = newFileDiscardCmdExecutor.Run()
+			gf.logging.RegisterNewLog(logging.REMOVE_NEWLY_NAMED_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+			if err != nil {
+				gf.logging.RegisterNewLog(logging.REMOVE_NEWLY_NAMED_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REMOVE_NEWLY_NAMED_FILE_OPS, err.Error()), true)
+				return
+			}
 			needFilesStatusRefetch = true
 		}
 
 		if needToRunExecutor {
 			changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-			changesDiscardCmdExecutor.Run()
+			err := changesDiscardCmdExecutor.Run()
+			gf.logging.RegisterNewLog(logging.DISCARD_FILE_CHANGES_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+			if err != nil {
+				gf.logging.RegisterNewLog(logging.DISCARD_FILE_CHANGES_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.DISCARD_FILE_CHANGES_OPS, err.Error()), true)
+			}
 		}
 
 		if needFilesStatusRefetch {
@@ -618,7 +672,11 @@ func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) 
 			gitArgs = []string{"checkout", "--theirs", "--", filePathName}
 		}
 		changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-		changesDiscardCmdExecutor.Run()
+		err := changesDiscardCmdExecutor.Run()
+		gf.logging.RegisterNewLog(logging.DISCARD_FILE_CHANGES_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+		if err != nil {
+			gf.logging.RegisterNewLog(logging.RESOLVE_CONFLICT_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RESOLVE_CONFLICT_OPS, err.Error()), true)
+		}
 	}
 }
 
@@ -641,12 +699,14 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 
 	// Bounds check to prevent panic and ensure we only process modified lines (+/-)
 	if actualDiscardLineIndex < 0 || actualDiscardLineIndex >= len(diffContentStringArray) {
+		gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.WARN, "Invalid line index which will cause panic", false)
 		return
 	}
 	selectedLine := diffContentStringArray[actualDiscardLineIndex]
 	isAddition := strings.HasPrefix(selectedLine, "+") && !strings.HasPrefix(selectedLine, "+++")
 	isDeletion := strings.HasPrefix(selectedLine, "-") && !strings.HasPrefix(selectedLine, "---")
 	if !isAddition && !isDeletion {
+		gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.WARN, "Selected line is not a modified line", false)
 		return
 	}
 
@@ -654,8 +714,9 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 	if fileIndexExist {
 		// Create a temporary patch file.
 		// This file will hold the unified diff content for the specific line we want to reverse.
-		tempPatchFile, err := os.CreateTemp("", "gitti-patch-discard-line-change-*")
-		if err != nil {
+		tempPatchFile, createErr := os.CreateTemp("", "gitti-patch-discard-line-change-*")
+		if createErr != nil {
+			gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.ERROR, fmt.Sprintf("[CREATE TEMP FILE ERROR]: %s", createErr.Error()), false)
 			return
 		}
 		// Ensure the file is cleaned up (deleted) after function exits
@@ -668,12 +729,14 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 		// We reuse generateStageLinePatchString because the patch structure is the same.
 		_, writeErr = tempPatchFile.WriteString(generateDiscardLinePatchString(diffContentStringArray, actualDiscardLineIndex))
 		if writeErr != nil {
+			gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.ERROR, fmt.Sprintf("[WRITE TEMP FILE ERROR]: %s", writeErr.Error()), false)
 			tempPatchFile.Close() // Close before return
 			return
 		}
 		// Close the file descriptor so Git can read it safely
 		closeErr := tempPatchFile.Close()
 		if closeErr != nil {
+			gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.ERROR, fmt.Sprintf("[CLOSE TEMP FILE ERROR]: %s", closeErr.Error()), false)
 			return
 		}
 
@@ -688,7 +751,11 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 		}
 
 		discardLineCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-		discardLineCmdExecutor.Run()
+		err := discardLineCmdExecutor.Run()
+		gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, strings.Join(gitArgs, " "), logging.INFO, "", false)
+		if err != nil {
+			gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.DISCARD_LINE_CHANGES_OPS, err.Error()), false)
+		}
 		// Update file status to reflect changes
 		gf.GetGitFilesStatus()
 		gf.updateChannel <- GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE

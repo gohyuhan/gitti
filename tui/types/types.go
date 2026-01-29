@@ -8,9 +8,11 @@ import (
 	"charm.land/bubbles/v2/viewport"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type GittiModel struct {
+	GittiLogger                               *logging.GittiLogging
 	IsRenderInit                              atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
 	UserSetEditor                             string
 	TuiUpdateChannel                          chan string
@@ -47,6 +49,7 @@ type GittiModel struct {
 	DetailPanelTwoViewportOffset              int
 	ShowDetailPanelTwo                        atomic.Bool
 	DetailComponentPanelLayout                string
+	CurrentLogComponentViewport               viewport.Model
 	ListNavigationIndexPosition               GittiComponentsCurrentListNavigationIndexPosition
 	ShowPopUp                                 atomic.Bool
 	PopUpType                                 string

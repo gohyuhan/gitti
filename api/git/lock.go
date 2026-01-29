@@ -4,6 +4,7 @@ import (
 	"sync/atomic"
 
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 // this basically act as the universal lock so that any function that will exec git operation
@@ -12,11 +13,13 @@ import (
 type GitProcessLock struct {
 	isGitLockedForProcessing      atomic.Bool
 	otherGitProcessRunningWarning string
+	logging                       *logging.GittiLogging
 }
 
-func InitGitProcessLock() *GitProcessLock {
+func InitGitProcessLock(logging *logging.GittiLogging) *GitProcessLock {
 	gPL := &GitProcessLock{
 		otherGitProcessRunningWarning: i18n.LANGUAGEMAPPING.OtherGitOpsIsRunningWarning,
+		logging:                       logging,
 	}
 	gPL.isGitLockedForProcessing.Store(false)
 
@@ -26,9 +29,10 @@ func InitGitProcessLock() *GitProcessLock {
 func (gpl *GitProcessLock) CanProceedWithGitOps() bool {
 	if gpl.isGitLockedForProcessing.CompareAndSwap(false, true) {
 		return true
+	} else {
+		gpl.logging.RegisterNewLog(logging.ACQUIRE_GIT_LOCK, "", logging.WARN, "There is other git process that acquired a lock is still running", false)
+		return false
 	}
-
-	return false
 }
 
 func (gpl *GitProcessLock) ReleaseGitOpsLock() {

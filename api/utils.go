@@ -12,6 +12,7 @@ import (
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 )
 
@@ -63,17 +64,17 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 	}
 }
 
-func InitGitOperations(absolutePath string, updateChannel chan string) *GitOperations {
-	gitProcessLock := git.InitGitProcessLock()
+func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogging *logging.GittiLogging) *GitOperations {
+	gitProcessLock := git.InitGitProcessLock(gittiLogging)
 	return &GitOperations{
-		GitBranch:              git.InitGitBranch(gitProcessLock),
-		GitCommit:              git.InitGitCommit(updateChannel, gitProcessLock),
-		GitFiles:               git.InitGitFile(updateChannel, gitProcessLock),
-		GitPull:                git.InitGitPull(updateChannel, gitProcessLock),
-		GitStash:               git.InitGitStash(gitProcessLock),
-		GitRemote:              git.InitGitRemote(updateChannel, gitProcessLock),
-		GitCommitLog:           git.InitGitCommitLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount),
-		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock),
+		GitBranch:              git.InitGitBranch(gitProcessLock, gittiLogging),
+		GitCommit:              git.InitGitCommit(updateChannel, gitProcessLock, gittiLogging),
+		GitFiles:               git.InitGitFile(updateChannel, gitProcessLock, gittiLogging),
+		GitPull:                git.InitGitPull(updateChannel, gitProcessLock, gittiLogging),
+		GitStash:               git.InitGitStash(gitProcessLock, gittiLogging),
+		GitRemote:              git.InitGitRemote(updateChannel, gitProcessLock, gittiLogging),
+		GitCommitLog:           git.InitGitCommitLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount, gittiLogging),
+		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock, gittiLogging),
 	}
 }
 

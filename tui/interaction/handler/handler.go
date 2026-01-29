@@ -181,6 +181,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 	case "]":
 		return handleNonTypingRightBracketKeyBindingInteraction(m)
 
+	case "/":
+		return handleNonTypingSlashKeyBindingInteraction(m)
+
 	case "q", "Q":
 		// only work when there is no pop up
 		return handleNonTypingqQKeyBindingInteraction(m)

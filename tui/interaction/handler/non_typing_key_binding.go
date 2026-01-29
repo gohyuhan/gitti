@@ -534,6 +534,9 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(true)
 				branchPopUp.InitChooseSwitchBranchTypePopUpModel(m, currentSelectedLocalBranch.BranchName)
 			}
+		case constant.LogComponent:
+			m.CurrentSelectedComponent = constant.DetailComponent
+			m.DetailPanelParentComponent = constant.LogComponent
 		}
 	} else {
 		switch m.PopUpType {
@@ -1261,6 +1264,17 @@ func handleNonTypingRightBracketKeyBindingInteraction(m *types.GittiModel) (*typ
 		// handle detail component panel switching
 		if m.CurrentSelectedComponent == constant.DetailComponent && m.ShowDetailPanelTwo.Load() {
 			m.CurrentSelectedComponent = constant.DetailComponentTwo
+		}
+	}
+	return m, nil
+}
+
+func handleNonTypingSlashKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		if m.CurrentSelectedComponent != constant.LogComponent {
+			m.CurrentSelectedComponent = constant.LogComponent
+			m.DetailPanelParentComponent = ""
+			services.FetchDetailComponentPanelInfoService(m, true)
 		}
 	}
 	return m, nil

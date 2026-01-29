@@ -4,13 +4,13 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"os/exec"
 	"regexp"
 	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 // represent the info of commit that got cherry picked
@@ -33,11 +33,11 @@ type CommitLog struct {
 }
 
 type GitCommitLog struct {
-	errorLog           []error
 	gitCommitLogOutput []CommitLog
 	updateChannel      chan string
 	maxCommitLogCount  string
 	gitProcessLock     *GitProcessLock
+	logging            *logging.GittiLogging
 }
 
 // ----------------------------------
@@ -45,13 +45,14 @@ type GitCommitLog struct {
 //	Init Git Commit Log
 //
 // ----------------------------------
-func InitGitCommitLog(updateChannel chan string, gitProcessLock *GitProcessLock, maxCommitLogCountInt int) *GitCommitLog {
+func InitGitCommitLog(updateChannel chan string, gitProcessLock *GitProcessLock, maxCommitLogCountInt int, logging *logging.GittiLogging) *GitCommitLog {
 	maxCommitLogCount := strconv.Itoa(maxCommitLogCountInt)
 	gitCommitLog := GitCommitLog{
 		gitCommitLogOutput: make([]CommitLog, 0),
 		gitProcessLock:     gitProcessLock,
 		updateChannel:      updateChannel,
 		maxCommitLogCount:  maxCommitLogCount,
+		logging:            logging,
 	}
 	return &gitCommitLog
 }
@@ -88,12 +89,12 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 	// Use pipe to process line-by-line to avoid loading entire history into memory
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG ERROR]: %s", err.Error()))
+		gCL.logging.RegisterNewLog(logging.COMMIT_LOG_OPS, "", logging.ERROR, fmt.Sprintf("[PIPE ERROR]: %s", err.Error()), false)
 		return
 	}
 
 	if err := cmd.Start(); err != nil {
-		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG ERROR]: %s", err.Error()))
+		gCL.logging.RegisterNewLog(logging.COMMIT_LOG_OPS, "", logging.ERROR, fmt.Sprintf("[START ERROR]: %s", err.Error()), false)
 		return
 	}
 
@@ -443,17 +444,10 @@ func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash stri
 	if err != nil {
 		if ctx.Err() != nil {
 			// This catches context.Canceled
-			gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[COMMIT LOG DETAIL OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+			gCL.logging.RegisterNewLog(logging.COMMIT_LOG_DETAIL_OPS, strings.Join(gitArgs, " "), logging.WARN, fmt.Sprintf("[%s CANCELLED]: %s", logging.COMMIT_LOG_DETAIL_OPS, ctx.Err().Error()), true)
 			return nil
-		}
-		exitError, ok := err.(*exec.ExitError)
-		if ok {
-			if exitError.ExitCode() != 1 {
-				gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT COMMIT LOG DETAIL ERROR]: %w", err))
-				return nil
-			}
 		} else {
-			gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT COMMIT LOG DETAIL ERROR]: %w", err))
+			gCL.logging.RegisterNewLog(logging.COMMIT_LOG_DETAIL_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.COMMIT_LOG_DETAIL_OPS, ctx.Err().Error()), true)
 			return nil
 		}
 	}
@@ -475,7 +469,6 @@ func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
 	cmdOutput, cmdErr := cmd.Output()
 
 	if cmdErr != nil {
-		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG CHECK LARGE COMMIT ERROR]: %s", cmdErr.Error()))
 		return true
 	}
 
@@ -488,7 +481,6 @@ func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
 
 	filesChanged, err := strconv.Atoi(matches[1])
 	if err != nil {
-		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT LOG CHECK LARGE COMMIT ERROR]: %s", err.Error()))
 		return true
 	}
 
@@ -506,9 +498,10 @@ func (gCL *GitCommitLog) GitCherryPick(cherryPickedCommitHashes []string) {
 	gitArgs = append(gitArgs, topoOrderedCherryPickedCommitHashes...)
 
 	cherryPickCmdExec := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_, cherryPickErr := cherryPickCmdExec.Output()
-	if cherryPickErr != nil {
-		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT CHERRY PICKED ERROR]: %s", cherryPickErr.Error()))
+	err := cherryPickCmdExec.Run()
+	gCL.logging.RegisterNewLog(logging.CHERRY_PICK_COMMIT_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gCL.logging.RegisterNewLog(logging.CHERRY_PICK_COMMIT_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHERRY_PICK_COMMIT_OPS, err.Error()), true)
 	}
 }
 
@@ -531,7 +524,6 @@ func (gCL *GitCommitLog) topoOrderCherryPickedCommit(cherryPickedCommitHashes []
 	topoOrderCherryPickedCommitHashesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	topoOrderCherryPiCkedCommitHashesOutput, topoOrderCherryPiCkedCommitHashesErr := topoOrderCherryPickedCommitHashesCmdExecutor.Output()
 	if topoOrderCherryPiCkedCommitHashesErr != nil {
-		gCL.errorLog = append(gCL.errorLog, fmt.Errorf("[GIT TOPO ORDER CHERRY PICKED COMMIT HASHES ERROR]: %s", topoOrderCherryPiCkedCommitHashesErr.Error()))
 		// will default to current cherry picked commit hashes sequencees by user
 		return cherryPickedCommitHashes
 	}
