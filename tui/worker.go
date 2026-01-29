@@ -21,3 +21,12 @@ func StartTuiUpdateListener(p *tea.Program, updateChannel chan string) {
 		}
 	}()
 }
+
+func StartLoggingUpdateListener(p *tea.Program, updateChannel chan string) {
+	go func() {
+		for updateEvent := range updateChannel {
+			// Push message into the Bubble Tea runtime
+			p.Send(GitUpdateMsg(updateEvent))
+		}
+	}()
+}

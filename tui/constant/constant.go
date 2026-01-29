@@ -50,6 +50,8 @@ const (
 	Padding                             = 1
 	MainPageKeyBindingLayoutPanelHeight = 1
 
+	MaxLogComponentHeight = 6
+
 	ListItemOrTitleWidthPad = 4
 
 	MaxGlobalKeyBindingPopUpWidth                      = 150
@@ -116,7 +118,9 @@ const (
 	LocalBranchComponent   = "C1" // component index 1
 	ModifiedFilesComponent = "C2" // component index 2
 	CommitLogComponent     = "C3" // component index 3
-	StashComponent         = "C4" // component index 3
+	StashComponent         = "C4" // component index 4
+
+	LogComponent = "L0" // this can be selected by keybinding but not by number
 
 	// this is not a selectable component from key binding but act like an extension for each component to enter for more detail,
 	// no component index, the current selected component index will be still set as its parent's

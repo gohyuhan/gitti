@@ -8,6 +8,7 @@ import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 )
 
@@ -78,7 +79,7 @@ func SetAllowCommitGraphWrite(allow string) {
 	}
 }
 
-func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperations, api.GitRepoPath) {
+func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *logging.GittiLogging) (*api.GitOperations, api.GitRepoPath) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
 	// check if the user repo is git inited, is not prompt user to init it
@@ -86,7 +87,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string) (*api.GitOperatio
 	// after we successfully get the gitRepoPathInfo back we need to update the current cmd executor dir
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
-	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel)
+	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gittiLogging)
 	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations, settings.GITTICONFIGSETTINGS.AllowCommitGraphWrite)
 
 	return gitOperations, gitRepoPathInfo

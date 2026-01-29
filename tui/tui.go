@@ -3,10 +3,12 @@ package tui
 import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
+	logComponent "github.com/gohyuhan/gitti/tui/component/log"
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/interaction"
@@ -24,7 +26,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
-func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations) *GittiAppModel {
+func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging) *GittiAppModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
@@ -36,6 +38,12 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	vpTwo.MouseWheelEnabled = true
 	vpTwo.SetHorizontalStep(1)
 	vpTwo.MouseWheelDelta = 1
+
+	logVp := viewport.New()
+	logVp.SoftWrap = false
+	logVp.MouseWheelEnabled = false
+	logVp.SetHorizontalStep(1)
+	logVp.MouseWheelDelta = 1
 
 	lineEditingIndexCursorVp := viewport.New()
 	lineEditingIndexCursorVp.SoftWrap = false
@@ -50,6 +58,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	lineEditingIndexCursorVpTwo.MouseWheelDelta = 0
 
 	gittiModel := &types.GittiModel{
+		GittiLogger:                       gittiLogger,
 		TuiUpdateChannel:                  tuiUpdateChannel,
 		UserSetEditor:                     settings.GITTICONFIGSETTINGS.Editor,
 		CurrentSelectedComponent:          constant.ModifiedFilesComponent,
@@ -76,6 +85,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		DetailPanelTwoViewport:            vpTwo,
 		DetailPanelTwoViewportOffset:      0,
 		DetailComponentPanelLayout:        constant.HORIZONTAL,
+		CurrentLogComponentViewport:       logVp,
 		ListNavigationIndexPosition:       types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
 		PopUpType:                         constant.NoPopUp,
 		PopUpModel:                        struct{}{},
@@ -130,8 +140,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		updateEvent := string(msg)
 		switch updateEvent {
 		case constant.DETAIL_COMPONENT_PANEL_UPDATED:
-			layout.UpdateDetailComponentViewportLayout(gAM.model)
-			return gAM, nil
+			layout.UpdateDetailComponentViewportLayout(m)
 		case git.GIT_BRANCH_UPDATE:
 			branchComponent.InitBranchList(m)
 			if m.CurrentSelectedComponent == constant.LocalBranchComponent {
@@ -167,6 +176,13 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE:
 			needReinit := filesComponent.InitModifiedFilesList(m)
 			services.FetchDetailComponentPanelInfoService(m, needReinit)
+		case logging.NEW_LOG_UPDATE:
+			content := logComponent.InitGittiLogViewport(m, true, nil)
+			m.CurrentLogComponentViewport.SetContent(content)
+			m.CurrentLogComponentViewport.GotoBottom()
+			if m.CurrentSelectedComponent == constant.LogComponent || m.DetailPanelParentComponent == constant.LogComponent {
+				services.FetchDetailComponentPanelInfoService(m, true)
+			}
 		}
 		return gAM, nil
 	case types.EditorFinishedMsg:

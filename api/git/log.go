@@ -469,7 +469,6 @@ func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
 	cmdOutput, cmdErr := cmd.Output()
 
 	if cmdErr != nil {
-		gCL.logging.RegisterNewLog(logging.COMMIT_LOG_LARGE_CHECKER_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.COMMIT_LOG_LARGE_CHECKER_OPS, cmdErr.Error()), true)
 		return true
 	}
 
@@ -482,7 +481,6 @@ func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
 
 	filesChanged, err := strconv.Atoi(matches[1])
 	if err != nil {
-		gCL.logging.RegisterNewLog(logging.COMMIT_LOG_LARGE_CHECKER_OPS, "", logging.ERROR, fmt.Sprintf("[STRING CONVERT ERROR]: %s", err.Error()), false)
 		return true
 	}
 

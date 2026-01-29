@@ -64,9 +64,8 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 	}
 }
 
-func InitGitOperations(absolutePath string, updateChannel chan string) *GitOperations {
-	gitProcessLock := git.InitGitProcessLock()
-	gittiLogging := logging.InitGittiLogging(300, updateChannel)
+func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogging *logging.GittiLogging) *GitOperations {
+	gitProcessLock := git.InitGitProcessLock(gittiLogging)
 	return &GitOperations{
 		GitBranch:              git.InitGitBranch(gitProcessLock, gittiLogging),
 		GitCommit:              git.InitGitCommit(updateChannel, gitProcessLock, gittiLogging),

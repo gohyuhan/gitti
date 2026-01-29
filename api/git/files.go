@@ -131,7 +131,7 @@ func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus,
 	if err != nil {
 		if ctx.Err() != nil {
 			// This catches context.Canceled
-			gf.logging.RegisterNewLog(logging.FILE_DIFF_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s CANCEL]", logging.FILE_DIFF_OPS), true)
+			gf.logging.RegisterNewLog(logging.FILE_DIFF_OPS, "", logging.WARN, fmt.Sprintf("[%s CANCELLED]", logging.FILE_DIFF_OPS), true)
 			return nil
 		}
 		exitError, ok := err.(*exec.ExitError)

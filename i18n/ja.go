@@ -123,6 +123,9 @@ var jA = LanguageMapping{
 		"[ctrl+p] チェリーピック操作",
 		"[?] グローバルキー操作",
 	},
+	KeyBindingLogComponent: []string{
+		"[enter] ログ内容を表示",
+	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右に移動",
 		"[↑/↓] 上下に移動",

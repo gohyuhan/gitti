@@ -7,10 +7,10 @@ package logging
 // ------------------------------------------
 
 type LogItem struct {
-	opsType          string
-	opsCommand       string
-	opsSeverityLevel string // either INFO, WARN or ERROR
-	opsDescription   string
+	OpsType          string
+	OpsCommand       string
+	OpsSeverityLevel string // either INFO, WARN or ERROR
+	OpsDescription   string
 }
 
 type GittiLogging struct {
@@ -46,10 +46,10 @@ func (gl *GittiLogging) RegisterNewLog(logOpsType string, logOpsCommand string, 
 		logOpsCommand = "git " + logOpsCommand
 	}
 	newLogItem := LogItem{
-		opsType:          logOpsType,
-		opsCommand:       logOpsCommand,
-		opsSeverityLevel: logOpsSeverityLevel,
-		opsDescription:   logOpsDescription,
+		OpsType:          logOpsType,
+		OpsCommand:       logOpsCommand,
+		OpsSeverityLevel: logOpsSeverityLevel,
+		OpsDescription:   logOpsDescription,
 	}
 	if len(gl.logs) < gl.maxLogsCount {
 		gl.logs = append(gl.logs, newLogItem)

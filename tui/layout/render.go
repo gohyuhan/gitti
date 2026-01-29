@@ -249,6 +249,17 @@ func renderStashComponentPanel(width int, height int, m *types.GittiModel) strin
 		Render(m.CurrentRepoStashInfoList.View())
 }
 
+func renderLogComponentPanel(width int, height int, m *types.GittiModel) string {
+	borderStyle := style.PanelBorderStyle
+	if m.CurrentSelectedComponent == constant.LogComponent {
+		borderStyle = style.SelectedBorderStyle
+	}
+	return borderStyle.
+		Width(width).
+		Height(height).
+		Render(m.CurrentLogComponentViewport.View())
+}
+
 func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 	keys := []string{""} // to prevent a misconfiguration on key binding will not crash the program
 
@@ -416,6 +427,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyStashComponentNone
 			}
+		case constant.LogComponent:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingLogComponent
 		}
 	}
 

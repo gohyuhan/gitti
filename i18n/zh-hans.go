@@ -123,6 +123,9 @@ var zH_HANS = LanguageMapping{
 		"[ctrl+p] 遴选操作",
 		"[?] 全局快捷键",
 	},
+	KeyBindingLogComponent: []string{
+		"[enter] 查看日志内容",
+	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",

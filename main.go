@@ -34,6 +34,7 @@ import (
 	"github.com/gohyuhan/gitti/constant"
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui"
 	"github.com/gohyuhan/gitti/updater"
@@ -86,9 +87,11 @@ func main() {
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string)
 		tuiUpdateChannel := make(chan string)
+		loggingUpdateChannel := make(chan string)
+		gittiLogging := logging.InitGittiLogging(300, loggingUpdateChannel)
 
 		// initialization
-		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, gitUpdateChannel)
+		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, gitUpdateChannel, gittiLogging)
 
 		// check for update if user allows it
 		if settings.GITTICONFIGSETTINGS.AutoUpdate {
@@ -109,7 +112,7 @@ func main() {
 			return msg
 		}
 
-		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, repoPath, gitRepoPathInfo.RepoName, gitOperations)
+		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, repoPath, gitRepoPathInfo.RepoName, gitOperations, gittiLogging)
 		gitti := tea.NewProgram(
 			gittiAppModel,
 			tea.WithFilter(mouseThrottle),
@@ -117,6 +120,7 @@ func main() {
 
 		tui.StartGitUpdateListener(gitti, gitUpdateChannel)
 		tui.StartTuiUpdateListener(gitti, tuiUpdateChannel)
+		tui.StartLoggingUpdateListener(gitti, loggingUpdateChannel)
 
 		// start the Git Daemon
 		if api.GITDAEMON != nil {
