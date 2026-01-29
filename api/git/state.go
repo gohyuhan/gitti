@@ -1,14 +1,18 @@
 package git
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type GitStateUniversalUtils struct {
 	currentGitState string
-	errorLog        []error
 	gitProcessLock  *GitProcessLock
 	GitAbsolutePath string
+	logging         *logging.GittiLogging
 }
 
 // --------------------------------
@@ -16,12 +20,12 @@ type GitStateUniversalUtils struct {
 // init the Git GitStateUniversalUtils
 //
 // --------------------------------
-func InitGitStateUniversalUtils(gitAbsolutePath string, gitProcessLock *GitProcessLock) *GitStateUniversalUtils {
+func InitGitStateUniversalUtils(gitAbsolutePath string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitStateUniversalUtils {
 	gitStateUniversalUtils := &GitStateUniversalUtils{
 		currentGitState: "",
-		errorLog:        []error{},
 		gitProcessLock:  gitProcessLock,
 		GitAbsolutePath: gitAbsolutePath,
+		logging:         logging,
 	}
 
 	return gitStateUniversalUtils
@@ -73,9 +77,11 @@ func (gSUU *GitStateUniversalUtils) GitUniversalContinue() {
 	}
 
 	continueCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	continueCmdExecutor.Run()
-
-	return
+	err := continueCmdExecutor.Run()
+	gSUU.logging.RegisterNewLog(logging.CONTINUE, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gSUU.logging.RegisterNewLog(logging.CONTINUE, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CONTINUE, err.Error()), true)
+	}
 }
 
 // --------------------------------
@@ -115,9 +121,11 @@ func (gSUU *GitStateUniversalUtils) GitUniversalAbort() {
 	}
 
 	abortCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	abortCmdExecutor.Run()
-
-	return
+	err := abortCmdExecutor.Run()
+	gSUU.logging.RegisterNewLog(logging.ABORT, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gSUU.logging.RegisterNewLog(logging.ABORT, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.ABORT, err.Error()), true)
+	}
 }
 
 // --------------------------------
@@ -153,9 +161,11 @@ func (gSUU *GitStateUniversalUtils) GitUniversalSkip() {
 	}
 
 	skipCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	skipCmdExecutor.Run()
-
-	return
+	err := skipCmdExecutor.Run()
+	gSUU.logging.RegisterNewLog(logging.SKIP, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gSUU.logging.RegisterNewLog(logging.SKIP, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.SKIP, err.Error()), true)
+	}
 }
 
 // --------------------------------

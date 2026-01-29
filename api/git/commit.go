@@ -11,16 +11,17 @@ import (
 	"time"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type GitCommit struct {
-	errorLog              []error
 	gitCommitOutput       []string
 	gitCommitOutputMu     sync.RWMutex
 	gitRemotePushOutput   []string
 	gitRemotePushOutputMu sync.RWMutex
 	updateChannel         chan string
 	gitProcessLock        *GitProcessLock
+	logging               *logging.GittiLogging
 }
 
 type LatestCommitMsgAndDesc struct {
@@ -28,12 +29,13 @@ type LatestCommitMsgAndDesc struct {
 	Description string
 }
 
-func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock) *GitCommit {
+func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitCommit {
 	gitCommit := GitCommit{
 		gitCommitOutput:     []string{},
 		gitRemotePushOutput: []string{},
 		updateChannel:       updateChannel,
 		gitProcessLock:      gitProcessLock,
+		logging:             logging,
 	}
 
 	return &gitCommit
@@ -95,15 +97,17 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 	// Combine stderr into stdout
 	stdout, err := commitCmd.StdoutPipe()
 	if err != nil {
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
+		gc.logging.RegisterNewLog(logging.COMMIT_OPS, "", logging.ERROR, fmt.Sprintf("[PIPE ERROR]: %s", err.Error()), false)
 		return -1
 	}
 	commitCmd.Stderr = commitCmd.Stdout
 
 	// Start the process
 	if err := commitCmd.Start(); err != nil {
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
+		gc.logging.RegisterNewLog(logging.COMMIT_OPS, "", logging.ERROR, fmt.Sprintf("[START ERROR]: %s", err.Error()), false)
 		return -1
+	} else {
+		gc.logging.RegisterNewLog(logging.COMMIT_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	}
 
 	// Stream combined output
@@ -153,16 +157,20 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 	waitErr := commitCmd.Wait()
 	wg.Wait()
 
-	if waitErr != nil {
-		if exitErr, ok := waitErr.(*exec.ExitError); ok {
-			status := exitErr.ExitCode()
-			gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT COMMIT ERROR]: %w", waitErr))
-			return status
-		}
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", waitErr))
+	if ctx.Err() != nil {
+		gc.logging.RegisterNewLog(logging.COMMIT_OPS, strings.Join(gitArgs, " "), logging.WARN, fmt.Sprintf("[%s CANCELLED]", logging.COMMIT_OPS), true)
 		return -1
 	}
 
+	if waitErr != nil {
+		if exitErr, ok := waitErr.(*exec.ExitError); ok {
+			status := exitErr.ExitCode()
+			gc.logging.RegisterNewLog(logging.COMMIT_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.COMMIT_OPS, waitErr.Error()), true)
+			return status
+		}
+		gc.logging.RegisterNewLog(logging.COMMIT_OPS, "", logging.ERROR, fmt.Sprintf("[UNEXPECTED ERROR]: %s", waitErr.Error()), false)
+		return -1
+	}
 	return 0
 }
 
@@ -181,8 +189,9 @@ func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 	gitArgs := []string{"log", "-1", "--pretty=format:%s%n%b", "HEAD"}
 	latestCommitCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	commitMsgAndDesc, cmdErr := latestCommitCmd.Output()
+	gc.logging.RegisterNewLog(logging.GET_LATEST_COMMIT_MSG_AND_DESC_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	if cmdErr != nil {
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[GET LATEST COMMIT INFO ERROR]: %w", cmdErr))
+		gc.logging.RegisterNewLog(logging.GET_LATEST_COMMIT_MSG_AND_DESC_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GET_LATEST_COMMIT_MSG_AND_DESC_OPS, cmdErr.Error()), true)
 		return LatestCommitMsgAndDesc{}
 	}
 
@@ -243,15 +252,17 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
+		gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, "", logging.ERROR, fmt.Sprintf("[PIPE ERROR]: %s", err.Error()), false)
 		return -1
 	}
 	cmd.Stderr = cmd.Stdout
 
 	// Start the process
 	if err := cmd.Start(); err != nil {
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[START ERROR]: %w", err))
+		gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, "", logging.ERROR, fmt.Sprintf("[START ERROR]: %s", err.Error()), false)
 		return -1
+	} else {
+		gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	}
 
 	// Stream combined output
@@ -289,15 +300,21 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	waitErr := cmd.Wait()
 	wg.Wait()
 
+	if ctx.Err() != nil {
+		gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, strings.Join(gitArgs, " "), logging.WARN, fmt.Sprintf("[%s CANCELLED]", logging.GIT_PUSH_OPS), true)
+		return -1
+	}
+
 	if waitErr != nil {
 		if exitErr, ok := waitErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
-			gc.errorLog = append(gc.errorLog, fmt.Errorf("[GIT PUSH ERROR]: %w", waitErr))
+			gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GIT_PUSH_OPS, waitErr.Error()), true)
 			return status
 		}
-		gc.errorLog = append(gc.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", waitErr))
+		gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, "", logging.ERROR, fmt.Sprintf("[UNEXPECTED ERROR]: %s", waitErr.Error()), false)
 		return -1
 	}
+
 	return 0
 }
 
@@ -335,7 +352,12 @@ func (gc *GitCommit) GitResetLatestCommit(resetType string) {
 	}
 
 	commitLatestResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_ = commitLatestResetCmdExecutor.Run()
+	err := commitLatestResetCmdExecutor.Run()
+	gc.logging.RegisterNewLog(logging.GIT_RESET_LATEST_COMMIT_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gc.logging.RegisterNewLog(logging.GIT_RESET_LATEST_COMMIT_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GIT_RESET_LATEST_COMMIT_OPS, err.Error()), true)
+		return
+	}
 }
 
 // ----------------------------------
@@ -366,5 +388,10 @@ func (gc *GitCommit) GitResetToSelectedCommit(resetType string, commitHash strin
 	}
 
 	resetToSelectedCommitCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_ = resetToSelectedCommitCmdExecutor.Run()
+	err := resetToSelectedCommitCmdExecutor.Run()
+	gc.logging.RegisterNewLog(logging.GIT_RESET_TO_SELECTED_COMMIT_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gc.logging.RegisterNewLog(logging.GIT_RESET_TO_SELECTED_COMMIT_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GIT_RESET_TO_SELECTED_COMMIT_OPS, err.Error()), true)
+		return
+	}
 }

@@ -8,10 +8,10 @@ import (
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type GitRemote struct {
-	errorLog                      []error
 	updateChannel                 chan string
 	gitProcessLock                *GitProcessLock
 	remote                        []GitRemoteInfo
@@ -19,6 +19,7 @@ type GitRemote struct {
 	upStreamRemoteIcon            string
 	currentBranchUpStream         string
 	currentBranchUpStreamWithIcon string
+	logging                       *logging.GittiLogging
 }
 
 type GitRemoteInfo struct {
@@ -31,7 +32,7 @@ type RemoteSyncStatus struct {
 	Remote string
 }
 
-func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *GitRemote {
+func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitRemote {
 	gitRemote := GitRemote{
 		updateChannel:                 updateChannel,
 		gitProcessLock:                gitProcessLock,
@@ -40,6 +41,7 @@ func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock) *G
 		upStreamRemoteIcon:            "",
 		currentBranchUpStream:         "",
 		currentBranchUpStreamWithIcon: "",
+		logging:                       logging,
 	}
 
 	return &gitRemote
@@ -107,15 +109,16 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 
 	// CombinedOutput starts and waits for the command
 	gitOutput, err := cmd.CombinedOutput()
+	gr.logging.RegisterNewLog(logging.ADD_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 
 	gitAddRemoteOutput := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
-			gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT ADD REMOTE ERROR]: %w", err))
+			gr.logging.RegisterNewLog(logging.ADD_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.ADD_REMOTE_OPS, err.Error()), true)
 			return gitAddRemoteOutput, status
 		}
-		gr.errorLog = append(gr.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", err))
+		gr.logging.RegisterNewLog(logging.ADD_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.ADD_REMOTE_OPS, err.Error()), true)
 		return gitAddRemoteOutput, -1
 
 	}
@@ -126,9 +129,12 @@ func (gr *GitRemote) CheckRemoteExist() bool {
 	gitArgs := []string{"remote", "-v"}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmd.Output()
+	gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	if err != nil {
-		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE ERROR]: %w", err))
+		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHECK_REMOTE_OPS, err.Error()), true)
+		return false
 	}
+
 	remotes := strings.SplitSeq(strings.TrimSpace(string(gitOutput)), "\n")
 	var remoteStruct []GitRemoteInfo
 	for remote := range remotes {
@@ -169,7 +175,7 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool) {
 	remoteSyncStatusCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	remoteSyncStatusOutput, remoteSyncStatusErr := remoteSyncStatusCmd.Output()
 	if remoteSyncStatusErr != nil {
-		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_SYNC_STATUS_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHECK_REMOTE_SYNC_STATUS_OPS, remoteSyncStatusErr.Error()), true)
 		gr.remoteSyncStatus = RemoteSyncStatus{}
 		return
 	}
@@ -178,7 +184,7 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool) {
 	parts := strings.Fields(parsedOutput)
 
 	if len(parts) < 2 {
-		gr.errorLog = append(gr.errorLog, fmt.Errorf("[GIT REMOTE SYNC STATUS ERROR]: %w", remoteSyncStatusErr))
+		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_SYNC_STATUS_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: Invalid output format", logging.CHECK_REMOTE_SYNC_STATUS_OPS), true)
 		gr.remoteSyncStatus = RemoteSyncStatus{}
 		return
 	}

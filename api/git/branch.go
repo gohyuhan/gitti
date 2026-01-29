@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type BranchInfo struct {
@@ -16,14 +17,15 @@ type GitBranch struct {
 	isRepoUnborn    bool // meaning this is a newly init repo, no commit on any branch yet
 	currentCheckOut BranchInfo
 	allBranches     []BranchInfo
-	errorLog        []error
+	logging         *logging.GittiLogging
 	gitProcessLock  *GitProcessLock
 }
 
-func InitGitBranch(gitProcessLock *GitProcessLock) *GitBranch {
+func InitGitBranch(gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitBranch {
 	gitBranch := GitBranch{
 		isRepoUnborn:   false,
 		gitProcessLock: gitProcessLock,
+		logging:        logging,
 	}
 	return &gitBranch
 }
@@ -72,7 +74,8 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 	branchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := branchCmdExecutor.Output()
 	if err != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
+		gb.logging.RegisterNewLog(logging.GET_LATEST_BRANCH_INFO_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GET_LATEST_BRANCH_INFO_OPS, err.Error()), true)
+		return
 	}
 
 	gitBranches := processGeneralGitOpsOutputIntoStringArray(gitOutput)
@@ -84,7 +87,8 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 		branchCmdExecutor = executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 		gitOutput, err := branchCmdExecutor.Output()
 		if err != nil {
-			gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT BRANCHES ERROR]: %w", err))
+			gb.logging.RegisterNewLog(logging.GET_LATEST_BRANCH_INFO_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GET_LATEST_BRANCH_INFO_OPS, err.Error()), true)
+			return
 		}
 		gitBranches = processGeneralGitOpsOutputIntoStringArray(gitOutput)
 		gb.currentCheckOut = BranchInfo{
@@ -144,9 +148,11 @@ func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 	}
 
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	_, err := cmdExecutor.CombinedOutput()
+	err := cmdExecutor.Run()
+	gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	if err != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE BRANCH ERROR]: %w", err))
+		gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CREATE_NEW_BRANCH_OPS, err.Error()), true)
+		return
 	}
 }
 
@@ -163,9 +169,10 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 
 	createAndSwitchBranchGitArgs := []string{"checkout", "-b", branchName}
 	createAndSwitchBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(createAndSwitchBranchGitArgs, false)
-	_, createAndSwitchBranchErr := createAndSwitchBranchCmdExecutor.CombinedOutput()
+	createAndSwitchBranchErr := createAndSwitchBranchCmdExecutor.Run()
+	gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_AND_SWITCH_OPS, strings.Join(createAndSwitchBranchGitArgs, " "), logging.INFO, "", true)
 	if createAndSwitchBranchErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE AND SWITCH BRANCH ERROR]: %w", createAndSwitchBranchErr))
+		gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_AND_SWITCH_OPS, strings.Join(createAndSwitchBranchGitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CREATE_NEW_BRANCH_AND_SWITCH_OPS, createAndSwitchBranchErr.Error()), true)
 		return
 	}
 }
@@ -189,11 +196,12 @@ func (gb *GitBranch) GitCreateNewBranchBasedOnRemote(remoteName string, branchNa
 	createBranchBasedOnRemoteGitArgs := []string{"branch", branchName, remoteBranchName}
 	createBranchBasedOnRemoteCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(createBranchBasedOnRemoteGitArgs, false)
 	createBranchBasedOnRemoteOutput, createBranchBasedOnRemoteErr := createBranchBasedOnRemoteCmdExecutor.CombinedOutput()
+	gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_BASED_ON_REMOTE_BRANCH_OPS, strings.Join(createBranchBasedOnRemoteGitArgs, " "), logging.INFO, "", true)
 
 	parsedCreateBranchBasedOnRemoteOutput := processGeneralGitOpsOutputIntoStringArray(createBranchBasedOnRemoteOutput)
 
 	if createBranchBasedOnRemoteErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT CREATE BRANCH BASED ON REMOTE ERROR]: %w", createBranchBasedOnRemoteErr))
+		gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_BASED_ON_REMOTE_BRANCH_OPS, strings.Join(createBranchBasedOnRemoteGitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CREATE_NEW_BRANCH_BASED_ON_REMOTE_BRANCH_OPS, createBranchBasedOnRemoteErr.Error()), true)
 	} else {
 		success = true
 	}
@@ -214,24 +222,25 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 
 	var gitOpsOutput []string
 
-	stashChangesGitArgs := []string{"stash", "push", "-u"}
-	stashChangesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(stashChangesGitArgs, false)
+	gitArgs := []string{"stash", "push", "-u"}
+	stashChangesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stashChangesOutput, stashChangesErr := stashChangesCmdExecutor.CombinedOutput()
+	gb.logging.RegisterNewLog(logging.STASH_ALL_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(stashChangesOutput)...)
 	if stashChangesErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT STASH CHANGES ERROR]: %w", stashChangesErr))
+		gb.logging.RegisterNewLog(logging.STASH_ALL_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STASH_ALL_FILE_OPS, stashChangesErr.Error()), true)
 		return gitOpsOutput, false
 	}
 
-	switchBranchGitArgs := []string{"checkout", branchName}
-	switchBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(switchBranchGitArgs, false)
+	gitArgs = []string{"checkout", branchName}
+	switchBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	switchBranchOutput, switchBranchErr := switchBranchCmdExecutor.CombinedOutput()
+	gb.logging.RegisterNewLog(logging.SWITCH_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(switchBranchOutput)...)
 	if switchBranchErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT SWITCH BRANCH ERROR]: %w", switchBranchErr))
+		gb.logging.RegisterNewLog(logging.SWITCH_BRANCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.SWITCH_BRANCH_OPS, switchBranchErr.Error()), true)
 		return gitOpsOutput, false
 	}
-
 	return gitOpsOutput, true
 }
 
@@ -250,14 +259,14 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 	switchBranchGitArgs := []string{"checkout", branchName}
 	switchBranchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(switchBranchGitArgs, false)
 	switchBranchOutput, switchBranchErr := switchBranchCmdExecutor.CombinedOutput()
+	gb.logging.RegisterNewLog(logging.SWITCH_BRANCH_OPS, strings.Join(switchBranchGitArgs, " "), logging.INFO, "", true)
 
 	gitOpsOutput = append(gitOpsOutput, processGeneralGitOpsOutputIntoStringArray(switchBranchOutput)...)
 
 	if switchBranchErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT SWITCH BRANCH ERROR]: %w", switchBranchErr))
+		gb.logging.RegisterNewLog(logging.SWITCH_BRANCH_OPS, strings.Join(switchBranchGitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.SWITCH_BRANCH_OPS, switchBranchErr.Error()), true)
 		return gitOpsOutput, false
 	}
-
 	return gitOpsOutput, true
 }
 
@@ -274,13 +283,13 @@ func (gb *GitBranch) DeleteLocalBranch(branchName string) ([]string, bool) {
 	gitArgs := []string{"branch", "-D", branchName}
 	branchDeleteExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	branchDeleteOutput, branchDeleteErr := branchDeleteExecutor.CombinedOutput()
+	gb.logging.RegisterNewLog(logging.DELETE_LOCAL_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 
 	gitOpsOutput := processGeneralGitOpsOutputIntoStringArray(branchDeleteOutput)
 
 	if branchDeleteErr != nil {
-		gb.errorLog = append(gb.errorLog, fmt.Errorf("[GIT DELETE BRANCH ERROR]: %w", branchDeleteErr))
+		gb.logging.RegisterNewLog(logging.DELETE_LOCAL_BRANCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.DELETE_LOCAL_BRANCH_OPS, branchDeleteErr.Error()), true)
 		return gitOpsOutput, false
 	}
-
 	return gitOpsOutput, true
 }

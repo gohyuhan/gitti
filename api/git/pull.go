@@ -5,26 +5,28 @@ import (
 	"context"
 	"fmt"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type GitPull struct {
-	errorLog        []error
 	gitPullOutput   []string
 	gitPullOutputMu sync.RWMutex
 	gitProcessLock  *GitProcessLock
 	updateChannel   chan string
+	logging         *logging.GittiLogging
 }
 
-func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock) *GitPull {
+func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitPull {
 	gitPull := &GitPull{
-		errorLog:       []error{},
 		gitPullOutput:  []string{},
 		updateChannel:  updateChannel,
 		gitProcessLock: gitProcessLock,
+		logging:        logging,
 	}
 
 	return gitPull
@@ -73,15 +75,17 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 	// Combine stderr into stdout
 	stdout, err := cmdExecutor.StdoutPipe()
 	if err != nil {
-		gp.errorLog = append(gp.errorLog, fmt.Errorf("[PIPE ERROR]: %w", err))
+		gp.logging.RegisterNewLog(logging.PULL_OPS, "", logging.ERROR, fmt.Sprintf("[PIPE ERROR]: %s", err.Error()), false)
 		return -1
 	}
 	cmdExecutor.Stderr = cmdExecutor.Stdout
 
 	// Start the process
 	if err := cmdExecutor.Start(); err != nil {
-		gp.errorLog = append(gp.errorLog, fmt.Errorf("[START ERROR]: %w", err))
+		gp.logging.RegisterNewLog(logging.PULL_OPS, "", logging.ERROR, fmt.Sprintf("[START ERROR]: %s", err.Error()), false)
 		return -1
+	} else {
+		gp.logging.RegisterNewLog(logging.PULL_OPS, strings.Join(gitPullArgs, " "), logging.INFO, "", true)
 	}
 
 	// Stream combined output
@@ -119,13 +123,18 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 	waitErr := cmdExecutor.Wait()
 	wg.Wait()
 
+	if ctx.Err() != nil {
+		gp.logging.RegisterNewLog(logging.PULL_OPS, strings.Join(gitPullArgs, " "), logging.WARN, fmt.Sprintf("[%s CANCELLED]: %s", logging.PULL_OPS, ctx.Err().Error()), true)
+		return -1
+	}
+
 	if waitErr != nil {
 		if exitErr, ok := waitErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
-			gp.errorLog = append(gp.errorLog, fmt.Errorf("[GIT PULL ERROR]: %w", waitErr))
+			gp.logging.RegisterNewLog(logging.PULL_OPS, strings.Join(gitPullArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.PULL_OPS, waitErr.Error()), true)
 			return status
 		}
-		gp.errorLog = append(gp.errorLog, fmt.Errorf("[UNEXPECTED ERROR]: %w", waitErr))
+		gp.logging.RegisterNewLog(logging.PULL_OPS, strings.Join(gitPullArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.PULL_OPS, waitErr.Error()), true)
 		return -1
 	}
 	return 0

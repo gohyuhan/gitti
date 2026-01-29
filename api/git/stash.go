@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 type StashInfo struct {
@@ -17,15 +18,15 @@ type StashInfo struct {
 
 type GitStash struct {
 	allStash       []StashInfo
-	errorLog       []error
 	gitProcessLock *GitProcessLock
+	logging        *logging.GittiLogging
 }
 
-func InitGitStash(gitProcessLock *GitProcessLock) *GitStash {
+func InitGitStash(gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitStash {
 	gitStash := &GitStash{
 		allStash:       []StashInfo{},
-		errorLog:       []error{},
 		gitProcessLock: gitProcessLock,
+		logging:        logging,
 	}
 
 	return gitStash
@@ -47,7 +48,8 @@ func (gs *GitStash) GetLatestStashInfo() {
 	stashInfoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stashInfoOutput, stashInfoErr := stashInfoCmdExecutor.Output()
 	if stashInfoErr != nil {
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH INFO RETRIEVE ERROR]: %w", stashInfoErr))
+		gs.logging.RegisterNewLog(logging.GET_STASH_INFO, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GET_STASH_INFO, stashInfoErr.Error()), true)
+		return
 	}
 
 	parsedStashInfo := strings.Split(string(stashInfoOutput), "\n")
@@ -85,15 +87,19 @@ func (gs *GitStash) GitStashAll(message string) ([]string, int) {
 
 	stashAllCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stashAllOutput, stashAllErr := stashAllCmdExecutor.CombinedOutput()
-	stashAllOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashAllOutput)
+	gs.logging.RegisterNewLog(logging.STASH_ALL, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	var stashAllOutputStringArray []string
 	if stashAllErr != nil {
+		gs.logging.RegisterNewLog(logging.STASH_ALL, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STASH_ALL, stashAllErr.Error()), true)
 		if exitErr, ok := stashAllErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
 			return stashAllOutputStringArray, status
 		}
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ALL ERROR]: %w", stashAllErr))
 		return stashAllOutputStringArray, -1
 	}
+
+	stashAllOutputStringArray = processGeneralGitOpsOutputIntoStringArray(stashAllOutput)
 
 	return stashAllOutputStringArray, 0
 }
@@ -127,15 +133,19 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) ([]string,
 
 	stashCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stashOutput, stashErr := stashCmdExecutor.CombinedOutput()
-	stashOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashOutput)
+	gs.logging.RegisterNewLog(logging.STASH_FILE, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	var stashOutputStringArray []string
 	if stashErr != nil {
+		gs.logging.RegisterNewLog(logging.STASH_FILE, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STASH_FILE, stashErr.Error()), true)
 		if exitErr, ok := stashErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
 			return stashOutputStringArray, status
 		}
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH ERROR]: %w", stashErr))
 		return stashOutputStringArray, -1
 	}
+
+	stashOutputStringArray = processGeneralGitOpsOutputIntoStringArray(stashOutput)
 
 	return stashOutputStringArray, 0
 }
@@ -155,15 +165,18 @@ func (gs *GitStash) GitStashApply(stashId string) ([]string, int) {
 
 	stashApplyCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stashApplyOutput, stashApplyErr := stashApplyCmdExecutor.CombinedOutput()
-	stashApplyOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashApplyOutput)
+	gs.logging.RegisterNewLog(logging.STASH_APPLY, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	var stashApplyOutputStringArray []string
 	if stashApplyErr != nil {
+		gs.logging.RegisterNewLog(logging.STASH_APPLY, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STASH_APPLY, stashApplyErr.Error()), true)
 		if exitErr, ok := stashApplyErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
 			return stashApplyOutputStringArray, status
 		}
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH APPLY ERROR]: %w", stashApplyErr))
 		return stashApplyOutputStringArray, -1
 	}
+	stashApplyOutputStringArray = processGeneralGitOpsOutputIntoStringArray(stashApplyOutput)
 
 	return stashApplyOutputStringArray, 0
 }
@@ -183,15 +196,18 @@ func (gs *GitStash) GitStashPop(stashId string) ([]string, int) {
 
 	stashPopCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stashPopOutput, stashPopErr := stashPopCmdExecutor.CombinedOutput()
-	stashPopOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashPopOutput)
+	gs.logging.RegisterNewLog(logging.STASH_POP, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	var stashPopOutputStringArray []string
 	if stashPopErr != nil {
+		gs.logging.RegisterNewLog(logging.STASH_POP, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STASH_POP, stashPopErr.Error()), true)
 		if exitErr, ok := stashPopErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
 			return stashPopOutputStringArray, status
 		}
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH POP ERROR]: %w", stashPopErr))
 		return stashPopOutputStringArray, -1
 	}
+	stashPopOutputStringArray = processGeneralGitOpsOutputIntoStringArray(stashPopOutput)
 
 	return stashPopOutputStringArray, 0
 }
@@ -211,15 +227,18 @@ func (gs *GitStash) GitStashDrop(stashId string) ([]string, int) {
 
 	stashDropCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	stashDropOutput, stashDropErr := stashDropCmdExecutor.CombinedOutput()
-	stashDropOutputStringArray := processGeneralGitOpsOutputIntoStringArray(stashDropOutput)
+	gs.logging.RegisterNewLog(logging.STASH_DROP, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	var stashDropOutputStringArray []string
 	if stashDropErr != nil {
+		gs.logging.RegisterNewLog(logging.STASH_DROP, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STASH_DROP, stashDropErr.Error()), true)
 		if exitErr, ok := stashDropErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
 			return stashDropOutputStringArray, status
 		}
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DROP ERROR]: %w", stashDropErr))
 		return stashDropOutputStringArray, -1
 	}
+	stashDropOutputStringArray = processGeneralGitOpsOutputIntoStringArray(stashDropOutput)
 
 	return stashDropOutputStringArray, 0
 }
@@ -236,7 +255,6 @@ func (gs *GitStash) GitStashDetail(ctx context.Context, stashId string) []string
 	var gitArgs []string
 	isSmall, err := gs.isStashSmall(ctx, stashId)
 	if err != nil {
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[STASH DETAIL OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
 		return parsedDetail
 	}
 	if isSmall {
@@ -250,10 +268,10 @@ func (gs *GitStash) GitStashDetail(ctx context.Context, stashId string) []string
 	if detailCmdErr != nil {
 		if ctx.Err() != nil {
 			// This catches context.Canceled
-			gs.errorLog = append(gs.errorLog, fmt.Errorf("[STASH DETAIL OPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
+			gs.logging.RegisterNewLog(logging.STASH_DETAIL, strings.Join(gitArgs, " "), logging.WARN, fmt.Sprintf("[%s CANCELLED]", logging.STASH_DETAIL), true)
 			return parsedDetail
 		}
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[GIT STASH DETAIL ERROR]: %w", detailCmdErr))
+		gs.logging.RegisterNewLog(logging.STASH_DETAIL, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.STASH_DETAIL, detailCmdErr.Error()), true)
 		return parsedDetail
 	}
 	parsedDetail = processGeneralGitOpsOutputIntoStringArray(stashDetailOutput)
@@ -278,7 +296,6 @@ func (gs *GitStash) isStashSmall(ctx context.Context, stashId string) (bool, err
 	if showErr != nil {
 		if ctx.Err() != nil {
 			// This catches context.Canceled
-			gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASHOPERATION CANCELLED DUE TO CONTEXT SWITCHING]: %w", ctx.Err()))
 			return false, ctx.Err()
 		}
 		return false, showErr
@@ -286,17 +303,11 @@ func (gs *GitStash) isStashSmall(ctx context.Context, stashId string) (bool, err
 
 	// Start the process
 	if err := showCmdExecutor.Start(); err != nil {
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASH SIZE START ERROR]: %w", err))
 		return false, err
 	}
 
 	defer func() {
-		if err := showCmdExecutor.Wait(); err != nil {
-			// Only log if it's not a context cancellation
-			if ctx.Err() == nil {
-				gs.errorLog = append(gs.errorLog, fmt.Errorf("[DETERMINE STASH SIZE WAIT ERROR]: %w", err))
-			}
-		}
+		showCmdExecutor.Wait()
 	}()
 
 	scanner := bufio.NewScanner(showOutput)
@@ -316,7 +327,6 @@ func (gs *GitStash) isStashSmall(ctx context.Context, stashId string) (bool, err
 		if ctx.Err() != nil {
 			return false, ctx.Err()
 		}
-		gs.errorLog = append(gs.errorLog, fmt.Errorf("[SCANNER ERROR]: %w", err))
 		return false, err
 	}
 
