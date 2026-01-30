@@ -125,6 +125,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingLogComponent: []string{
 		"[enter] ログ内容を表示",
+		"[e] ログをエクスポート",
 	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右に移動",

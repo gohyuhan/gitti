@@ -10,6 +10,9 @@ const (
 
 // the ops type constant
 const (
+	// EXPORT logging
+	EXPORT_LOGGING_OPS = "EXPORT LOGGING"
+
 	// BRANCH RELATED OPS
 	GET_LATEST_BRANCH_INFO_OPS                   = "GET LATEST BRANCH INFO"
 	CREATE_NEW_BRANCH_OPS                        = "CREATE NEW BRANCH"

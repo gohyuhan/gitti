@@ -125,6 +125,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLogComponent: []string{
 		"[enter] view log content",
+		"[e] export log",
 	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] move left and right",

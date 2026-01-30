@@ -3,6 +3,7 @@ package log
 import (
 	"context"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/tui/style"
@@ -29,28 +30,34 @@ func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context
 			default:
 			}
 		}
-
+		opsTimeStringCharCount := utf8.RuneCountInString(log.OpsTimeString)
 		switch log.OpsSeverityLevel {
 		case logging.INFO:
+			contentString.WriteString(log.OpsTimeString)
+			contentString.WriteString("  ")
 			contentString.WriteString("[INFO]")
-			contentString.WriteString("   ")
+			contentString.WriteString(" ")
 			contentString.WriteString(log.OpsType)
 			contentString.WriteString("\n")
-			contentString.WriteString("         ")
+			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
 			contentString.WriteString(log.OpsCommand)
 		case logging.WARN:
+			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(log.OpsTimeString))
+			contentString.WriteString("  ")
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render("[WARN]"))
-			contentString.WriteString("   ")
+			contentString.WriteString(" ")
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(log.OpsType))
 			contentString.WriteString("\n")
-			contentString.WriteString("         ")
+			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(log.OpsDescription))
 		case logging.ERROR:
-			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render("[ERROR]"))
+			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsTimeString))
 			contentString.WriteString("  ")
+			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render("[ERROR]"))
+			contentString.WriteString(" ")
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsType))
 			contentString.WriteString("\n")
-			contentString.WriteString("         ")
+			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsDescription))
 		}
 

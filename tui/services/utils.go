@@ -163,6 +163,10 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 		getDiffTypeForVpLine1 = git.GETSTAGEDDIFF
 		vpLine1.Reset()
 		vpLine1.WriteString(fmt.Sprintf("%s\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.StagedTitle, fileStatus.FilePathname))
+	} else if !fileStatus.HasConflict && fileStatus.IndexState != " " && fileStatus.WorkTree == " " && fileStatus.IndexState != "?" && fileStatus.WorkTree != "?" {
+		getDiffTypeForVpLine1 = git.GETSTAGEDDIFF
+	} else if !fileStatus.HasConflict && fileStatus.IndexState == " " && fileStatus.WorkTree != " " && fileStatus.IndexState != "?" && fileStatus.WorkTree != "?" {
+		getDiffTypeForVpLine1 = git.GETUNSTAGEDDIFF
 	}
 
 	fileDiffLines1 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, getDiffTypeForVpLine1)

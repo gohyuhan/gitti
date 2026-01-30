@@ -88,7 +88,7 @@ func main() {
 		gitUpdateChannel := make(chan string)
 		tuiUpdateChannel := make(chan string)
 		loggingUpdateChannel := make(chan string)
-		gittiLogging := logging.InitGittiLogging(300, loggingUpdateChannel)
+		gittiLogging := logging.InitGittiLogging(300, loggingUpdateChannel, 3)
 
 		// initialization
 		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, gitUpdateChannel, gittiLogging)

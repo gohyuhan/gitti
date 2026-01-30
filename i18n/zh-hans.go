@@ -125,6 +125,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingLogComponent: []string{
 		"[enter] 查看日志内容",
+		"[e] 导出日志",
 	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右移动",

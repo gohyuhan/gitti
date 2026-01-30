@@ -286,7 +286,8 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			m.IsTyping.Store(false)
 		}
 	} else {
-		if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+		switch m.CurrentSelectedComponent {
+		case constant.ModifiedFilesComponent:
 			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if currentSelectedFileItem != nil {
 				currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
@@ -302,6 +303,10 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					})
 				}
 			}
+		case constant.LogComponent:
+			go func() {
+				m.GittiLogger.ExportLogging()
+			}()
 		}
 	}
 	return m, nil
