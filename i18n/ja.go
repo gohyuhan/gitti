@@ -576,4 +576,9 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "現在の入力フィールドの内容をクリップボードにコピー",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "/",
+		TitleOrInfoLine: "ログパネルにフォーカス",
+		LineType:        INFO,
+	},
 }

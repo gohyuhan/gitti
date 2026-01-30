@@ -575,4 +575,9 @@ var zhHantGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "將目前輸入框的內容複製到剪貼板",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "/",
+		TitleOrInfoLine: "聚焦到日誌面板",
+		LineType:        INFO,
+	},
 }

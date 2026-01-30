@@ -574,4 +574,9 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "yank (copy) content from current input field to clipboard",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "/",
+		TitleOrInfoLine: "focus on the log panel",
+		LineType:        INFO,
+	},
 }

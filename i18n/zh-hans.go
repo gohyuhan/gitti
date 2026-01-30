@@ -575,4 +575,9 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		TitleOrInfoLine: "将当前输入框的内容复制到剪贴板",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "/",
+		TitleOrInfoLine: "聚焦到日志面板",
+		LineType:        INFO,
+	},
 }
