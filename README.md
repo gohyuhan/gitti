@@ -206,6 +206,16 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.4.0]
+
+- feature: introduce copy and paste for input field
+- feature: add config for max count retrieval for commit logs (--max-commit-count)
+- feature: universal `--skip`
+- feature: build commit-graph goroutine function so large repo benefit from it to speed up git log retrieval
+- feature: add logging component panel and logging and log exporting feature
+- feature: reposition line staging mode into line editing in general and allow line discard
+- optimize: optimize branch,file,commit log and stash panel cursor reposition to retain selection
+
 ### [v0.3.1]
 
 - fix: fix for cherry pick selection reinit after applying cherry pick git operation is executed
