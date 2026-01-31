@@ -710,8 +710,38 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 		return
 	}
 
-	_, fileIndexExist := gf.filesPosition[filePathName]
+	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
+		file := gf.filesStatus[fileIndex]
+
+		// Check if line discard is applicable based on file status and what we're discarding
+		// Key insight:
+		// - For UNSTAGE (worktree changes): We patch the worktree against the INDEX, so "AM" works
+		// - For STAGE (index changes): We patch the INDEX against HEAD, so "A " doesn't work (no HEAD)
+
+		switch stageStatus {
+		case STAGE:
+			// Discarding from INDEX: File must exist in HEAD
+			// Cannot discard if file is newly added to index
+			isNewlyAddedToIndex := file.IndexState == "A" ||
+				file.IndexState == "?" ||
+				(file.IndexState == "U" && file.WorkTree == "A")
+
+			if isNewlyAddedToIndex {
+				gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.WARN, "Cannot discard staged line changes for newly added files (no HEAD to patch against). Please discard the entire file instead.", false)
+				return
+			}
+		case UNSTAGE:
+			// Discarding from WORKTREE: File must exist in INDEX or HEAD
+			// Cannot discard if file is completely untracked
+			isUntracked := file.IndexState == "?" && file.WorkTree == "?"
+
+			if isUntracked {
+				gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.WARN, "Cannot discard unstaged line changes for untracked files. Please discard the entire file instead.", false)
+				return
+			}
+		}
+
 		// Create a temporary patch file.
 		// This file will hold the unified diff content for the specific line we want to reverse.
 		tempPatchFile, createErr := os.CreateTemp("", "gitti-patch-discard-line-change-*")
