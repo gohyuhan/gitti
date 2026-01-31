@@ -41,16 +41,20 @@ const (
 	GitDiscardFileLineChangeConfirmPopUp       = "GitDiscardFileLineChangeConfirmPopUp"       // IsTyping will be false
 )
 
-const SelectedLeftPanelComponentHeightRatio = 0.4
+const (
+	SelectedLeftPanelComponentHeightRatio = 0.40
+	MinUnSelectedComponentPanelHeight     = 3 // this will ensure it will at least show 1 item within the list (so at its smallest. it will show, title, 1 item of the list and list counter)
+)
 
 const (
 	MinWidth  = 80
-	MinHeight = 27
+	MinHeight = 24
 
 	Padding                             = 1
 	MainPageKeyBindingLayoutPanelHeight = 1
 
-	MaxLogComponentHeight = 6
+	MinLogComponentHeight   = 4
+	LogComponentHeightRatio = 0.15
 
 	ListItemOrTitleWidthPad = 4
 

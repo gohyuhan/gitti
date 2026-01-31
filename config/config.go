@@ -79,6 +79,28 @@ func SetAllowCommitGraphWrite(allow string) {
 	}
 }
 
+func SetMaxLogCount(maxLog int) {
+	if maxLog < settings.GITTICONFIGSETTINGS.ShowXLog {
+		fmt.Printf(i18n.LANGUAGEMAPPING.MaxLogCountSetError+"\n", maxLog, settings.GITTICONFIGSETTINGS.ShowXLog)
+		os.Exit(1)
+	} else {
+		settings.UpdateMaxLogCount(maxLog)
+		fmt.Printf(i18n.LANGUAGEMAPPING.MaxLogCountSet+"\n", maxLog)
+		os.Exit(0)
+	}
+}
+
+func SetShowXLog(x int) {
+	if x > settings.GITTICONFIGSETTINGS.MaxLogCount {
+		fmt.Printf(i18n.LANGUAGEMAPPING.ShowXLogSetError+"\n", x, settings.GITTICONFIGSETTINGS.MaxLogCount)
+		os.Exit(1)
+	} else {
+		settings.UpdateShowXLog(x)
+		fmt.Printf(i18n.LANGUAGEMAPPING.ShowXLogSet+"\n", x)
+		os.Exit(0)
+	}
+}
+
 func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *logging.GittiLogging) (*api.GitOperations, api.GitRepoPath) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)

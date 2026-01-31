@@ -38,6 +38,7 @@ type GittiModel struct {
 	ModifiedFilesComponentPanelHeight         int
 	CommitLogComponentPanelHeight             int
 	StashComponentPanelHeight                 int
+	LogComponentPanelHeight                   int
 	CurrentRepoBranchesInfoList               list.Model
 	CurrentRepoModifiedFilesInfoList          list.Model
 	CurrentRepoCommitLogInfoList              list.Model

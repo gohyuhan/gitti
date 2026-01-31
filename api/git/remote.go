@@ -175,7 +175,6 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool) {
 	remoteSyncStatusCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	remoteSyncStatusOutput, remoteSyncStatusErr := remoteSyncStatusCmd.Output()
 	if remoteSyncStatusErr != nil {
-		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_SYNC_STATUS_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHECK_REMOTE_SYNC_STATUS_OPS, remoteSyncStatusErr.Error()), true)
 		gr.remoteSyncStatus = RemoteSyncStatus{}
 		return
 	}

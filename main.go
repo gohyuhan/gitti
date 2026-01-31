@@ -58,6 +58,8 @@ func main() {
 	setEditor := flag.Bool("editor", false, i18n.LANGUAGEMAPPING.FlagEditor)
 	setMaxCommitLogCount := flag.Int("max-commit-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxCommitLogCount)
 	allowCommitGraphWrite := flag.String("allow-commit-graph-write", "", i18n.LANGUAGEMAPPING.FlagAllowCommitGraphWrite)
+	setMaxLogCount := flag.Int("max-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxLogCount)
+	setShowXLog := flag.Int("show-x-log", 0, i18n.LANGUAGEMAPPING.FlagShowXLog)
 
 	flag.Parse()
 
@@ -83,12 +85,16 @@ func main() {
 		config.SetMaxCommitLogCount(*setMaxCommitLogCount)
 	case *allowCommitGraphWrite != "":
 		config.SetAllowCommitGraphWrite(*allowCommitGraphWrite)
+	case *setMaxLogCount > 0:
+		config.SetMaxLogCount(*setMaxLogCount)
+	case *setShowXLog > 0:
+		config.SetShowXLog(*setShowXLog)
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string)
 		tuiUpdateChannel := make(chan string)
 		loggingUpdateChannel := make(chan string)
-		gittiLogging := logging.InitGittiLogging(300, loggingUpdateChannel)
+		gittiLogging := logging.InitGittiLogging(settings.GITTICONFIGSETTINGS.MaxLogCount, loggingUpdateChannel, settings.GITTICONFIGSETTINGS.ShowXLog)
 
 		// initialization
 		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, gitUpdateChannel, gittiLogging)

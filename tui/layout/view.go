@@ -67,7 +67,7 @@ func GittiMainPageView(m *types.GittiModel) string {
 	commitLogPanel := renderCommitLogComponentPanel(m.WindowLeftPanelWidth, m.CommitLogComponentPanelHeight, m)
 	stashFilesPanel := renderStashComponentPanel(m.WindowLeftPanelWidth, m.StashComponentPanelHeight, m)
 	detailPanel := renderDetailComponentPanel(m.DetailComponentPanelWidth, m.DetailComponentPanelHeight, m)
-	logPanel := renderLogComponentPanel(m.DetailComponentPanelWidth, constant.MaxLogComponentHeight, m)
+	logPanel := renderLogComponentPanel(m.DetailComponentPanelWidth, m.LogComponentPanelHeight, m)
 	bottomBar := renderKeyBindingComponentPanel(m.Width, m)
 
 	leftPanel := lipgloss.JoinVertical(lipgloss.Left, GitStatusPanel, localBranchesPanel, modifiedFilesPanel, commitLogPanel, stashFilesPanel)

@@ -30,6 +30,8 @@ var zH_HANT = LanguageMapping{
 	FlagEditor:                          "設定由 gitti 啟動的編輯器",
 	FlagMaxCommitLogCount:               "設定顯示的提交記錄最大數量（預設為 2,500）。在大型儲存庫中檢索提交記錄時，設定過大的最大提交記錄數可能會導致效能問題",
 	FlagAllowCommitGraphWrite:           "允許建立 git 提交圖以提高在大型倉庫中檢索提交日誌時的效能",
+	FlagMaxLogCount:                     "設定記錄的 gitti 日誌最大數量",
+	FlagShowXLog:                        "設定在日誌面板中顯示的日誌數量",
 	FailToGetCWD:                        "無法取得目前工作目錄",
 	TuiRunFail:                          "發生錯誤",
 	OtherGitOpsIsRunningWarning:         "Gitti 中有其他 Git 操作正在執行, 請稍後再試",
@@ -52,6 +54,10 @@ var zH_HANT = LanguageMapping{
 	AllowCommitGraphWriteEnabled:        "已啟用允許寫入提交圖",
 	AllowCommitGraphWriteDisabled:       "已停用允許寫入提交圖",
 	AllowCommitGraphWriteSetError:       "輸入無效，請輸入 `true` 以啟用允許寫入提交圖，或輸入 `false` 以停用允許寫入提交圖",
+	MaxLogCountSet:                      "最大日誌記錄數已設定為 %d",
+	MaxLogCountSetError:                 "最大日誌記錄數不得少於 %d (目前 ShowXLog 為 %d)",
+	ShowXLogSet:                         "日誌面板顯示數量已設定為 %d",
+	ShowXLogSetError:                    "日誌面板顯示數量不得大於 %d (目前 MaxLogCount 為 %d)",
 	Branches:                            "分支",
 	ModifiedFiles:                       "已修改的檔案",
 	CommitLog:                           "提交記錄",
@@ -125,6 +131,7 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingLogComponent: []string{
 		"[enter] 查看日誌內容",
+		"[e] 導出日誌",
 	},
 	KeyBindingKeyDetailComponent: []string{
 		"[←/→] 左右移動",

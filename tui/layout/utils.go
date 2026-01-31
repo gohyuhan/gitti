@@ -13,7 +13,14 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.DetailComponentPanelWidth = m.Width - m.WindowLeftPanelWidth
 
 	m.WindowCoreContentHeight = m.Height - constant.MainPageKeyBindingLayoutPanelHeight - 2*constant.Padding
-	m.DetailComponentPanelHeight = m.WindowCoreContentHeight - 2*constant.Padding - constant.MaxLogComponentHeight
+
+	// calculate the log component height based on the ratio of the window core content height
+	logComponentHeight := int(float64(m.WindowCoreContentHeight) * constant.LogComponentHeightRatio)
+	// if the calculated log component height is less than the minimum log component height,
+	// set the log component height to the minimum log component height
+	logComponentHeight = max(logComponentHeight, constant.MinLogComponentHeight)
+	m.LogComponentPanelHeight = logComponentHeight
+	m.DetailComponentPanelHeight = m.WindowCoreContentHeight - 2*constant.Padding - logComponentHeight
 
 	// update the dynamic size of the left panel
 	LeftPanelDynamicResize(m)
@@ -35,10 +42,13 @@ func TuiWindowSizing(m *types.GittiModel) {
 
 	// log panel (the height is fixed)
 	m.CurrentLogComponentViewport.SetWidth(m.DetailComponentPanelWidth - 2)
-	m.CurrentLogComponentViewport.SetHeight(constant.MaxLogComponentHeight)
+	m.CurrentLogComponentViewport.SetHeight(m.LogComponentPanelHeight)
 }
 
 func LeftPanelDynamicResize(m *types.GittiModel) {
+	var unSelectedComponentPanelHeightPerComponent int
+	var selectedComponentPanelHeight int
+	remainingHeight := 0
 	// this is after reserving the height for the gitti status panel and also Padding
 	leftPanelRemainingHeight := m.WindowCoreContentHeight - 1 - ((len(constant.ComponentNavigationList) - 1) * 2)
 
@@ -46,10 +56,26 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	// and the one that got selected will not be account in to the dynamic height calculation
 	// ( gitti status component's height is fix at 3, while the selected one will always get 40% )
 	componentWithDynamicHeight := (len(constant.ComponentNavigationList) - 2)
-	unSelectedComponentPanelHeightPerComponent := int(int(float64(leftPanelRemainingHeight)*(1.0-constant.SelectedLeftPanelComponentHeightRatio)) / componentWithDynamicHeight)
-	selectedComponentPanelHeight := leftPanelRemainingHeight - (unSelectedComponentPanelHeightPerComponent * componentWithDynamicHeight)
+
+	// because log component is not a member of left panel, so if this panel was selected, we need top adjust the component with dynamic height as no component in left panel is selected in that case
+	if m.CurrentSelectedComponent == constant.LogComponent {
+		componentWithDynamicHeight = (len(constant.ComponentNavigationList) - 1)
+		unSelectedComponentPanelHeightPerComponent = int(leftPanelRemainingHeight / componentWithDynamicHeight)
+		// there will be possibility of some height remaining after divide and turn to int, so we use the original - (divided height*the count of component)
+		// the remainingHeight will be added to the height for modified file component
+		remainingHeight = leftPanelRemainingHeight - (unSelectedComponentPanelHeightPerComponent * componentWithDynamicHeight)
+	} else {
+		unSelectedComponentPanelHeightPerComponent = int(int(float64(leftPanelRemainingHeight)*(1.0-constant.SelectedLeftPanelComponentHeightRatio)) / componentWithDynamicHeight)
+		selectedComponentPanelHeight = leftPanelRemainingHeight - (unSelectedComponentPanelHeightPerComponent * componentWithDynamicHeight)
+	}
+
+	if unSelectedComponentPanelHeightPerComponent < constant.MinUnSelectedComponentPanelHeight {
+		unSelectedComponentPanelHeightPerComponent = constant.MinUnSelectedComponentPanelHeight
+		selectedComponentPanelHeight = leftPanelRemainingHeight - (unSelectedComponentPanelHeightPerComponent * componentWithDynamicHeight)
+	}
+
 	m.LocalBranchesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
-	m.ModifiedFilesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+	m.ModifiedFilesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent + remainingHeight
 	m.CommitLogComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.StashComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 
