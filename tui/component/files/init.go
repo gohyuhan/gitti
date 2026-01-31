@@ -18,18 +18,22 @@ import (
 func InitModifiedFilesList(m *types.GittiModel) bool {
 	latestModifiedFilesArray := m.GitOperations.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))
-	for _, modifiedFile := range latestModifiedFilesArray {
-		items = append(items, GitModifiedFilesItem(modifiedFile))
-	}
 
 	// get the previous selected file and see if it was within the new list if yes get the latest position of the previous selected file
 	previousSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	selectedFilesPosition := -1
 
-	for index, item := range items {
-		if item == previousSelectedFile {
-			selectedFilesPosition = index
-			break
+	if previousSelectedFile != nil {
+		for index, modifiedFile := range latestModifiedFilesArray {
+			// we use filepath name here to determine if it was the same file as the filepath name is unique
+			if modifiedFile.FilePathname == previousSelectedFile.(GitModifiedFilesItem).FilePathname {
+				selectedFilesPosition = index
+			}
+			items = append(items, GitModifiedFilesItem(modifiedFile))
+		}
+	} else {
+		for _, modifiedFile := range latestModifiedFilesArray {
+			items = append(items, GitModifiedFilesItem(modifiedFile))
 		}
 	}
 

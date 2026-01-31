@@ -18,25 +18,6 @@ func InitGitCommitLogList(m *types.GittiModel) bool {
 	latestGitCommitLog := m.GitOperations.GitCommitLog.GitCommitLogOutput()
 	var latestGitCommitLogItemArray []list.Item
 
-	for _, commitLog := range latestGitCommitLog {
-		laneCharList := make([]Cell, len(commitLog.LaneCharInfo))
-		for i, c := range commitLog.LaneCharInfo {
-			laneCharList[i] = Cell{
-				Char:    c.Char,
-				ColorID: c.ColorID,
-			}
-		}
-
-		latestGitCommitLogItemArray = append(latestGitCommitLogItemArray, GitCommitLogItem{
-			Hash:         commitLog.Hash,
-			Parents:      commitLog.Parents,
-			Message:      commitLog.Message,
-			Author:       commitLog.Author,
-			LaneCharList: laneCharList,
-			ColorID:      commitLog.ColorID,
-		})
-	}
-
 	// get the previous selected commit log and see if it was within the new list if yes get the latest position of the previous selected file
 	previousSelectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
 	var prevHash string
@@ -46,11 +27,46 @@ func InitGitCommitLogList(m *types.GittiModel) bool {
 	selectedCommitLogPosition := -1
 
 	if previousSelectedCommitLog != nil {
-		for index, item := range latestGitCommitLogItemArray {
-			if item.(GitCommitLogItem).Hash == prevHash {
+		for index, commitLog := range latestGitCommitLog {
+			//  we use hash here to determine if it was the same commit log as the hash is unique
+			if commitLog.Hash == prevHash {
 				selectedCommitLogPosition = index
-				break
 			}
+			laneCharList := make([]Cell, len(commitLog.LaneCharInfo))
+			for i, c := range commitLog.LaneCharInfo {
+				laneCharList[i] = Cell{
+					Char:    c.Char,
+					ColorID: c.ColorID,
+				}
+			}
+
+			latestGitCommitLogItemArray = append(latestGitCommitLogItemArray, GitCommitLogItem{
+				Hash:         commitLog.Hash,
+				Parents:      commitLog.Parents,
+				Message:      commitLog.Message,
+				Author:       commitLog.Author,
+				LaneCharList: laneCharList,
+				ColorID:      commitLog.ColorID,
+			})
+		}
+	} else {
+		for _, commitLog := range latestGitCommitLog {
+			laneCharList := make([]Cell, len(commitLog.LaneCharInfo))
+			for i, c := range commitLog.LaneCharInfo {
+				laneCharList[i] = Cell{
+					Char:    c.Char,
+					ColorID: c.ColorID,
+				}
+			}
+
+			latestGitCommitLogItemArray = append(latestGitCommitLogItemArray, GitCommitLogItem{
+				Hash:         commitLog.Hash,
+				Parents:      commitLog.Parents,
+				Message:      commitLog.Message,
+				Author:       commitLog.Author,
+				LaneCharList: laneCharList,
+				ColorID:      commitLog.ColorID,
+			})
 		}
 	}
 
