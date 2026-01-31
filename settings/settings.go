@@ -35,6 +35,8 @@ type GittiConfigSettings struct {
 	Editor                          string    `json:"editor"`
 	MaxCommitLogCount               int       `json:"max_commit_log_count"`
 	AllowCommitGraphWrite           bool      `json:"allow_commit_graph_write"`
+	MaxLogCount                     int       `json:"max_log_count"`
+	ShowXLog                        int       `json:"show_x_log"`
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
@@ -50,6 +52,8 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	Editor:                          "vim",
 	MaxCommitLogCount:               2500,
 	AllowCommitGraphWrite:           true,
+	MaxLogCount:                     300,
+	ShowXLog:                        3,
 }
 
 // getConfigPath returns the config.json path (creates directories if needed)
@@ -116,6 +120,12 @@ func InitOrReadConfig() {
 	}
 	cfg.FileWatcherDebounceMS = min(cfg.FileWatcherDebounceMS, MAXFILEWATCHERDEBOUNCEMS)
 	cfg.GitFilesActiveRefreshDurationMS = min(cfg.GitFilesActiveRefreshDurationMS, MAXGITFILESACTIVEREFRESHDURATIONMS)
+
+	// max log count should always be equal or larger than show x log
+	if cfg.MaxLogCount < cfg.ShowXLog {
+		cfg.MaxLogCount = cfg.ShowXLog
+		saveConfig(cfgPath, cfg)
+	}
 
 	GITTICONFIGSETTINGS = &cfg
 }
@@ -227,6 +237,22 @@ func UpdateMaxCommitLogCount(maxCount int) {
 
 func UpdateAllowCommitGraphWrite(allow bool) {
 	GITTICONFIGSETTINGS.AllowCommitGraphWrite = allow
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
+
+func UpdateMaxLogCount(maxLog int) {
+	GITTICONFIGSETTINGS.MaxLogCount = maxLog
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
+
+func UpdateShowXLog(x int) {
+	GITTICONFIGSETTINGS.ShowXLog = x
 	cfgPath, err := getConfigPath()
 	if err == nil {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)

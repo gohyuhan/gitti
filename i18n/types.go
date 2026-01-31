@@ -45,6 +45,8 @@ type LanguageMapping struct {
 	FlagEditor                string
 	FlagMaxCommitLogCount     string
 	FlagAllowCommitGraphWrite string
+	FlagMaxLogCount           string
+	FlagShowXLog              string
 	// Run Error
 	FailToGetCWD                string
 	TuiRunFail                  string
@@ -72,6 +74,10 @@ type LanguageMapping struct {
 	AllowCommitGraphWriteEnabled   string
 	AllowCommitGraphWriteDisabled  string
 	AllowCommitGraphWriteSetError  string
+	MaxLogCountSet                 string
+	MaxLogCountSetError            string
+	ShowXLogSet                    string
+	ShowXLogSetError               string
 	// Gitti UI text
 	Branches                    string
 	ModifiedFiles               string
