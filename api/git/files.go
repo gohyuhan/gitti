@@ -710,38 +710,8 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 		return
 	}
 
-	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	_, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
-		file := gf.filesStatus[fileIndex]
-
-		// Check if line discard is applicable based on file status and what we're discarding
-		// Key insight:
-		// - For UNSTAGE (worktree changes): We patch the worktree against the INDEX, so "AM" works
-		// - For STAGE (index changes): We patch the INDEX against HEAD, so "A " doesn't work (no HEAD)
-
-		switch stageStatus {
-		case STAGE:
-			// Discarding from INDEX: File must exist in HEAD
-			// Cannot discard if file is newly added to index
-			isNewlyAddedToIndex := file.IndexState == "A" ||
-				file.IndexState == "?" ||
-				(file.IndexState == "U" && file.WorkTree == "A")
-
-			if isNewlyAddedToIndex {
-				gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.WARN, "Cannot discard staged line changes for newly added files (no HEAD to patch against). Please discard the entire file instead.", false)
-				return
-			}
-		case UNSTAGE:
-			// Discarding from WORKTREE: File must exist in INDEX or HEAD
-			// Cannot discard if file is completely untracked
-			isUntracked := file.IndexState == "?" && file.WorkTree == "?"
-
-			if isUntracked {
-				gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.WARN, "Cannot discard unstaged line changes for untracked files. Please discard the entire file instead.", false)
-				return
-			}
-		}
-
 		// Create a temporary patch file.
 		// This file will hold the unified diff content for the specific line we want to reverse.
 		tempPatchFile, createErr := os.CreateTemp("", "gitti-patch-discard-line-change-*")
@@ -757,7 +727,7 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 
 		// Generate and write the patch content.
 		// We reuse generateStageLinePatchString because the patch structure is the same.
-		_, writeErr = tempPatchFile.WriteString(generateDiscardLinePatchString(diffContentStringArray, actualDiscardLineIndex))
+		_, writeErr = tempPatchFile.WriteString(generateDiscardLinePatchString(diffContentStringArray, actualDiscardLineIndex, filePathName))
 		if writeErr != nil {
 			gf.logging.RegisterNewLog(logging.DISCARD_LINE_CHANGES_OPS, "", logging.ERROR, fmt.Sprintf("[WRITE TEMP FILE ERROR]: %s", writeErr.Error()), false)
 			tempPatchFile.Close() // Close before return
@@ -772,11 +742,8 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 
 		switch stageStatus {
 		case STAGE:
-			// Discarding a change that is already STAGED means unstaging it.
-			// We apply the reverse patch to the index (--cached).
 			gitArgs = []string{"apply", "--cached", "--unidiff-zero", "--recount", "--whitespace=nowarn", tempPatchFile.Name()}
 		case UNSTAGE:
-			// Discarding a change that is UNSTAGED (only in worktree) means discarding it from the worktree.
 			gitArgs = []string{"apply", "--unidiff-zero", "--recount", "--whitespace=nowarn", tempPatchFile.Name()}
 		}
 
@@ -798,13 +765,16 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 // 1. The TARGET line's operator is swapped (+ becomes -, - becomes +) to "undo" it.
 // 2. OTHER added lines (+) are converted to context space (' ') because they already exist in the target state.
 // 3. OTHER deleted lines (-) are skipped because they do not exist in the target state.
-func generateDiscardLinePatchString(diffContentStringArray []string, actualDiscardLineIndex int) string {
+// 4. Special /dev/null paths are transformed to actual file paths for newly added/deleted files.
+func generateDiscardLinePatchString(diffContentStringArray []string, actualDiscardLineIndex int, filePathName string) string {
 	var discardLinePatchString strings.Builder
 
 	lastLineWasSkipped := false
 	for index, diffLine := range diffContentStringArray {
 		if utf8.RuneCountInString(diffLine) > 0 {
-			// Handle special markers
+			// ---------------------------------------------------------
+			// HANDLE SPECIAL MARKERS AND HEADERS
+			// ---------------------------------------------------------
 			if strings.HasPrefix(diffLine, "\\ No newline") {
 				if lastLineWasSkipped {
 					continue
@@ -813,6 +783,29 @@ func generateDiscardLinePatchString(diffContentStringArray []string, actualDisca
 				discardLinePatchString.WriteString("\n")
 				continue
 			}
+			// Skip "new file mode" and "deleted file mode" headers
+			if strings.HasPrefix(diffLine, "new file mode") || strings.HasPrefix(diffLine, "deleted file mode") {
+				continue
+			}
+			// Transform /dev/null paths for newly added files
+			// For discarding from the worktree, we need --- a/file, not --- /dev/null
+			if strings.HasPrefix(diffLine, "--- /dev/null") {
+				discardLinePatchString.WriteString("--- a/")
+				discardLinePatchString.WriteString(filePathName)
+				discardLinePatchString.WriteString("\n")
+				lastLineWasSkipped = false
+				continue
+			}
+			// Transform /dev/null paths for deleted files
+			// For discarding deletions, we might need +++ b/file instead of +++ /dev/null
+			if strings.HasPrefix(diffLine, "+++ /dev/null") {
+				discardLinePatchString.WriteString("+++ b/")
+				discardLinePatchString.WriteString(filePathName)
+				discardLinePatchString.WriteString("\n")
+				lastLineWasSkipped = false
+				continue
+			}
+
 			// TARGET LINE: Swap the operator to reverse the change
 			if index == actualDiscardLineIndex {
 				if utf8.RuneCountInString(diffLine) > 1 {
@@ -860,7 +853,7 @@ func generateDiscardLinePatchString(diffContentStringArray []string, actualDisca
 					lastLineWasSkipped = true
 					continue
 				} else {
-					// Keep existing context lines as is.
+					// Keep existing context lines (including ---, +++, diff, index, @@) as is.
 					discardLinePatchString.WriteString(diffLine)
 					discardLinePatchString.WriteString("\n")
 					lastLineWasSkipped = false
