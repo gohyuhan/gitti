@@ -206,6 +206,10 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.4.1]
+
+- hotfix: prevent deadlock in main thread by moving checking into goroutine when user navigate a list quickly which cause detail panel to constantly cancel and fetch relevant content
+
 ### [v0.4.0]
 
 - feature: introduce copy and paste for input field
