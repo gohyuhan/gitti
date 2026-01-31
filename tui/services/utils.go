@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
@@ -42,19 +43,23 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		m.DetailComponentPanelInfoFetchCancelFunc()
 	}
 
-	// Wait for the previous goroutine to finish (its defer will set processing to false),
-	// then atomically set it to true before starting a new one.
-	for !m.IsDetailComponentPanelInfoFetchProcessing.CompareAndSwap(false, true) {
-		// The previous goroutine is still running, wait a tiny bit
-	}
-
 	ctx, cancel := context.WithCancel(context.Background())
 	m.DetailComponentPanelInfoFetchCancelFunc = cancel
 	go func(ctx context.Context) {
-		defer func() {
-			cancel()
-			m.IsDetailComponentPanelInfoFetchProcessing.Store(false)
-		}()
+		defer cancel()
+
+		// Wait for the previous goroutine to finish (its defer will set processing to false),
+		// then atomically set it to true before starting a new one.
+		for !m.IsDetailComponentPanelInfoFetchProcessing.CompareAndSwap(false, true) {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				// The previous goroutine is still running, wait a bit
+				time.Sleep(10 * time.Millisecond)
+			}
+		}
+		defer m.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 
 		var contentLine string
 		var contentLine2 string // fro detail panel 2nd (only used for files changes to show staged and unstaged diff in seperated panel)
