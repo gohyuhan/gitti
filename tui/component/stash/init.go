@@ -19,18 +19,21 @@ import (
 func InitStashList(m *types.GittiModel) bool {
 	latestStashArray := m.GitOperations.GitStash.AllStash()
 	items := make([]list.Item, 0, len(latestStashArray))
-	for _, stashInfo := range latestStashArray {
-		items = append(items, GitStashItem(stashInfo))
-	}
 
-	// get the previous selected file and see if it was within the new list if yes get the latest position of the previous selected file
+	// get the previous selected stash and see if it was within the new list if yes get the latest position of the previous selected stash
 	previousSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
-	selectedFilesPosition := -1
+	selectedStashPosition := -1
 
-	for index, item := range items {
-		if item == previousSelectedStash {
-			selectedFilesPosition = index
-			break
+	if previousSelectedStash != nil {
+		for index, stashInfo := range latestStashArray {
+			if stashInfo.Id == previousSelectedStash.(GitStashItem).Id {
+				selectedStashPosition = index
+			}
+			items = append(items, GitStashItem(stashInfo))
+		}
+	} else {
+		for _, stashInfo := range latestStashArray {
+			items = append(items, GitStashItem(stashInfo))
 		}
 	}
 	previousStashCount := len(m.CurrentRepoStashInfoList.Items())
@@ -54,9 +57,9 @@ func InitStashList(m *types.GittiModel) bool {
 		return len(items) != previousStashCount
 	}
 
-	if selectedFilesPosition >= 0 {
-		m.CurrentRepoStashInfoList.Select(selectedFilesPosition)
-		m.ListNavigationIndexPosition.StashComponent = selectedFilesPosition
+	if selectedStashPosition >= 0 {
+		m.CurrentRepoStashInfoList.Select(selectedStashPosition)
+		m.ListNavigationIndexPosition.StashComponent = selectedStashPosition
 	} else {
 		if m.ListNavigationIndexPosition.StashComponent > len(m.CurrentRepoStashInfoList.Items())-1 {
 			m.CurrentRepoStashInfoList.Select(len(m.CurrentRepoStashInfoList.Items()) - 1)
