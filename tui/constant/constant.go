@@ -91,7 +91,7 @@ const (
 	MaxGitCherryPickApplyConfirmPopUpWidth             = 150
 	MaxGitDiscardFileLineChangeConfirmPopUpWidth       = 150
 
-	PopUpGlobalKeyBindingViewPortHeight                = 30
+	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10
 	PopUpGitAmendCommitOutputViewPortHeight            = 10
 	PopUpAddRemoteOutputViewPortHeight                 = 2

@@ -27,7 +27,7 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 
 	switch m.PopUpType {
 	case constant.GlobalKeyBindingPopUp:
-		popUp = keybinding.RenderGlobalKeyBindingPopUp(m)
+		popUp = keybinding.RenderKeyBindingPopUp(m)
 	case constant.CommitPopUp:
 		popUp = commit.RenderGitCommitPopUp(m)
 	case constant.AmendCommitPopUp:

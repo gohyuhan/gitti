@@ -78,27 +78,27 @@ var jA = LanguageMapping{
 	CherryPickOpsSelectionTitle:         "チェリーピック操作の選択",
 	CherryPickApplyConfirmTitle:         "チェリーピックされたコミットを現在のチェックアウト中のブランチに適用してもよろしいですか: \n %s",
 	KeyBindingForGitStatusComponent: []string{
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新しいブランチ",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] ブランチ切り替え",
 		"[n] 新しいブランチ",
 		"[d] ブランチを削除",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
 		"[space] この変更をステージ",
 		"[e] 編集",
 		"[r] 競合を解決",
 		"[enter] 変更内容を表示",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] この変更のステージを解除",
@@ -107,7 +107,7 @@ var jA = LanguageMapping{
 		"[S] すべての変更をスタッシュ",
 		"[d] 変更を破棄",
 		"[enter] 変更内容を表示",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] この変更をステージ",
@@ -116,10 +116,10 @@ var jA = LanguageMapping{
 		"[S] すべての変更をスタッシュ",
 		"[d] 変更を破棄",
 		"[enter] 変更内容を表示",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下に移動",
@@ -127,7 +127,7 @@ var jA = LanguageMapping{
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingLogComponent: []string{
 		"[enter] ログ内容を表示",
@@ -137,14 +137,14 @@ var jA = LanguageMapping{
 		"[←/→] 左右に移動",
 		"[↑/↓] 上下に移動",
 		"[esc] 戻る",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] 左右に移動",
 		"[↑/↓] 上下に移動",
 		"[L] 行編集モードに入る",
 		"[esc] 戻る",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] 左右に移動",
@@ -152,7 +152,7 @@ var jA = LanguageMapping{
 		"[d] 行の変更を破棄",
 		"[space] ステージ/アンステージ",
 		"[esc] 行編集モードを終了",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingKeyStashComponent: []string{
 		"[↑/↓] 上下に移動",
@@ -160,10 +160,10 @@ var jA = LanguageMapping{
 		"[backspace] ポップ",
 		"[d] 破棄",
 		"[enter] スタッシュ内容を表示",
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingKeyStashComponentNone: []string{
-		"[?] グローバルキー操作",
+		"[?] キー操作と説明",
 	},
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 次の入力欄に移動",
@@ -307,6 +307,13 @@ var jA = LanguageMapping{
 		"[esc] 閉じる",
 	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
+	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
+	ModifiedFilesComponentKeyBinding:                         jaModifiedFilesComponentKeyBinding,
+	CommitLogComponentKeyBinding:                             jaCommitLogComponentKeyBinding,
+	StashComponentKeyBinding:                                 jaStashComponentKeyBinding,
+	LogComponentKeyBinding:                                   jaLogComponentKeyBinding,
+	DetailComponentKeyBinding:                                jaDetailComponentKeyBinding,
+	FeatureInstructions:                                      jaFeatureInstructions,
 	CommitPopUpMessageTitle:                                  "* コミットメッセージ",
 	CommitPopUpMessageInputPlaceHolder:                       "コミットメッセージを入力",
 	CommitPopUpDescriptionTitle:                              "説明",
@@ -447,7 +454,7 @@ var aboutGittiJa = []string{
 }
 
 // the global key binding for ja
-var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
+var jaGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "",
 		TitleOrInfoLine: "-- グローバルキー操作 --",
@@ -549,11 +556,6 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ / ]",
-		TitleOrInfoLine: "ステージ済みおよびステージなしの差分詳細パネル間を移動",
-		LineType:        INFO,
-	},
-	{
 		KeyBindingLine:  "- / +",
 		TitleOrInfoLine: "左パネルの幅の比率を増減",
 		LineType:        INFO,
@@ -587,5 +589,600 @@ var jaGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "ログパネルにフォーカス",
 		LineType:        INFO,
+	},
+}
+
+// Local Branch Component Key Binding for ja
+var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- ローカルブランチコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "ブランチ切り替え",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新しいブランチを作成",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "ブランチを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Modified Files Component Key Binding for ja
+var jaModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 変更ファイルコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "変更をステージ / アンステージ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "変更内容を表示",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "変更を破棄",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "ファイルを編集",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "s",
+		TitleOrInfoLine: "ファイルをスタッシュ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "S",
+		TitleOrInfoLine: "すべてのファイルをスタッシュ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "競合を解決",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Commit Log Component Key Binding for ja
+var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- コミットログコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "コミットログの内容を表示",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "このコミットにリセット",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "R",
+		TitleOrInfoLine: "最新のコミットをリセット",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "チェリーピック操作を開始",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Stash Component Key Binding for ja
+var jaStashComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- スタッシュコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "適用",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "ポップ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "破棄",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "スタッシュ内容を表示",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Log Component Key Binding for ja
+var jaLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- ログコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "ログ内容を表示",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "ログをエクスポート",
+		LineType:        INFO,
+	},
+}
+
+// Detail Component Key Binding for ja
+var jaDetailComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 詳細コンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "L",
+		TitleOrInfoLine: "行編集モードに入る (変更ファイルコンポーネントから詳細ビューに入った場合のみ)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ / ]",
+		TitleOrInfoLine: "ステージ済みおよび未ステージの差分詳細パネル間を移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "戻る",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "←/→",
+		TitleOrInfoLine: "左右に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "** 行編集モードのみのキー操作 **",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "行の変更を破棄",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "ステージ/アンステージ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "行編集モードを終了",
+		LineType:        INFO,
+	},
+}
+
+// Feature Instructions for ja
+var jaFeatureInstructions = []FeatureInstructionMappingFormat{
+	{
+		Feature:          "",
+		InstructionLines: []string{""},
+		LineType:         TITLE,
+	},
+	{
+		Feature:          "",
+		InstructionLines: []string{""},
+		LineType:         INFO,
+	},
+	{
+		Feature: "コミット (commit)",
+		InstructionLines: []string{
+			"1. 変更がステージされていることを確認してください（ファイルで `space` または全体で `ctrl+s`）",
+			"2. `c` を押してコミットポップアップを開く",
+			"3. コミットメッセージを入力",
+			"   - オプションで `tab` を押して説明を追加",
+			"   - `shift+tab` でメッセージフィールドに戻る",
+			"4. `ctrl+e` を押してコミット",
+			"5. `esc` を押してポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "コミットを修正 (amend commit)",
+		InstructionLines: []string{
+			"1. 追加の変更を行いステージする（またはメッセージのみを変更）",
+			"2. `A`（Shift+a）を押してコミット修正ポップアップを開く",
+			"3. コミットメッセージまたは説明を編集",
+			"   - `tab` / `shift+tab` でフィールド間を移動",
+			"4. `ctrl+e` を押して最新のコミットを修正",
+			"5. `esc` を押して閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "プッシュ (push)",
+		InstructionLines: []string{
+			"1. `p` を押してプッシュを開始",
+			"2. 複数のリモートが存在する場合、`↑/↓` で選択して `enter` を押す",
+			"3. プッシュタイプを選択:",
+			"   - 通常プッシュ",
+			"   - 強制プッシュ（安全）- リースあり",
+			"   - 強制プッシュ（危険）- 保護なし",
+			"4. `enter` を押して実行",
+			"5. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "プル (pull)",
+		InstructionLines: []string{
+			"1. `P`（Shift+p）を押してプルを開始",
+			"2. プル戦略を選択:",
+			"   - プル - 標準的な git pull",
+			"   - リベース - リベースでプル",
+			"   - マージ - マージでプル",
+			"3. `enter` を押して実行",
+			"4. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ファイルをステージ (stage file)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. `↑/↓` でアンステージされたファイルを選択",
+			"3. `space` を押してファイルをステージ",
+			"",
+			"すべてをステージ:",
+			"- `ctrl+s` をグローバルに押してすべての変更をステージ",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ファイルのステージを解除 (unstage file)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. `↑/↓` でステージされたファイルを選択",
+			"3. `space` を押してファイルのステージを解除",
+			"",
+			"すべてのステージを解除:",
+			"- `ctrl+u` をグローバルに押してすべての変更のステージを解除",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "行をステージ (stage line)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. ファイルを選択して `enter` を押して差分を表示",
+			"3. `L`（Shift+l）を押して行編集モードに入る",
+			"4. `↑/↓` でステージしたい行に移動",
+			"5. `space` を押してその特定の行をステージ",
+			"6. `esc` を押して行編集モードを終了",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "行のステージを解除 (unstage line)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. ファイルを選択して `enter` を押して差分を表示",
+			"3. ステージされた変更を表示（必要に応じて `[` でステージビューに切り替え）",
+			"4. `L`（Shift+l）を押して行編集モードに入る",
+			"5. `↑/↓` でステージを解除したい行に移動",
+			"6. `space` を押してその特定の行のステージを解除",
+			"7. `esc` を押して行編集モードを終了",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ファイルの変更を破棄 (discard file)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. `↑/↓` でファイルを選択",
+			"3. `d` を押して破棄オプションを開く",
+			"4. 破棄タイプを選択:",
+			"   - すべての変更を破棄（ステージ済みおよび未ステージ）",
+			"   - 未ステージの変更のみを破棄",
+			"   - 変更を破棄して名前変更を取り消す（名前変更されたファイルの場合）",
+			"5. `enter` を押して確認",
+			"6. 操作を確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "行の変更を破棄 (discard line)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. ファイルを選択して `enter` を押して差分を表示",
+			"3. `L`（Shift+l）を押して行編集モードに入る",
+			"4. `↑/↓` で破棄したい行に移動",
+			"5. `d` を押してその特定の行の変更を破棄",
+			"6. 破棄操作を確認",
+			"7. `esc` を押して行編集モードを終了",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "競合を解決 (resolve conflict)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. 競合しているファイルを選択",
+			"3. `r` を押して解決オプションを開く",
+			"4. 解決方法を選択:",
+			"   - マージを再開（競合マーカーを復元）",
+			"   - ours の変更を採用",
+			"   - theirs の変更を採用",
+			"5. `enter` を押して適用",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ファイルをスタッシュ (stash file)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントに移動（`2` を押す）",
+			"2. `↑/↓` でファイルを選択",
+			"3. `s` を押してファイルをスタッシュ",
+			"4. オプションのスタッシュメッセージを入力",
+			"5. `enter` を押して続行",
+			"6. スタッシュ操作を確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "すべてをスタッシュ (stash all)",
+		InstructionLines: []string{
+			"1. 変更されたファイルコンポーネントから `S`（Shift+s）を押す",
+			"2. オプションのスタッシュメッセージを入力",
+			"3. `enter` を押して続行",
+			"4. すべての変更をスタッシュすることを確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "スタッシュを適用 (stash apply)",
+		InstructionLines: []string{
+			"1. スタッシュコンポーネントに移動（`4` を押す）",
+			"2. `↑/↓` でスタッシュを選択",
+			"3. `space` を押してスタッシュを適用",
+			"4. 操作を確認",
+			"   - 適用後もスタッシュはリストに残ります",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "スタッシュをポップ (stash pop)",
+		InstructionLines: []string{
+			"1. スタッシュコンポーネントに移動（`4` を押す）",
+			"2. `↑/↓` でスタッシュを選択",
+			"3. `backspace` を押してスタッシュをポップ",
+			"4. 操作を確認",
+			"   - スタッシュは適用されリストから削除されます",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "スタッシュを削除 (stash drop)",
+		InstructionLines: []string{
+			"1. スタッシュコンポーネントに移動（`4` を押す）",
+			"2. `↑/↓` でスタッシュを選択",
+			"3. `d` を押してスタッシュを削除",
+			"4. 操作を確認",
+			"   - スタッシュは完全に削除されます",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ブランチを作成 (create branch)",
+		InstructionLines: []string{
+			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"2. `n` を押してブランチ作成オプションを開く",
+			"3. 選択:",
+			"   - 新しいブランチを作成（現在のブランチに留まる）",
+			"   - 新しいブランチを作成して切り替え（変更を移動）",
+			"   - リモートに基づいてブランチを作成",
+			"4. `enter` を押して確認",
+			"5. 新しいブランチ名を入力",
+			"6. `enter` を押して作成",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ブランチを切り替え (switch branch)",
+		InstructionLines: []string{
+			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"2. `↑/↓` で対象ブランチを選択",
+			"3. `enter` を押して切り替えを開始",
+			"4. 切り替えタイプを選択:",
+			"   - 変更なしで切り替え（現在の変更はスタッシュされます）",
+			"   - 変更ありで切り替え（変更を新しいブランチに移動）",
+			"5. `enter` を押して確認",
+			"6. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ブランチを削除 (delete branch)",
+		InstructionLines: []string{
+			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"2. `↑/↓` で削除するブランチを選択",
+			"   - 現在チェックアウト中のブランチは削除できません",
+			"3. `d` を押して削除を開始",
+			"4. `enter` を押して確認",
+			"5. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "最新のコミットをリセット (reset latest commit)",
+		InstructionLines: []string{
+			"1. コミットログコンポーネントから `R`（Shift+r）を押す",
+			"2. リセットタイプを選択:",
+			"   - ソフト - 変更をステージしたまま保持",
+			"   - ミックス - 変更を保持、ステージ解除",
+			"   - ハード - すべての変更を完全に破棄",
+			"3. `enter` を押して選択",
+			"4. リセットを確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "コミットにリセット (reset to commit)",
+		InstructionLines: []string{
+			"1. コミットログコンポーネントに移動（`3` を押す）",
+			"2. `↑/↓` で対象コミットを選択",
+			"3. `r` を押してリセットを開始",
+			"4. リセットタイプを選択:",
+			"   - ソフト - 変更をステージしたまま保持",
+			"   - ミックス - 変更を保持、ステージ解除",
+			"   - ハード - すべての変更を完全に破棄",
+			"5. `enter` を押して選択",
+			"6. リセットを確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "チェリーピック (cherry pick)",
+		InstructionLines: []string{
+			"1. コミットログコンポーネントに移動（`3` を押す）",
+			"2. `ctrl+p` を押してチェリーピックメニューを開く",
+			"3. 「チェリーピック」を選択して `enter` を押す",
+			"4. `↑/↓` でコミットを移動",
+			"5. `space` を押してコミットを選択/選択解除",
+			"6. `e` を押して選択を編集（オプション）",
+			"7. `a` を押して選択したコミットを適用",
+			"8. チェリーピックの適用を確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "リモートを追加 (add remote)",
+		InstructionLines: []string{
+			"1. リモートが存在しないときに `p` を押す",
+			"2. 「リモートを追加」ポップアップが自動的に表示されます",
+			"3. リモート名を入力（例: 'origin'）",
+			"4. `tab` を押してURLフィールドに移動",
+			"5. リモートURLを入力:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. `enter` を押してリモートを追加",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "Git操作を続行 (continue git operation)",
+		InstructionLines: []string{
+			"Git操作が一時停止している場合（マージ、リベース、チェリーピックなど）:",
+			"",
+			"1. 必要に応じて競合を解決",
+			"2. 解決したファイルをステージ",
+			"3. `C`（Shift+c）を押して操作を続行",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "Git操作を中止 (abort git operation)",
+		InstructionLines: []string{
+			"Git操作が一時停止している場合（マージ、リベース、チェリーピックなど）:",
+			"",
+			"1. `ctrl+a` を押して操作を中止",
+			"2. 操作からのすべての変更が破棄されます",
+			"3. リポジトリは操作前の状態に戻ります",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "Git操作をスキップ (skip git operation)",
+		InstructionLines: []string{
+			"リベース、リバート、またはチェリーピック中:",
+			"",
+			"1. `ctrl+k` を押して現在のコミットをスキップ",
+			"2. 操作は次のコミットで続行されます",
+		},
+		LineType: INFO,
 	},
 }

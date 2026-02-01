@@ -91,9 +91,9 @@ func main() {
 		config.SetShowXLog(*setShowXLog)
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
-		gitUpdateChannel := make(chan string)
-		tuiUpdateChannel := make(chan string)
-		loggingUpdateChannel := make(chan string)
+		gitUpdateChannel := make(chan string, 32)
+		tuiUpdateChannel := make(chan string, 32)
+		loggingUpdateChannel := make(chan string, 64)
 		gittiLogging := logging.InitGittiLogging(settings.GITTICONFIGSETTINGS.MaxLogCount, loggingUpdateChannel, settings.GITTICONFIGSETTINGS.ShowXLog)
 
 		// initialization

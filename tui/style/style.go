@@ -58,15 +58,17 @@ var (
 					Foreground(ColorBlueMuted).
 					Faint(true)
 
-	GlobalKeyBindingPopUpStyle = NewStyle.
-					Border(lipgloss.ThickBorder()).
-					Padding(0).
-					Margin(0).
-					BorderForeground(ColorPurpleSoft)
-	GlobalKeyBindingTitleLineStyle = NewStyle.
+	KeyBindingPopUpStyle = NewStyle.
+				Border(lipgloss.ThickBorder()).
+				Padding(0).
+				Margin(0).
+				BorderForeground(ColorPurpleSoft)
+	KeyBindingTitleLineStyle = NewStyle.
 					Foreground(ColorPurpleSoft)
-	GlobalKeyBindingKeyMappingLineStyle = NewStyle.
-						Foreground(ColorCyanSoft)
+	KeyBindingKeyMappingLineStyle = NewStyle.
+					Foreground(ColorCyanSoft)
+	KeyBindingKeyMappingWarnStyle = NewStyle.
+					Foreground(ColorYellowWarm)
 
 	DiffOldLineStyle = NewStyle.
 				Foreground(ColorError)

@@ -12,61 +12,68 @@ import (
 )
 
 type GittiModel struct {
-	GittiLogger                               *logging.GittiLogging
-	IsRenderInit                              atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
-	UserSetEditor                             string
-	TuiUpdateChannel                          chan string
-	CurrentSelectedComponent                  string
-	CurrentSelectedComponentIndex             int
-	TotalComponentCount                       int
-	RepoPath                                  string
-	RepoName                                  string
-	CheckOutBranch                            string
-	RemoteSyncLocalState                      string
-	RemoteSyncRemoteState                     string
-	CurrentGitRepoStatus                      string
-	BranchUpStream                            string
-	TrackedUpstreamOrBranchIcon               string
-	Width                                     int
-	Height                                    int
-	WindowLeftPanelWidth                      int // this is the left part of the window
-	WindowLeftPanelRatio                      float64
-	DetailComponentPanelWidth                 int // this is the right part of the window, will always be for detail component panel only
-	WindowCoreContentHeight                   int // this is the height of the part where key binding panel is not included
-	DetailComponentPanelHeight                int
-	LocalBranchesComponentPanelHeight         int
-	ModifiedFilesComponentPanelHeight         int
-	CommitLogComponentPanelHeight             int
-	StashComponentPanelHeight                 int
-	LogComponentPanelHeight                   int
-	CurrentRepoBranchesInfoList               list.Model
-	CurrentRepoModifiedFilesInfoList          list.Model
-	CurrentRepoCommitLogInfoList              list.Model
-	CurrentRepoStashInfoList                  list.Model
-	DetailPanelParentComponent                string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
-	DetailPanelViewport                       viewport.Model
-	DetailPanelViewportOffset                 int
-	DetailPanelTwoViewport                    viewport.Model
-	DetailPanelTwoViewportOffset              int
-	ShowDetailPanelTwo                        atomic.Bool
-	DetailComponentPanelLayout                string
-	CurrentLogComponentViewport               viewport.Model
-	ListNavigationIndexPosition               GittiComponentsCurrentListNavigationIndexPosition
-	ShowPopUp                                 atomic.Bool
-	PopUpType                                 string
-	PopUpModel                                interface{}
-	IsTyping                                  atomic.Bool
-	GitOperations                             *api.GitOperations
-	GlobalKeyBindingKeyMapLargestLen          int                // this was use for global key binding pop up styling, we save it once so we don't have to recompute
-	DetailComponentPanelInfoFetchCancelFunc   context.CancelFunc // this was to cancel the fetch detail oepration
-	IsDetailComponentPanelInfoFetchProcessing atomic.Bool
-	IsLineEditingState                        atomic.Bool
-	LineEditingIndexPositionAndInfo           GittiLineEditingIndexPositionAndInfo
-	LineEditingIndexCursorViewport            viewport.Model
-	LineEditingIndexCursorTwoViewport         viewport.Model
-	DetailPanelViewportOGStringArray          []string
-	DetailPanelTwoViewportOGStringArray       []string
-	CherryPickedCommitInfo                    CherryPickedCommitInfo
+	GittiLogger                                      *logging.GittiLogging
+	IsRenderInit                                     atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
+	UserSetEditor                                    string
+	TuiUpdateChannel                                 chan string
+	CurrentSelectedComponent                         string
+	CurrentSelectedComponentIndex                    int
+	TotalComponentCount                              int
+	RepoPath                                         string
+	RepoName                                         string
+	CheckOutBranch                                   string
+	RemoteSyncLocalState                             string
+	RemoteSyncRemoteState                            string
+	CurrentGitRepoStatus                             string
+	BranchUpStream                                   string
+	TrackedUpstreamOrBranchIcon                      string
+	Width                                            int
+	Height                                           int
+	WindowLeftPanelWidth                             int // this is the left part of the window
+	WindowLeftPanelRatio                             float64
+	DetailComponentPanelWidth                        int // this is the right part of the window, will always be for detail component panel only
+	WindowCoreContentHeight                          int // this is the height of the part where key binding panel is not included
+	DetailComponentPanelHeight                       int
+	LocalBranchesComponentPanelHeight                int
+	ModifiedFilesComponentPanelHeight                int
+	CommitLogComponentPanelHeight                    int
+	StashComponentPanelHeight                        int
+	LogComponentPanelHeight                          int
+	CurrentRepoBranchesInfoList                      list.Model
+	CurrentRepoModifiedFilesInfoList                 list.Model
+	CurrentRepoCommitLogInfoList                     list.Model
+	CurrentRepoStashInfoList                         list.Model
+	DetailPanelParentComponent                       string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
+	DetailPanelViewport                              viewport.Model
+	DetailPanelViewportOffset                        int
+	DetailPanelTwoViewport                           viewport.Model
+	DetailPanelTwoViewportOffset                     int
+	ShowDetailPanelTwo                               atomic.Bool
+	DetailComponentPanelLayout                       string
+	CurrentLogComponentViewport                      viewport.Model
+	ListNavigationIndexPosition                      GittiComponentsCurrentListNavigationIndexPosition
+	ShowPopUp                                        atomic.Bool
+	PopUpType                                        string
+	PopUpModel                                       interface{}
+	IsTyping                                         atomic.Bool
+	GitOperations                                    *api.GitOperations
+	GlobalKeyBindingKeyMapLargestLen                 int                // this was use for global key binding pop up styling, we save it once so we don't have to recompute
+	LocalBranchComponentKeyBindingKeyMapLargestLen   int                // this was use for local branch component key binding pop up styling, we save it once so we don't have to recompute
+	ModifiedFilesComponentKeyBindingKeyMapLargestLen int                // this was use for modified files component key binding pop up styling, we save it once so we don't have to recompute
+	CommitLogComponentKeyBindingKeyMapLargestLen     int                // this was use for commit log component key binding pop up styling, we save it once so we don't have to recompute
+	StashComponentKeyBindingKeyMapLargestLen         int                // this was use for stash component key binding pop up styling, we save it once so we don't have to recompute
+	LogComponentKeyBindingKeyMapLargestLen           int                // this was use for log component key binding pop up styling, we save it once so we don't have to recompute
+	DetailComponentKeyBindingKeyMapLargestLen        int                // this was use for detail component key binding pop up styling, we save it once so we don't have to recompute
+	FeatureInstructionsMapLargestLen                 int                // this was use for feature instructions pop up styling, we save it once so we don't have to recompute
+	DetailComponentPanelInfoFetchCancelFunc          context.CancelFunc // this was to cancel the fetch detail oepration
+	IsDetailComponentPanelInfoFetchProcessing        atomic.Bool
+	IsLineEditingState                               atomic.Bool
+	LineEditingIndexPositionAndInfo                  GittiLineEditingIndexPositionAndInfo
+	LineEditingIndexCursorViewport                   viewport.Model
+	LineEditingIndexCursorTwoViewport                viewport.Model
+	DetailPanelViewportOGStringArray                 []string
+	DetailPanelTwoViewportOGStringArray              []string
+	CherryPickedCommitInfo                           CherryPickedCommitInfo
 }
 
 // ---------------------------------
