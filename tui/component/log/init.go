@@ -38,7 +38,7 @@ func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context
 			contentString.WriteString("[INFO]")
 			contentString.WriteString(" ")
 			contentString.WriteString(log.OpsType)
-			contentString.WriteString("\n")
+			contentString.WriteRune('\n')
 			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
 			contentString.WriteString(log.OpsCommand)
 		case logging.WARN:
@@ -47,7 +47,7 @@ func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render("[WARN]"))
 			contentString.WriteString(" ")
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(log.OpsType))
-			contentString.WriteString("\n")
+			contentString.WriteRune('\n')
 			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(log.OpsDescription))
 		case logging.ERROR:
@@ -56,12 +56,12 @@ func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render("[ERROR]"))
 			contentString.WriteString(" ")
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsType))
-			contentString.WriteString("\n")
+			contentString.WriteRune('\n')
 			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsDescription))
 		}
 
-		contentString.WriteString("\n")
+		contentString.WriteRune('\n')
 	}
 	return contentString.String()
 }
