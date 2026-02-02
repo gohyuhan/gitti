@@ -8,15 +8,15 @@ import (
 )
 
 // init the viewport pop up for showing info of global key binding
-func InitGlobalKeyBindingPopUpModel(m *types.GittiModel) {
+func InitKeybindingAndFeatureInstructionsPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
-	vp.SoftWrap = true
+	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
 	vp.MouseWheelDelta = 1
-	vp.SetHeight(min(constant.PopUpGlobalKeyBindingViewPortHeight, int(float64(m.Height)*0.8)))
-	vp.SetWidth(min(constant.MaxGlobalKeyBindingPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	vp.SetHeight(max(constant.PopUpGlobalKeyBindingViewPortHeight, int(float64(m.Height)*0.8)))
+	vp.SetWidth(min(constant.MaxKeybindingAndFeatureInstructionsPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 
-	m.PopUpModel = &GlobalKeyBindingPopUpModel{
+	m.PopUpModel = &KeybindingAndFeatureInstructionsPopUpModel{
 		GlobalKeyBindingViewport: vp,
 	}
 }

@@ -31,64 +31,29 @@ var (
 	PaginationStyle   = NewStyle
 
 	// Styles
-	TitleStyle = NewStyle.Foreground(ColorPurpleVibrant).
-			Bold(true)
-	PromptTitleStyle = NewStyle.Foreground(ColorPurpleSoft).
-				Bold(true)
-	BottomKeyBindingStyle = NewStyle.
-				Foreground(ColorCyanSoft)
-	PanelBorderStyle = NewStyle.
-				Border(lipgloss.RoundedBorder()).
-				Padding(0).
-				Margin(0).
-				BorderForeground(ColorBlueGrayMuted)
-	SelectedBorderStyle = NewStyle.
-				Border(lipgloss.DoubleBorder()).
-				Padding(0).
-				Margin(0).
-				BorderForeground(ColorBlueVeryLight)
-	PopUpBorderStyle = NewStyle.
-				Border(lipgloss.ThickBorder()).
-				Padding(0).
-				Margin(0).
-				BorderForeground(ColorBlueVeryLight)
-	SpinnerStyle = NewStyle.
-			Foreground(ColorBlueSoft)
-	BranchInvalidWarningStyle = NewStyle.
-					Foreground(ColorBlueMuted).
-					Faint(true)
-
-	GlobalKeyBindingPopUpStyle = NewStyle.
-					Border(lipgloss.ThickBorder()).
-					Padding(0).
-					Margin(0).
-					BorderForeground(ColorPurpleSoft)
-	GlobalKeyBindingTitleLineStyle = NewStyle.
-					Foreground(ColorPurpleSoft)
-	GlobalKeyBindingKeyMappingLineStyle = NewStyle.
-						Foreground(ColorCyanSoft)
-
-	DiffOldLineStyle = NewStyle.
-				Foreground(ColorError)
-	DiffNewLineStyle = NewStyle.
-				Foreground(ColorGreenSoft)
-
-	StagedFileStyle = NewStyle.
-			Foreground(ColorGreenSoft)
-	UnstagedFileStyle = NewStyle.
-				Foreground(ColorError)
-
-	LocalStatusStyle = NewStyle.
-				Foreground(ColorGreenSoft)
-	RemoteStatusStyle = NewStyle.
-				Foreground(ColorError)
-
-	StashIdStyle       = NewStyle.Foreground(ColorYellowWarm)
-	StashMessageStyle  = NewStyle.Foreground(ColorYellowSoft)
-	StashFilePathStyle = NewStyle.Foreground(ColorCyanSoft)
-
-	ErrorStyle = NewStyle.
-			Foreground(ColorError)
+	TitleStyle                                     = NewStyle.Foreground(ColorPurpleVibrant).Bold(true)
+	PromptTitleStyle                               = NewStyle.Foreground(ColorPurpleSoft).Bold(true)
+	BottomKeyBindingStyle                          = NewStyle.Foreground(ColorCyanSoft)
+	PanelBorderStyle                               = NewStyle.Border(lipgloss.RoundedBorder()).Padding(0).Margin(0).BorderForeground(ColorBlueGrayMuted)
+	SelectedBorderStyle                            = NewStyle.Border(lipgloss.DoubleBorder()).Padding(0).Margin(0).BorderForeground(ColorBlueVeryLight)
+	PopUpBorderStyle                               = NewStyle.Border(lipgloss.ThickBorder()).Padding(0).Margin(0).BorderForeground(ColorBlueVeryLight)
+	SpinnerStyle                                   = NewStyle.Foreground(ColorBlueSoft)
+	BranchInvalidWarningStyle                      = NewStyle.Foreground(ColorBlueMuted).Faint(true)
+	KeyBindingPopUpStyle                           = NewStyle.Border(lipgloss.ThickBorder()).Padding(0).Margin(0).BorderForeground(ColorPurpleSoft)
+	KeyBindingAndFeatureInstructionsTitleLineStyle = NewStyle.Foreground(ColorPurpleSoft)
+	KeyBindingKeyMappingInfoStyle                  = NewStyle.Foreground(ColorCyanSoft)
+	FeatureInfoLineStyle                           = NewStyle.Foreground(ColorCyanSoft)
+	KeyBindingAndFeatureInstructionsWarnStyle      = NewStyle.Foreground(ColorYellowWarm)
+	DiffOldLineStyle                               = NewStyle.Foreground(ColorError)
+	DiffNewLineStyle                               = NewStyle.Foreground(ColorGreenSoft)
+	StagedFileStyle                                = NewStyle.Foreground(ColorGreenSoft)
+	UnstagedFileStyle                              = NewStyle.Foreground(ColorError)
+	LocalStatusStyle                               = NewStyle.Foreground(ColorGreenSoft)
+	RemoteStatusStyle                              = NewStyle.Foreground(ColorError)
+	StashIdStyle                                   = NewStyle.Foreground(ColorYellowWarm)
+	StashMessageStyle                              = NewStyle.Foreground(ColorYellowSoft)
+	StashFilePathStyle                             = NewStyle.Foreground(ColorCyanSoft)
+	ErrorStyle                                     = NewStyle.Foreground(ColorError)
 )
 
 var Palette = []color.Color{

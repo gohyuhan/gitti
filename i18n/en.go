@@ -78,27 +78,27 @@ var eN = LanguageMapping{
 	CherryPickOpsSelectionTitle:         "Cherry Pick Operation Selection",
 	CherryPickApplyConfirmTitle:         "Are you sure you want to apply cherry picked commit to current checked out branch: \n %s",
 	KeyBindingForGitStatusComponent: []string{
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] new branch",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] switch branch",
 		"[n] new branch",
 		"[d] delete branch",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
 		"[space] stage this change",
 		"[e] edit",
 		"[r] resolve conflict",
 		"[enter] view modified content",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] unstage this change",
@@ -107,7 +107,7 @@ var eN = LanguageMapping{
 		"[S] stash all changes",
 		"[d] discard changes",
 		"[enter] view modified content",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] stage this change",
@@ -116,10 +116,10 @@ var eN = LanguageMapping{
 		"[S] stash all changes",
 		"[d] discard changes",
 		"[enter] view modified content",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] move up and down",
@@ -127,7 +127,7 @@ var eN = LanguageMapping{
 		"[r] reset to this commit",
 		"[R] reset the latest commit",
 		"[ctrl+p] cherry pick ops",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingLogComponent: []string{
 		"[enter] view log content",
@@ -137,14 +137,14 @@ var eN = LanguageMapping{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
 		"[esc] back",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] move left and right",
 		"[↑/↓] move up and down",
 		"[L] enter line editing mode",
 		"[esc] back",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] move left and right",
@@ -152,7 +152,7 @@ var eN = LanguageMapping{
 		"[d] discard line change",
 		"[space] stage/unstage",
 		"[esc] exit line editing mode",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingKeyStashComponent: []string{
 		"[↑/↓] move up and down",
@@ -160,10 +160,10 @@ var eN = LanguageMapping{
 		"[backspace] pop",
 		"[d] discard",
 		"[enter] view stash content",
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingKeyStashComponentNone: []string{
-		"[?] global key binding",
+		"[?] keybinding and instructions",
 	},
 	KeyBindingForCommitPopUp: []string{
 		"[tab] move to next input",
@@ -303,10 +303,17 @@ var eN = LanguageMapping{
 		"[enter] confirm discard",
 		"[esc] cancel / close",
 	},
-	KeyBindingForGlobalKeyBindingPopUp: []string{
+	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] close",
 	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
+	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
+	ModifiedFilesComponentKeyBinding:                         enModifiedFilesComponentKeyBinding,
+	CommitLogComponentKeyBinding:                             enCommitLogComponentKeyBinding,
+	StashComponentKeyBinding:                                 enStashComponentKeyBinding,
+	LogComponentKeyBinding:                                   enLogComponentKeyBinding,
+	DetailComponentKeyBinding:                                enDetailComponentKeyBinding,
+	FeatureInstructions:                                      enFeatureInstructions,
 	CommitPopUpMessageTitle:                                  "* Commit Message",
 	CommitPopUpMessageInputPlaceHolder:                       "Enter commit message",
 	CommitPopUpDescriptionTitle:                              "Description",
@@ -445,7 +452,7 @@ var aboutGittiEn = []string{
 }
 
 // the global key binding for en
-var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
+var enGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "",
 		TitleOrInfoLine: "-- Global Key Binding --",
@@ -547,11 +554,6 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ / ]",
-		TitleOrInfoLine: "navigated between staged and unstaged diff detail component panel",
-		LineType:        INFO,
-	},
-	{
 		KeyBindingLine:  "- / +",
 		TitleOrInfoLine: "increase or decrease the left panel width ratio",
 		LineType:        INFO,
@@ -585,5 +587,595 @@ var enGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "focus on the log panel",
 		LineType:        INFO,
+	},
+}
+
+// Local Branch Component Key Binding for en
+var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Local Branch Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "switch branch",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "create new branch",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "delete branch",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+}
+
+// Modified Files Component Key Binding for en
+var enModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Modified Files Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "stage / unstage change",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "view modified content",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "discard changes",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "edit file",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "s",
+		TitleOrInfoLine: "stash file",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "S",
+		TitleOrInfoLine: "stash all files",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "resolve conflict",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+}
+
+// Commit Log Component Key Binding for en
+var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Commit Log Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "view commit log content",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "reset to this commit",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "R",
+		TitleOrInfoLine: "reset the latest commit",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "start a cherry-pick operation",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up and down",
+		LineType:        INFO,
+	},
+}
+
+// Stash Component Key Binding for en
+var enStashComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Stash Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "apply",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "pop",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "discard",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "view stash content",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up and down",
+		LineType:        INFO,
+	},
+}
+
+// Log Component Key Binding for en
+var enLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Log Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "view log content",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "export log",
+		LineType:        INFO,
+	},
+}
+
+// Detail Component Key Binding for en
+var enDetailComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Detail Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "L",
+		TitleOrInfoLine: "enter line editing mode (only when you enter detail view from modified files component)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ / ]",
+		TitleOrInfoLine: "navigated between staged and unstaged diff detail component panel",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "back",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "←/→",
+		TitleOrInfoLine: "move left and right",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up and down",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "** Line Editing Mode Only Key Bindings **",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "discard line change",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "stage/unstage",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "exit line editing mode",
+		LineType:        INFO,
+	},
+}
+
+// Feature Instructions for en
+var enFeatureInstructions = []FeatureInstructionMappingFormat{
+	{
+		Feature:          "",
+		InstructionLines: []string{"-- Features Instructions with Steps --"},
+		LineType:         TITLE,
+	},
+	{
+		Feature: "commit",
+		InstructionLines: []string{
+			"1. Ensure your changes are staged (press `space` on files or `ctrl+s` for all)",
+			"2. Press `c` to open the Commit popup",
+			"3. Enter your commit message",
+			"   - Optionally, press `tab` to add a description",
+			"   - Press `shift+tab` to return to message field",
+			"4. Press `ctrl+e` to commit",
+			"5. Press `esc` to close the popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "amend commit",
+		InstructionLines: []string{
+			"1. Make additional changes and stage them (or modify message only)",
+			"2. Press `A` (Shift+a) to open Amend Commit popup",
+			"3. Edit the commit message or description",
+			"   - Use `tab` / `shift+tab` to navigate fields",
+			"4. Press `ctrl+e` to amend the latest commit",
+			"5. Press `esc` to close",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "push",
+		InstructionLines: []string{
+			"1. Press `p` to initiate push",
+			"2. If multiple remotes exist, select one using `↑/↓` and press `enter`",
+			"3. Select push type:",
+			"   - Normal Push",
+			"   - Force Push (safe) - with lease",
+			"   - Force Push (dangerous) - without protection",
+			"4. Press `enter` to execute",
+			"5. Press `esc` to close output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "pull",
+		InstructionLines: []string{
+			"1. Press `P` (Shift+p) to initiate pull",
+			"2. Select pull strategy:",
+			"   - Pull - Standard git pull",
+			"   - Rebase - Pull with rebase",
+			"   - Merge - Pull with merge",
+			"3. Press `enter` to execute",
+			"4. Press `esc` to close output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "stage file",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select an unstaged file using `↑/↓`",
+			"3. Press `space` to stage the file",
+			"",
+			"To stage all:",
+			"- Press `ctrl+s` globally to stage all changes",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "unstage file",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select a staged file using `↑/↓`",
+			"3. Press `space` to unstage the file",
+			"",
+			"To unstage all:",
+			"- Press `ctrl+u` globally to unstage all changes",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "stage line",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select a file and press `enter` to view diff",
+			"3. Press `L` (Shift+l) to enter line editing mode",
+			"4. Navigate to the line you want to stage using `↑/↓`",
+			"5. Press `space` to stage that specific line",
+			"6. Press `esc` to exit line editing mode",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "unstage line",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select a file and press `enter` to view diff",
+			"3. View staged changes (use `[` to switch to staged view if needed)",
+			"4. Press `L` (Shift+l) to enter line editing mode",
+			"5. Navigate to the staged line you want to unstage using `↑/↓`",
+			"6. Press `space` to unstage that specific line",
+			"7. Press `esc` to exit line editing mode",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "discard file",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select the file using `↑/↓`",
+			"3. Press `d` to open discard options",
+			"4. Select discard type:",
+			"   - Discard all changes (both staged and unstaged)",
+			"   - Discard unstaged changes only",
+			"   - Discard and revert rename (for renamed files)",
+			"5. Press `enter` to confirm",
+			"6. Confirm the operation",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "discard line",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select a file and press `enter` to view diff",
+			"3. Press `L` (Shift+l) to enter line editing mode",
+			"4. Navigate to the line you want to discard using `↑/↓`",
+			"5. Press `d` to discard that specific line change",
+			"6. Confirm the discard operation",
+			"7. Press `esc` to exit line editing mode",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "resolve conflict",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select a conflicted file",
+			"3. Press `r` to open resolve options",
+			"4. Select resolution:",
+			"   - Restart merge (restore conflict markers)",
+			"   - Accept ours changes",
+			"   - Accept theirs changes",
+			"5. Press `enter` to apply",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "stash file",
+		InstructionLines: []string{
+			"1. Navigate to Modified Files component (press `2`)",
+			"2. Select a file using `↑/↓`",
+			"3. Press `s` to stash the file",
+			"4. Enter an optional stash message",
+			"5. Press `enter` to proceed",
+			"6. Confirm the stash operation",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "stash all",
+		InstructionLines: []string{
+			"1. Press `S` (Shift+s) from Modified Files component",
+			"2. Enter an optional stash message",
+			"3. Press `enter` to proceed",
+			"4. Confirm to stash all changes",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "stash apply",
+		InstructionLines: []string{
+			"1. Navigate to Stash component (press `4`)",
+			"2. Select a stash using `↑/↓`",
+			"3. Press `space` to apply the stash",
+			"4. Confirm the operation",
+			"   - The stash remains in the list after applying",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "stash pop",
+		InstructionLines: []string{
+			"1. Navigate to Stash component (press `4`)",
+			"2. Select a stash using `↑/↓`",
+			"3. Press `backspace` to pop the stash",
+			"4. Confirm the operation",
+			"   - The stash is applied and removed from the list",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "stash drop",
+		InstructionLines: []string{
+			"1. Navigate to Stash component (press `4`)",
+			"2. Select a stash using `↑/↓`",
+			"3. Press `d` to drop the stash",
+			"4. Confirm the operation",
+			"   - The stash is permanently deleted",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "create branch",
+		InstructionLines: []string{
+			"1. Navigate to Branches component (press `1`)",
+			"2. Press `n` to open branch creation options",
+			"3. Select:",
+			"   - Create new branch (stay on current)",
+			"   - Create new branch and switch (move changes)",
+			"   - Create branch based on remote",
+			"4. Press `enter` to confirm",
+			"5. Enter the new branch name",
+			"6. Press `enter` to create",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "switch branch",
+		InstructionLines: []string{
+			"1. Navigate to Branches component (press `1`)",
+			"2. Select the target branch using `↑/↓`",
+			"3. Press `enter` to initiate switch",
+			"4. Select switch type:",
+			"   - Switch without changes (will stash current changes)",
+			"   - Switch with changes (bring changes to new branch)",
+			"5. Press `enter` to confirm",
+			"6. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "delete branch",
+		InstructionLines: []string{
+			"1. Navigate to Branches component (press `1`)",
+			"2. Select the branch to delete using `↑/↓`",
+			"   - Cannot delete currently checked out branch",
+			"3. Press `d` to initiate deletion",
+			"4. Confirm by pressing `enter`",
+			"5. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "reset latest commit",
+		InstructionLines: []string{
+			"1. Press `R` (Shift+r) from Commit Log component",
+			"2. Select reset type:",
+			"   - Soft - Keep changes staged",
+			"   - Mixed - Keep changes, unstage them",
+			"   - Hard - Permanently discard all changes",
+			"3. Press `enter` to select",
+			"4. Confirm the reset",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "reset to commit",
+		InstructionLines: []string{
+			"1. Navigate to Commit Log component (press `3`)",
+			"2. Select target commit using `↑/↓`",
+			"3. Press `r` to initiate reset",
+			"4. Select reset type:",
+			"   - Soft - Keep changes staged",
+			"   - Mixed - Keep changes, unstage them",
+			"   - Hard - Permanently discard all changes",
+			"5. Press `enter` to select",
+			"6. Confirm the reset",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "cherry pick",
+		InstructionLines: []string{
+			"1. Navigate to Commit Log component (press `3`)",
+			"2. Press `ctrl+p` to open cherry pick menu",
+			"3. Select 'Cherry Pick' and press `enter`",
+			"4. Use `↑/↓` to navigate commits",
+			"5. Press `space` to select/deselect commits",
+			"6. Press `e` to edit selections (optional)",
+			"7. Press `a` to apply selected commits",
+			"8. Confirm to apply cherry picks",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "add remote",
+		InstructionLines: []string{
+			"1. Press `p` when no remote exists",
+			"2. The 'Add Remote' popup appears automatically",
+			"3. Enter remote name (e.g., 'origin')",
+			"4. Press `tab` to move to URL field",
+			"5. Enter remote URL:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. Press `enter` to add remote",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "continue git operation",
+		InstructionLines: []string{
+			"When git operation is paused (merge, rebase, cherry-pick, etc.):",
+			"",
+			"1. Resolve any conflicts if needed",
+			"2. Stage the resolved files",
+			"3. Press `C` (Shift+c) to continue the operation",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "abort git operation",
+		InstructionLines: []string{
+			"When git operation is paused (merge, rebase, cherry-pick, etc.):",
+			"",
+			"1. Press `ctrl+a` to abort the operation",
+			"2. All changes from the operation will be discarded",
+			"3. Repository returns to state before the operation",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "skip git operation",
+		InstructionLines: []string{
+			"During rebase, revert, or cherry-pick:",
+			"",
+			"1. Press `ctrl+k` to skip the current commit",
+			"2. The operation continues with the next commit",
+		},
+		LineType: INFO,
 	},
 }

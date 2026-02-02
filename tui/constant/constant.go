@@ -7,7 +7,7 @@ package constant
 // -----------------------------------------------------------------------------
 const (
 	NoPopUp                                    = "NoPopUp"
-	GlobalKeyBindingPopUp                      = "GlobalKeyBindingPopUp"
+	KeybindingAndFeatureInstructionsPopUp      = "KeybindingAndFeatureInstructionsPopUp"
 	AmendCommitPopUp                           = "AmendCommitPopUp"                           // IsTyping will be true
 	CommitPopUp                                = "CommitPopUp"                                // IsTyping will be true
 	AddRemotePromptPopUp                       = "AddRemotePromptPopUp"                       // IsTyping will be true
@@ -58,7 +58,7 @@ const (
 
 	ListItemOrTitleWidthPad = 4
 
-	MaxGlobalKeyBindingPopUpWidth                      = 150
+	MaxKeybindingAndFeatureInstructionsPopUpWidth      = 150
 	MaxCommitPopUpWidth                                = 150
 	MaxAmendCommitPopUpWidth                           = 150
 	MaxAddRemotePromptPopUpWidth                       = 150
@@ -91,7 +91,7 @@ const (
 	MaxGitCherryPickApplyConfirmPopUpWidth             = 150
 	MaxGitDiscardFileLineChangeConfirmPopUpWidth       = 150
 
-	PopUpGlobalKeyBindingViewPortHeight                = 30
+	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10
 	PopUpGitAmendCommitOutputViewPortHeight            = 10
 	PopUpAddRemoteOutputViewPortHeight                 = 2

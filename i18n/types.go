@@ -7,10 +7,16 @@ const (
 	WARN  = "WARN"
 )
 
-type GlobalKeyBindingMappingFormat struct {
+type KeyBindingMappingFormat struct {
 	KeyBindingLine  string
 	TitleOrInfoLine string
 	LineType        string
+}
+
+type FeatureInstructionMappingFormat struct {
+	Feature          string
+	InstructionLines []string
+	LineType         string
 }
 
 // -------------------------------------------------------
@@ -144,12 +150,26 @@ type LanguageMapping struct {
 	KeyBindingForGitEditCherryPickPopUp                     []string
 	KeyBindingForGitCherryPickApplyConfirmPopUp             []string
 	KeyBindingForGitDiscardFileLineChangeConfirmPopUp       []string
-	KeyBindingForGlobalKeyBindingPopUp                      []string
+	KeyBindingForKeybindingAndFeatureInstructionsPopUp      []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
 	// Global Key KeyBinding
-	GlobalKeyBinding []GlobalKeyBindingMappingFormat
+	GlobalKeyBinding []KeyBindingMappingFormat
+	// Local Branch Component KeyBinding
+	LocalBranchComponentKeyBinding []KeyBindingMappingFormat
+	// Modified Files Component KeyBinding
+	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
+	// Commit Log Component KeyBinding
+	CommitLogComponentKeyBinding []KeyBindingMappingFormat
+	// Stash Component KeyBinding
+	StashComponentKeyBinding []KeyBindingMappingFormat
+	// Log Component KeyBinding
+	LogComponentKeyBinding []KeyBindingMappingFormat
+	// Detail Component KeyBinding
+	DetailComponentKeyBinding []KeyBindingMappingFormat
+	// Feature Instructions
+	FeatureInstructions []FeatureInstructionMappingFormat
 	// commit
 	CommitPopUpMessageTitle                                  string
 	CommitPopUpMessageInputPlaceHolder                       string

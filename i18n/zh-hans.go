@@ -78,27 +78,27 @@ var zH_HANS = LanguageMapping{
 	CherryPickOpsSelectionTitle:         "遴选操作选择",
 	CherryPickApplyConfirmTitle:         "您确定要将遴选的提交应用到当前检出的分支吗: \n %s",
 	KeyBindingForGitStatusComponent: []string{
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新建分支",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切换分支",
 		"[n] 新建分支",
 		"[d] 删除分支",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
 		"[space] 暂存此更改",
 		"[e] 编辑",
 		"[r] 解决冲突",
 		"[enter] 查看修改内容",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] 取消暂存此更改",
@@ -107,7 +107,7 @@ var zH_HANS = LanguageMapping{
 		"[S] 储藏所有更改",
 		"[d] 舍弃更改",
 		"[enter] 查看修改内容",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] 暂存此更改",
@@ -116,10 +116,10 @@ var zH_HANS = LanguageMapping{
 		"[S] 储藏所有更改",
 		"[d] 舍弃更改",
 		"[enter] 查看修改内容",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下移动",
@@ -127,7 +127,7 @@ var zH_HANS = LanguageMapping{
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 遴选操作",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingLogComponent: []string{
 		"[enter] 查看日志内容",
@@ -137,14 +137,14 @@ var zH_HANS = LanguageMapping{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",
 		"[esc] 返回",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingKeyDetailComponentLineEditingEligible: []string{
 		"[←/→] 左右移动",
 		"[↑/↓] 上下移动",
 		"[L] 进入行编辑模式",
 		"[esc] 返回",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingKeyDetailComponentLineEditing: []string{
 		"[←/→] 左右移动",
@@ -152,7 +152,7 @@ var zH_HANS = LanguageMapping{
 		"[d] 舍弃行更改",
 		"[space] 暂存/取消暂存",
 		"[esc] 退出行编辑模式",
-		"[?] 全局快捷键",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingKeyStashComponent: []string{
 		"[↑/↓] 上下移动",
@@ -160,10 +160,10 @@ var zH_HANS = LanguageMapping{
 		"[backspace] 弹出",
 		"[d] 丢弃",
 		"[enter] 查看储藏内容",
-		"[?] 全局按键绑定",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingKeyStashComponentNone: []string{
-		"[?] 全局按键绑定",
+		"[?] 快捷键与说明",
 	},
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 移动到下一个输入框",
@@ -303,10 +303,17 @@ var zH_HANS = LanguageMapping{
 		"[enter] 确认丢弃",
 		"[esc] 取消 / 关闭",
 	},
-	KeyBindingForGlobalKeyBindingPopUp: []string{
+	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 关闭",
 	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
+	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
+	ModifiedFilesComponentKeyBinding:                         zhHansModifiedFilesComponentKeyBinding,
+	CommitLogComponentKeyBinding:                             zhHansCommitLogComponentKeyBinding,
+	StashComponentKeyBinding:                                 zhHansStashComponentKeyBinding,
+	LogComponentKeyBinding:                                   zhHansLogComponentKeyBinding,
+	DetailComponentKeyBinding:                                zhHansDetailComponentKeyBinding,
+	FeatureInstructions:                                      zhHansFeatureInstructions,
 	CommitPopUpMessageTitle:                                  "* 提交信息",
 	CommitPopUpMessageInputPlaceHolder:                       "输入提交信息",
 	CommitPopUpDescriptionTitle:                              "描述",
@@ -446,7 +453,7 @@ var aboutGittiZhHans = []string{
 }
 
 // the global key binding for zh-hans
-var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
+var zhHansGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "",
 		TitleOrInfoLine: "-- 全局快捷键 --",
@@ -459,7 +466,7 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "",
-		TitleOrInfoLine: " 即使有弹出窗口也生效的全局快捷键将在末尾标记 `[!!]`",
+		TitleOrInfoLine: "   即使有弹出窗口也生效的全局快捷键将在末尾标记 `[!!]`",
 		LineType:        WARN,
 	},
 	{
@@ -548,11 +555,6 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "[ / ]",
-		TitleOrInfoLine: "在已暂存和未暂存的差异详细信息面板之间导航",
-		LineType:        INFO,
-	},
-	{
 		KeyBindingLine:  "- / +",
 		TitleOrInfoLine: "增大或减小左侧面板宽度比例",
 		LineType:        INFO,
@@ -586,5 +588,595 @@ var zhHansGlobalKeyBinding = []GlobalKeyBindingMappingFormat{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "聚焦到日志面板",
 		LineType:        INFO,
+	},
+}
+
+// Local Branch Component Key Binding for zh-hans
+var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 本地分支组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "切换分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "创建新分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "删除分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+}
+
+// Modified Files Component Key Binding for zh-hans
+var zhHansModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 已修改文件组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "暂存 / 取消暂存更改",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "查看修改内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "舍弃更改",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "编辑文件",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "s",
+		TitleOrInfoLine: "储藏 (stash) 文件",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "S",
+		TitleOrInfoLine: "储藏所有文件",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "解决冲突",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+}
+
+// Commit Log Component Key Binding for zh-hans
+var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 提交日志组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "查看提交日志内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "重置到此提交",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "R",
+		TitleOrInfoLine: "重置最新提交",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "开始遴选操作",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动",
+		LineType:        INFO,
+	},
+}
+
+// Stash Component Key Binding for zh-hans
+var zhHansStashComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 储藏组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "应用",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "弹出",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "丢弃",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "查看储藏内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动",
+		LineType:        INFO,
+	},
+}
+
+// Log Component Key Binding for zh-hans
+var zhHansLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 日志组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "查看日志内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "导出日志",
+		LineType:        INFO,
+	},
+}
+
+// Detail Component Key Binding for zh-hans
+var zhHansDetailComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 详细信息组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "L",
+		TitleOrInfoLine: "进入行编辑模式 (仅当从已修改文件组件进入详细视图时)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "[ / ]",
+		TitleOrInfoLine: "在已暂存和未暂存的差异详细信息面板之间导航",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "返回",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "←/→",
+		TitleOrInfoLine: "左右移动",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "** 仅限行编辑模式的快捷键 **",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "舍弃行更改",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "space",
+		TitleOrInfoLine: "暂存/取消暂存",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "退出行编辑模式",
+		LineType:        INFO,
+	},
+}
+
+// Feature Instructions for zh-hans
+var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
+	{
+		Feature:          "",
+		InstructionLines: []string{"-- 功能说明与步骤 --"},
+		LineType:         TITLE,
+	},
+	{
+		Feature: "提交 (commit)",
+		InstructionLines: []string{
+			"1. 确保您的更改已暂存（在文件上按 `space` 或全局按 `ctrl+s`）",
+			"2. 按 `c` 打开提交弹窗",
+			"3. 输入提交消息",
+			"   - 可选：按 `tab` 添加描述",
+			"   - 按 `shift+tab` 返回消息字段",
+			"4. 按 `ctrl+e` 提交",
+			"5. 按 `esc` 关闭弹窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "修改提交 (amend commit)",
+		InstructionLines: []string{
+			"1. 进行额外的更改并暂存（或仅修改消息）",
+			"2. 按 `A`（Shift+a）打开修改提交弹窗",
+			"3. 编辑提交消息或描述",
+			"   - 使用 `tab` / `shift+tab` 在字段间导航",
+			"4. 按 `ctrl+e` 修改最新提交",
+			"5. 按 `esc` 关闭",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "推送 (push)",
+		InstructionLines: []string{
+			"1. 按 `p` 开始推送",
+			"2. 如果存在多个远程仓库，使用 `↑/↓` 选择并按 `enter`",
+			"3. 选择推送类型:",
+			"   - 正常推送",
+			"   - 强制推送（安全）- 带租约",
+			"   - 强制推送（危险）- 无保护",
+			"4. 按 `enter` 执行",
+			"5. 按 `esc` 关闭输出弹窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "拉取 (pull)",
+		InstructionLines: []string{
+			"1. 按 `P`（Shift+p）开始拉取",
+			"2. 选择拉取策略:",
+			"   - Pull - 标准 git pull",
+			"   - Rebase - 使用 rebase 拉取",
+			"   - Merge - 使用 merge 拉取",
+			"3. 按 `enter` 执行",
+			"4. 按 `esc` 关闭输出弹窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "暂存文件 (stage file)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 使用 `↑/↓` 选择未暂存的文件",
+			"3. 按 `space` 暂存该文件",
+			"",
+			"暂存所有:",
+			"- 全局按 `ctrl+s` 暂存所有更改",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "取消暂存文件 (unstage file)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 使用 `↑/↓` 选择已暂存的文件",
+			"3. 按 `space` 取消暂存该文件",
+			"",
+			"取消暂存所有:",
+			"- 全局按 `ctrl+u` 取消暂存所有更改",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "暂存行 (stage line)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 选择文件并按 `enter` 查看差异",
+			"3. 按 `L`（Shift+l）进入行编辑模式",
+			"4. 使用 `↑/↓` 导航到要暂存的行",
+			"5. 按 `space` 暂存该特定行",
+			"6. 按 `esc` 退出行编辑模式",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "取消暂存行 (unstage line)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 选择文件并按 `enter` 查看差异",
+			"3. 查看已暂存的更改（如需要使用 `[` 切换到已暂存视图）",
+			"4. 按 `L`（Shift+l）进入行编辑模式",
+			"5. 使用 `↑/↓` 导航到要取消暂存的行",
+			"6. 按 `space` 取消暂存该特定行",
+			"7. 按 `esc` 退出行编辑模式",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "舍弃文件更改 (discard file)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 使用 `↑/↓` 选择文件",
+			"3. 按 `d` 打开舍弃选项",
+			"4. 选择舍弃类型:",
+			"   - 舍弃所有更改（已暂存和未暂存）",
+			"   - 仅舍弃未暂存的更改",
+			"   - 舍弃更改并撤销重命名（对于重命名的文件）",
+			"5. 按 `enter` 确认",
+			"6. 确认操作",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "舍弃行更改 (discard line)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 选择文件并按 `enter` 查看差异",
+			"3. 按 `L`（Shift+l）进入行编辑模式",
+			"4. 使用 `↑/↓` 导航到要舍弃的行",
+			"5. 按 `d` 舍弃该特定行的更改",
+			"6. 确认舍弃操作",
+			"7. 按 `esc` 退出行编辑模式",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "解决冲突 (resolve conflict)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 选择冲突的文件",
+			"3. 按 `r` 打开解决选项",
+			"4. 选择解决方案:",
+			"   - 重新开始合并（恢复冲突标记）",
+			"   - 接受 ours 更改",
+			"   - 接受 theirs 更改",
+			"5. 按 `enter` 应用",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "储藏文件 (stash file)",
+		InstructionLines: []string{
+			"1. 导航到已修改文件组件（按 `2`）",
+			"2. 使用 `↑/↓` 选择文件",
+			"3. 按 `s` 储藏该文件",
+			"4. 输入可选的储藏消息",
+			"5. 按 `enter` 继续",
+			"6. 确认储藏操作",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "储藏所有 (stash all)",
+		InstructionLines: []string{
+			"1. 从已修改文件组件按 `S`（Shift+s）",
+			"2. 输入可选的储藏消息",
+			"3. 按 `enter` 继续",
+			"4. 确认储藏所有更改",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "应用储藏 (stash apply)",
+		InstructionLines: []string{
+			"1. 导航到储藏组件（按 `4`）",
+			"2. 使用 `↑/↓` 选择储藏",
+			"3. 按 `space` 应用该储藏",
+			"4. 确认操作",
+			"   - 应用后储藏仍保留在列表中",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "弹出储藏 (stash pop)",
+		InstructionLines: []string{
+			"1. 导航到储藏组件（按 `4`）",
+			"2. 使用 `↑/↓` 选择储藏",
+			"3. 按 `backspace` 弹出该储藏",
+			"4. 确认操作",
+			"   - 储藏被应用并从列表中移除",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "丢弃储藏 (stash drop)",
+		InstructionLines: []string{
+			"1. 导航到储藏组件（按 `4`）",
+			"2. 使用 `↑/↓` 选择储藏",
+			"3. 按 `d` 丢弃该储藏",
+			"4. 确认操作",
+			"   - 储藏被永久删除",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "创建分支 (create branch)",
+		InstructionLines: []string{
+			"1. 导航到分支组件（按 `1`）",
+			"2. 按 `n` 打开分支创建选项",
+			"3. 选择:",
+			"   - 创建新分支（留在当前分支）",
+			"   - 创建新分支并切换（移动更改）",
+			"   - 基于远程分支创建",
+			"4. 按 `enter` 确认",
+			"5. 输入新分支名称",
+			"6. 按 `enter` 创建",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "切换分支 (switch branch)",
+		InstructionLines: []string{
+			"1. 导航到分支组件（按 `1`）",
+			"2. 使用 `↑/↓` 选择目标分支",
+			"3. 按 `enter` 开始切换",
+			"4. 选择切换类型:",
+			"   - 不带更改切换（将储藏当前更改）",
+			"   - 带更改切换（将更改带到新分支）",
+			"5. 按 `enter` 确认",
+			"6. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "删除分支 (delete branch)",
+		InstructionLines: []string{
+			"1. 导航到分支组件（按 `1`）",
+			"2. 使用 `↑/↓` 选择要删除的分支",
+			"   - 无法删除当前检出的分支",
+			"3. 按 `d` 开始删除",
+			"4. 按 `enter` 确认",
+			"5. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "重置最新提交 (reset latest commit)",
+		InstructionLines: []string{
+			"1. 从提交日志组件按 `R`（Shift+r）",
+			"2. 选择重置类型:",
+			"   - 软重置 - 保持更改已暂存",
+			"   - 混合重置 - 保持更改，取消暂存",
+			"   - 硬重置 - 永久舍弃所有更改",
+			"3. 按 `enter` 选择",
+			"4. 确认重置",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "重置到提交 (reset to commit)",
+		InstructionLines: []string{
+			"1. 导航到提交日志组件（按 `3`）",
+			"2. 使用 `↑/↓` 选择目标提交",
+			"3. 按 `r` 开始重置",
+			"4. 选择重置类型:",
+			"   - 软重置 - 保持更改已暂存",
+			"   - 混合重置 - 保持更改，取消暂存",
+			"   - 硬重置 - 永久舍弃所有更改",
+			"5. 按 `enter` 选择",
+			"6. 确认重置",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "遴选 (cherry pick)",
+		InstructionLines: []string{
+			"1. 导航到提交日志组件（按 `3`）",
+			"2. 按 `ctrl+p` 打开遴选菜单",
+			"3. 选择'遴选'并按 `enter`",
+			"4. 使用 `↑/↓` 导航提交",
+			"5. 按 `space` 选择/取消选择提交",
+			"6. 按 `e` 编辑选择（可选）",
+			"7. 按 `a` 应用选定的提交",
+			"8. 确认应用遴选",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "添加远程 (add remote)",
+		InstructionLines: []string{
+			"1. 当不存在远程时按 `p`",
+			"2. '添加远程'弹窗自动出现",
+			"3. 输入远程名称（例如：'origin'）",
+			"4. 按 `tab` 移动到 URL 字段",
+			"5. 输入远程 URL:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. 按 `enter` 添加远程",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "继续 Git 操作 (continue git operation)",
+		InstructionLines: []string{
+			"当 Git 操作暂停时（合并、变基、遴选等）:",
+			"",
+			"1. 如需要，解决任何冲突",
+			"2. 暂存已解决的文件",
+			"3. 按 `C`（Shift+c）继续操作",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "中止 Git 操作 (abort git operation)",
+		InstructionLines: []string{
+			"当 Git 操作暂停时（合并、变基、遴选等）:",
+			"",
+			"1. 按 `ctrl+a` 中止操作",
+			"2. 操作的所有更改将被舍弃",
+			"3. 仓库返回到操作前的状态",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "跳过 Git 操作 (skip git operation)",
+		InstructionLines: []string{
+			"在变基、还原或遴选期间:",
+			"",
+			"1. 按 `ctrl+k` 跳过当前提交",
+			"2. 操作继续进行下一个提交",
+		},
+		LineType: INFO,
 	},
 }

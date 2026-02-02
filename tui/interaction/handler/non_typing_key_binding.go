@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"strings"
+
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
@@ -29,8 +32,8 @@ import (
 func handleNonTypingGlobalKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	m.ShowPopUp.Store(true)
 	m.IsTyping.Store(false)
-	m.PopUpType = constant.GlobalKeyBindingPopUp
-	keybindingPopUp.InitGlobalKeyBindingPopUpModel(m)
+	m.PopUpType = constant.KeybindingAndFeatureInstructionsPopUp
+	keybindingPopUp.InitKeybindingAndFeatureInstructionsPopUpModel(m)
 	return m, nil
 }
 
@@ -885,7 +888,7 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
-		case constant.GlobalKeyBindingPopUp:
+		case constant.KeybindingAndFeatureInstructionsPopUp:
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp
@@ -1218,6 +1221,17 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 			if ok {
 				popUp.DiscardFileLineChangeViewport.ScrollLeft(1)
 			}
+		case constant.KeybindingAndFeatureInstructionsPopUp:
+			popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
+			if ok {
+				scrollSpeed := 1
+				if strings.ToUpper(settings.GITTICONFIGSETTINGS.LanguageCode) != "EN" {
+					// other than en, all other i18n we support are both zh and jp which each rune takes up twice the width of en character
+					scrollSpeed = 2
+				}
+
+				popUp.GlobalKeyBindingViewport.ScrollLeft(scrollSpeed)
+			}
 		}
 	}
 	return m, nil
@@ -1246,6 +1260,16 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
 			if ok {
 				popUp.DiscardFileLineChangeViewport.ScrollRight(1)
+			}
+		case constant.KeybindingAndFeatureInstructionsPopUp:
+			popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
+			if ok {
+				scrollSpeed := 1
+				if strings.ToUpper(settings.GITTICONFIGSETTINGS.LanguageCode) != "EN" {
+					// other than en, all other i18n we support are both zh and jp which each rune takes up twice the width of en character
+					scrollSpeed = 2
+				}
+				popUp.GlobalKeyBindingViewport.ScrollRight(scrollSpeed)
 			}
 		}
 	}

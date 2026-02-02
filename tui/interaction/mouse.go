@@ -1,10 +1,14 @@
 package interaction
 
 import (
+	"strings"
+
 	tea "charm.land/bubbletea/v2"
+	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/interaction/handler"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
+	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -25,6 +29,16 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				if ok {
 					popUp.DiscardFileLineChangeViewport.ScrollLeft(1)
 				}
+			case constant.KeybindingAndFeatureInstructionsPopUp:
+				popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
+				if ok {
+					scrollSpeed := 1
+					if strings.ToUpper(settings.GITTICONFIGSETTINGS.LanguageCode) != "EN" {
+						// other than en, all other i18n we support are both zh and jp which each rune takes up twice the width of en character
+						scrollSpeed = 2
+					}
+					popUp.GlobalKeyBindingViewport.ScrollLeft(scrollSpeed)
+				}
 			}
 		}
 
@@ -41,6 +55,16 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
 				if ok {
 					popUp.DiscardFileLineChangeViewport.ScrollRight(1)
+				}
+			case constant.KeybindingAndFeatureInstructionsPopUp:
+				popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
+				if ok {
+					scrollSpeed := 1
+					if strings.ToUpper(settings.GITTICONFIGSETTINGS.LanguageCode) != "EN" {
+						// other than en, all other i18n we support are both zh and jp which each rune takes up twice the width of en character
+						scrollSpeed = 2
+					}
+					popUp.GlobalKeyBindingViewport.ScrollRight(scrollSpeed)
 				}
 			}
 		}

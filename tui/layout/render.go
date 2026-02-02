@@ -302,8 +302,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitPullOutputPopUp
 		case constant.GitStashMessagePopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStashMessagePopUp
-		case constant.GlobalKeyBindingPopUp:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingForGlobalKeyBindingPopUp
+		case constant.KeybindingAndFeatureInstructionsPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForKeybindingAndFeatureInstructionsPopUp
 		case constant.GitDiscardTypeOptionPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardTypeOptionPopUp
 		case constant.GitDiscardConfirmPromptPopUp:
