@@ -150,7 +150,7 @@ type LanguageMapping struct {
 	KeyBindingForGitEditCherryPickPopUp                     []string
 	KeyBindingForGitCherryPickApplyConfirmPopUp             []string
 	KeyBindingForGitDiscardFileLineChangeConfirmPopUp       []string
-	KeyBindingForGlobalKeyBindingPopUp                      []string
+	KeyBindingForKeybindingAndFeatureInstructionsPopUp      []string
 	// -----------------
 	//  For Pop Up
 	// -----------------

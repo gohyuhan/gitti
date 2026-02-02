@@ -303,7 +303,7 @@ var eN = LanguageMapping{
 		"[enter] confirm discard",
 		"[esc] cancel / close",
 	},
-	KeyBindingForGlobalKeyBindingPopUp: []string{
+	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] close",
 	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
@@ -848,13 +848,8 @@ var enDetailComponentKeyBinding = []KeyBindingMappingFormat{
 var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature:          "",
-		InstructionLines: []string{""},
+		InstructionLines: []string{"-- Features Instructions with Steps --"},
 		LineType:         TITLE,
-	},
-	{
-		Feature:          "",
-		InstructionLines: []string{""},
-		LineType:         INFO,
 	},
 	{
 		Feature: "commit",

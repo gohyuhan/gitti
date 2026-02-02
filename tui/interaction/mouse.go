@@ -29,8 +29,8 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				if ok {
 					popUp.DiscardFileLineChangeViewport.ScrollLeft(1)
 				}
-			case constant.GlobalKeyBindingPopUp:
-				popUp, ok := m.PopUpModel.(*keybindingPopUp.GlobalKeyBindingPopUpModel)
+			case constant.KeybindingAndFeatureInstructionsPopUp:
+				popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
 				if ok {
 					scrollSpeed := 1
 					if strings.ToUpper(settings.GITTICONFIGSETTINGS.LanguageCode) != "EN" {
@@ -56,8 +56,8 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				if ok {
 					popUp.DiscardFileLineChangeViewport.ScrollRight(1)
 				}
-			case constant.GlobalKeyBindingPopUp:
-				popUp, ok := m.PopUpModel.(*keybindingPopUp.GlobalKeyBindingPopUpModel)
+			case constant.KeybindingAndFeatureInstructionsPopUp:
+				popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
 				if ok {
 					scrollSpeed := 1
 					if strings.ToUpper(settings.GITTICONFIGSETTINGS.LanguageCode) != "EN" {

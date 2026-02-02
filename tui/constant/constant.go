@@ -7,7 +7,7 @@ package constant
 // -----------------------------------------------------------------------------
 const (
 	NoPopUp                                    = "NoPopUp"
-	GlobalKeyBindingPopUp                      = "GlobalKeyBindingPopUp"
+	KeybindingAndFeatureInstructionsPopUp      = "KeybindingAndFeatureInstructionsPopUp"
 	AmendCommitPopUp                           = "AmendCommitPopUp"                           // IsTyping will be true
 	CommitPopUp                                = "CommitPopUp"                                // IsTyping will be true
 	AddRemotePromptPopUp                       = "AddRemotePromptPopUp"                       // IsTyping will be true
@@ -58,7 +58,7 @@ const (
 
 	ListItemOrTitleWidthPad = 4
 
-	MaxGlobalKeyBindingPopUpWidth                      = 150
+	MaxKeybindingAndFeatureInstructionsPopUpWidth      = 150
 	MaxCommitPopUpWidth                                = 150
 	MaxAmendCommitPopUpWidth                           = 150
 	MaxAddRemotePromptPopUpWidth                       = 150

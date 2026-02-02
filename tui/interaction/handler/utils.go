@@ -241,8 +241,8 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 			return m, nil
 		}
 	// following is for viewport
-	case constant.GlobalKeyBindingPopUp:
-		popUp, ok := m.PopUpModel.(*keybindingPopUp.GlobalKeyBindingPopUpModel)
+	case constant.KeybindingAndFeatureInstructionsPopUp:
+		popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
 		if ok {
 			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
 			return m, cmd
@@ -297,8 +297,8 @@ func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types
 	var cmd tea.Cmd
 	// for pop up that have viewport
 	switch m.PopUpType {
-	case constant.GlobalKeyBindingPopUp:
-		popUp, ok := m.PopUpModel.(*keybindingPopUp.GlobalKeyBindingPopUpModel)
+	case constant.KeybindingAndFeatureInstructionsPopUp:
+		popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
 		if ok {
 			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
 			return m, cmd

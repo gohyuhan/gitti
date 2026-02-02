@@ -64,7 +64,6 @@ type GittiModel struct {
 	StashComponentKeyBindingKeyMapLargestLen         int                // this was use for stash component key binding pop up styling, we save it once so we don't have to recompute
 	LogComponentKeyBindingKeyMapLargestLen           int                // this was use for log component key binding pop up styling, we save it once so we don't have to recompute
 	DetailComponentKeyBindingKeyMapLargestLen        int                // this was use for detail component key binding pop up styling, we save it once so we don't have to recompute
-	FeatureInstructionsMapLargestLen                 int                // this was use for feature instructions pop up styling, we save it once so we don't have to recompute
 	DetailComponentPanelInfoFetchCancelFunc          context.CancelFunc // this was to cancel the fetch detail oepration
 	IsDetailComponentPanelInfoFetchProcessing        atomic.Bool
 	IsLineEditingState                               atomic.Bool

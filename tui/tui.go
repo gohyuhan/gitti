@@ -97,7 +97,6 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		StashComponentKeyBindingKeyMapLargestLen:         0,
 		LogComponentKeyBindingKeyMapLargestLen:           0,
 		DetailComponentKeyBindingKeyMapLargestLen:        0,
-		FeatureInstructionsMapLargestLen:                 0,
 		LineEditingIndexPositionAndInfo:                  types.GittiLineEditingIndexPositionAndInfo{},
 		LineEditingIndexCursorViewport:                   lineEditingIndexCursorVp,
 		LineEditingIndexCursorTwoViewport:                lineEditingIndexCursorVpTwo,

@@ -303,7 +303,7 @@ var zH_HANS = LanguageMapping{
 		"[enter] 确认丢弃",
 		"[esc] 取消 / 关闭",
 	},
-	KeyBindingForGlobalKeyBindingPopUp: []string{
+	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 关闭",
 	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
@@ -849,13 +849,8 @@ var zhHansDetailComponentKeyBinding = []KeyBindingMappingFormat{
 var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature:          "",
-		InstructionLines: []string{""},
+		InstructionLines: []string{"-- 功能说明与步骤 --"},
 		LineType:         TITLE,
-	},
-	{
-		Feature:          "",
-		InstructionLines: []string{""},
-		LineType:         INFO,
 	},
 	{
 		Feature: "提交 (commit)",

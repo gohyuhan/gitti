@@ -303,7 +303,7 @@ var jA = LanguageMapping{
 		"[enter] 破棄を確定",
 		"[esc] キャンセル / 閉じる",
 	},
-	KeyBindingForGlobalKeyBindingPopUp: []string{
+	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 閉じる",
 	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
@@ -850,13 +850,8 @@ var jaDetailComponentKeyBinding = []KeyBindingMappingFormat{
 var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature:          "",
-		InstructionLines: []string{""},
+		InstructionLines: []string{"-- 機能の説明と手順 --"},
 		LineType:         TITLE,
-	},
-	{
-		Feature:          "",
-		InstructionLines: []string{""},
-		LineType:         INFO,
 	},
 	{
 		Feature: "コミット (commit)",
