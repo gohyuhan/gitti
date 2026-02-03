@@ -94,10 +94,11 @@ func main() {
 		gitUpdateChannel := make(chan string, 32)
 		tuiUpdateChannel := make(chan string, 32)
 		loggingUpdateChannel := make(chan string, 64)
+		daemonUpdateChannel := make(chan string, 16)
 		gittiLogging := logging.InitGittiLogging(settings.GITTICONFIGSETTINGS.MaxLogCount, loggingUpdateChannel, settings.GITTICONFIGSETTINGS.ShowXLog)
 
 		// initialization
-		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, gitUpdateChannel, gittiLogging)
+		gitOperations, gitRepoPathInfo := config.InitGitAndAPI(repoPath, gitUpdateChannel, gittiLogging, daemonUpdateChannel)
 
 		// check for update if user allows it
 		if settings.GITTICONFIGSETTINGS.AutoUpdate {
@@ -118,7 +119,7 @@ func main() {
 			return msg
 		}
 
-		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, repoPath, gitRepoPathInfo.RepoName, gitOperations, gittiLogging)
+		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, gitRepoPathInfo.TopLevelRepoPath, gitRepoPathInfo.RepoName, gitOperations, gittiLogging, daemonUpdateChannel)
 		gitti := tea.NewProgram(
 			gittiAppModel,
 			tea.WithFilter(mouseThrottle),

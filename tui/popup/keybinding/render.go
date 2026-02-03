@@ -19,7 +19,7 @@ func RenderKeyBindingAndFeatureInstructionsPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*KeybindingAndFeatureInstructionsPopUpModel)
 	if ok {
 		var contentLine strings.Builder
-		contentLine.WriteString("\n")
+		contentLine.WriteRune('\n')
 
 		// context aware, only show the key binding of the current user selected component panel related keybinding
 		renderSelectedComponentKeyBindingPart(m, &contentLine)
@@ -85,9 +85,9 @@ func renderGlobalKeyBindingPart(m *types.GittiModel, contentLine *strings.Builde
 
 		contentLine.WriteString(" \n")
 	}
-	contentLine.WriteString("\n")
-	contentLine.WriteString("\n")
-	contentLine.WriteString("\n")
+	contentLine.WriteRune('\n')
+	contentLine.WriteRune('\n')
+	contentLine.WriteRune('\n')
 }
 
 func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *strings.Builder) {
@@ -160,9 +160,9 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 
 		contentLine.WriteString(" \n")
 	}
-	contentLine.WriteString("\n")
-	contentLine.WriteString("\n")
-	contentLine.WriteString("\n")
+	contentLine.WriteRune('\n')
+	contentLine.WriteRune('\n')
+	contentLine.WriteRune('\n')
 }
 
 func renderFeaturesInstuctionsAndStepsPart(contentLine *strings.Builder) {
@@ -191,7 +191,7 @@ func renderFeaturesInstuctionsAndStepsPart(contentLine *strings.Builder) {
 
 		contentLine.WriteString(" \n")
 	}
-	contentLine.WriteString("\n")
-	contentLine.WriteString("\n")
-	contentLine.WriteString("\n")
+	contentLine.WriteRune('\n')
+	contentLine.WriteRune('\n')
+	contentLine.WriteRune('\n')
 }

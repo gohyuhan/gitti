@@ -16,7 +16,7 @@ import (
 // init the list component for commit log Component
 func InitGitCommitLogList(m *types.GittiModel) bool {
 	latestGitCommitLog := m.GitOperations.GitCommitLog.GitCommitLogOutput()
-	var latestGitCommitLogItemArray []list.Item
+	latestGitCommitLogItemArray := make([]list.Item, 0, len(latestGitCommitLog))
 
 	// get the previous selected commit log and see if it was within the new list if yes get the latest position of the previous selected file
 	previousSelectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()

@@ -189,7 +189,7 @@ func (gb *GitBranch) GitCreateNewBranchBasedOnRemote(remoteName string, branchNa
 	}
 	defer gb.gitProcessLock.ReleaseGitOpsLock()
 
-	gitFetch()
+	gitFetch(gb.logging, false)
 
 	remoteBranchName := fmt.Sprintf("%s/%s", remoteName, branchName)
 

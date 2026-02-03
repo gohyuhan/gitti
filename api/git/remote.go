@@ -161,13 +161,13 @@ func (gr *GitRemote) CheckRemoteExist() bool {
 //	Related to Git Remote sync status and upstream, will be call by system
 //
 // ----------------------------------
-func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool) {
+func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool, userTriggered bool) {
 	upstreamIcon, upstream, _ := hasUpstreamWithIcon()
 	gr.upStreamRemoteIcon = upstreamIcon
 	gr.currentBranchUpStream = upstream
 
 	if needFetch {
-		gitFetch()
+		gitFetch(gr.logging, userTriggered)
 	}
 
 	gitArgs := []string{"rev-list", "--left-right", "--count", "HEAD...@{upstream}"}

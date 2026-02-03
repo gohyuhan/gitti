@@ -161,7 +161,8 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 		} else {
 			for _, line := range fileDiffLines2 {
 				line = style.NewStyle.Render(line)
-				vpLine2.WriteString(line + "\n")
+				vpLine2.WriteString(line)
+				vpLine2.WriteRune('\n')
 			}
 		}
 
@@ -181,7 +182,8 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 	} else {
 		for _, line := range fileDiffLines1 {
 			line = style.NewStyle.Render(line)
-			vpLine1.WriteString(line + "\n")
+			vpLine1.WriteString(line)
+			vpLine1.WriteRune('\n')
 		}
 	}
 
@@ -206,7 +208,8 @@ func generateCommitLogDetailPanelContent(ctx context.Context, m *types.GittiMode
 
 	for _, Line := range commitLogDetail {
 		line := style.NewStyle.Render(Line)
-		vpLine.WriteString(line + "\n")
+		vpLine.WriteString(line)
+		vpLine.WriteRune('\n')
 	}
 	return vpLine.String()
 }
@@ -222,20 +225,22 @@ func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) s
 	}
 
 	var vpLine strings.Builder
-	vpLine.WriteString(fmt.Sprintf(
-		"[%s]\n[%s]\n\n",
-		style.StashIdStyle.Render(stashItem.Id),
-		style.StashMessageStyle.Render(stashItem.Message),
-	))
 
 	stashDetail := m.GitOperations.GitStash.GitStashDetail(ctx, stashItem.Id)
 	if len(stashDetail) < 1 {
 		return ""
 	}
 
+	vpLine.WriteString(fmt.Sprintf(
+		"[%s]\n[%s]\n\n",
+		style.StashIdStyle.Render(stashItem.Id),
+		style.StashMessageStyle.Render(stashItem.Message),
+	))
+
 	for _, Line := range stashDetail {
 		line := style.NewStyle.Render(Line)
-		vpLine.WriteString(line + "\n")
+		vpLine.WriteString(line)
+		vpLine.WriteRune('\n')
 	}
 	return vpLine.String()
 }
@@ -252,7 +257,8 @@ func generateAboutGittiContent() string {
 	logoLineArray := style.GradientLines(constant.GittiAsciiArtLogo)
 	aboutLines := i18n.LANGUAGEMAPPING.AboutGitti
 
-	vpLine.WriteString(strings.Join(logoLineArray, "\n") + "\n")
+	vpLine.WriteString(strings.Join(logoLineArray, "\n"))
+	vpLine.WriteRune('\n')
 	vpLine.WriteString(strings.Join(aboutLines, "\n"))
 
 	return vpLine.String()
@@ -477,21 +483,32 @@ func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewpor
 	// set the cursor viewport
 	var cursorVpLine strings.Builder
 	var cursorVpTwoLine strings.Builder
+
 	for index := range detailPanelViewportVisibleIndex {
 		if index == m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition {
-			cursorVpLine.WriteString(style.SelectedItemStyle.Render("❯  ") + "\n")
+			cursorVpLine.WriteString(style.SelectedItemStyle.Render("❯  "))
+			cursorVpLine.WriteRune('\n')
 		} else {
-			cursorVpLine.WriteString(style.NewStyle.Render("   ") + "\n")
+			cursorVpLine.WriteString(style.NewStyle.Render("   "))
+			cursorVpLine.WriteRune('\n')
 		}
 	}
 
 	for index := range detailPanelTwoViewportVisibleIndex {
 		if index == m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
-			cursorVpTwoLine.WriteString(style.SelectedItemStyle.Render("❯  ") + "\n")
+			cursorVpTwoLine.WriteString(style.SelectedItemStyle.Render("❯  "))
+			cursorVpTwoLine.WriteRune('\n')
 		} else {
-			cursorVpTwoLine.WriteString(style.NewStyle.Render("   ") + "\n")
+			cursorVpTwoLine.WriteString(style.NewStyle.Render("   "))
+			cursorVpTwoLine.WriteRune('\n')
 		}
 	}
 	m.LineEditingIndexCursorViewport.SetContent(cursorVpLine.String())
 	m.LineEditingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
+}
+
+func GitFetchService(m *types.GittiModel) {
+	go func() {
+		m.DaemonUpdateChannel <- git.GIT_FETCH
+	}()
 }

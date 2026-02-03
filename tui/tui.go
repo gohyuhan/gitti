@@ -26,7 +26,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
-func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging) *GittiAppModel {
+func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
@@ -59,6 +59,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 
 	gittiModel := &types.GittiModel{
 		GittiLogger:                      gittiLogger,
+		DaemonUpdateChannel:              daemonUpdateChannel,
 		TuiUpdateChannel:                 tuiUpdateChannel,
 		UserSetEditor:                    settings.GITTICONFIGSETTINGS.Editor,
 		CurrentSelectedComponent:         constant.ModifiedFilesComponent,

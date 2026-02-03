@@ -1,6 +1,8 @@
 package pull
 
 import (
+	"strings"
+
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -12,12 +14,13 @@ func UpdatePopUpGitPullOutputViewport(m *types.GittiModel) {
 		popUp.GitPullOutputViewport.SetWidth(min(constant.MaxGitPullOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
 		popUp.GitPullOutputViewport.SetYOffset(popUp.GitPullOutputViewport.YOffset())
 		logs := m.GitOperations.GitPull.GetGitPullOutput()
-		var GitPullLog string
+		var GitPullLogString strings.Builder
 		for _, line := range logs {
 			logLine := style.NewStyle.Render(line)
-			GitPullLog += logLine + "\n"
+			GitPullLogString.WriteString(logLine)
+			GitPullLogString.WriteRune('\n')
 		}
-		popUp.GitPullOutputViewport.SetContent(GitPullLog)
+		popUp.GitPullOutputViewport.SetContent(GitPullLogString.String())
 		popUp.GitPullOutputViewport.PageDown()
 	}
 }

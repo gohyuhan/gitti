@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 )
 
 func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {
@@ -180,10 +181,17 @@ func isFilesInConflictState(indexState string, workTree string) bool {
 //	Related to Git Fetch
 //
 // ----------------------------------
-func gitFetch() {
+func gitFetch(gittiLogger *logging.GittiLogging, userTriggered bool) {
 	gitArgs := []string{"fetch"}
+	if userTriggered {
+		gittiLogger.RegisterNewLog(logging.FETCH_OPS, strings.Join(gitArgs, ""), logging.INFO, "", true)
+	}
 	fetchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	fetchCmdExecutor.Run()
+	err := fetchCmdExecutor.Run()
+
+	if err != nil && userTriggered {
+		gittiLogger.RegisterNewLog(logging.FETCH_OPS, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.FETCH_OPS, err.Error()), true)
+	}
 }
 
 // checkIfFileExistWithinDotGitFolder verifies if a specific file (e.g., MERGE_HEAD) exists in the .git directory.

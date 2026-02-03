@@ -1,6 +1,5 @@
 package git
 
-// --- ANSI Colors ---
 const (
 	PUSH               = "PUSH"
 	FORCEPUSHSAFE      = "FORCEPUSHSAFE"
