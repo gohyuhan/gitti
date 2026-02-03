@@ -585,6 +585,11 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "ctrl+f",
+		TitleOrInfoLine: "觸發 git fetch",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "聚焦到日誌面板",
 		LineType:        INFO,
@@ -888,6 +893,14 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 強制推送（危險）- 無保護",
 			"4. 按 `enter` 執行",
 			"5. 按 `esc` 關閉輸出彈出視窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "獲取 (fetch)",
+		InstructionLines: []string{
+			"1. 按下 `ctrl+f` 觸發 fetch",
+			"   - 如果正在進行 fetch，請求將被拒絕",
 		},
 		LineType: INFO,
 	},

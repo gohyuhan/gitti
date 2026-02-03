@@ -586,6 +586,11 @@ var jaGlobalKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "ctrl+f",
+		TitleOrInfoLine: "git fetch を実行",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "ログパネルにフォーカス",
 		LineType:        INFO,
@@ -889,6 +894,14 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 強制プッシュ（危険）- 保護なし",
 			"4. `enter` を押して実行",
 			"5. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "フェッチ (fetch)",
+		InstructionLines: []string{
+			"1. `ctrl+f` を押してフェッチを実行",
+			"   - フェッチが進行中の場合は拒否されます",
 		},
 		LineType: INFO,
 	},

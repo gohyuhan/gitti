@@ -585,6 +585,11 @@ var zhHansGlobalKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "ctrl+f",
+		TitleOrInfoLine: "触发 git fetch",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "聚焦到日志面板",
 		LineType:        INFO,
@@ -888,6 +893,14 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 强制推送（危险）- 无保护",
 			"4. 按 `enter` 执行",
 			"5. 按 `esc` 关闭输出弹窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "获取 (fetch)",
+		InstructionLines: []string{
+			"1. 按下 `ctrl+f` 触发 fetch",
+			"   - 如果正在进行 fetch，请求将被拒绝",
 		},
 		LineType: INFO,
 	},

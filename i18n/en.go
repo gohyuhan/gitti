@@ -584,6 +584,11 @@ var enGlobalKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "ctrl+f",
+		TitleOrInfoLine: "trigger git fetch",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "focus on the log panel",
 		LineType:        INFO,
@@ -887,6 +892,14 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - Force Push (dangerous) - without protection",
 			"4. Press `enter` to execute",
 			"5. Press `esc` to close output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "fetch",
+		InstructionLines: []string{
+			"1. Press `ctrl+f` to trigger fetch",
+			"   - If there is a fetch in progress, it will be denied",
 		},
 		LineType: INFO,
 	},
