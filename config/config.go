@@ -101,7 +101,7 @@ func SetShowXLog(x int) {
 	}
 }
 
-func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *logging.GittiLogging) (*api.GitOperations, api.GitRepoPath) {
+func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *logging.GittiLogging, daemonUpdateChannel chan string) (*api.GitOperations, api.GitRepoPath) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
 	// check if the user repo is git inited, is not prompt user to init it
@@ -110,7 +110,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *log
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
 	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gittiLogging)
-	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations, settings.GITTICONFIGSETTINGS.AllowCommitGraphWrite)
+	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations, settings.GITTICONFIGSETTINGS.AllowCommitGraphWrite, daemonUpdateChannel, gittiLogging)
 
 	return gitOperations, gitRepoPathInfo
 }

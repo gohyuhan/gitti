@@ -32,6 +32,9 @@ func GittiKeyInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel
 	case "ctrl+l":
 		utils.OpenBrowser(constant.AUTHOR_LINKEDIN)
 		return m, nil
+	case "ctrl+f":
+		services.GitFetchService(m)
+		return m, nil
 	}
 
 	// for typing mode, it will always and must be a pop up

@@ -12,6 +12,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 )
 
@@ -32,13 +33,15 @@ type GitDaemon struct {
 	stopChannel                         chan struct{}
 	errorLog                            []error
 	updateChannel                       chan string // to communicate back to main thread for an update event
+	daemonReceiverChannel               chan string // this is used to receive signal from main thread by the daemon
 	gitOperations                       *GitOperations
 	allowCommitGraphWrite               bool
+	gittiLogger                         *logging.GittiLogging
 }
 
 var GITDAEMON *GitDaemon
 
-func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations, allowCommitGraphWrite bool) {
+func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations, allowCommitGraphWrite bool, daemonReceiverChannel chan string, gittiLogger *logging.GittiLogging) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		// Log the critical error - this means file watching won't work
@@ -64,7 +67,9 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 		errorLog:                            make([]error, 0),
 		updateChannel:                       updateChannel,
 		gitOperations:                       gitOperations,
+		daemonReceiverChannel:               daemonReceiverChannel,
 		allowCommitGraphWrite:               allowCommitGraphWrite,
+		gittiLogger:                         gittiLogger,
 	}
 	gd.isGitFilesPassiveActiveRunning.Store(false)
 	gd.isGitRemoteSyncStatusActiveRunning.Store(false)
@@ -141,10 +146,23 @@ func (gd *GitDaemon) Start() {
 				go func() {
 					if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 						defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
-						gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true)
+						gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, false)
 						gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 					}
 				}()
+			case signal := <-gd.daemonReceiverChannel:
+				switch signal {
+				case git.GIT_FETCH:
+					go func() {
+						if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
+							defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
+							gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, true)
+							gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
+						} else {
+							gd.gittiLogger.RegisterNewLog(logging.FETCH_OPS, "", logging.WARN, "[WARN]: A background process to fetch is already running", false)
+						}
+					}()
+				}
 			case <-gd.stopChannel:
 				gd.watcher.Close()
 				return
@@ -183,7 +201,7 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 	go func() {
 		if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
-			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(needFetch)
+			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(needFetch, false)
 			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 		}
 	}()

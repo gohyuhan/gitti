@@ -506,3 +506,9 @@ func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewpor
 	m.LineEditingIndexCursorViewport.SetContent(cursorVpLine.String())
 	m.LineEditingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
 }
+
+func GitFetchService(m *types.GittiModel) {
+	go func() {
+		m.DaemonUpdateChannel <- git.GIT_FETCH
+	}()
+}
