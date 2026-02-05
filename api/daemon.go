@@ -27,6 +27,7 @@ type GitDaemon struct {
 	isGitCommitLogPassiveRunning        atomic.Bool
 	isGitStashPassiveRunning            atomic.Bool
 	isGitRemoteSyncStatusActiveRunning  atomic.Bool
+	isGitTagPassiveRunning              atomic.Bool
 	watcherTimer                        *time.Timer
 	gitFilesActiveTimer                 *time.Timer
 	gitRemoteSyncStatusActiveTimer      *time.Timer
@@ -76,6 +77,7 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 	gd.isGitBranchPassiveRunning.Store(false)
 	gd.isGitCommitLogPassiveRunning.Store(false)
 	gd.isGitStashPassiveRunning.Store(false)
+	gd.isGitTagPassiveRunning.Store(false)
 	gd.watcherTimer.Stop()
 	gd.gitFilesActiveTimer.Stop()
 	gd.gitRemoteSyncStatusActiveTimer.Stop()
@@ -91,7 +93,7 @@ func (gd *GitDaemon) watchPath() {
 	}
 	err = filepath.WalkDir(gd.repoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
-			if d.IsDir() && d.Name() == "objects" {
+			if d.IsDir() && (d.Name() == "objects" || d.Name() == "hooks") {
 				return fs.SkipDir
 			}
 			gd.watcher.Add(path)
@@ -219,6 +221,13 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 			gd.updateChannel <- git.GIT_STASH_UPDATE
 		}
 	}()
+	go func() {
+		if gd.isGitTagPassiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitTagPassiveRunning.Store(false)
+			gd.gitOperations.GitTag.GetLatestGitTag()
+			gd.updateChannel <- git.GIT_TAG_UPDATE
+		}
+	}()
 }
 
 func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
@@ -239,7 +248,7 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 		if err == nil && fi.IsDir() {
 			filepath.WalkDir(event.Name, func(path string, d fs.DirEntry, err error) error {
 				if err == nil && d.IsDir() {
-					if d.IsDir() && d.Name() == "objects" {
+					if d.IsDir() && (d.Name() == "objects" || d.Name() == "hooks") {
 						return fs.SkipDir
 					}
 					_ = gd.watcher.Add(path)
