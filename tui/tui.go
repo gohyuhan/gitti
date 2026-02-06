@@ -96,6 +96,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		GitOperations:                           gitOperations,
 		GlobalKeyBindingKeyMapLargestLen:        0,
 		LocalBranchComponentKeyBindingKeyMapLargestLen:   0,
+		TagComponentKeyBindingKeyMapLargestLen:           0,
 		ModifiedFilesComponentKeyBindingKeyMapLargestLen: 0,
 		CommitLogComponentKeyBindingKeyMapLargestLen:     0,
 		StashComponentKeyBindingKeyMapLargestLen:         0,

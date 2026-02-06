@@ -1,10 +1,8 @@
 package tag
 
 import (
-	"fmt"
-
 	"charm.land/bubbles/v2/list"
-	"github.com/gohyuhan/gitti/i18n"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -19,6 +17,8 @@ func InitTagList(m *types.GittiModel) {
 
 	previousSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
 	selectedTagPosition := -1
+
+	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
 
 	if previousSelectedTag != nil {
 		previousSelectedTagInfo := previousSelectedTag.(GitTagItem)
@@ -41,7 +41,7 @@ func InitTagList(m *types.GittiModel) {
 	m.CurrentRepoTagInfoList.SetShowStatusBar(false)
 	m.CurrentRepoTagInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoTagInfoList.SetShowFilter(false)
-	m.CurrentRepoTagInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf412 %s:", i18n.LANGUAGEMAPPING.Tag), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoTagInfoList.Title = ansi.Truncate(ConstructTagComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoTagInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoTagInfoList.Styles.PaginationStyle = style.PaginationStyle
 	m.CurrentRepoTagInfoList.Styles.TitleBar = style.NewStyle

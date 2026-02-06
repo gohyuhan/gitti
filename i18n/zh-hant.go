@@ -320,6 +320,7 @@ var zH_HANT = LanguageMapping{
 	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHantModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHantCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHantStashComponentKeyBinding,
@@ -633,6 +634,35 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "刪除分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for zh-hant
+var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 標籤組件面板快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
 		LineType:        INFO,
 	},
 	{
@@ -1078,7 +1108,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "建立分支 (create branch)",
 		InstructionLines: []string{
-			"1. 導航到分支組件（按 `1`）",
+			"1. 導航到分支組件（按 `1`）或切換到分支組件（按 `< >`）",
 			"2. 按 `n` 開啟分支建立選項",
 			"3. 選擇:",
 			"   - 建立新分支（留在當前分支）",
@@ -1093,7 +1123,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "切換分支 (switch branch)",
 		InstructionLines: []string{
-			"1. 導航到分支組件（按 `1`）",
+			"1. 導航到分支組件（按 `1`）或切換到分支組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇目標分支",
 			"3. 按 `enter` 開始切換",
 			"4. 選擇切換類型:",
@@ -1107,7 +1137,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "刪除分支 (delete branch)",
 		InstructionLines: []string{
-			"1. 導航到分支組件（按 `1`）",
+			"1. 導航到分支組件（按 `1`）或切換到分支組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇要刪除的分支",
 			"   - 無法刪除當前檢出的分支",
 			"3. 按 `d` 開始刪除",

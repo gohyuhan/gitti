@@ -231,6 +231,11 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 			layout.TuiWindowSizing(m)
 		}
 		return m, nil
+	case "<":
+		return handleNonTypingLeftAngleBracketKeyBindingInteraction(m)
+
+	case ">":
+		return handleNonTypingRightAngleBracketKeyBindingInteraction(m)
 
 	case "ctrl+a":
 		return handleNonTypingCtrlaKeyBindingInteraction(m)

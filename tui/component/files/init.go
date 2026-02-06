@@ -1,10 +1,8 @@
 package files
 
 import (
-	"fmt"
-
 	"charm.land/bubbles/v2/list"
-	"github.com/gohyuhan/gitti/i18n"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -22,6 +20,8 @@ func InitModifiedFilesList(m *types.GittiModel) bool {
 	// get the previous selected file and see if it was within the new list if yes get the latest position of the previous selected file
 	previousSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	selectedFilesPosition := -1
+
+	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
 
 	if previousSelectedFile != nil {
 		for index, modifiedFile := range latestModifiedFilesArray {
@@ -44,7 +44,7 @@ func InitModifiedFilesList(m *types.GittiModel) bool {
 	m.CurrentRepoModifiedFilesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoModifiedFilesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoModifiedFilesInfoList.SetShowFilter(false)
-	m.CurrentRepoModifiedFilesInfoList.Title = utils.TruncateString(fmt.Sprintf("[2] \ueae9 %s:", i18n.LANGUAGEMAPPING.ModifiedFiles), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoModifiedFilesInfoList.Title = ansi.Truncate(ConstructModifiedFilesComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoModifiedFilesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoModifiedFilesInfoList.Styles.TitleBar = style.NewStyle
 	m.CurrentRepoModifiedFilesInfoList.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)

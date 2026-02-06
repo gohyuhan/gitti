@@ -103,7 +103,8 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 			selectedComponentKeyBindingKeyMapLargestLen = &m.LocalBranchComponentKeyBindingKeyMapLargestLen
 			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.LocalBranchComponentKeyBinding
 		case constant.SHOW_TAG:
-			// TO DO
+			selectedComponentKeyBindingKeyMapLargestLen = &m.TagComponentKeyBindingKeyMapLargestLen
+			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.TagComponentKeyBinding
 		}
 	case constant.ModifiedFilesComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.ModifiedFilesComponentKeyBindingKeyMapLargestLen

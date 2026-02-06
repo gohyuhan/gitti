@@ -161,6 +161,8 @@ type LanguageMapping struct {
 	GlobalKeyBinding []KeyBindingMappingFormat
 	// Local Branch Component KeyBinding
 	LocalBranchComponentKeyBinding []KeyBindingMappingFormat
+	// Tag Component KeyBinding
+	TagComponentKeyBinding []KeyBindingMappingFormat
 	// Modified Files Component KeyBinding
 	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Commit Log Component KeyBinding

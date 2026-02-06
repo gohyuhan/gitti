@@ -320,6 +320,7 @@ var eN = LanguageMapping{
 	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         enModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             enCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 enStashComponentKeyBinding,
@@ -632,6 +633,35 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "delete branch",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between local branch and tag component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for en
+var enTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Tag Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between local branch and tag component",
 		LineType:        INFO,
 	},
 	{
@@ -1077,7 +1107,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "create branch",
 		InstructionLines: []string{
-			"1. Navigate to Branches component (press `1`)",
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
 			"2. Press `n` to open branch creation options",
 			"3. Select:",
 			"   - Create new branch (stay on current)",
@@ -1092,7 +1122,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "switch branch",
 		InstructionLines: []string{
-			"1. Navigate to Branches component (press `1`)",
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
 			"2. Select the target branch using `↑/↓`",
 			"3. Press `enter` to initiate switch",
 			"4. Select switch type:",
@@ -1106,7 +1136,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "delete branch",
 		InstructionLines: []string{
-			"1. Navigate to Branches component (press `1`)",
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
 			"2. Select the branch to delete using `↑/↓`",
 			"   - Cannot delete currently checked out branch",
 			"3. Press `d` to initiate deletion",

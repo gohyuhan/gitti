@@ -320,6 +320,7 @@ var jA = LanguageMapping{
 	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             jaCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 jaStashComponentKeyBinding,
@@ -634,6 +635,35 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "ブランチを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for ja
+var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- タグコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
 		LineType:        INFO,
 	},
 	{
@@ -1079,7 +1109,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "ブランチを作成 (create branch)",
 		InstructionLines: []string{
-			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
 			"2. `n` を押してブランチ作成オプションを開く",
 			"3. 選択:",
 			"   - 新しいブランチを作成（現在のブランチに留まる）",
@@ -1094,7 +1124,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "ブランチを切り替え (switch branch)",
 		InstructionLines: []string{
-			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
 			"2. `↑/↓` で対象ブランチを選択",
 			"3. `enter` を押して切り替えを開始",
 			"4. 切り替えタイプを選択:",
@@ -1108,7 +1138,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "ブランチを削除 (delete branch)",
 		InstructionLines: []string{
-			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
 			"2. `↑/↓` で削除するブランチを選択",
 			"   - 現在チェックアウト中のブランチは削除できません",
 			"3. `d` を押して削除を開始",

@@ -320,6 +320,7 @@ var zH_HANS = LanguageMapping{
 	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHansModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHansCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHansStashComponentKeyBinding,
@@ -633,6 +634,35 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "删除分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for zh-hans
+var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 标签组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和标签组件之间切换",
 		LineType:        INFO,
 	},
 	{
@@ -1078,7 +1108,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "创建分支 (create branch)",
 		InstructionLines: []string{
-			"1. 导航到分支组件（按 `1`）",
+			"1. 导航到分支组件（按 `1`）或切换到分支组件（按 `< >`）",
 			"2. 按 `n` 打开分支创建选项",
 			"3. 选择:",
 			"   - 创建新分支（留在当前分支）",
@@ -1093,7 +1123,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "切换分支 (switch branch)",
 		InstructionLines: []string{
-			"1. 导航到分支组件（按 `1`）",
+			"1. 导航到分支组件（按 `1`）或切换到分支组件（按 `< >`）",
 			"2. 使用 `↑/↓` 选择目标分支",
 			"3. 按 `enter` 开始切换",
 			"4. 选择切换类型:",
@@ -1107,7 +1137,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "删除分支 (delete branch)",
 		InstructionLines: []string{
-			"1. 导航到分支组件（按 `1`）",
+			"1. 导航到分支组件（按 `1`）或切换到分支组件（按 `< >`）",
 			"2. 使用 `↑/↓` 选择要删除的分支",
 			"   - 无法删除当前检出的分支",
 			"3. 按 `d` 开始删除",

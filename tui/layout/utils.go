@@ -1,6 +1,12 @@
 package layout
 
 import (
+	"github.com/charmbracelet/x/ansi"
+	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
+	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
+	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
+	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
+	tagComponent "github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -24,6 +30,14 @@ func TuiWindowSizing(m *types.GittiModel) {
 
 	// update the dynamic size of the left panel
 	LeftPanelDynamicResize(m)
+
+	// reconstruct the component title
+	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
+	m.CurrentRepoBranchesInfoList.Title = ansi.Truncate(branchComponent.ConstructLocalBranchComponentTitle(titleWidthLimit), titleWidthLimit, "...")
+	m.CurrentRepoTagInfoList.Title = ansi.Truncate(tagComponent.ConstructTagComponentTitle(titleWidthLimit), titleWidthLimit, "...")
+	m.CurrentRepoModifiedFilesInfoList.Title = ansi.Truncate(filesComponent.ConstructModifiedFilesComponentTitle(titleWidthLimit), titleWidthLimit, "...")
+	m.CurrentRepoCommitLogInfoList.Title = ansi.Truncate(commitlogComponent.ConstructCommitLogComponentTitle(titleWidthLimit), titleWidthLimit, "...")
+	m.CurrentRepoStashInfoList.Title = ansi.Truncate(stashComponent.ConstructStashComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 
 	// update viewport of detail panel
 	UpdateDetailComponentViewportLayout(m)

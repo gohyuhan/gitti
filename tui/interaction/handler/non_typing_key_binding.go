@@ -1339,6 +1339,36 @@ func handleNonTypingSlashKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagComponentPanel:
+			switch m.CurrentLocalBranchOrTagComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+			// do nothing, as local branch will be the most left option in the local branch or tagcomponent panel
+			case constant.SHOW_TAG:
+				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_LOCAL_BRANCH
+			}
+		}
+	}
+	return m, nil
+}
+
+func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagComponentPanel:
+			switch m.CurrentLocalBranchOrTagComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_TAG
+			case constant.SHOW_TAG:
+				// do nothing, as tag is currently the most right option in the local branch or tag component panel
+			}
+		}
+	}
+	return m, nil
+}
+
 func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		services.GitStateUniversalUtilsAbortService(m)

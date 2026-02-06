@@ -1,9 +1,7 @@
 package stash
 
 import (
-	"fmt"
-
-	"github.com/gohyuhan/gitti/i18n"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -24,6 +22,8 @@ func InitStashList(m *types.GittiModel) bool {
 	previousSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
 	selectedStashPosition := -1
 
+	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
+
 	if previousSelectedStash != nil {
 		for index, stashInfo := range latestStashArray {
 			if stashInfo.Id == previousSelectedStash.(GitStashItem).Id {
@@ -43,7 +43,7 @@ func InitStashList(m *types.GittiModel) bool {
 	m.CurrentRepoStashInfoList.SetShowStatusBar(false)
 	m.CurrentRepoStashInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoStashInfoList.SetShowFilter(false)
-	m.CurrentRepoStashInfoList.Title = utils.TruncateString(fmt.Sprintf("[4] \ueaf7 %s:", i18n.LANGUAGEMAPPING.Stash), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoStashInfoList.Title = ansi.Truncate(ConstructStashComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoStashInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoStashInfoList.Styles.TitleBar = style.NewStyle
 	m.CurrentRepoStashInfoList.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
