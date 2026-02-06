@@ -19,6 +19,7 @@ type GittiModel struct {
 	TuiUpdateChannel                                 chan string
 	CurrentSelectedComponent                         string
 	CurrentSelectedComponentIndex                    int
+	CurrentLocalBranchOrTagComponentShowing          string
 	TotalComponentCount                              int
 	RepoPath                                         string
 	RepoName                                         string
@@ -36,11 +37,13 @@ type GittiModel struct {
 	WindowCoreContentHeight                          int // this is the height of the part where key binding panel is not included
 	DetailComponentPanelHeight                       int
 	LocalBranchesComponentPanelHeight                int
+	TagsComponentPanelHeight                         int
 	ModifiedFilesComponentPanelHeight                int
 	CommitLogComponentPanelHeight                    int
 	StashComponentPanelHeight                        int
 	LogComponentPanelHeight                          int
 	CurrentRepoBranchesInfoList                      list.Model
+	CurrentRepoTagInfoList                           list.Model
 	CurrentRepoModifiedFilesInfoList                 list.Model
 	CurrentRepoCommitLogInfoList                     list.Model
 	CurrentRepoStashInfoList                         list.Model
@@ -96,6 +99,7 @@ type GittiComponentsCurrentListNavigationIndexPosition struct {
 	ModifiedFilesComponent int
 	CommitLogComponent     int
 	StashComponent         int
+	TagComponent           int
 }
 
 // ---------------------------------

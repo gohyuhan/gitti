@@ -89,6 +89,7 @@ type LanguageMapping struct {
 	ModifiedFiles               string
 	CommitLog                   string
 	Stash                       string
+	Tag                         string
 	FileTypeUnSupportedPreview  string
 	TerminalSizeWarning         string
 	CurrentTerminalHeight       string
@@ -109,6 +110,8 @@ type LanguageMapping struct {
 	KeyBindingLocalBranchComponentIsCheckOut                []string
 	KeyBindingLocalBranchComponentDefault                   []string
 	KeyBindingLocalBranchComponentNone                      []string
+	KeyBindingTagComponentNone                              []string
+	KeyBindingTagComponentDefault                           []string
 	KeyBindingModifiedFilesComponentConflict                []string
 	KeyBindingModifiedFilesComponentIsStaged                []string
 	KeyBindingModifiedFilesComponentDefault                 []string

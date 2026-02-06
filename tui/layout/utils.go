@@ -50,16 +50,16 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	var selectedComponentPanelHeight int
 	remainingHeight := 0
 	// this is after reserving the height for the gitti status panel and also Padding
-	leftPanelRemainingHeight := m.WindowCoreContentHeight - 1 - ((len(constant.ComponentNavigationList) - 1) * 2)
+	leftPanelRemainingHeight := m.WindowCoreContentHeight - 1 - ((len(constant.ComponentPanelNavigationList) - 1) * 2)
 
 	// we minus 2 if GitStatusComponent is not the one chosen is because GitStatusComponent
 	// and the one that got selected will not be account in to the dynamic height calculation
 	// ( gitti status component's height is fix at 3, while the selected one will always get 40% )
-	componentWithDynamicHeight := (len(constant.ComponentNavigationList) - 2)
+	componentWithDynamicHeight := (len(constant.ComponentPanelNavigationList) - 2)
 
 	// because log component is not a member of left panel, so if this panel was selected, we need top adjust the component with dynamic height as no component in left panel is selected in that case
-	if m.CurrentSelectedComponent == constant.LogComponent {
-		componentWithDynamicHeight = (len(constant.ComponentNavigationList) - 1)
+	if m.CurrentSelectedComponent == constant.LogComponentPanel {
+		componentWithDynamicHeight = (len(constant.ComponentPanelNavigationList) - 1)
 		unSelectedComponentPanelHeightPerComponent = int(leftPanelRemainingHeight / componentWithDynamicHeight)
 		// there will be possibility of some height remaining after divide and turn to int, so we use the original - (divided height*the count of component)
 		// the remainingHeight will be added to the height for modified file component
@@ -75,43 +75,47 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	}
 
 	m.LocalBranchesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+	m.TagsComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.ModifiedFilesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent + remainingHeight
 	m.CommitLogComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.StashComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 
 	switch m.CurrentSelectedComponent {
-	case constant.LocalBranchComponent:
+	case constant.LocalBranchOrTagComponentPanel:
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
-	case constant.ModifiedFilesComponent:
+		m.TagsComponentPanelHeight = selectedComponentPanelHeight
+	case constant.ModifiedFilesComponentPanel:
 		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-	case constant.CommitLogComponent:
+	case constant.CommitLogComponentPanel:
 		m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
-	case constant.StashComponent:
+	case constant.StashComponentPanel:
 		m.StashComponentPanelHeight = selectedComponentPanelHeight
-	case constant.GitStatusComponent:
+	case constant.GitStatusComponentPanel:
 		// if it was the Gitti status component panel that got selected (because its height is fix),
 		// the next panel will get the selected height which is the branch component panel
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
-	case constant.DetailComponentTwo:
+	case constant.DetailComponentPanelTwo:
 		switch m.DetailPanelParentComponent {
-		case constant.LocalBranchComponent:
+		case constant.LocalBranchOrTagComponentPanel:
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.ModifiedFilesComponent:
+			m.TagsComponentPanelHeight = selectedComponentPanelHeight
+		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.CommitLogComponent:
+		case constant.CommitLogComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
-		case constant.StashComponent:
+		case constant.StashComponentPanel:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight
 		}
-	case constant.DetailComponent:
+	case constant.DetailComponentPanel:
 		switch m.DetailPanelParentComponent {
-		case constant.LocalBranchComponent:
+		case constant.LocalBranchOrTagComponentPanel:
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.ModifiedFilesComponent:
+			m.TagsComponentPanelHeight = selectedComponentPanelHeight
+		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.CommitLogComponent:
+		case constant.CommitLogComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
-		case constant.StashComponent:
+		case constant.StashComponentPanel:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight
 		}
 	}
@@ -119,6 +123,9 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	// update all components Width and Height
 	m.CurrentRepoBranchesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoBranchesInfoList.SetHeight(m.LocalBranchesComponentPanelHeight)
+
+	m.CurrentRepoTagInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoTagInfoList.SetHeight(m.TagsComponentPanelHeight)
 
 	m.CurrentRepoModifiedFilesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoModifiedFilesInfoList.SetHeight(m.ModifiedFilesComponentPanelHeight)

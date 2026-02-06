@@ -62,6 +62,7 @@ var zH_HANT = LanguageMapping{
 	ModifiedFiles:                       "已修改的檔案",
 	CommitLog:                           "提交記錄",
 	Stash:                               "暫存",
+	Tag:                                 "標籤",
 	FileTypeUnSupportedPreview:          "目前選擇的檔案類型不支援預覽",
 	TerminalSizeWarning:                 "終端機太小 — 請調整大小以繼續.",
 	CurrentTerminalHeight:               "目前高度",
@@ -82,15 +83,26 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新增分支",
+		"[</>] 切換元件",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切換分支",
 		"[n] 新增分支",
 		"[d] 刪除分支",
+		"[</>] 切換元件",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] 切換元件",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] 切換元件",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] 切換元件",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{

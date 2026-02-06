@@ -8,7 +8,7 @@ import (
 
 func GitDiscardLineFileChangeService(m *types.GittiModel, filePathName string) {
 	switch m.CurrentSelectedComponent {
-	case constant.DetailComponent:
+	case constant.DetailComponentPanel:
 		contentArray := stripAnsi(m.DetailPanelViewportOGStringArray)
 		overflowIndexCount := m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount
 		actualCurrentIndex := m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
@@ -26,7 +26,7 @@ func GitDiscardLineFileChangeService(m *types.GittiModel, filePathName string) {
 			return
 		}
 
-	case constant.DetailComponentTwo:
+	case constant.DetailComponentPanelTwo:
 		contentArray := stripAnsi(m.DetailPanelTwoViewportOGStringArray)
 		overflowIndexCount := m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount
 		actualCurrentIndex := m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex

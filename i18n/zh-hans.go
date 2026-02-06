@@ -62,6 +62,7 @@ var zH_HANS = LanguageMapping{
 	ModifiedFiles:                       "已修改的文件",
 	CommitLog:                           "提交记录",
 	Stash:                               "暂存",
+	Tag:                                 "标签",
 	FileTypeUnSupportedPreview:          "当前选择的文件类型不支持预览",
 	TerminalSizeWarning:                 "终端窗口太小 — 请调整大小后继续.",
 	CurrentTerminalHeight:               "当前高度",
@@ -82,15 +83,26 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新建分支",
+		"[</>] 切换组件",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切换分支",
 		"[n] 新建分支",
 		"[d] 删除分支",
+		"[</>] 切换组件",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] 切换组件",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] 切换组件",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] 切换组件",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{

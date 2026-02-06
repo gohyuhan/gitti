@@ -51,7 +51,8 @@ func stripAnsi(strArray []string) []string {
 }
 
 func GitStageLineOrUnstageLineService(m *types.GittiModel, filePathName string) {
-	if m.CurrentSelectedComponent == constant.DetailComponent {
+	switch m.CurrentSelectedComponent {
+	case constant.DetailComponentPanel:
 		contentArray := stripAnsi(m.DetailPanelViewportOGStringArray)
 		overflowIndexCount := m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount
 		actualCurrentIndex := m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
@@ -68,7 +69,7 @@ func GitStageLineOrUnstageLineService(m *types.GittiModel, filePathName string) 
 		default:
 			return
 		}
-	} else if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+	case constant.DetailComponentPanelTwo:
 		contentArray := stripAnsi(m.DetailPanelTwoViewportOGStringArray)
 		overflowIndexCount := m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount
 		actualCurrentIndex := m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex

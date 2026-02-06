@@ -62,6 +62,7 @@ var jA = LanguageMapping{
 	ModifiedFiles:                       "変更されたファイル",
 	CommitLog:                           "コミットログ",
 	Stash:                               "スタッシュ",
+	Tag:                                 "タグ",
 	FileTypeUnSupportedPreview:          "現在選択されているファイル形式はプレビューに対応していません",
 	TerminalSizeWarning:                 "端末サイズが小さすぎます - サイズを変更してください.",
 	CurrentTerminalHeight:               "現在の高さ",
@@ -82,15 +83,26 @@ var jA = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新しいブランチ",
+		"[</>] コンポーネントを切り替え",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] ブランチ切り替え",
 		"[n] 新しいブランチ",
 		"[d] ブランチを削除",
+		"[</>] コンポーネントを切り替え",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[?] キー操作と説明",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[?] キー操作と説明",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] コンポーネントを切り替え",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{

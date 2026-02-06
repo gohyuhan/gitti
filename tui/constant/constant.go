@@ -116,29 +116,29 @@ const (
 	PopUpGitDiscardFileLineChangeViewportHeight        = 1
 )
 
-// variables for indicating which panel/components/container or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
+// variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
 const (
-	GitStatusComponent     = "C0" // component index 0
-	LocalBranchComponent   = "C1" // component index 1
-	ModifiedFilesComponent = "C2" // component index 2
-	CommitLogComponent     = "C3" // component index 3
-	StashComponent         = "C4" // component index 4
+	GitStatusComponentPanel        = "C0" // component panel index 0
+	LocalBranchOrTagComponentPanel = "C1" // component panel index 1 (local branch component and tag component share the same panel)
+	ModifiedFilesComponentPanel    = "C2" // component panel index 2
+	CommitLogComponentPanel        = "C3" // component panel index 3
+	StashComponentPanel            = "C4" // component panel index 4
 
-	LogComponent = "L0" // this can be selected by keybinding but not by number
+	LogComponentPanel = "L0" // this can be selected by keybinding but not by number
 
 	// this is not a selectable component from key binding but act like an extension for each component to enter for more detail,
 	// no component index, the current selected component index will be still set as its parent's
-	DetailComponent    = "EC-DT"  // extended component -  detail component
-	DetailComponentTwo = "EC-DT2" // extended component -  detail component two (currently only used for unstaged changes diff)
+	DetailComponentPanel    = "EC-DT"  // extended component panel -  detail component
+	DetailComponentPanelTwo = "EC-DT2" // extended component panel -  detail component two (currently only used for unstaged changes diff)
 )
 
 // will be used by the key binding navigation of going to previous or next component panel
-var ComponentNavigationList = []string{
-	GitStatusComponent,
-	LocalBranchComponent,
-	ModifiedFilesComponent,
-	CommitLogComponent,
-	StashComponent,
+var ComponentPanelNavigationList = []string{
+	GitStatusComponentPanel,
+	LocalBranchOrTagComponentPanel,
+	ModifiedFilesComponentPanel,
+	CommitLogComponentPanel,
+	StashComponentPanel,
 }
 
 const DETAIL_COMPONENT_PANEL_UPDATED = "DETAIL_COMPONENT_PANEL_UPDATED"
@@ -170,4 +170,9 @@ const (
 	CHERRYPICK      = "CHERRYPICK"
 	EDITCHERRYPICK  = "EDITCHERRYPICK"
 	APPLYCHERRYPICK = "APPLYCHERRYPICK"
+)
+
+const (
+	SHOW_LOCAL_BRANCH = "SHOW_LOCAL_BRANCH"
+	SHOW_TAG          = "SHOW_TAG"
 )

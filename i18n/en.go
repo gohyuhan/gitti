@@ -62,6 +62,7 @@ var eN = LanguageMapping{
 	ModifiedFiles:                       "Modified Files",
 	CommitLog:                           "Commit Log",
 	Stash:                               "Stash",
+	Tag:                                 "Tag",
 	FileTypeUnSupportedPreview:          "The current selected file type is not supported for preview",
 	TerminalSizeWarning:                 "Terminal too small — resize to continue.",
 	CurrentTerminalHeight:               "Current height",
@@ -82,15 +83,26 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] new branch",
+		"[</>] switch component",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] switch branch",
 		"[n] new branch",
 		"[d] delete branch",
+		"[</>] switch component",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] switch component",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] switch component",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] switch component",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
