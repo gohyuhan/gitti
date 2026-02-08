@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"unicode/utf8"
+
 	tea "charm.land/bubbletea/v2"
 	"github.com/atotto/clipboard"
 	"github.com/gohyuhan/gitti/api"
@@ -10,6 +12,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
+	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -33,6 +36,11 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		m.PopUpType = constant.NoPopUp
 		m.PopUpModel = nil
 	case constant.CreateBranchBasedOnRemotePopUp:
+		m.ShowPopUp.Store(false)
+		m.IsTyping.Store(false)
+		m.PopUpType = constant.NoPopUp
+		m.PopUpModel = nil
+	case constant.CreateTagPopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -82,6 +90,19 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 				popUp.RemoteUrlTextInput.Focus()
 			}
 		}
+	case constant.CreateTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.TagNameInput.Focus()
+				popUp.TagMessageTextAreaInput.Blur()
+			case 2:
+				popUp.TagNameInput.Blur()
+				popUp.TagMessageTextAreaInput.Focus()
+			}
+		}
 	}
 	return m, nil
 }
@@ -127,6 +148,21 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				popUp.RemoteUrlTextInput.Focus()
 			}
 		}
+
+	case constant.CreateTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.TagNameInput.Focus()
+				popUp.TagMessageTextAreaInput.Blur()
+			case 2:
+				popUp.TagNameInput.Blur()
+				popUp.TagMessageTextAreaInput.Focus()
+			}
+		}
+
 	}
 	return m, nil
 }
@@ -163,11 +199,22 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				return m, popUp.Spinner.Tick
 			}
 		}
+	case constant.CreateTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
+		if ok {
+			if utf8.RuneCountInString(popUp.TagNameInput.Value()) < 1 {
+				return m, nil
+			}
+			m.ShowPopUp.Store(true)
+			m.IsTyping.Store(false)
+			tagPopUp.InitCreateTagConfirmationPopUpModel(m, popUp.TagNameInput.Value(), popUp.TagMessageTextAreaInput.Value(), popUp.CommitHash, popUp.CommitMessage)
+			m.PopUpType = constant.CreateTagConfirmationPopUp
+		}
 	}
 	return m, nil
 }
 
-func handleTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyMsg) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
@@ -241,6 +288,36 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			}
 		}
 
+	// the following is to handle the change line for textarea input
+	case constant.CommitPopUp:
+		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
+		if ok {
+			if popUp.CurrentActiveInputIndex == 2 {
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+
+	case constant.AmendCommitPopUp:
+		popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
+		if ok {
+			if popUp.CurrentActiveInputIndex == 2 {
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+
+	case constant.CreateTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
+		if ok {
+			if popUp.CurrentActiveInputIndex == 2 {
+				var cmd tea.Cmd
+				popUp.TagMessageTextAreaInput, cmd = popUp.TagMessageTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -320,6 +397,21 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			popUp.RemoteBranchNameInput, cmd = popUp.RemoteBranchNameInput.Update(msg)
 			return m, cmd
 		}
+	case constant.CreateTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.TagNameInput, cmd = popUp.TagNameInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.TagMessageTextAreaInput, cmd = popUp.TagMessageTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -372,11 +464,21 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 		if ok {
 			content = popUp.RemoteBranchNameInput.Value()
 		}
+	case constant.CreateTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.TagNameInput.Value()
+			case 2:
+				content = popUp.TagMessageTextAreaInput.Value()
+			}
+		}
 	}
 
 	err := clipboard.WriteAll(content)
 	if err != nil {
-		// TODO: log this error, this will be for a future implementation on the logging system we will introduce in a later version
+		// TODO: log the error
 	}
 
 	return m, nil

@@ -22,7 +22,7 @@ func RenderGitStashMessagePopUp(m *types.GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxGitStashMessagePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitStashMessageTitle)
-		popUp.StashMessageInput.SetWidth(popUpWidth - 4)
+		popUp.StashMessageInput.SetWidth(popUpWidth - 6)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,

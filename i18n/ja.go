@@ -136,6 +136,7 @@ var jA = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
+		"[t] タグを作成",
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
@@ -318,6 +319,16 @@ var jA = LanguageMapping{
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 閉じる",
 	},
+	KeyBindingForCreateTagPopUp: []string{
+		"[tab] 次の入力欄に移動",
+		"[shift+tab] 前の入力欄に移動",
+		"[ctrl+e] タグを作成",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForCreateTagConfirmationPopUp: []string{
+		"[enter] タグの作成を確定",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -442,6 +453,11 @@ var jA = LanguageMapping{
 	ApplyCherryPickOpsDescription:                            "チェリーピックされたコミットを現在のチェックアウトブランチに適用します",
 	CherryPickedFromBranch:                                   "チェリーピック元のブランチ  ~>",
 	GitDiscardFileLineChangeConfirmTitle:                     "以下の行の変更を破棄してもよろしいですか？",
+	CreateTagPopUpNameTitle:                                  "* タグ名",
+	CreateTagPopUpNameInputPlaceHolder:                       "タグ名を入力...",
+	CreateTagPopUpMessageTitle:                               "タグメッセージ",
+	CreateTagPopUpMessageInputPlaceHolder:                    "タグメッセージを入力...",
+	CreateTagConfirmation:                                    "以下の内容でタグを作成してもよろしいですか？\nコミットハッシュ: %s \nコミットメッセージ: %s \n タグ名: %s \n タグメッセージ: %s",
 }
 
 // for about gitti
@@ -742,6 +758,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "コミットログの内容を表示",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "t",
+		TitleOrInfoLine: "タグを作成",
 		LineType:        INFO,
 	},
 	{

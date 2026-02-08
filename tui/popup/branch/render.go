@@ -41,7 +41,7 @@ func RenderCreateNewBranchPopUp(m *types.GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CreateNewBranchTitle)
-		popUp.NewBranchNameInput.SetWidth(popUpWidth - 4)
+		popUp.NewBranchNameInput.SetWidth(popUpWidth - 6)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -204,7 +204,7 @@ func RenderCreateBranchBasedOnRemotePopUp(m *types.GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxCreateBranchBasedOnRemotePopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteTitle)
-		popUp.RemoteBranchNameInput.SetWidth(popUpWidth - 4)
+		popUp.RemoteBranchNameInput.SetWidth(popUpWidth - 6)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,

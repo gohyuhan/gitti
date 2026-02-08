@@ -24,6 +24,7 @@ import (
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
+	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
@@ -486,6 +487,21 @@ func handleNonTypingSKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingtKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	switch m.CurrentSelectedComponent {
+	case constant.CommitLogComponentPanel:
+		currentSelectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
+		if currentSelectedCommit != nil {
+			commit := currentSelectedCommit.(commitlog.GitCommitLogItem)
+			m.PopUpType = constant.CreateTagPopUp
+			tagPopUp.InitCreateTagPopUpModel(m, commit.Hash, commit.Message)
+			m.ShowPopUp.Store(true)
+			m.IsTyping.Store(true)
+		}
+	}
+	return m, nil
+}
+
 func handleNonTypingqQKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if api.GITDAEMON != nil {
@@ -806,6 +822,14 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.PopUpType = constant.NoPopUp
 				}
 			}
+		case constant.CreateTagConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagConfirmationPopUpModel)
+			if ok {
+				services.CreateNewTagService(m, popUp.CommitHash, popUp.TagName, popUp.TagMessage)
+				m.PopUpType = constant.NoPopUp
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+			}
 		}
 	}
 	return m, nil
@@ -898,35 +922,10 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
-		case constant.KeybindingAndFeatureInstructionsPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
 		case constant.GitRemotePushPopUp:
 			services.GitRemotePushCancelService(m)
 		case constant.GitPullOutputPopUp:
 			services.GitPullCancelService(m)
-		case constant.ChooseRemotePopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.ChoosePushTypePopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.ChooseNewBranchTypePopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.ChooseSwitchBranchTypePopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -937,21 +936,6 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
-		case constant.ChooseGitPullTypePopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitDiscardTypeOptionPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitDiscardConfirmPromptPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
 		case constant.GitStashOperationOutputPopUp:
 			// Block ESC during stash operation - operation must complete
 			popUp, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
@@ -962,24 +946,6 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
-		case constant.GitStashConfirmPromptPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-
-		case constant.GitResolveConflictOptionPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-
-		case constant.GitDeleteBranchConfirmPromptPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-
 		case constant.GitDeleteBranchOutputPopUp:
 			popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
 			if ok && !popUp.IsProcessing.Load() {
@@ -999,47 +965,28 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
-		case constant.GitResetLatestCommitTypeOptionPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitResetLatestCommitConfirmPromptPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitResetToSelectedCommitTypeOptionPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitResetToSelectedCommitConfirmPromptPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitCherryPickPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitEditCherryPickPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitCherryPickOptionSelectionPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitCherryPickApplyConfirmPopUp:
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpType = constant.NoPopUp
-			m.PopUpModel = nil
-		case constant.GitDiscardFileLineChangeConfirmPopUp:
+		case constant.KeybindingAndFeatureInstructionsPopUp,
+			constant.ChooseRemotePopUp,
+			constant.ChoosePushTypePopUp,
+			constant.ChooseNewBranchTypePopUp,
+			constant.ChooseSwitchBranchTypePopUp,
+			constant.ChooseGitPullTypePopUp,
+			constant.GitDiscardTypeOptionPopUp,
+			constant.GitDiscardConfirmPromptPopUp,
+			constant.GitStashConfirmPromptPopUp,
+			constant.GitResolveConflictOptionPopUp,
+			constant.GitDeleteBranchConfirmPromptPopUp,
+			constant.GitResetLatestCommitTypeOptionPopUp,
+			constant.GitResetLatestCommitConfirmPromptPopUp,
+			constant.GitResetToSelectedCommitTypeOptionPopUp,
+			constant.GitResetToSelectedCommitConfirmPromptPopUp,
+			constant.GitCherryPickPopUp,
+			constant.GitEditCherryPickPopUp,
+			constant.GitCherryPickOptionSelectionPopUp,
+			constant.GitCherryPickApplyConfirmPopUp,
+			constant.GitDiscardFileLineChangeConfirmPopUp,
+			constant.CreateTagConfirmationPopUp:
+			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.NoPopUp
@@ -1348,6 +1295,7 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 			// do nothing, as local branch will be the most left option in the local branch or tagcomponent panel
 			case constant.SHOW_TAG:
 				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_LOCAL_BRANCH
+				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		}
 	}
@@ -1361,6 +1309,7 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_TAG
+				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_TAG:
 				// do nothing, as tag is currently the most right option in the local branch or tag component panel
 			}

@@ -94,29 +94,23 @@ func (gt *GitTag) GetLatestGitTag() {
 //	Create a new git tag, return the output and is success boolean
 //
 // ----------------------------------
-func (gt *GitTag) CreateNewTag(newTagName string, commitHash string, tagMessage string) ([]string, bool) {
+func (gt *GitTag) CreateNewTag(commitHash string, newTagName string, tagMessage string) {
 	if !gt.gitProcessLock.CanProceedWithGitOps() {
-		return nil, false
+		return
 	}
 	defer func() {
 		gt.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	var output []string
-	isSuccess := true
-
 	gitArgs := []string{"tag", "-a", newTagName, commitHash, "-m", tagMessage}
 	createNewTagCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, true)
 	gt.logging.RegisterNewLog(logging.CREATE_NEW_TAG_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
-	createNewTagCmdOutput, createNewTagCmdErr := createNewTagCmdExecutor.CombinedOutput()
+	createNewTagCmdErr := createNewTagCmdExecutor.Run()
 	if createNewTagCmdErr != nil {
 		gt.logging.RegisterNewLog(logging.CREATE_NEW_TAG_OPS, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CREATE_NEW_TAG_OPS, createNewTagCmdErr.Error()), true)
-		isSuccess = false
 	}
 
-	output = processGeneralGitOpsOutputIntoStringArray(createNewTagCmdOutput)
-
-	return output, isSuccess
+	return
 }
 
 // ----------------------------------

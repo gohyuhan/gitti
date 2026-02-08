@@ -12,6 +12,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/log"
 	"github.com/gohyuhan/gitti/tui/component/stash"
+	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -83,6 +84,13 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			theCurrentSelectedComponent = m.CurrentSelectedComponent
 		}
 		switch theCurrentSelectedComponent {
+		case constant.LocalBranchOrTagComponentPanel:
+			switch m.CurrentLocalBranchOrTagComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+				contentLine = generateAboutGittiContent()
+			case constant.SHOW_TAG:
+				contentLine = generateTagDetailPanelContent(ctx, m)
+			}
 		case constant.ModifiedFilesComponentPanel:
 			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
 		case constant.CommitLogComponentPanel:
@@ -128,6 +136,32 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			return
 		}
 	}(ctx)
+}
+
+// for tsg detail panel view
+func generateTagDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
+	currentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+	var tagItem tag.GitTagItem
+	if currentSelectedTag != nil {
+		tagItem = currentSelectedTag.(tag.GitTagItem)
+	} else {
+		return ""
+	}
+
+	var vpLine strings.Builder
+
+	tagDetail := m.GitOperations.GitTag.ShowGitTagDetail(ctx, tagItem.TagName)
+	if len(tagDetail) < 1 {
+		return ""
+	}
+
+	for _, Line := range tagDetail {
+		line := style.NewStyle.Render(Line)
+		vpLine.WriteString(line)
+
+		vpLine.WriteRune('\n')
+	}
+	return vpLine.String()
 }
 
 // for modified file detail panel view

@@ -136,8 +136,9 @@ var eN = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
+		"[t] create tag",
 		"[r] reset to this commit",
-		"[R] reset the latest commit",
+		"[R] reset latest commit",
 		"[ctrl+p] cherry pick ops",
 		"[?] keybinding and instructions",
 	},
@@ -318,6 +319,16 @@ var eN = LanguageMapping{
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] close",
 	},
+	KeyBindingForCreateTagPopUp: []string{
+		"[tab] move to next input",
+		"[shift+tab] move to previous input",
+		"[ctrl+e] create tag",
+		"[esc] close",
+	},
+	KeyBindingForCreateTagConfirmationPopUp: []string{
+		"[enter] confirm create tag",
+		"[esc] close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -442,6 +453,11 @@ var eN = LanguageMapping{
 	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
 	CherryPickedFromBranch:                                   "Cherry picked from branch  ~>",
 	GitDiscardFileLineChangeConfirmTitle:                     "Are you sure you want to discard the following line change?",
+	CreateTagPopUpNameTitle:                                  "* Tag Name",
+	CreateTagPopUpNameInputPlaceHolder:                       "Enter tag name...",
+	CreateTagPopUpMessageTitle:                               "Tag Message",
+	CreateTagPopUpMessageInputPlaceHolder:                    "Enter tag message...",
+	CreateTagConfirmation:                                    "Are you sure you want to create tag for following: \ncommit hash: %s \ncommit message: %s \n tag name: %s \n tag message: %s",
 }
 
 // for about gitti
@@ -743,13 +759,18 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "t",
+		TitleOrInfoLine: "create tag",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "reset to this commit",
 		LineType:        INFO,
 	},
 	{
 		KeyBindingLine:  "R",
-		TitleOrInfoLine: "reset the latest commit",
+		TitleOrInfoLine: "reset latest commit",
 		LineType:        INFO,
 	},
 	{

@@ -154,6 +154,8 @@ type LanguageMapping struct {
 	KeyBindingForGitCherryPickApplyConfirmPopUp             []string
 	KeyBindingForGitDiscardFileLineChangeConfirmPopUp       []string
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp      []string
+	KeyBindingForCreateTagPopUp                             []string
+	KeyBindingForCreateTagConfirmationPopUp                 []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -313,4 +315,10 @@ type LanguageMapping struct {
 	CherryPickedFromBranch        string
 	// for discard file line change
 	GitDiscardFileLineChangeConfirmTitle string
+	// for tag
+	CreateTagPopUpNameTitle               string
+	CreateTagPopUpNameInputPlaceHolder    string
+	CreateTagPopUpMessageTitle            string
+	CreateTagPopUpMessageInputPlaceHolder string
+	CreateTagConfirmation                 string
 }

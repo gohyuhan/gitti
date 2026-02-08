@@ -32,7 +32,7 @@ func InitGitCommitPopUpModel(m *types.GittiModel) {
 	CommitDescriptionTextAreaInput.SetValue(commitDesc)
 	CommitDescriptionTextAreaInput.ShowLineNumbers = false
 	CommitDescriptionTextAreaInput.Placeholder = commitDescPlaceholder
-	CommitDescriptionTextAreaInput.SetHeight(4)
+	CommitDescriptionTextAreaInput.SetHeight(constant.TextAreaInputHeight)
 	CommitDescriptionTextAreaInput.Blur()
 
 	vp := viewport.New()
@@ -81,7 +81,7 @@ func InitGitAmendCommitPopUpModel(m *types.GittiModel) {
 	CommitDescriptionTextAreaInput.SetValue(commitDesc)
 	CommitDescriptionTextAreaInput.ShowLineNumbers = false
 	CommitDescriptionTextAreaInput.Placeholder = commitDescPlaceholder
-	CommitDescriptionTextAreaInput.SetHeight(4)
+	CommitDescriptionTextAreaInput.SetHeight(constant.TextAreaInputHeight)
 	CommitDescriptionTextAreaInput.Blur()
 
 	vp := viewport.New()

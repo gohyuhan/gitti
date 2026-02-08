@@ -136,6 +136,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下移动",
 		"[enter] 查看提交日志内容",
+		"[t] 创建标签",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 遴选操作",
@@ -318,6 +319,16 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 关闭",
 	},
+	KeyBindingForCreateTagPopUp: []string{
+		"[tab] 移动到下一个输入框",
+		"[shift+tab] 移动到上一个输入框",
+		"[ctrl+e] 创建标签",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForCreateTagConfirmationPopUp: []string{
+		"[enter] 确认创建标签",
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -442,6 +453,11 @@ var zH_HANS = LanguageMapping{
 	ApplyCherryPickOpsDescription:                            "将已遴选的提交应用到当前检出的分支",
 	CherryPickedFromBranch:                                   "遴选自分支  ~>",
 	GitDiscardFileLineChangeConfirmTitle:                     "您确定要丢弃以下行更改吗？",
+	CreateTagPopUpNameTitle:                                  "* 标签名称",
+	CreateTagPopUpNameInputPlaceHolder:                       "输入标签名称...",
+	CreateTagPopUpMessageTitle:                               "标签消息",
+	CreateTagPopUpMessageInputPlaceHolder:                    "输入标签消息...",
+	CreateTagConfirmation:                                    "您确定要为以下内容创建标签吗？\n提交哈希: %s \n提交信息: %s \n 标签名称: %s \n 标签消息: %s",
 }
 
 // for about gitti
@@ -741,6 +757,11 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "查看提交日志内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "t",
+		TitleOrInfoLine: "创建标签",
 		LineType:        INFO,
 	},
 	{

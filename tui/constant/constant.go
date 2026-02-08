@@ -39,6 +39,8 @@ const (
 	GitEditCherryPickPopUp                     = "GitEditCherryPickPopUp"                     // IsTyping will be false
 	GitCherryPickApplyConfirmPopUp             = "GitCherryPickApplyConfirmPopUp"             // IsTyping will be false
 	GitDiscardFileLineChangeConfirmPopUp       = "GitDiscardFileLineChangeConfirmPopUp"       // IsTyping will be false
+	CreateTagPopUp                             = "CreateTagPopUp"                             // IsTyping will be true
+	CreateTagConfirmationPopUp                 = "CreateTagConfirmationPopUp"                 // IsTyping will be false
 )
 
 const (
@@ -49,6 +51,8 @@ const (
 const (
 	MinWidth  = 80
 	MinHeight = 24
+
+	TextAreaInputHeight = 4
 
 	Padding                             = 1
 	MainPageKeyBindingLayoutPanelHeight = 1
@@ -90,6 +94,8 @@ const (
 	MaxGitEditCherryPickPopUpWidth                     = 150
 	MaxGitCherryPickApplyConfirmPopUpWidth             = 150
 	MaxGitDiscardFileLineChangeConfirmPopUpWidth       = 150
+	MaxCreateTagPopUpWidth                             = 150
+	MaxCreateTagConfirmationPopUp                      = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10

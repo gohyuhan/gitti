@@ -9,6 +9,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
+	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -33,7 +34,7 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 
 	// because input mostly will no involve `enter` for change line, so `enter` can be safely used for submitting
 	case "enter":
-		return handleTypingEnterKeyBindingInteraction(m)
+		return handleTypingEnterKeyBindingInteraction(m, msg)
 
 	// to paste clipboard content into the current input field
 	case "ctrl+p":
@@ -112,6 +113,21 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 			popUp.RemoteBranchNameInput, cmd = popUp.RemoteBranchNameInput.Update(msg)
 			return m, cmd
 		}
+	case constant.CreateTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.TagNameInput, cmd = popUp.TagNameInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.TagMessageTextAreaInput, cmd = popUp.TagMessageTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -174,6 +190,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 
 	case "S":
 		return handleNonTypingSKeyBindingInteraction(m)
+
+	case "t":
+		return handleNonTypingtKeyBindingInteraction(m)
 
 	case "[":
 		return handleNonTypingLeftBracketKeyBindingInteraction(m)
