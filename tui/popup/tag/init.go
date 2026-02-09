@@ -1,14 +1,26 @@
 package tag
 
 import (
+	"fmt"
+
+	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/spinner"
 	"charm.land/bubbles/v2/textarea"
 	"charm.land/bubbles/v2/textinput"
+	"charm.land/bubbles/v2/viewport"
+	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// init the popup model for create tag input for ingo
+// ------------------------------------
+//
+//	For Creating Tag Model
+//
+// ------------------------------------
 func InitCreateTagPopUpModel(m *types.GittiModel, commitHash string, commitMessage string) {
 	tagName := ""
 	tagMessage := ""
@@ -39,6 +51,11 @@ func InitCreateTagPopUpModel(m *types.GittiModel, commitHash string, commitMessa
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	For Confirming Tag Creation Model
+//
+// ------------------------------------
 func InitCreateTagConfirmationPopUpModel(m *types.GittiModel, tagName string, tagMessage string, commitHash string, commitMessage string) {
 	popUpModel := &CreateTagConfirmationPopUpModel{
 		TagName:       tagName,
@@ -46,5 +63,103 @@ func InitCreateTagConfirmationPopUpModel(m *types.GittiModel, tagName string, ta
 		CommitHash:    commitHash,
 		CommitMessage: commitMessage,
 	}
+	m.PopUpModel = popUpModel
+}
+
+// ------------------------------------
+//
+//	For Choosing Tag Deletion Option PopUp
+//
+// ------------------------------------
+func InitChooseDeleteTagOptionPopUpModel(m *types.GittiModel, tagName string) {
+	items := make([]list.Item, 0, 2)
+	items = append(items, TagDeleteOptionItem{
+		Name:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteLocalTagOption, tagName),
+		Info:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteLocalTagOptionInfo, tagName),
+		DeleteTagType: git.TAGDELETELOCAL,
+	})
+	items = append(items, TagDeleteOptionItem{
+		Name:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteRemoteTagOption, tagName),
+		Info:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteRemoteTagOptionInfo, tagName),
+		DeleteTagType: git.TAGDELETEREMOTE,
+	})
+	width := (min(constant.MaxChooseDeleteTagOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	dL := list.New(items, TagDeleteOptionDelegate{}, width, constant.PopUpChooseDeleteTagOptionHeight)
+	dL.SetShowPagination(false)
+	dL.SetShowStatusBar(false)
+	dL.SetFilteringEnabled(false)
+	dL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	dL.SetShowHelp(true)
+	dL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	dL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	dL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &dL, constant.MaxChooseDeleteTagOptionPopUpWidth)
+
+	m.PopUpModel = &ChooseDeleteTagOptionPopUpModel{
+		TagName:          tagName,
+		DeleteOptionList: dL,
+	}
+}
+
+// ------------------------------------
+//
+//	For Choosing Remote for Remote Tag Deletion PopUp
+//
+// ------------------------------------
+func InitChooseRemoteForDeleteRemoteTagPopUpModel(m *types.GittiModel, remoteList []git.GitRemoteInfo, tagName string, deleteOptionType string) {
+	items := make([]list.Item, 0, len(remoteList))
+	for _, remote := range remoteList {
+		items = append(items, GitRemoteForDeleteRemoteTagItem(remote))
+	}
+	width := (min(constant.MaxChooseRemoteForDeleteRemoteTagPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	rL := list.New(items, GitRemoteForDeleteRemoteTagItemDelegate{}, width, constant.PopUpChooseRemoteHeight)
+	rL.SetShowPagination(false)
+	rL.SetShowStatusBar(false)
+	rL.SetFilteringEnabled(false)
+	rL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	rL.SetShowHelp(true)
+	rL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	rL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	rL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &rL, constant.MaxChooseRemoteForDeleteRemoteTagPopUpWidth)
+
+	m.PopUpModel = &ChooseRemoteForDeleteRemoteTagPopUpModel{
+		RemoteList:       rL,
+		TagName:          tagName,
+		DeleteOptionType: deleteOptionType,
+	}
+}
+
+// ------------------------------------
+//
+//	For Tag Deletion Output PopUp
+//
+// ------------------------------------
+func InitDeleteTagOutputPopUpModel(m *types.GittiModel, tagName string) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpDeleteTagOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxDeleteTagOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &DeleteTagOutputPopUpModel{
+		TagName:                 tagName,
+		DeleteTagOutputViewport: vp,
+		Spinner:                 s,
+		CancelFunc:              nil,
+	}
+
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+
 	m.PopUpModel = popUpModel
 }

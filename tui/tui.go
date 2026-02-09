@@ -19,6 +19,7 @@ import (
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
+	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 
@@ -158,9 +159,9 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				services.FetchDetailComponentPanelInfoService(m, false)
 			}
 		case git.GIT_TAG_UPDATE:
-			tagComponent.InitTagList(m)
+			needReinit := tagComponent.InitTagList(m)
 			if m.CurrentSelectedComponent == constant.LocalBranchOrTagComponentPanel && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
-				services.FetchDetailComponentPanelInfoService(m, false)
+				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_FILES_STATUS_UPDATE:
 			needReinit := filesComponent.InitModifiedFilesList(m)
@@ -258,6 +259,12 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if branchPopup, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.DeleteTagOutputPopUp:
+			if tagPopup, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel); ok && tagPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				tagPopup.Spinner, cmd = tagPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		}

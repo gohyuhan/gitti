@@ -156,6 +156,9 @@ type LanguageMapping struct {
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp      []string
 	KeyBindingForCreateTagPopUp                             []string
 	KeyBindingForCreateTagConfirmationPopUp                 []string
+	KeyBindingForChooseDeleteTagOptionPopUp                 []string
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp        []string
+	KeyBindingForDeleteTagOutputPopUp                       []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -316,9 +319,16 @@ type LanguageMapping struct {
 	// for discard file line change
 	GitDiscardFileLineChangeConfirmTitle string
 	// for tag
-	CreateTagPopUpNameTitle               string
-	CreateTagPopUpNameInputPlaceHolder    string
-	CreateTagPopUpMessageTitle            string
-	CreateTagPopUpMessageInputPlaceHolder string
-	CreateTagConfirmation                 string
+	CreateTagPopUpNameTitle                 string
+	CreateTagPopUpNameInputPlaceHolder      string
+	CreateTagPopUpMessageTitle              string
+	CreateTagPopUpMessageInputPlaceHolder   string
+	CreateTagConfirmation                   string
+	ChooseDeleteTagOptionTitle              string
+	DeleteTagPopUpDeleteLocalTagOption      string
+	DeleteTagPopUpDeleteLocalTagOptionInfo  string
+	DeleteTagPopUpDeleteRemoteTagOption     string
+	DeleteTagPopUpDeleteRemoteTagOptionInfo string
+	DeleteTagOutputPopUpTitle               string
+	DeleteTagDeleting                       string
 }

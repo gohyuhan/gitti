@@ -103,6 +103,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] コンポーネントを切り替え",
+		"[d] タグを削除",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -329,6 +330,19 @@ var jA = LanguageMapping{
 		"[enter] タグの作成を確定",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 削除タグオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] リモートタグ削除のリモートを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -357,7 +371,7 @@ var jA = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Gitプッシュ",
 	GitRemotePushPopUpProcessing:                             "プッシュ中...",
 	GitRemotePushOptionTitle:                                 "プッシュオプション",
-	ChooseRemoteTitle:                                        "プッシュ先のリモートを選択",
+	ChooseRemoteTitle:                                        "リモートを選択",
 	NormalPush:                                               "プッシュ",
 	ForcePushSafe:                                            "強制プッシュ（安全）",
 	ForcePushDangerous:                                       "強制プッシュ（危険）",
@@ -458,6 +472,13 @@ var jA = LanguageMapping{
 	CreateTagPopUpMessageTitle:                               "タグメッセージ",
 	CreateTagPopUpMessageInputPlaceHolder:                    "タグメッセージを入力...",
 	CreateTagConfirmation:                                    "以下の内容でタグを作成してもよろしいですか？\nコミットハッシュ: %s \nコミットメッセージ: %s \n タグ名: %s \n タグメッセージ: %s",
+	ChooseDeleteTagOptionTitle:                               "タグ削除オプションを選択",
+	DeleteTagPopUpDeleteLocalTagOption:                       "ローカルの '%s' タグを削除",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "ローカルリポジトリの '%s' タグを削除します",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "リモートの '%s' タグを削除",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "リモートリポジトリの '%s' タグを削除します",
+	DeleteTagOutputPopUpTitle:                                "タグ [%s] を削除",
+	DeleteTagDeleting:                                        "タグを削除中...",
 }
 
 // for about gitti
@@ -1253,6 +1274,31 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. `ctrl+k` を押して現在のコミットをスキップ",
 			"2. 操作は次のコミットで続行されます",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグの作成 (create tag)",
+		InstructionLines: []string{
+			"1. コミットログコンポーネントに移動 ( `3` を押す)",
+			"2. `↑/↓` を使ってタグを付けるコミットを選択",
+			"3. `t` を押してタグメニューを開く",
+			"4. タグ名を入力",
+			"5. `enter` を押して確定",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグの削除 (delete tag)",
+		InstructionLines: []string{
+			"1. タグコンポーネントに移動 ( `1` を押す) またはタグコンポーネントに切り替え ( `< >` を押す)",
+			"2. `↑/↓` を使って削除するタグを選択",
+			"3. `d` を押してタグ削除メニューを開く",
+			"4. 削除オプションを選択:",
+			"   - ローカルタグを削除",
+			"   - リモートタグを削除",
+			"5. `enter` を押して確定",
+			"6. `esc` を押して出力を閉じる",
 		},
 		LineType: INFO,
 	},

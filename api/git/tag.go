@@ -78,6 +78,10 @@ func (gt *GitTag) GetLatestGitTag() {
 	}
 
 	parsedOutput := processGeneralGitOpsOutputIntoStringArray(getLatestGitTagCmdOutput)
+	if len(parsedOutput) < 1 {
+		gt.allTag = []TagInfo{}
+		return
+	}
 	for index := range parsedOutput {
 		tag := TagInfo{
 			TagName: parsedOutput[index],

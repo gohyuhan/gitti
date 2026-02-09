@@ -12,7 +12,7 @@ import (
 // those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
 
 // init the list component for Branch Component
-func InitTagList(m *types.GittiModel) {
+func InitTagList(m *types.GittiModel) bool {
 	latestTagArray := []list.Item{}
 
 	previousSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
@@ -36,6 +36,8 @@ func InitTagList(m *types.GittiModel) {
 		}
 	}
 
+	previousTagsCount := len(m.CurrentRepoTagInfoList.Items())
+
 	m.CurrentRepoTagInfoList = list.New(latestTagArray, GitTagItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
 	m.CurrentRepoTagInfoList.SetShowPagination(false)
 	m.CurrentRepoTagInfoList.SetShowStatusBar(false)
@@ -52,6 +54,10 @@ func InitTagList(m *types.GittiModel) {
 	m.CurrentRepoTagInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
 	m.CurrentRepoTagInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoTagInfoList)
 
+	if len(latestTagArray) < 1 {
+		return len(latestTagArray) != previousTagsCount
+	}
+
 	if selectedTagPosition >= 0 {
 		m.CurrentRepoTagInfoList.Select(selectedTagPosition)
 		m.ListNavigationIndexPosition.TagComponent = selectedTagPosition
@@ -63,4 +69,10 @@ func InitTagList(m *types.GittiModel) {
 			m.CurrentRepoTagInfoList.Select(m.ListNavigationIndexPosition.TagComponent)
 		}
 	}
+
+	if previousSelectedTag == m.CurrentRepoTagInfoList.SelectedItem() {
+		return false
+	}
+
+	return true
 }

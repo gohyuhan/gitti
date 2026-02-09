@@ -103,6 +103,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] switch component",
+		"[d] delete tag",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -329,6 +330,19 @@ var eN = LanguageMapping{
 		"[enter] confirm create tag",
 		"[esc] close",
 	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select delete tag option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select remote for delete remote tag",
+		"[esc] cancel / close",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -357,7 +371,7 @@ var eN = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Git Push",
 	GitRemotePushPopUpProcessing:                             "Pushing...",
 	GitRemotePushOptionTitle:                                 "Push Option",
-	ChooseRemoteTitle:                                        "Choose a remote to push to",
+	ChooseRemoteTitle:                                        "Choose a remote",
 	NormalPush:                                               "Push",
 	ForcePushSafe:                                            "Force Push (safe)",
 	ForcePushDangerous:                                       "Force Push (Dangerous)",
@@ -458,6 +472,13 @@ var eN = LanguageMapping{
 	CreateTagPopUpMessageTitle:                               "Tag Message",
 	CreateTagPopUpMessageInputPlaceHolder:                    "Enter tag message...",
 	CreateTagConfirmation:                                    "Are you sure you want to create tag for following: \ncommit hash: %s \ncommit message: %s \n tag name: %s \n tag message: %s",
+	ChooseDeleteTagOptionTitle:                               "Choose the tag deletion option",
+	DeleteTagPopUpDeleteLocalTagOption:                       "Delete local '%s' tag",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "Delete '%s' tag on local repository",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "Delete remote '%s' tag",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "Delete '%s' tag on remote repository",
+	DeleteTagOutputPopUpTitle:                                "Delete Tag [%s]",
+	DeleteTagDeleting:                                        "Deleting tag...",
 }
 
 // for about gitti
@@ -1251,6 +1272,31 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. Press `ctrl+k` to skip the current commit",
 			"2. The operation continues with the next commit",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "create tag",
+		InstructionLines: []string{
+			"1. Navigate to Commit Log component (press `3`)",
+			"2. Select the commit to tag using `↑/↓`",
+			"3. Press `t` to open tag menu",
+			"4. Enter the tag name",
+			"5. Press `enter` to confirm",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "delete tag",
+		InstructionLines: []string{
+			"1. Navigate to Tag component (press `1`) or switch to Tag component (press `< >`)",
+			"2. Select the tag to delete using `↑/↓`",
+			"3. Press `d` to open delete tag menu",
+			"4. Select delete option:",
+			"   - Delete local tag",
+			"   - Delete remote tag",
+			"5. Press `enter` to confirm",
+			"6. Press `esc` to close output",
 		},
 		LineType: INFO,
 	},

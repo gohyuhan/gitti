@@ -11,6 +11,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/stash"
+	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
@@ -21,6 +22,7 @@ import (
 	logPopUp "github.com/gohyuhan/gitti/tui/popup/log"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
+	"github.com/gohyuhan/gitti/tui/popup/remote"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
@@ -162,6 +164,15 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 						m.ShowPopUp.Store(true)
 						m.IsTyping.Store(false)
 					}
+				}
+			case constant.SHOW_TAG:
+				selectedTagItem := m.CurrentRepoTagInfoList.SelectedItem()
+				if selectedTagItem != nil {
+					tagItem := selectedTagItem.(tag.GitTagItem)
+					tagPopUp.InitChooseDeleteTagOptionPopUpModel(m, tagItem.TagName)
+					m.PopUpType = constant.ChooseDeleteTagOptionPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
 				}
 			}
 		case constant.StashComponentPanel:
@@ -830,6 +841,78 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 			}
+		case constant.ChooseDeleteTagOptionPopUp:
+			popUp, ok := m.PopUpModel.(*tagPopUp.ChooseDeleteTagOptionPopUpModel)
+			if ok {
+				selectedDeleteType := popUp.DeleteOptionList.SelectedItem()
+				if selectedDeleteType != nil {
+					deleteType := selectedDeleteType.(tagPopUp.TagDeleteOptionItem).DeleteTagType
+					switch deleteType {
+					case git.TAGDELETELOCAL:
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.DeleteTagOutputPopUp
+						tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
+						services.DeleteTagService(m, "", popUp.TagName, git.TAGDELETELOCAL)
+
+						// to return the tick for the spinner
+						tagOutputPopUp, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel)
+						if ok {
+							return m, tagOutputPopUp.Spinner.Tick
+						}
+					case git.TAGDELETEREMOTE:
+						// first we need to check if there are any origin for this repo
+						// if not we prompt the user to add a new remote origin
+						if !m.GitOperations.GitRemote.CheckRemoteExist() {
+							m.PopUpType = constant.AddRemotePromptPopUp
+							if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
+								remotePopUp.InitAddRemotePromptPopUpModel(m, true)
+							} else {
+								popUp.AddRemoteOutputViewport.SetContent("")
+							}
+							m.ShowPopUp.Store(true)
+							m.IsTyping.Store(true)
+						} else {
+							m.ShowPopUp.Store(true)
+							m.IsTyping.Store(false)
+							remotes := m.GitOperations.GitRemote.Remote()
+							if len(remotes) == 1 {
+								m.PopUpType = constant.DeleteTagOutputPopUp
+								tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
+								services.DeleteTagService(m, remotes[0].Name, popUp.TagName, git.TAGDELETEREMOTE)
+
+								// to return the tick for the spinner
+								tagOutputPopUp, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel)
+								if ok {
+									return m, tagOutputPopUp.Spinner.Tick
+								}
+							} else if len(remotes) > 1 {
+								m.PopUpType = constant.ChooseRemoteForDeleteRemoteTagPopUp
+								tagPopUp.InitChooseRemoteForDeleteRemoteTagPopUpModel(m, remotes, popUp.TagName, deleteType)
+							}
+						}
+					}
+				}
+			}
+		case constant.ChooseRemoteForDeleteRemoteTagPopUp:
+			popUp, ok := m.PopUpModel.(*tagPopUp.ChooseRemoteForDeleteRemoteTagPopUpModel)
+			if ok {
+				selectedRemote := popUp.RemoteList.SelectedItem()
+				if selectedRemote != nil {
+					remote := selectedRemote.(remote.GitRemoteItem)
+					m.PopUpType = constant.DeleteTagOutputPopUp
+					tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					services.DeleteTagService(m, remote.Name, popUp.TagName, git.TAGDELETEREMOTE)
+
+					// to return the tick for the spinner
+					tagOutputPopUp, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel)
+					if ok {
+						return m, tagOutputPopUp.Spinner.Tick
+					}
+				}
+			}
 		}
 	}
 	return m, nil
@@ -965,6 +1048,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
+		case constant.DeleteTagOutputPopUp:
+			services.DeleteTagCancelService(m)
 		case constant.KeybindingAndFeatureInstructionsPopUp,
 			constant.ChooseRemotePopUp,
 			constant.ChoosePushTypePopUp,
@@ -985,7 +1070,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.GitCherryPickOptionSelectionPopUp,
 			constant.GitCherryPickApplyConfirmPopUp,
 			constant.GitDiscardFileLineChangeConfirmPopUp,
-			constant.CreateTagConfirmationPopUp:
+			constant.CreateTagConfirmationPopUp,
+			constant.ChooseDeleteTagOptionPopUp,
+			constant.ChooseRemoteForDeleteRemoteTagPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

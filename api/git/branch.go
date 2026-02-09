@@ -82,7 +82,7 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 
 	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommited branch
-	if len(gitBranches) == 1 && gitBranches[0] == "" {
+	if len(gitBranches) < 1 {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
 		branchCmdExecutor = executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 		gitOutput, err := branchCmdExecutor.Output()

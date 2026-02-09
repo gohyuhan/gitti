@@ -14,6 +14,7 @@ import (
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
+	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 )
@@ -238,6 +239,42 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 				}
 			}
 			popUp.CherryPickedCommitLog.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CherryPickedCommitLog, constant.MaxGitEditCherryPickPopUpWidth)
+			return m, nil
+		}
+	case constant.ChooseDeleteTagOptionPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.ChooseDeleteTagOptionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.DeleteOptionList.Index() > 0 {
+					latestIndex := popUp.DeleteOptionList.Index() - 1
+					popUp.DeleteOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.DeleteOptionList.Index() < len(popUp.DeleteOptionList.Items())-1 {
+					latestIndex := popUp.DeleteOptionList.Index() + 1
+					popUp.DeleteOptionList.Select(latestIndex)
+				}
+			}
+			popUp.DeleteOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.DeleteOptionList, constant.MaxChooseDeleteTagOptionPopUpWidth)
+			return m, nil
+		}
+	case constant.ChooseRemoteForDeleteRemoteTagPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.ChooseRemoteForDeleteRemoteTagPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.RemoteList.Index() > 0 {
+					latestIndex := popUp.RemoteList.Index() - 1
+					popUp.RemoteList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.RemoteList.Index() < len(popUp.RemoteList.Items())-1 {
+					latestIndex := popUp.RemoteList.Index() + 1
+					popUp.RemoteList.Select(latestIndex)
+				}
+			}
+			popUp.RemoteList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.RemoteList, constant.MaxChooseRemoteForDeleteRemoteTagPopUpWidth)
 			return m, nil
 		}
 	// following is for viewport

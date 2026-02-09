@@ -95,6 +95,12 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = tag.RenderCreateTagPopUp(m)
 	case constant.CreateTagConfirmationPopUp:
 		popUp = tag.RenderCreateTagConfirmationPopUp(m)
+	case constant.ChooseDeleteTagOptionPopUp:
+		popUp = tag.RenderChooseDeleteTagOptionPopUp(m)
+	case constant.ChooseRemoteForDeleteRemoteTagPopUp:
+		popUp = tag.RenderChooseRemoteForDeleteRemoteTagPopUp(m)
+	case constant.DeleteTagOutputPopUp:
+		popUp = tag.RenderDeleteTagOutputPopUp(m)
 	}
 	return popUp
 }

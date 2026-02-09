@@ -41,6 +41,9 @@ const (
 	GitDiscardFileLineChangeConfirmPopUp       = "GitDiscardFileLineChangeConfirmPopUp"       // IsTyping will be false
 	CreateTagPopUp                             = "CreateTagPopUp"                             // IsTyping will be true
 	CreateTagConfirmationPopUp                 = "CreateTagConfirmationPopUp"                 // IsTyping will be false
+	ChooseDeleteTagOptionPopUp                 = "ChooseDeleteTagOptionPopUp"                 // IsTyping will be false
+	ChooseRemoteForDeleteRemoteTagPopUp        = "ChooseRemoteForDeleteRemoteTagPopUp"        // IsTyping will be false
+	DeleteTagOutputPopUp                       = "DeleteTagOutputPopUp"                       // IsTyping will be false
 )
 
 const (
@@ -95,7 +98,10 @@ const (
 	MaxGitCherryPickApplyConfirmPopUpWidth             = 150
 	MaxGitDiscardFileLineChangeConfirmPopUpWidth       = 150
 	MaxCreateTagPopUpWidth                             = 150
-	MaxCreateTagConfirmationPopUp                      = 150
+	MaxCreateTagConfirmationPopUpWidth                 = 150
+	MaxChooseDeleteTagOptionPopUpWidth                 = 150
+	MaxChooseRemoteForDeleteRemoteTagPopUpWidth        = 150
+	MaxDeleteTagOutputPopUpWidth                       = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10
@@ -120,6 +126,9 @@ const (
 	PopUpGitCherryPickPopUpHeight                      = 10
 	PopUpGitEditCherryPickPopUpHeight                  = 10
 	PopUpGitDiscardFileLineChangeViewportHeight        = 1
+	PopUpChooseDeleteTagOptionHeight                   = 4
+	PopUpChooseRemoteForDeleteRemoteTagHeight          = 10
+	PopUpDeleteTagOutputViewportHeight                 = 10
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -165,10 +174,11 @@ const (
 	NOSTAGESTATUS = "NOSTAGESTATUS"
 )
 
-// action
+// action that require remote origin
 const (
 	PUSHACTION                = "PUSHACTION"
 	CREATEBRANCHBASEDONREMOTE = "CREATEBRANCHBASEDONREMOTE"
+	DELETEREMOTETAGACTION     = "DELETEREMOTETAGACTION"
 )
 
 // cherry pick ops options

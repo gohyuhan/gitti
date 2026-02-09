@@ -103,6 +103,7 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] 切換元件",
+		"[d] 刪除標籤",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -329,6 +330,19 @@ var zH_HANT = LanguageMapping{
 		"[enter] 確定建立標籤",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇刪除標籤選項",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇用於刪除遠端標籤的遠端",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -357,7 +371,7 @@ var zH_HANT = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Git 推送",
 	GitRemotePushPopUpProcessing:                             "推送中...",
 	GitRemotePushOptionTitle:                                 "推送選項",
-	ChooseRemoteTitle:                                        "選擇要推送到的遠端",
+	ChooseRemoteTitle:                                        "選擇遠端",
 	NormalPush:                                               "推送",
 	ForcePushSafe:                                            "強制推送（安全）",
 	ForcePushDangerous:                                       "強制推送（危險）",
@@ -458,6 +472,13 @@ var zH_HANT = LanguageMapping{
 	CreateTagPopUpMessageTitle:                               "標籤訊息",
 	CreateTagPopUpMessageInputPlaceHolder:                    "輸入標籤訊息...",
 	CreateTagConfirmation:                                    "您確定要為以下內容建立標籤嗎？\n提交哈希: %s \n提交訊息: %s \n 標籤名稱: %s \n 標籤訊息: %s",
+	ChooseDeleteTagOptionTitle:                               "選擇標籤刪除選項",
+	DeleteTagPopUpDeleteLocalTagOption:                       "刪除本地 '%s' 標籤",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "刪除本地儲存庫中的 '%s' 標籤",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "刪除遠端 '%s' 標籤",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "刪除遠端儲存庫中的 '%s' 標籤",
+	DeleteTagOutputPopUpTitle:                                "刪除標籤 [%s]",
+	DeleteTagDeleting:                                        "正在刪除標籤...",
 }
 
 // for about gitti
@@ -1252,6 +1273,31 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. 按 `ctrl+k` 跳過當前提交",
 			"2. 操作繼續進行下一個提交",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "建立標籤 (create tag)",
+		InstructionLines: []string{
+			"1. 導覽到提交日誌組件 (按 `3`) ",
+			"2. 使用 `↑/↓` 選擇要打標籤的提交",
+			"3. 按 `t` 打開標籤選單",
+			"4. 輸入標籤名稱",
+			"5. 按 `enter` 確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "刪除標籤 (delete tag)",
+		InstructionLines: []string{
+			"1. 導覽到標籤組件 (按 `1`) 或切換到標籤組件 (按 `< >`)",
+			"2. 使用 `↑/↓` 選擇要刪除的標籤",
+			"3. 按 `d` 打開刪除標籤選單",
+			"4. 選擇刪除選項:",
+			"   - 刪除本地標籤",
+			"   - 刪除遠端標籤",
+			"5. 按 `enter` 確認",
+			"6. 按 `esc` 關閉輸出",
 		},
 		LineType: INFO,
 	},

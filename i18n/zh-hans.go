@@ -103,6 +103,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] 切换组件",
+		"[d] 删除标签",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -329,6 +330,19 @@ var zH_HANS = LanguageMapping{
 		"[enter] 确认创建标签",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择删除标签选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择用于删除远程标签的远程",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -357,7 +371,7 @@ var zH_HANS = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Git 推送",
 	GitRemotePushPopUpProcessing:                             "推送中...",
 	GitRemotePushOptionTitle:                                 "推送选项",
-	ChooseRemoteTitle:                                        "选择要推送到的远程",
+	ChooseRemoteTitle:                                        "选择远程",
 	NormalPush:                                               "推送",
 	ForcePushSafe:                                            "强制推送（安全）",
 	ForcePushDangerous:                                       "强制推送（危险）",
@@ -458,6 +472,13 @@ var zH_HANS = LanguageMapping{
 	CreateTagPopUpMessageTitle:                               "标签消息",
 	CreateTagPopUpMessageInputPlaceHolder:                    "输入标签消息...",
 	CreateTagConfirmation:                                    "您确定要为以下内容创建标签吗？\n提交哈希: %s \n提交信息: %s \n 标签名称: %s \n 标签消息: %s",
+	ChooseDeleteTagOptionTitle:                               "选择标签删除选项",
+	DeleteTagPopUpDeleteLocalTagOption:                       "删除本地 '%s' 标签",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "删除本地仓库中的 '%s' 标签",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "删除远程 '%s' 标签",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "删除远程仓库中的 '%s' 标签",
+	DeleteTagOutputPopUpTitle:                                "删除标签 [%s]",
+	DeleteTagDeleting:                                        "正在删除标签...",
 }
 
 // for about gitti
@@ -1252,6 +1273,31 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. 按 `ctrl+k` 跳过当前提交",
 			"2. 操作继续进行下一个提交",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "创建标签 (create tag)",
+		InstructionLines: []string{
+			"1. 导航到提交日志组件 (按 `3`) ",
+			"2. 使用 `↑/↓` 选择要打标签的提交",
+			"3. 按 `t` 打开标签菜单",
+			"4. 输入标签名称",
+			"5. 按 `enter` 确认",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "删除标签 (delete tag)",
+		InstructionLines: []string{
+			"1. 导航到标签组件 (按 `1`) 或切换到标签组件 (按 `< >`)",
+			"2. 使用 `↑/↓` 选择要删除的标签",
+			"3. 按 `d` 打开删除标签菜单",
+			"4. 选择删除选项:",
+			"   - 删除本地标签",
+			"   - 删除远程标签",
+			"5. 按 `enter` 确认",
+			"6. 按 `esc` 关闭输出",
 		},
 		LineType: INFO,
 	},
