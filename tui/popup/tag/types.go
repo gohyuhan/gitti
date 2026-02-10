@@ -88,24 +88,24 @@ type DeleteTagOutputPopUpModel struct {
 //
 // ------------------------------------
 type (
-	TagDeleteOptionDelegate struct{}
-	TagDeleteOptionItem     struct {
+	DeleteTagOptionDelegate struct{}
+	DeleteTagOptionItem     struct {
 		Name          string
 		Info          string
 		DeleteTagType string
 	}
 )
 
-func (i TagDeleteOptionItem) FilterValue() string {
+func (i DeleteTagOptionItem) FilterValue() string {
 	return i.Name
 }
 
 // for tag deletion option selection
-func (d TagDeleteOptionDelegate) Height() int                             { return 1 }
-func (d TagDeleteOptionDelegate) Spacing() int                            { return 0 }
-func (d TagDeleteOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
-func (d TagDeleteOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(TagDeleteOptionItem)
+func (d DeleteTagOptionDelegate) Height() int                             { return 1 }
+func (d DeleteTagOptionDelegate) Spacing() int                            { return 0 }
+func (d DeleteTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d DeleteTagOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(DeleteTagOptionItem)
 	if !ok {
 		return
 	}
@@ -187,4 +187,85 @@ func (d GitRemoteForDeleteRemoteTagItemDelegate) Render(w io.Writer, m list.Mode
 	}
 
 	fmt.Fprint(w, fn(fullStr))
+}
+
+// ---------------------------------
+//
+// # For Choose Tag Push Option
+//
+// ---------------------------------
+type ChoosePushTagOptionPopUpModel struct {
+	TagName        string
+	RemoteName     string
+	PushOptionList list.Model
+}
+
+// ------------------------------------
+//
+//	For tag push option selection option
+//
+// ------------------------------------
+type (
+	PushTagOptionDelegate struct{}
+	PushTagOptionItem     struct {
+		Name        string
+		Info        string
+		PushTagType string
+	}
+)
+
+func (i PushTagOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// for tag deletion option selection
+func (d PushTagOptionDelegate) Height() int                             { return 1 }
+func (d PushTagOptionDelegate) Spacing() int                            { return 0 }
+func (d PushTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d PushTagOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(PushTagOptionItem)
+	if !ok {
+		return
+	}
+
+	nameStr := fmt.Sprintf("   %s", i.Name)
+	infoStr := fmt.Sprintf("    %s", i.Info)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
+
+	nameStr = utils.TruncateString(nameStr, componentWidth)
+	infoStr = utils.TruncateString(infoStr, componentWidth)
+
+	nameRendered := style.ItemStyle.Render(nameStr)
+	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
+	fullStr := nameRendered + "\n" + "  " + infoRendered
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(fullStr))
+}
+
+// ------------------------------------
+//
+//	For git push tag process pop up model
+//
+// ------------------------------------
+type PushTagOutputPopUpModel struct {
+	PushTagOutputViewport viewport.Model // to log out the output from git operation
+	Spinner               spinner.Model  // spinner for showing processing state
+	IsProcessing          atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError              atomic.Bool    // indicate if git delete tag exitcode is not 0 (meaning have error)
+	ProcessSuccess        atomic.Bool    // has the process sucessfuly executed
+	IsCancelled           atomic.Bool    // flag to indicate if the operation was cancelled by user
+	// CancelFunc is used to cancel the git delete tag operation
+	CancelFunc context.CancelFunc
 }

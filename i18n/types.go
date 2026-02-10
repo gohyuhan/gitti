@@ -159,6 +159,8 @@ type LanguageMapping struct {
 	KeyBindingForChooseDeleteTagOptionPopUp                 []string
 	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp        []string
 	KeyBindingForDeleteTagOutputPopUp                       []string
+	KeyBindingForChoosePushTagOptionPopUp                   []string
+	KeyBindingForPushTagOutputPopUp                         []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -331,4 +333,15 @@ type LanguageMapping struct {
 	DeleteTagPopUpDeleteRemoteTagOptionInfo string
 	DeleteTagOutputPopUpTitle               string
 	DeleteTagDeleting                       string
+	ChoosePushTagOptionTitle                string
+	PushTagPopUpPushTagOption               string
+	PushTagPopUpPushTagOptionInfo           string
+	PushTagPopUpPushAllTagOption            string
+	PushTagPopUpPushAllTagOptionInfo        string
+	PushTagPopUpPushForceTagOption          string
+	PushTagPopUpPushForceTagOptionInfo      string
+	PushTagPopUpPushAllForceTagOption       string
+	PushTagPopUpPushAllForceTagOptionInfo   string
+	PushTagOutputPopUpTitle                 string
+	PushTagPushing                          string
 }

@@ -146,3 +146,72 @@ func RenderDeleteTagOutputPopUp(m *types.GittiModel) string {
 	}
 	return ""
 }
+
+// ------------------------------------
+//
+//	For Push Tag Option PopUp
+//
+// ------------------------------------
+func RenderPushTagOptionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChoosePushTagOptionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxChoosePushTagOptionPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChoosePushTagOptionTitle)
+		popUp.PushOptionList.SetWidth(popUpWidth - 4)
+		popUp.PushOptionList.SetHeight(constant.PopUpChoosePushTagOptionHeight)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.PushOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Push Tag Output
+//
+// ------------------------------------
+func RenderPushTagOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*PushTagOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxPushTagOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.PushTagOutputPopUpTitle)
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpDeleteTagOutputViewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.PushTagOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.PushTagOutputViewport.SetYOffset(popUp.PushTagOutputViewport.YOffset())
+		logViewPort := logViewPortStyle.Render(popUp.PushTagOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.PushTagPushing)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}

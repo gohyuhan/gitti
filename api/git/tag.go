@@ -51,7 +51,7 @@ func (gt *GitTag) AllTag() []TagInfo {
 //	Return git tag push output
 //
 // ----------------------------------
-func (gt *GitTag) TagPushOutput() []string {
+func (gt *GitTag) PushTagOutput() []string {
 	gt.tagPushOutputMu.RLock()
 	defer gt.tagPushOutputMu.RUnlock()
 
@@ -149,7 +149,7 @@ func (gt *GitTag) ShowGitTagDetail(ctx context.Context, tagName string) []string
 //	Push new tag to remote
 //
 // ----------------------------------
-func (gt *GitTag) GitTagPush(ctx context.Context, originName string, tagName string, pushType string) int {
+func (gt *GitTag) GitPushTag(ctx context.Context, originName string, tagName string, pushType string) int {
 	if !gt.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
@@ -158,7 +158,7 @@ func (gt *GitTag) GitTagPush(ctx context.Context, originName string, tagName str
 	}()
 
 	// Reset the output buffer
-	gt.ClearGitTagPushOutput()
+	gt.ClearGitPushTagOutput()
 
 	var gitArgs []string
 	switch pushType {
@@ -208,8 +208,8 @@ func (gt *GitTag) GitTagPush(ctx context.Context, originName string, tagName str
 				return // Stop immediately on cancel
 			default:
 				gt.tagPushOutputMu.Lock()
-				updatedCursorIndex, updatedTagPushOutput := handleProgressOutputStream(cursorIndex, scanner, gt.tagPushOutput)
-				gt.tagPushOutput = updatedTagPushOutput
+				updatedCursorIndex, updatedPushTagOutput := handleProgressOutputStream(cursorIndex, scanner, gt.tagPushOutput)
+				gt.tagPushOutput = updatedPushTagOutput
 				cursorIndex = updatedCursorIndex
 				gt.tagPushOutputMu.Unlock()
 				if time.Since(lastSent) >= STREAMUPDATETHROTTLEMS*time.Millisecond {
@@ -246,7 +246,7 @@ func (gt *GitTag) GitTagPush(ctx context.Context, originName string, tagName str
 	return 0
 }
 
-func (gt *GitTag) ClearGitTagPushOutput() {
+func (gt *GitTag) ClearGitPushTagOutput() {
 	gt.tagPushOutputMu.Lock()
 	defer gt.tagPushOutputMu.Unlock()
 	gt.tagPushOutput = []string{}
@@ -257,7 +257,7 @@ func (gt *GitTag) ClearGitTagPushOutput() {
 //	Fetch tags from remote
 //
 // ----------------------------------
-func (gt *GitTag) GitTagFetch(ctx context.Context, originName string, fetchType string) int {
+func (gt *GitTag) GitFetchTag(ctx context.Context, originName string, fetchType string) int {
 	if !gt.gitProcessLock.CanProceedWithGitOps() {
 		return -1
 	}
@@ -265,7 +265,7 @@ func (gt *GitTag) GitTagFetch(ctx context.Context, originName string, fetchType 
 		gt.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	gt.ClearGitTagFetchOutput()
+	gt.ClearGitFetchTagOutput()
 	var gitArgs []string
 	switch fetchType {
 	case TAGFETCH:
@@ -314,8 +314,8 @@ func (gt *GitTag) GitTagFetch(ctx context.Context, originName string, fetchType 
 				return // Stop immediately on cancel
 			default:
 				gt.tagFetchOutputMu.Lock()
-				updatedCursorIndex, updatedTagFetchOutput := handleProgressOutputStream(cursorIndex, scanner, gt.tagFetchOutput)
-				gt.tagFetchOutput = updatedTagFetchOutput
+				updatedCursorIndex, updatedFetchTagOutput := handleProgressOutputStream(cursorIndex, scanner, gt.tagFetchOutput)
+				gt.tagFetchOutput = updatedFetchTagOutput
 				cursorIndex = updatedCursorIndex
 				gt.tagFetchOutputMu.Unlock()
 				if time.Since(lastSent) >= STREAMUPDATETHROTTLEMS*time.Millisecond {
@@ -351,7 +351,7 @@ func (gt *GitTag) GitTagFetch(ctx context.Context, originName string, fetchType 
 	return 0
 }
 
-func (gt *GitTag) ClearGitTagFetchOutput() {
+func (gt *GitTag) ClearGitFetchTagOutput() {
 	gt.tagFetchOutputMu.Lock()
 	defer gt.tagFetchOutputMu.Unlock()
 	gt.tagFetchOutput = []string{}

@@ -73,18 +73,18 @@ func InitCreateTagConfirmationPopUpModel(m *types.GittiModel, tagName string, ta
 // ------------------------------------
 func InitChooseDeleteTagOptionPopUpModel(m *types.GittiModel, tagName string) {
 	items := make([]list.Item, 0, 2)
-	items = append(items, TagDeleteOptionItem{
+	items = append(items, DeleteTagOptionItem{
 		Name:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteLocalTagOption, tagName),
 		Info:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteLocalTagOptionInfo, tagName),
 		DeleteTagType: git.TAGDELETELOCAL,
 	})
-	items = append(items, TagDeleteOptionItem{
+	items = append(items, DeleteTagOptionItem{
 		Name:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteRemoteTagOption, tagName),
 		Info:          fmt.Sprintf(i18n.LANGUAGEMAPPING.DeleteTagPopUpDeleteRemoteTagOptionInfo, tagName),
 		DeleteTagType: git.TAGDELETEREMOTE,
 	})
 	width := (min(constant.MaxChooseDeleteTagOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-	dL := list.New(items, TagDeleteOptionDelegate{}, width, constant.PopUpChooseDeleteTagOptionHeight)
+	dL := list.New(items, DeleteTagOptionDelegate{}, width, constant.PopUpChooseDeleteTagOptionHeight)
 	dL.SetShowPagination(false)
 	dL.SetShowStatusBar(false)
 	dL.SetFilteringEnabled(false)
@@ -154,6 +154,84 @@ func InitDeleteTagOutputPopUpModel(m *types.GittiModel, tagName string) {
 		DeleteTagOutputViewport: vp,
 		Spinner:                 s,
 		CancelFunc:              nil,
+	}
+
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+
+	m.PopUpModel = popUpModel
+}
+
+// ------------------------------------
+//
+//	For Tag Push Option PopUp
+//
+// ------------------------------------
+func InitChoosePushTagOptionPopUpModel(m *types.GittiModel, remoteName string, tagName string) {
+	items := make([]list.Item, 0, 4)
+	items = append(items, PushTagOptionItem{
+		Name:        fmt.Sprintf(i18n.LANGUAGEMAPPING.PushTagPopUpPushTagOption, tagName),
+		Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.PushTagPopUpPushTagOptionInfo, tagName),
+		PushTagType: git.TAGPUSH,
+	})
+	items = append(items, PushTagOptionItem{
+		Name:        i18n.LANGUAGEMAPPING.PushTagPopUpPushAllTagOption,
+		Info:        i18n.LANGUAGEMAPPING.PushTagPopUpPushAllTagOptionInfo,
+		PushTagType: git.TAGPUSHALL,
+	})
+	items = append(items, PushTagOptionItem{
+		Name:        fmt.Sprintf(i18n.LANGUAGEMAPPING.PushTagPopUpPushForceTagOption, tagName),
+		Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.PushTagPopUpPushForceTagOptionInfo, tagName),
+		PushTagType: git.TAGPUSHFORCE,
+	})
+	items = append(items, PushTagOptionItem{
+		Name:        i18n.LANGUAGEMAPPING.PushTagPopUpPushAllForceTagOption,
+		Info:        i18n.LANGUAGEMAPPING.PushTagPopUpPushAllForceTagOptionInfo,
+		PushTagType: git.TAGPUSHALLFORCE,
+	})
+	width := (min(constant.MaxChoosePushTagOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	cPTOL := list.New(items, PushTagOptionDelegate{}, width, constant.PopUpChoosePushTagOptionHeight)
+	cPTOL.SetShowPagination(false)
+	cPTOL.SetShowStatusBar(false)
+	cPTOL.SetFilteringEnabled(false)
+	cPTOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	cPTOL.SetShowHelp(true)
+	cPTOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	cPTOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	cPTOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cPTOL, constant.MaxChoosePushTagOptionPopUpWidth)
+
+	m.PopUpModel = &ChoosePushTagOptionPopUpModel{
+		TagName:        tagName,
+		RemoteName:     remoteName,
+		PushOptionList: cPTOL,
+	}
+}
+
+// ------------------------------------
+//
+//	For Tag Push Output PopUp
+//
+// ------------------------------------
+func InitPushTagOutputPopUpModel(m *types.GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpPushTagOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxPushTagOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &PushTagOutputPopUpModel{
+		PushTagOutputViewport: vp,
+		Spinner:               s,
+		CancelFunc:            nil,
 	}
 
 	popUpModel.IsProcessing.Store(false)

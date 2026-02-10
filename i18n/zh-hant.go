@@ -104,6 +104,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingTagComponentDefault: []string{
 		"[</>] 切換元件",
 		"[d] 刪除標籤",
+		"[ctrl+p] 推送標籤",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -343,6 +344,14 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForDeleteTagOutputPopUp: []string{
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇推送標籤選項",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -479,6 +488,17 @@ var zH_HANT = LanguageMapping{
 	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "刪除遠端儲存庫中的 '%s' 標籤",
 	DeleteTagOutputPopUpTitle:                                "刪除標籤 [%s]",
 	DeleteTagDeleting:                                        "正在刪除標籤...",
+	ChoosePushTagOptionTitle:                                 "選擇標籤推送選項",
+	PushTagPopUpPushTagOption:                                "推送標籤 '%s'",
+	PushTagPopUpPushTagOptionInfo:                            "推送標籤 '%s' 到遠端倉庫",
+	PushTagPopUpPushAllTagOption:                             "推送所有標籤",
+	PushTagPopUpPushAllTagOptionInfo:                         "推送所有標籤到遠端倉庫",
+	PushTagPopUpPushForceTagOption:                           "強制推送標籤 '%s'",
+	PushTagPopUpPushForceTagOptionInfo:                       "強制推送標籤 '%s' 到遠端倉庫",
+	PushTagPopUpPushAllForceTagOption:                        "強制推送所有標籤",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "強制推送所有標籤到遠端倉庫",
+	PushTagOutputPopUpTitle:                                  "推送標籤",
+	PushTagPushing:                                           "正在推送標籤...",
 }
 
 // for about gitti
@@ -1296,6 +1316,22 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"4. 選擇刪除選項:",
 			"   - 刪除本地標籤",
 			"   - 刪除遠端標籤",
+			"5. 按 `enter` 確認",
+			"6. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "推送標籤 (push tag)",
+		InstructionLines: []string{
+			"1. 導覽至標籤組件（按 `1`）或切換至標籤組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要推送的標籤",
+			"3. 按 `ctrl+p` 開啟推送標籤菜單",
+			"4. 選擇推送選項：",
+			"   - 推送選中的標籤",
+			"   - 推送所有標籤",
+			"   - 強制推送選中的標籤",
+			"   - 強制推送所有標籤",
 			"5. 按 `enter` 確認",
 			"6. 按 `esc` 關閉輸出",
 		},

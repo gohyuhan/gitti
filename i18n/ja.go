@@ -104,6 +104,7 @@ var jA = LanguageMapping{
 	KeyBindingTagComponentDefault: []string{
 		"[</>] コンポーネントを切り替え",
 		"[d] タグを削除",
+		"[ctrl+p] タグをプッシュ",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -343,6 +344,14 @@ var jA = LanguageMapping{
 	KeyBindingForDeleteTagOutputPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] プッシュタグオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -479,6 +488,17 @@ var jA = LanguageMapping{
 	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "リモートリポジトリの '%s' タグを削除します",
 	DeleteTagOutputPopUpTitle:                                "タグ [%s] を削除",
 	DeleteTagDeleting:                                        "タグを削除中...",
+	ChoosePushTagOptionTitle:                                 "タグのプッシュオプションを選択してください",
+	PushTagPopUpPushTagOption:                                "タグ '%s' をプッシュ",
+	PushTagPopUpPushTagOptionInfo:                            "リモートリポジトリにタグ '%s' をプッシュします",
+	PushTagPopUpPushAllTagOption:                             "すべてのタグをプッシュ",
+	PushTagPopUpPushAllTagOptionInfo:                         "リモートリポジトリにすべてのタグをプッシュします",
+	PushTagPopUpPushForceTagOption:                           "タグ '%s' を強制プッシュ",
+	PushTagPopUpPushForceTagOptionInfo:                       "リモートリポジトリにタグ '%s' を強制プッシュします",
+	PushTagPopUpPushAllForceTagOption:                        "すべてのタグを強制プッシュ",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "リモートリポジトリにすべてのタグを強制プッシュします",
+	PushTagOutputPopUpTitle:                                  "タグのプッシュ",
+	PushTagPushing:                                           "タグをプッシュ中...",
 }
 
 // for about gitti
@@ -1299,6 +1319,22 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - リモートタグを削除",
 			"5. `enter` を押して確定",
 			"6. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグのプッシュ (push tag)",
+		InstructionLines: []string{
+			"1. タグコンポーネントに移動（`1`を押す）またはタグコンポーネントに切り替え（`< >`を押す）",
+			"2. `↑/↓`を使用してプッシュするタグを選択",
+			"3. `ctrl+p`を押してタグプッシュメニューを開く",
+			"4. プッシュオプションを選択:",
+			"   - 選択したタグをプッシュ",
+			"   - すべてのタグをプッシュ",
+			"   - 選択したタグを強制プッシュ",
+			"   - すべてのタグを強制プッシュ",
+			"5. `enter`を押して確定",
+			"6. `esc`を押して出力を閉じる",
 		},
 		LineType: INFO,
 	},

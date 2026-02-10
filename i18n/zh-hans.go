@@ -104,6 +104,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingTagComponentDefault: []string{
 		"[</>] 切换组件",
 		"[d] 删除标签",
+		"[ctrl+p] 推送标签",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -343,6 +344,14 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForDeleteTagOutputPopUp: []string{
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择推送标签选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -479,6 +488,17 @@ var zH_HANS = LanguageMapping{
 	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "删除远程仓库中的 '%s' 标签",
 	DeleteTagOutputPopUpTitle:                                "删除标签 [%s]",
 	DeleteTagDeleting:                                        "正在删除标签...",
+	ChoosePushTagOptionTitle:                                 "选择标签推送选项",
+	PushTagPopUpPushTagOption:                                "推送标签 '%s'",
+	PushTagPopUpPushTagOptionInfo:                            "推送标签 '%s' 到远程仓库",
+	PushTagPopUpPushAllTagOption:                             "推送所有标签",
+	PushTagPopUpPushAllTagOptionInfo:                         "推送所有标签到远程仓库",
+	PushTagPopUpPushForceTagOption:                           "强制推送标签 '%s'",
+	PushTagPopUpPushForceTagOptionInfo:                       "强制推送标签 '%s' 到远程仓库",
+	PushTagPopUpPushAllForceTagOption:                        "强制推送所有标签",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "强制推送所有标签到远程仓库",
+	PushTagOutputPopUpTitle:                                  "推送标签",
+	PushTagPushing:                                           "正在推送标签...",
 }
 
 // for about gitti
@@ -1296,6 +1316,22 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"4. 选择删除选项:",
 			"   - 删除本地标签",
 			"   - 删除远程标签",
+			"5. 按 `enter` 确认",
+			"6. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "推送标签 (push tag)",
+		InstructionLines: []string{
+			"1. 导航到标签组件（按 `1`）或切换到标签组件（按 `< >`）",
+			"2. 使用 `↑/↓` 选择要推送的标签",
+			"3. 按 `ctrl+p` 打开推送标签菜单",
+			"4. 选择推送选项：",
+			"   - 推送选中的标签",
+			"   - 推送所有标签",
+			"   - 强制推送选中的标签",
+			"   - 强制推送所有标签",
 			"5. 按 `enter` 确认",
 			"6. 按 `esc` 关闭输出",
 		},

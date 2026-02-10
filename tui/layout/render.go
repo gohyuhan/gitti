@@ -374,6 +374,10 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseRemoteForDeleteRemoteTagPopUp
 		case constant.DeleteTagOutputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForDeleteTagOutputPopUp
+		case constant.ChoosePushTagOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChoosePushTagOptionPopUp
+		case constant.PushTagOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForPushTagOutputPopUp
 		}
 	} else {
 		//-----------------------------

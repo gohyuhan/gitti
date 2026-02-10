@@ -104,6 +104,7 @@ var eN = LanguageMapping{
 	KeyBindingTagComponentDefault: []string{
 		"[</>] switch component",
 		"[d] delete tag",
+		"[ctrl+p] push tag",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -343,6 +344,14 @@ var eN = LanguageMapping{
 	KeyBindingForDeleteTagOutputPopUp: []string{
 		"[esc] cancel / close",
 	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select push tag option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -479,6 +488,17 @@ var eN = LanguageMapping{
 	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "Delete '%s' tag on remote repository",
 	DeleteTagOutputPopUpTitle:                                "Delete Tag [%s]",
 	DeleteTagDeleting:                                        "Deleting tag...",
+	ChoosePushTagOptionTitle:                                 "Choose the tag push option",
+	PushTagPopUpPushTagOption:                                "Push tag '%s'",
+	PushTagPopUpPushTagOptionInfo:                            "Push tag '%s' to remote repository",
+	PushTagPopUpPushAllTagOption:                             "Push all tags",
+	PushTagPopUpPushAllTagOptionInfo:                         "Push all tags to remote repository",
+	PushTagPopUpPushForceTagOption:                           "Force push tag '%s'",
+	PushTagPopUpPushForceTagOptionInfo:                       "Force push tag '%s' to remote repository",
+	PushTagPopUpPushAllForceTagOption:                        "Force push all tags",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "Force push all tags to remote repository",
+	PushTagOutputPopUpTitle:                                  "Push Tag(s)",
+	PushTagPushing:                                           "Pushing tag(s)...",
 }
 
 // for about gitti
@@ -1295,6 +1315,22 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"4. Select delete option:",
 			"   - Delete local tag",
 			"   - Delete remote tag",
+			"5. Press `enter` to confirm",
+			"6. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "push tag",
+		InstructionLines: []string{
+			"1. Navigate to Tag component (press `1`) or switch to Tag component (press `< >`)",
+			"2. Select the tag to push using `↑/↓`",
+			"3. Press `ctrl+p` to open push tag menu",
+			"4. Select push option:",
+			"   - Push selected tag",
+			"   - Push all tags",
+			"   - Force push selected tag",
+			"   - Force push all tags",
 			"5. Press `enter` to confirm",
 			"6. Press `esc` to close output",
 		},

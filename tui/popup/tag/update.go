@@ -23,3 +23,20 @@ func UpdateDeleteTagOutputViewPort(m *types.GittiModel, deleteTagOutput []string
 		popUp.DeleteTagOutputViewport.PageDown()
 	}
 }
+
+func UpdatePushTagOutputViewPort(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*PushTagOutputPopUpModel)
+	if ok {
+		popUp.PushTagOutputViewport.SetWidth(min(constant.MaxPushTagOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.PushTagOutputViewport.SetYOffset(popUp.PushTagOutputViewport.YOffset())
+		var gitOpsOutputLogString strings.Builder
+		pushTagOutput := m.GitOperations.GitTag.PushTagOutput()
+		for _, line := range pushTagOutput {
+			logLine := style.NewStyle.Render(line)
+			gitOpsOutputLogString.WriteString(logLine)
+			gitOpsOutputLogString.WriteRune('\n')
+		}
+		popUp.PushTagOutputViewport.SetContent(gitOpsOutputLogString.String())
+		popUp.PushTagOutputViewport.PageDown()
+	}
+}

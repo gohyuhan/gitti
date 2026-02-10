@@ -22,7 +22,6 @@ import (
 	logPopUp "github.com/gohyuhan/gitti/tui/popup/log"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
-	"github.com/gohyuhan/gitti/tui/popup/remote"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
@@ -602,6 +601,19 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
 					// only one remote found so, we will default to that remote
 					branchPopUp.InitCreateBranchBasedOnRemotePopUp(m, remoteName)
+				case constant.TAGPUSHACTION:
+					selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+					if selectedTag != nil {
+						m.IsTyping.Store(false)
+						m.ShowPopUp.Store(true)
+						m.PopUpType = constant.ChoosePushTagOptionPopUp
+						tagPopUp.InitChoosePushTagOptionPopUpModel(m, remoteName, selectedTag.(tag.GitTagItem).TagName)
+					} else {
+						m.IsTyping.Store(false)
+						m.ShowPopUp.Store(false)
+						m.PopUpType = constant.NoPopUp
+						m.PopUpModel = nil
+					}
 				}
 			}
 
@@ -846,7 +858,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			if ok {
 				selectedDeleteType := popUp.DeleteOptionList.SelectedItem()
 				if selectedDeleteType != nil {
-					deleteType := selectedDeleteType.(tagPopUp.TagDeleteOptionItem).DeleteTagType
+					deleteType := selectedDeleteType.(tagPopUp.DeleteTagOptionItem).DeleteTagType
 					switch deleteType {
 					case git.TAGDELETELOCAL:
 						m.ShowPopUp.Store(true)
@@ -899,7 +911,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			if ok {
 				selectedRemote := popUp.RemoteList.SelectedItem()
 				if selectedRemote != nil {
-					remote := selectedRemote.(remote.GitRemoteItem)
+					remote := selectedRemote.(tagPopUp.GitRemoteForDeleteRemoteTagItem)
 					m.PopUpType = constant.DeleteTagOutputPopUp
 					tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
 					m.ShowPopUp.Store(true)
@@ -911,6 +923,28 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					if ok {
 						return m, tagOutputPopUp.Spinner.Tick
 					}
+				}
+			}
+		case constant.ChoosePushTagOptionPopUp:
+			popUp, ok := m.PopUpModel.(*tagPopUp.ChoosePushTagOptionPopUpModel)
+			if ok {
+				selectedPushType := popUp.PushOptionList.SelectedItem()
+				originName := popUp.RemoteName
+				tagName := popUp.TagName
+				if selectedPushType != nil {
+					m.PopUpType = constant.PushTagOutputPopUp
+					tagPopUp.InitPushTagOutputPopUpModel(m)
+					popUp, ok := m.PopUpModel.(*tagPopUp.PushTagOutputPopUpModel)
+					if ok {
+						services.GitPushTagService(m, originName, tagName, selectedPushType.(tagPopUp.PushTagOptionItem).PushTagType)
+						return m, popUp.Spinner.Tick
+					}
+				} else {
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpModel = nil
+					m.PopUpType = constant.NoPopUp
+					return m, nil
 				}
 			}
 		}
@@ -1009,6 +1043,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			services.GitRemotePushCancelService(m)
 		case constant.GitPullOutputPopUp:
 			services.GitPullCancelService(m)
+		case constant.PushTagOutputPopUp:
+			services.GitPushTagCancelService(m)
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -1072,7 +1108,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.GitDiscardFileLineChangeConfirmPopUp,
 			constant.CreateTagConfirmationPopUp,
 			constant.ChooseDeleteTagOptionPopUp,
-			constant.ChooseRemoteForDeleteRemoteTagPopUp:
+			constant.ChooseRemoteForDeleteRemoteTagPopUp,
+			constant.ChoosePushTagOptionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -1446,6 +1483,36 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.PopUpType = constant.GitCherryPickOptionSelectionPopUp
 				m.IsTyping.Store(false)
 				logPopUp.InitGitCherryPickOptionSelectionPopUp(m)
+			}
+		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagComponentPanel) &&
+			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
+			selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+			if selectedTag == nil {
+				return m, nil
+			}
+			if !m.GitOperations.GitRemote.CheckRemoteExist() {
+				// if no remote found, we add one
+				m.PopUpType = constant.AddRemotePromptPopUp
+				if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
+					remotePopUp.InitAddRemotePromptPopUpModel(m, true)
+				} else {
+					popUp.AddRemoteOutputViewport.SetContent("")
+				}
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(true)
+			} else {
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				remotes := m.GitOperations.GitRemote.Remote()
+				if len(remotes) == 1 {
+					m.PopUpType = constant.ChoosePushTagOptionPopUp
+					// only one remote found so, we will default to that remote
+					tagPopUp.InitChoosePushTagOptionPopUpModel(m, remotes[0].Name, selectedTag.(tag.GitTagItem).TagName)
+				} else if len(remotes) > 1 {
+					// if remote is more than 1 let user choose which remote
+					m.PopUpType = constant.ChooseRemotePopUp
+					remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.TAGPUSHACTION)
+				}
 			}
 		}
 	}
