@@ -105,6 +105,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = tag.RenderPushTagOptionPopUp(m)
 	case constant.PushTagOutputPopUp:
 		popUp = tag.RenderPushTagOutputPopUp(m)
+	case constant.ChooseFetchTagOptionPopUp:
+		popUp = tag.RenderFetchTagOptionPopUp(m)
+	case constant.FetchTagOutputPopUp:
+		popUp = tag.RenderFetchTagOutputPopUp(m)
 	}
 	return popUp
 }

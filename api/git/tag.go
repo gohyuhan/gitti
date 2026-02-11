@@ -62,6 +62,20 @@ func (gt *GitTag) PushTagOutput() []string {
 
 // ----------------------------------
 //
+//	Return git tag fetch output
+//
+// ----------------------------------
+func (gt *GitTag) FetchTagOutput() []string {
+	gt.tagFetchOutputMu.RLock()
+	defer gt.tagFetchOutputMu.RUnlock()
+
+	copied := make([]string, len(gt.tagFetchOutput))
+	copy(copied, gt.tagFetchOutput)
+	return copied
+}
+
+// ----------------------------------
+//
 //	Fetch the latest tag available
 //
 // ----------------------------------

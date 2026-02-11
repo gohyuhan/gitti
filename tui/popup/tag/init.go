@@ -241,3 +241,80 @@ func InitPushTagOutputPopUpModel(m *types.GittiModel) {
 
 	m.PopUpModel = popUpModel
 }
+
+// ------------------------------------
+//
+//	For Tag Fetch Option PopUp
+//
+// ------------------------------------
+func InitChooseFetchTagOptionPopUpModel(m *types.GittiModel, remoteName string) {
+	items := make([]list.Item, 0, 4)
+	items = append(items, FetchTagOptionItem{
+		Name:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchTagOption,
+		Info:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchTagOptionInfo,
+		FetchTagType: git.TAGFETCH,
+	})
+	items = append(items, FetchTagOptionItem{
+		Name:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchOverwriteTagOption,
+		Info:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchOverwriteTagOptionInfo,
+		FetchTagType: git.TAGFETCHOVERWRITE,
+	})
+	items = append(items, FetchTagOptionItem{
+		Name:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchPruneTagOption,
+		Info:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchPruneTagOptionInfo,
+		FetchTagType: git.TAGFETCHPRUNE,
+	})
+	items = append(items, FetchTagOptionItem{
+		Name:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchMirrorTagOption,
+		Info:         i18n.LANGUAGEMAPPING.FetchTagPopUpFetchMirrorTagOptionInfo,
+		FetchTagType: git.TAGFETCHMIRROR,
+	})
+	width := (min(constant.MaxChooseFetchTagOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	cFTOL := list.New(items, FetchTagOptionDelegate{}, width, constant.PopUpChooseFetchTagOptionHeight)
+	cFTOL.SetShowPagination(false)
+	cFTOL.SetShowStatusBar(false)
+	cFTOL.SetFilteringEnabled(false)
+	cFTOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	cFTOL.SetShowHelp(true)
+	cFTOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	cFTOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	cFTOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cFTOL, constant.MaxChooseFetchTagOptionPopUpWidth)
+
+	m.PopUpModel = &ChooseFetchTagOptionPopUpModel{
+		RemoteName:      remoteName,
+		FetchOptionList: cFTOL,
+	}
+}
+
+// ------------------------------------
+//
+//	For Tag Fetch Output PopUp
+//
+// ------------------------------------
+func InitFetchTagOutputPopUpModel(m *types.GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpFetchTagOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxFetchTagOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &FetchTagOutputPopUpModel{
+		FetchTagOutputViewport: vp,
+		Spinner:                s,
+		CancelFunc:             nil,
+	}
+
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+
+	m.PopUpModel = popUpModel
+}

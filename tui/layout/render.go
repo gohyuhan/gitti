@@ -378,6 +378,10 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChoosePushTagOptionPopUp
 		case constant.PushTagOutputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForPushTagOutputPopUp
+		case constant.ChooseFetchTagOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseFetchTagOptionPopUp
+		case constant.FetchTagOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForFetchTagOutputPopUp
 		}
 	} else {
 		//-----------------------------

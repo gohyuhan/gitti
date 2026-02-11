@@ -99,12 +99,14 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] 切換元件",
+		"[f] 獲取標籤",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] 切換元件",
 		"[d] 刪除標籤",
 		"[ctrl+p] 推送標籤",
+		"[f] 獲取標籤",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -183,7 +185,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[ctrl+e] 提交更新的變更",
+		"[ctrl+e] 提交變更",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
@@ -352,6 +354,14 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForPushTagOutputPopUp: []string{
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇獲取標籤選項",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -499,6 +509,17 @@ var zH_HANT = LanguageMapping{
 	PushTagPopUpPushAllForceTagOptionInfo:                    "強制推送所有標籤到遠端倉庫",
 	PushTagOutputPopUpTitle:                                  "推送標籤",
 	PushTagPushing:                                           "正在推送標籤...",
+	ChooseFetchTagOptionTitle:                                "選擇標籤獲取選項",
+	FetchTagPopUpFetchTagOption:                              "獲取標籤",
+	FetchTagPopUpFetchTagOptionInfo:                          "從遠端倉庫獲取標籤",
+	FetchTagPopUpFetchOverwriteTagOption:                     "獲取並覆蓋標籤",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "在本地儲存庫獲取並覆蓋標籤（將現有標籤更新到新提交）",
+	FetchTagPopUpFetchPruneTagOption:                         "獲取並修剪標籤",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "在本地儲存庫獲取並修剪標籤（移除遠端已不存在的標籤）",
+	FetchTagPopUpFetchMirrorTagOption:                        "獲取並鏡像標籤",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地儲存庫獲取並鏡像標籤，以與遠端儲存庫完全匹配",
+	FetchTagOutputPopUpTitle:                                 "獲取標籤",
+	FetchTagFetching:                                         "正在獲取標籤...",
 }
 
 // for about gitti
@@ -570,6 +591,11 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "ctrl+c",
+		TitleOrInfoLine: "強制退出 [!!]",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "ctrl+g",
 		TitleOrInfoLine: "在瀏覽器中開啟作者的 GitHub [!!]",
 		LineType:        INFO,
@@ -577,11 +603,6 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+l",
 		TitleOrInfoLine: "在瀏覽器中開啟作者的 LinkedIn [!!]",
-		LineType:        INFO,
-	},
-	{
-		KeyBindingLine:  "ctrl+c",
-		TitleOrInfoLine: "強制退出 [!!]",
 		LineType:        INFO,
 	},
 	{
@@ -720,6 +741,21 @@ var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "</>",
 		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "刪除標籤",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "擷取標籤",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "推送標籤",
 		LineType:        INFO,
 	},
 	{
@@ -1334,6 +1370,21 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 強制推送所有標籤",
 			"5. 按 `enter` 確認",
 			"6. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "擷取標籤 (fetch tag)",
+		InstructionLines: []string{
+			"1. 導覽至標籤組件（按 `1`）或切換至標籤組件（按 `< >`）",
+			"2. 按 `f` 打開擷取標籤選單",
+			"3. 選擇擷取選項：",
+			"   - 擷取標籤",
+			"   - 擷取標籤並修剪 (prune) - 刪除遠端已不存在的標籤",
+			"   - 擷取標籤並覆蓋 (overwrite) - 以遠端標籤覆蓋不同的現有標籤",
+			"   - 擷取標籤並鏡像 (mirror) - 鏡像遠端的所有標籤",
+			"4. 按 `enter` 確認",
+			"5. 按 `esc` 關閉輸出",
 		},
 		LineType: INFO,
 	},

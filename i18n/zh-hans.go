@@ -99,12 +99,14 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] 切换组件",
+		"[f] 获取标签",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] 切换组件",
 		"[d] 删除标签",
 		"[ctrl+p] 推送标签",
+		"[f] 获取标签",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -352,6 +354,14 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForPushTagOutputPopUp: []string{
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择获取标签选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -368,7 +378,7 @@ var zH_HANS = LanguageMapping{
 	CommitPopUpProcessing:                                    "提交中...",
 	CommitPopUpMessageTitleAmendVersion:                      "* 修改提交信息",
 	CommitPopUpMessageInputPlaceHolderAmendVersion:           "编辑提交信息",
-	CommitPopUpDescriptionTitleAmendVersion:                  "修改改描述",
+	CommitPopUpDescriptionTitleAmendVersion:                  "修改描述",
 	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion: "> 更新你的提交描述...",
 	AddRemotePopUpPrompt:                                     "* 未检测到远程, 请添加一个.",
 	AddRemotePopUpRemoteNameTitle:                            "远程名称",
@@ -499,6 +509,17 @@ var zH_HANS = LanguageMapping{
 	PushTagPopUpPushAllForceTagOptionInfo:                    "强制推送所有标签到远程仓库",
 	PushTagOutputPopUpTitle:                                  "推送标签",
 	PushTagPushing:                                           "正在推送标签...",
+	ChooseFetchTagOptionTitle:                                "选择标签获取选项",
+	FetchTagPopUpFetchTagOption:                              "获取标签",
+	FetchTagPopUpFetchTagOptionInfo:                          "从远程仓库获取标签",
+	FetchTagPopUpFetchOverwriteTagOption:                     "获取并覆盖标签",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "在本地仓库获取并覆盖标签（将现有标签更新到新提交）",
+	FetchTagPopUpFetchPruneTagOption:                         "获取并修剪标签",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "在本地仓库获取并修剪标签（移除远程已不存在的标签）",
+	FetchTagPopUpFetchMirrorTagOption:                        "获取并镜像标签",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地仓库获取并镜像标签，以与远程仓库完全匹配",
+	FetchTagOutputPopUpTitle:                                 "获取标签",
+	FetchTagFetching:                                         "正在获取标签...",
 }
 
 // for about gitti
@@ -507,7 +528,7 @@ var aboutGittiZhHans = []string{
 	"Copyright (c) 2025 Yu Han Goh.",
 	fmt.Sprintf(" %s \033[38;2;180;150;255m%s\033[0m\n", constant.APPNAME, constant.APPVERSION),
 	"Gitti 起源于作者在使用 Neovim 工作时的个人需求.",
-	"当时为了进行更直观的 Git 操作, 不得不切换到外部的 Git GU, ",
+	"当时为了进行更直观的 Git 操作, 不得不切换到外部的 Git GUI, ",
 	"导致打断工作流程.",
 	"Gitti 通过在终端中直接提供一个直观, 轻量的 TUI, ",
 	"弥合了这一差距.\n",
@@ -720,6 +741,21 @@ var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "</>",
 		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "删除标签",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "获取标签",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "推送标签",
 		LineType:        INFO,
 	},
 	{
@@ -1334,6 +1370,21 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 强制推送所有标签",
 			"5. 按 `enter` 确认",
 			"6. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "获取标签 (fetch tag)",
+		InstructionLines: []string{
+			"1. 导航到标签组件（按 `1`）或切换到标签组件（按 `< >`）",
+			"2. 按 `f` 打开获取标签菜单",
+			"3. 选择获取选项：",
+			"   - 获取标签",
+			"   - 获取标签并修剪 (prune) - 删除远程中不再存在的标签",
+			"   - 获取标签并覆盖 (overwrite) - 用远程标签覆盖不同的现有标签",
+			"   - 获取标签并镜像 (mirror) - 镜像远程中的所有标签",
+			"4. 按 `enter` 确认",
+			"5. 按 `esc` 关闭输出",
 		},
 		LineType: INFO,
 	},

@@ -329,6 +329,39 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		if (m.CurrentSelectedComponent == constant.LocalBranchOrTagComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagComponentPanel) &&
+			m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
+			if !m.GitOperations.GitRemote.CheckRemoteExist() {
+				// if no remote found, we add one
+				m.PopUpType = constant.AddRemotePromptPopUp
+				if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
+					remotePopUp.InitAddRemotePromptPopUpModel(m, true)
+				} else {
+					popUp.AddRemoteOutputViewport.SetContent("")
+				}
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(true)
+			} else {
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				remotes := m.GitOperations.GitRemote.Remote()
+				if len(remotes) == 1 {
+					m.PopUpType = constant.ChooseFetchTagOptionPopUp
+					// only one remote found so, we will default to that remote
+					tagPopUp.InitChooseFetchTagOptionPopUpModel(m, remotes[0].Name)
+				} else if len(remotes) > 1 {
+					// if remote is more than 1 let user choose which remote
+					m.PopUpType = constant.ChooseRemotePopUp
+					remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.TAGFETCHACTION)
+				}
+			}
+		}
+	}
+	return m, nil
+}
+
 func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	// enter line stage state
 	services.EnterOrReinitLineEditingStateService(m)
@@ -614,6 +647,11 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.PopUpType = constant.NoPopUp
 						m.PopUpModel = nil
 					}
+				case constant.TAGFETCHACTION:
+					m.IsTyping.Store(false)
+					m.ShowPopUp.Store(true)
+					m.PopUpType = constant.ChooseFetchTagOptionPopUp
+					tagPopUp.InitChooseFetchTagOptionPopUpModel(m, remoteName)
 				}
 			}
 
@@ -947,6 +985,27 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					return m, nil
 				}
 			}
+		case constant.ChooseFetchTagOptionPopUp:
+			popUp, ok := m.PopUpModel.(*tagPopUp.ChooseFetchTagOptionPopUpModel)
+			if ok {
+				selectedFetchType := popUp.FetchOptionList.SelectedItem()
+				originName := popUp.RemoteName
+				if selectedFetchType != nil {
+					m.PopUpType = constant.FetchTagOutputPopUp
+					tagPopUp.InitFetchTagOutputPopUpModel(m)
+					popUp, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel)
+					if ok {
+						services.GitFetchTagService(m, originName, selectedFetchType.(tagPopUp.FetchTagOptionItem).FetchTagType)
+						return m, popUp.Spinner.Tick
+					}
+				} else {
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpModel = nil
+					m.PopUpType = constant.NoPopUp
+					return m, nil
+				}
+			}
 		}
 	}
 	return m, nil
@@ -1045,6 +1104,10 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			services.GitPullCancelService(m)
 		case constant.PushTagOutputPopUp:
 			services.GitPushTagCancelService(m)
+		case constant.FetchTagOutputPopUp:
+			services.GitFetchTagCancelService(m)
+		case constant.DeleteTagOutputPopUp:
+			services.DeleteTagCancelService(m)
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -1084,8 +1147,6 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
 			}
-		case constant.DeleteTagOutputPopUp:
-			services.DeleteTagCancelService(m)
 		case constant.KeybindingAndFeatureInstructionsPopUp,
 			constant.ChooseRemotePopUp,
 			constant.ChoosePushTypePopUp,
@@ -1109,7 +1170,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.CreateTagConfirmationPopUp,
 			constant.ChooseDeleteTagOptionPopUp,
 			constant.ChooseRemoteForDeleteRemoteTagPopUp,
-			constant.ChoosePushTagOptionPopUp:
+			constant.ChoosePushTagOptionPopUp,
+			constant.ChooseFetchTagOptionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

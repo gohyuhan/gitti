@@ -269,3 +269,83 @@ type PushTagOutputPopUpModel struct {
 	// CancelFunc is used to cancel the git delete tag operation
 	CancelFunc context.CancelFunc
 }
+
+// ---------------------------------
+//
+// # For Choose Fetch Tag Option
+//
+// ---------------------------------
+type ChooseFetchTagOptionPopUpModel struct {
+	RemoteName      string
+	FetchOptionList list.Model
+}
+
+// ------------------------------------
+//
+//	For tag fetch option selection option
+//
+// ------------------------------------
+type (
+	FetchTagOptionDelegate struct{}
+	FetchTagOptionItem     struct {
+		Name         string
+		Info         string
+		FetchTagType string
+	}
+)
+
+func (i FetchTagOptionItem) FilterValue() string {
+	return i.Name
+}
+
+// for tag deletion option selection
+func (d FetchTagOptionDelegate) Height() int                             { return 1 }
+func (d FetchTagOptionDelegate) Spacing() int                            { return 0 }
+func (d FetchTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d FetchTagOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(FetchTagOptionItem)
+	if !ok {
+		return
+	}
+
+	nameStr := fmt.Sprintf("   %s", i.Name)
+	infoStr := fmt.Sprintf("    %s", i.Info)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
+
+	nameStr = utils.TruncateString(nameStr, componentWidth)
+	infoStr = utils.TruncateString(infoStr, componentWidth)
+
+	nameRendered := style.ItemStyle.Render(nameStr)
+	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
+	fullStr := nameRendered + "\n" + "  " + infoRendered
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(fullStr))
+}
+
+// ------------------------------------
+//
+//	For git fetch tag process pop up model
+//
+// ------------------------------------
+type FetchTagOutputPopUpModel struct {
+	FetchTagOutputViewport viewport.Model // to log out the output from git operation
+	Spinner                spinner.Model  // spinner for showing processing state
+	IsProcessing           atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError               atomic.Bool    // indicate if git delete tag exitcode is not 0 (meaning have error)
+	ProcessSuccess         atomic.Bool    // has the process sucessfuly executed
+	IsCancelled            atomic.Bool    // flag to indicate if the operation was cancelled by user
+	// CancelFunc is used to cancel the git delete tag operation
+	CancelFunc context.CancelFunc
+}

@@ -99,12 +99,14 @@ var jA = LanguageMapping{
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] コンポーネントを切り替え",
+		"[f] タグをフェッチ",
 		"[?] キー操作と説明",
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] コンポーネントを切り替え",
 		"[d] タグを削除",
 		"[ctrl+p] タグをプッシュ",
+		"[f] タグをフェッチ",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -352,6 +354,14 @@ var jA = LanguageMapping{
 	KeyBindingForPushTagOutputPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] タグフェッチオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -499,6 +509,17 @@ var jA = LanguageMapping{
 	PushTagPopUpPushAllForceTagOptionInfo:                    "リモートリポジトリにすべてのタグを強制プッシュします",
 	PushTagOutputPopUpTitle:                                  "タグのプッシュ",
 	PushTagPushing:                                           "タグをプッシュ中...",
+	ChooseFetchTagOptionTitle:                                "タグのフェッチオプションを選択してください",
+	FetchTagPopUpFetchTagOption:                              "タグをフェッチ",
+	FetchTagPopUpFetchTagOptionInfo:                          "リモートリポジトリからタグをフェッチします",
+	FetchTagPopUpFetchOverwriteTagOption:                     "タグをフェッチして上書き",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "ローカルリポジトリのタグをフェッチして上書きします (既存のタグを新しいコミットに更新)",
+	FetchTagPopUpFetchPruneTagOption:                         "タグをフェッチして整理 (prune)",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "ローカルリポジトリのタグをフェッチして整理します (リモートに存在しないタグを削除)",
+	FetchTagPopUpFetchMirrorTagOption:                        "タグをフェッチしてミラーリング",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "ローカルリポジトリのタグをリモートリポジトリと完全に一致するようにフェッチしてミラーリングします",
+	FetchTagOutputPopUpTitle:                                 "タグのフェッチ",
+	FetchTagFetching:                                         "タグをフェッチ中...",
 }
 
 // for about gitti
@@ -721,6 +742,21 @@ var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "</>",
 		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "タグを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "タグをフェッチ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "タグをプッシュ",
 		LineType:        INFO,
 	},
 	{
@@ -1335,6 +1371,21 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - すべてのタグを強制プッシュ",
 			"5. `enter`を押して確定",
 			"6. `esc`を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグのフェッチ (fetch tag)",
+		InstructionLines: []string{
+			"1. タグコンポーネントに移動（`1`を押す）またはタグコンポーネントに切り替え（`< >`を押す）",
+			"2. `f` を押してタグフェッチメニューを開く",
+			"3. フェッチオプションを選択:",
+			"   - タグをフェッチ",
+			"   - タグをフェッチして整理 (prune) - リモートに存在しないタグを削除",
+			"   - タグをフェッチして上書き (overwrite) - 既存のタグをリモートのタグで上書き",
+			"   - タグをフェッチしてミラーリング (mirror) - すべてのタグをリモートと同期",
+			"4. `enter` を押して確定",
+			"5. `esc` を押して出力を閉じる",
 		},
 		LineType: INFO,
 	},

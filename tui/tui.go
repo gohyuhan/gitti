@@ -202,6 +202,8 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case git.GIT_TAG_PUSH_OUTPUT_UPDATE:
 			tagPopUp.UpdatePushTagOutputViewPort(m)
+		case git.GIT_TAG_FETCH_OUTPUT_UPDATE:
+			tagPopUp.UpdateFetchTagOutputViewPort(m)
 		}
 		return gAM, nil
 	case types.EditorFinishedMsg:
@@ -274,6 +276,12 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if ok {
 				var cmd tea.Cmd
 				tagPopUp.Spinner, cmd = tagPopUp.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.FetchTagOutputPopUp:
+			if tagPopup, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel); ok && tagPopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				tagPopup.Spinner, cmd = tagPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		}

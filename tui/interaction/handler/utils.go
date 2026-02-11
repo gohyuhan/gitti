@@ -296,7 +296,26 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 			popUp.PushOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.PushOptionList, constant.MaxChoosePushTagOptionPopUpWidth)
 			return m, nil
 		}
-		// following is for viewport
+	case constant.ChooseFetchTagOptionPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.ChooseFetchTagOptionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.FetchOptionList.Index() > 0 {
+					latestIndex := popUp.FetchOptionList.Index() - 1
+					popUp.FetchOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.FetchOptionList.Index() < len(popUp.FetchOptionList.Items())-1 {
+					latestIndex := popUp.FetchOptionList.Index() + 1
+					popUp.FetchOptionList.Select(latestIndex)
+				}
+			}
+			popUp.FetchOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.FetchOptionList, constant.MaxChooseFetchTagOptionPopUpWidth)
+			return m, nil
+		}
+
+	// following is for viewport
 	case constant.KeybindingAndFeatureInstructionsPopUp:
 		popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
 		if ok {

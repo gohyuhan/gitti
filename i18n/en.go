@@ -68,7 +68,7 @@ var eN = LanguageMapping{
 	CurrentTerminalHeight:               "Current height",
 	MinimumTerminalHeight:               "Minimum required height",
 	CurrentTerminalWidth:                "Current width",
-	MinimumTerminalWidth:                "Minimum required height",
+	MinimumTerminalWidth:                "Minimum required width",
 	Loading:                             "Loading...",
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
@@ -99,12 +99,14 @@ var eN = LanguageMapping{
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] switch component",
+		"[f] fetch tag",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] switch component",
 		"[d] delete tag",
 		"[ctrl+p] push tag",
+		"[f] fetch tag",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -352,6 +354,14 @@ var eN = LanguageMapping{
 	KeyBindingForPushTagOutputPopUp: []string{
 		"[esc] cancel / close",
 	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select fetch tag option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -499,6 +509,17 @@ var eN = LanguageMapping{
 	PushTagPopUpPushAllForceTagOptionInfo:                    "Force push all tags to remote repository",
 	PushTagOutputPopUpTitle:                                  "Push Tag(s)",
 	PushTagPushing:                                           "Pushing tag(s)...",
+	ChooseFetchTagOptionTitle:                                "Choose the tag fetch option",
+	FetchTagPopUpFetchTagOption:                              "Fetch tag(s)",
+	FetchTagPopUpFetchTagOptionInfo:                          "Fetch tag(s) from remote repository",
+	FetchTagPopUpFetchOverwriteTagOption:                     "Fetch and overwrite tag(s)",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "Fetch and overwrite tag(s) on local repository (update existing tags to new commit)",
+	FetchTagPopUpFetchPruneTagOption:                         "Fetch and prune tag(s)",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "Fetch and prune tag(s) on local repository (remove tags that no longer exist on remote)",
+	FetchTagPopUpFetchMirrorTagOption:                        "Fetch and mirror tag(s)",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "Fetch and mirror tag(s) on local repository to match remote repository exactly",
+	FetchTagOutputPopUpTitle:                                 "Fetch Tag(s)",
+	FetchTagFetching:                                         "Fetching tag(s)...",
 }
 
 // for about gitti
@@ -719,6 +740,21 @@ var enTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "</>",
 		TitleOrInfoLine: "switch between local branch and tag component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "delete tag",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "fetch tag",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "push tag",
 		LineType:        INFO,
 	},
 	{
@@ -1333,6 +1369,21 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - Force push all tags",
 			"5. Press `enter` to confirm",
 			"6. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "fetch tag",
+		InstructionLines: []string{
+			"1. Navigate to Tag component (press `1`) or switch to Tag component (press `< >`)",
+			"2. Press `f` to open fetch tag menu",
+			"3. Select fetch option:",
+			"   - Fetch tag(s)",
+			"   - Fetch tag(s) prune - Remove tags that no longer exist in remote",
+			"   - Fetch tag(s) overwrite - Overwrite existing tags with remote tags that differ",
+			"   - Fetch tag(s) mirror - Mirror all tags from remote",
+			"4. Press `enter` to confirm",
+			"5. Press `esc` to close output",
 		},
 		LineType: INFO,
 	},

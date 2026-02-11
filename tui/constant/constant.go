@@ -46,6 +46,8 @@ const (
 	DeleteTagOutputPopUp                       = "DeleteTagOutputPopUp"                       // IsTyping will be false
 	ChoosePushTagOptionPopUp                   = "ChoosePushTagOptionPopUp"                   // IsTyping will be false
 	PushTagOutputPopUp                         = "PushTagOutputPopUp"                         // IsTyping will be false
+	ChooseFetchTagOptionPopUp                  = "ChooseFetchTagOptionPopUp"                  // IsTyping will be false
+	FetchTagOutputPopUp                        = "FetchTagOutputPopUp"                        // IsTyping will be false
 )
 
 const (
@@ -106,6 +108,8 @@ const (
 	MaxDeleteTagOutputPopUpWidth                       = 150
 	MaxChoosePushTagOptionPopUpWidth                   = 150
 	MaxPushTagOutputPopUpWidth                         = 150
+	MaxChooseFetchTagOptionPopUpWidth                  = 150
+	MaxFetchTagOutputPopUpWidth                        = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10
@@ -135,6 +139,8 @@ const (
 	PopUpDeleteTagOutputViewportHeight                 = 10
 	PopUpChoosePushTagOptionHeight                     = 10
 	PopUpPushTagOutputViewportHeight                   = 10
+	PopUpChooseFetchTagOptionHeight                    = 10
+	PopUpFetchTagOutputViewportHeight                  = 10
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -185,6 +191,7 @@ const (
 	PUSHACTION                = "PUSHACTION"
 	CREATEBRANCHBASEDONREMOTE = "CREATEBRANCHBASEDONREMOTE"
 	TAGPUSHACTION             = "TAGPUSHACTION"
+	TAGFETCHACTION            = "TAGFETCHACTION"
 )
 
 // cherry pick ops options

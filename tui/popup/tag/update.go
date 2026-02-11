@@ -40,3 +40,20 @@ func UpdatePushTagOutputViewPort(m *types.GittiModel) {
 		popUp.PushTagOutputViewport.PageDown()
 	}
 }
+
+func UpdateFetchTagOutputViewPort(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*FetchTagOutputPopUpModel)
+	if ok {
+		popUp.FetchTagOutputViewport.SetWidth(min(constant.MaxFetchTagOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.FetchTagOutputViewport.SetYOffset(popUp.FetchTagOutputViewport.YOffset())
+		var gitOpsOutputLogString strings.Builder
+		fetchTagOutput := m.GitOperations.GitTag.FetchTagOutput()
+		for _, line := range fetchTagOutput {
+			logLine := style.NewStyle.Render(line)
+			gitOpsOutputLogString.WriteString(logLine)
+			gitOpsOutputLogString.WriteRune('\n')
+		}
+		popUp.FetchTagOutputViewport.SetContent(gitOpsOutputLogString.String())
+		popUp.FetchTagOutputViewport.PageDown()
+	}
+}

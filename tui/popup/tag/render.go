@@ -181,7 +181,7 @@ func RenderPushTagOutputPopUp(m *types.GittiModel) string {
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.PushTagOutputPopUpTitle)
 		logViewPortStyle := style.PanelBorderStyle.
 			Width(popUpWidth - 2).
-			Height(constant.PopUpDeleteTagOutputViewportHeight + 2)
+			Height(constant.PopUpPushTagOutputViewportHeight + 2)
 		if popUp.HasError.Load() {
 			logViewPortStyle = style.PanelBorderStyle.
 				BorderForeground(style.ColorError)
@@ -197,6 +197,75 @@ func RenderPushTagOutputPopUp(m *types.GittiModel) string {
 		// Show spinner above viewport when processing
 		if popUp.IsProcessing.Load() {
 			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.PushTagPushing)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Fetch Tag Option PopUp
+//
+// ------------------------------------
+func RenderFetchTagOptionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChooseFetchTagOptionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxChooseFetchTagOptionPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChooseFetchTagOptionTitle)
+		popUp.FetchOptionList.SetWidth(popUpWidth - 4)
+		popUp.FetchOptionList.SetHeight(constant.PopUpChooseFetchTagOptionHeight)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.FetchOptionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	For Fetch Tag Output
+//
+// ------------------------------------
+func RenderFetchTagOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*FetchTagOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxFetchTagOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.FetchTagOutputPopUpTitle)
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpFetchTagOutputViewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.FetchTagOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.FetchTagOutputViewport.SetYOffset(popUp.FetchTagOutputViewport.YOffset())
+		logViewPort := logViewPortStyle.Render(popUp.FetchTagOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.FetchTagFetching)
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,

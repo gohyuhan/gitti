@@ -156,3 +156,76 @@ func GitPushTagCancelService(m *types.GittiModel) {
 		popUp.ProcessSuccess.Store(false)
 	}
 }
+
+// ------------------------------------
+//
+//	For Git Tag Fetch
+//
+// ------------------------------------
+func GitFetchTagService(m *types.GittiModel, originName string, fetchType string) {
+	// Initialize a cancellable context for the push operation
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Store the cancel function in the popup model so the task can be aborted from the UI
+	popUp, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel)
+	if ok {
+		popUp.CancelFunc = cancel
+	}
+
+	// Execute the push operation in a separate goroutine to maintain UI responsiveness
+	go func(ctx context.Context) {
+		defer cancel()
+
+		// Prepare the popup state: reset errors and set processing flags
+		popUp, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel)
+		var exitStatusCode int
+		if ok {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+			popUp.IsCancelled.Store(false)
+		} else {
+			return
+		}
+
+		// Perform the actual git tag push operation via the git service
+		exitStatusCode = m.GitOperations.GitTag.GitFetchTag(ctx, originName, fetchType)
+
+		// After the operation completes, update the UI state if the popup hasn't been cancelled
+		popUp, ok = m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel)
+		if ok && !popUp.IsCancelled.Load() {
+			popUp.IsProcessing.Store(false) // Update the processing status
+
+			// Check the exit status: 0 typically indicates success
+			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(true)
+				popUp.IsProcessing.Store(false)
+				popUp.HasError.Store(false)
+			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
+				// If the command failed, set the error flag
+				popUp.HasError.Store(true)
+			}
+		}
+	}(ctx)
+}
+
+func GitFetchTagCancelService(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel)
+	if ok {
+		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
+		if popUp.CancelFunc != nil {
+			popUp.CancelFunc() // Cancel the context, which terminates the command and goroutine
+		}
+	}
+	m.GitOperations.GitTag.ClearGitFetchTagOutput() // clear the git tag output log
+
+	m.ShowPopUp.Store(false) // close the pop up
+	m.IsTyping.Store(false)  // reset typing mode
+	m.PopUpType = constant.NoPopUp
+	if ok {
+		popUp.FetchTagOutputViewport.SetContent("") // set the git commit output viewport to nothing
+		popUp.IsProcessing.Store(false)
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+	}
+}
