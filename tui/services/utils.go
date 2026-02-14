@@ -12,6 +12,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/log"
 	"github.com/gohyuhan/gitti/tui/component/stash"
+	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -76,20 +77,27 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			m.DetailPanelTwoViewport.SetXOffset(0)
 			m.DetailPanelTwoViewport.SetYOffset(0)
 		}
-		if m.CurrentSelectedComponent == constant.DetailComponent || m.CurrentSelectedComponent == constant.DetailComponentTwo {
+		if m.CurrentSelectedComponent == constant.DetailComponentPanel || m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 			// if the current selected one is the detail component itself, the current selected one will be its parent (the component that led into the detail component)
 			theCurrentSelectedComponent = m.DetailPanelParentComponent
 		} else {
 			theCurrentSelectedComponent = m.CurrentSelectedComponent
 		}
 		switch theCurrentSelectedComponent {
-		case constant.ModifiedFilesComponent:
+		case constant.LocalBranchOrTagComponentPanel:
+			switch m.CurrentLocalBranchOrTagComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+				contentLine = generateAboutGittiContent()
+			case constant.SHOW_TAG:
+				contentLine = generateTagDetailPanelContent(ctx, m)
+			}
+		case constant.ModifiedFilesComponentPanel:
 			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
-		case constant.CommitLogComponent:
+		case constant.CommitLogComponentPanel:
 			contentLine = generateCommitLogDetailPanelContent(ctx, m)
-		case constant.StashComponent:
+		case constant.StashComponentPanel:
 			contentLine = generateStashDetailPanelContent(ctx, m)
-		case constant.LogComponent:
+		case constant.LogComponentPanel:
 			contentLine = generateLogDetailPanelContent(ctx, m)
 		default:
 			contentLine = generateAboutGittiContent()
@@ -99,7 +107,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		case <-ctx.Done():
 			return
 		default:
-			needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponent
+			needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponentPanel
 			if contentLine == "" {
 				// if the content will be empty, render about gitti for detail panel
 				contentLine = generateAboutGittiContent()
@@ -117,8 +125,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			} else {
 				// if the detail component two is selected, switch to detail component as it is not set for detail component two
 				// as it will hide the detail component two viewport
-				if m.CurrentSelectedComponent == constant.DetailComponentTwo {
-					m.CurrentSelectedComponent = constant.DetailComponent
+				if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
+					m.CurrentSelectedComponent = constant.DetailComponentPanel
 				}
 			}
 			if m.IsLineEditingState.Load() {
@@ -128,6 +136,32 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			return
 		}
 	}(ctx)
+}
+
+// for tsg detail panel view
+func generateTagDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
+	currentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+	var tagItem tag.GitTagItem
+	if currentSelectedTag != nil {
+		tagItem = currentSelectedTag.(tag.GitTagItem)
+	} else {
+		return ""
+	}
+
+	var vpLine strings.Builder
+
+	tagDetail := m.GitOperations.GitTag.ShowGitTagDetail(ctx, tagItem.TagName)
+	if len(tagDetail) < 1 {
+		return ""
+	}
+
+	for _, Line := range tagDetail {
+		line := style.NewStyle.Render(Line)
+		vpLine.WriteString(line)
+
+		vpLine.WriteRune('\n')
+	}
+	return vpLine.String()
 }
 
 // for modified file detail panel view
@@ -274,7 +308,7 @@ func generateAboutGittiContent() string {
 //
 // ------------------------------------
 func EnterOrReinitLineEditingStateService(m *types.GittiModel) {
-	if !((m.CurrentSelectedComponent == constant.DetailComponent || m.CurrentSelectedComponent == constant.DetailComponentTwo) && m.DetailPanelParentComponent == constant.ModifiedFilesComponent && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil) {
+	if !((m.CurrentSelectedComponent == constant.DetailComponentPanel || m.CurrentSelectedComponent == constant.DetailComponentPanelTwo) && m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil) {
 		// we are eligible to be in line editing mode, so we need to reset the state
 		m.IsLineEditingState.Store(false)
 		// reinit the index position

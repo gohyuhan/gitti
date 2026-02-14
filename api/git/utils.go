@@ -18,6 +18,10 @@ func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {
 	var cleanedStringArray []string
 	cleanedStringArray = strings.Split(strings.TrimSpace(string(dirtyGitOutput)), "\n")
 
+	if len(cleanedStringArray) == 1 && cleanedStringArray[0] == "" {
+		return []string{}
+	}
+
 	return cleanedStringArray
 }
 

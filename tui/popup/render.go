@@ -13,6 +13,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/remote"
 	"github.com/gohyuhan/gitti/tui/popup/resolve"
 	"github.com/gohyuhan/gitti/tui/popup/stash"
+	"github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -90,6 +91,24 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = log.RenderGitCherryPickApplyConfirmPopUp(m)
 	case constant.GitDiscardFileLineChangeConfirmPopUp:
 		popUp = files.RenderGitDiscardFileLineChangeConfirmPopUp(m)
+	case constant.CreateTagPopUp:
+		popUp = tag.RenderCreateTagPopUp(m)
+	case constant.CreateTagConfirmationPopUp:
+		popUp = tag.RenderCreateTagConfirmationPopUp(m)
+	case constant.ChooseDeleteTagOptionPopUp:
+		popUp = tag.RenderChooseDeleteTagOptionPopUp(m)
+	case constant.ChooseRemoteForDeleteRemoteTagPopUp:
+		popUp = tag.RenderChooseRemoteForDeleteRemoteTagPopUp(m)
+	case constant.DeleteTagOutputPopUp:
+		popUp = tag.RenderDeleteTagOutputPopUp(m)
+	case constant.ChoosePushTagOptionPopUp:
+		popUp = tag.RenderPushTagOptionPopUp(m)
+	case constant.PushTagOutputPopUp:
+		popUp = tag.RenderPushTagOutputPopUp(m)
+	case constant.ChooseFetchTagOptionPopUp:
+		popUp = tag.RenderFetchTagOptionPopUp(m)
+	case constant.FetchTagOutputPopUp:
+		popUp = tag.RenderFetchTagOutputPopUp(m)
 	}
 	return popUp
 }

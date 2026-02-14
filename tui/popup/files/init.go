@@ -21,10 +21,10 @@ func InitGitDiscardFileLineChangeConfirmPopUp(m *types.GittiModel) {
 	discardFileLineChange.WriteString("  ")
 
 	switch m.CurrentSelectedComponent {
-	case constant.DetailComponent:
+	case constant.DetailComponentPanel:
 		ogArrayIndex := m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex - m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount
 		discardFileLineChange.WriteString(m.DetailPanelViewportOGStringArray[ogArrayIndex])
-	case constant.DetailComponentTwo:
+	case constant.DetailComponentPanelTwo:
 		ogArrayIndex := m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex - m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount
 		discardFileLineChange.WriteString(m.DetailPanelTwoViewportOGStringArray[ogArrayIndex])
 	}

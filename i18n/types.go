@@ -89,6 +89,7 @@ type LanguageMapping struct {
 	ModifiedFiles               string
 	CommitLog                   string
 	Stash                       string
+	Tag                         string
 	FileTypeUnSupportedPreview  string
 	TerminalSizeWarning         string
 	CurrentTerminalHeight       string
@@ -109,6 +110,8 @@ type LanguageMapping struct {
 	KeyBindingLocalBranchComponentIsCheckOut                []string
 	KeyBindingLocalBranchComponentDefault                   []string
 	KeyBindingLocalBranchComponentNone                      []string
+	KeyBindingTagComponentNone                              []string
+	KeyBindingTagComponentDefault                           []string
 	KeyBindingModifiedFilesComponentConflict                []string
 	KeyBindingModifiedFilesComponentIsStaged                []string
 	KeyBindingModifiedFilesComponentDefault                 []string
@@ -151,6 +154,15 @@ type LanguageMapping struct {
 	KeyBindingForGitCherryPickApplyConfirmPopUp             []string
 	KeyBindingForGitDiscardFileLineChangeConfirmPopUp       []string
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp      []string
+	KeyBindingForCreateTagPopUp                             []string
+	KeyBindingForCreateTagConfirmationPopUp                 []string
+	KeyBindingForChooseDeleteTagOptionPopUp                 []string
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp        []string
+	KeyBindingForDeleteTagOutputPopUp                       []string
+	KeyBindingForChoosePushTagOptionPopUp                   []string
+	KeyBindingForPushTagOutputPopUp                         []string
+	KeyBindingForChooseFetchTagOptionPopUp                  []string
+	KeyBindingForFetchTagOutputPopUp                        []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -158,6 +170,8 @@ type LanguageMapping struct {
 	GlobalKeyBinding []KeyBindingMappingFormat
 	// Local Branch Component KeyBinding
 	LocalBranchComponentKeyBinding []KeyBindingMappingFormat
+	// Tag Component KeyBinding
+	TagComponentKeyBinding []KeyBindingMappingFormat
 	// Modified Files Component KeyBinding
 	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Commit Log Component KeyBinding
@@ -308,4 +322,39 @@ type LanguageMapping struct {
 	CherryPickedFromBranch        string
 	// for discard file line change
 	GitDiscardFileLineChangeConfirmTitle string
+	// for tag
+	CreateTagPopUpNameTitle                  string
+	CreateTagPopUpNameInputPlaceHolder       string
+	CreateTagPopUpMessageTitle               string
+	CreateTagPopUpMessageInputPlaceHolder    string
+	CreateTagConfirmation                    string
+	ChooseDeleteTagOptionTitle               string
+	DeleteTagPopUpDeleteLocalTagOption       string
+	DeleteTagPopUpDeleteLocalTagOptionInfo   string
+	DeleteTagPopUpDeleteRemoteTagOption      string
+	DeleteTagPopUpDeleteRemoteTagOptionInfo  string
+	DeleteTagOutputPopUpTitle                string
+	DeleteTagDeleting                        string
+	ChoosePushTagOptionTitle                 string
+	PushTagPopUpPushTagOption                string
+	PushTagPopUpPushTagOptionInfo            string
+	PushTagPopUpPushAllTagOption             string
+	PushTagPopUpPushAllTagOptionInfo         string
+	PushTagPopUpPushForceTagOption           string
+	PushTagPopUpPushForceTagOptionInfo       string
+	PushTagPopUpPushAllForceTagOption        string
+	PushTagPopUpPushAllForceTagOptionInfo    string
+	PushTagOutputPopUpTitle                  string
+	PushTagPushing                           string
+	ChooseFetchTagOptionTitle                string
+	FetchTagPopUpFetchTagOption              string
+	FetchTagPopUpFetchTagOptionInfo          string
+	FetchTagPopUpFetchOverwriteTagOption     string
+	FetchTagPopUpFetchOverwriteTagOptionInfo string
+	FetchTagPopUpFetchPruneTagOption         string
+	FetchTagPopUpFetchPruneTagOptionInfo     string
+	FetchTagPopUpFetchMirrorTagOption        string
+	FetchTagPopUpFetchMirrorTagOptionInfo    string
+	FetchTagOutputPopUpTitle                 string
+	FetchTagFetching                         string
 }

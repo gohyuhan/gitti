@@ -17,7 +17,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 	switch msg.String() {
 	case "wheelleft":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+			if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 				m.DetailPanelTwoViewport.ScrollLeft(1)
 			} else {
 				m.DetailPanelViewport.ScrollLeft(1)
@@ -44,7 +44,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 
 	case "wheelright":
 		if !m.ShowPopUp.Load() {
-			if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+			if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 				m.DetailPanelTwoViewport.ScrollRight(1)
 			} else {
 				m.DetailPanelViewport.ScrollRight(1)
@@ -72,7 +72,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 	case "wheelup":
 		if !m.ShowPopUp.Load() {
 			if !m.IsLineEditingState.Load() {
-				if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+				if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				} else {
 					m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
@@ -87,7 +87,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 	case "wheeldown":
 		if !m.ShowPopUp.Load() {
 			if !m.IsLineEditingState.Load() {
-				if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+				if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				} else {
 					m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)

@@ -25,7 +25,7 @@ import (
 // render the Gitti Status Panel
 func renderGitStatusComponentPanel(m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.GitStatusComponent {
+	if m.CurrentSelectedComponent == constant.GitStatusComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	if m.CurrentGitRepoStatus == "" {
@@ -72,19 +72,26 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 // Render the Local Branches panel
 func renderLocalBranchesComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.LocalBranchComponent {
+	if m.CurrentSelectedComponent == constant.LocalBranchOrTagComponentPanel {
 		borderStyle = style.SelectedBorderStyle
+	}
+	var content string
+	switch m.CurrentLocalBranchOrTagComponentShowing {
+	case constant.SHOW_LOCAL_BRANCH:
+		content = m.CurrentRepoBranchesInfoList.View()
+	case constant.SHOW_TAG:
+		content = m.CurrentRepoTagInfoList.View()
 	}
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(m.CurrentRepoBranchesInfoList.View())
+		Render(content)
 }
 
 // Render the Changed Files panel
 func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.ModifiedFilesComponent {
+	if m.CurrentSelectedComponent == constant.ModifiedFilesComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	return borderStyle.
@@ -96,7 +103,7 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 // Render the Changed Files panel
 func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.CommitLogComponent {
+	if m.CurrentSelectedComponent == constant.CommitLogComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	return borderStyle.
@@ -120,9 +127,10 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 	detailComponentTwoBorderStyle := style.PanelBorderStyle
 
 	// determine the border style based on the current selected component
-	if m.CurrentSelectedComponent == constant.DetailComponent {
+	switch m.CurrentSelectedComponent {
+	case constant.DetailComponentPanel:
 		detailComponentBorderStyle = style.SelectedBorderStyle
-	} else if m.CurrentSelectedComponent == constant.DetailComponentTwo {
+	case constant.DetailComponentPanelTwo:
 		detailComponentTwoBorderStyle = style.SelectedBorderStyle
 	}
 
@@ -240,7 +248,7 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 
 func renderStashComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.StashComponent {
+	if m.CurrentSelectedComponent == constant.StashComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	return borderStyle.
@@ -251,7 +259,7 @@ func renderStashComponentPanel(width int, height int, m *types.GittiModel) strin
 
 func renderLogComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.LogComponent {
+	if m.CurrentSelectedComponent == constant.LogComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	return borderStyle.
@@ -356,6 +364,24 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitCherryPickApplyConfirmPopUp
 		case constant.GitDiscardFileLineChangeConfirmPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitDiscardFileLineChangeConfirmPopUp
+		case constant.CreateTagPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateTagPopUp
+		case constant.CreateTagConfirmationPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateTagConfirmationPopUp
+		case constant.ChooseDeleteTagOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseDeleteTagOptionPopUp
+		case constant.ChooseRemoteForDeleteRemoteTagPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseRemoteForDeleteRemoteTagPopUp
+		case constant.DeleteTagOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForDeleteTagOutputPopUp
+		case constant.ChoosePushTagOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChoosePushTagOptionPopUp
+		case constant.PushTagOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForPushTagOutputPopUp
+		case constant.ChooseFetchTagOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseFetchTagOptionPopUp
+		case constant.FetchTagOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForFetchTagOutputPopUp
 		}
 	} else {
 		//-----------------------------
@@ -364,21 +390,31 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		//
 		//-----------------------------
 		switch m.CurrentSelectedComponent {
-		case constant.GitStatusComponent:
+		case constant.GitStatusComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStatusComponent
-		case constant.LocalBranchComponent:
-			CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
-			if CurrentSelectedBranch == nil {
-				keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentNone
-			} else {
-				isCurrentSelectedBranchCheckedOutBranch := CurrentSelectedBranch.(branchComponent.GitBranchItem).IsCheckedOut
-				if isCurrentSelectedBranchCheckedOutBranch {
-					keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentIsCheckOut
+		case constant.LocalBranchOrTagComponentPanel:
+			switch m.CurrentLocalBranchOrTagComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+				CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
+				if CurrentSelectedBranch == nil {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentNone
 				} else {
-					keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentDefault
+					isCurrentSelectedBranchCheckedOutBranch := CurrentSelectedBranch.(branchComponent.GitBranchItem).IsCheckedOut
+					if isCurrentSelectedBranchCheckedOutBranch {
+						keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentIsCheckOut
+					} else {
+						keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentDefault
+					}
+				}
+			case constant.SHOW_TAG:
+				CurrentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+				if CurrentSelectedTag == nil {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentNone
+				} else {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentDefault
 				}
 			}
-		case constant.ModifiedFilesComponent:
+		case constant.ModifiedFilesComponentPanel:
 			CurrentSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if CurrentSelectedFile == nil {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentNone
@@ -402,32 +438,32 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					}
 				}
 			}
-		case constant.CommitLogComponent:
+		case constant.CommitLogComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
-		case constant.DetailComponent:
+		case constant.DetailComponentPanel:
 			if m.IsLineEditingState.Load() {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditing
-			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
+			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditingEligible
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 			}
 
-		case constant.DetailComponentTwo:
+		case constant.DetailComponentPanelTwo:
 			if m.IsLineEditingState.Load() {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditing
-			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponent {
+			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditingEligible
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent
 			}
-		case constant.StashComponent:
+		case constant.StashComponentPanel:
 			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyStashComponent
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyStashComponentNone
 			}
-		case constant.LogComponent:
+		case constant.LogComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingLogComponent
 		}
 	}

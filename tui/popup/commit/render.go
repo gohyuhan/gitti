@@ -21,8 +21,8 @@ func RenderGitCommitPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxCommitPopUpWidth, int(float64(m.Width)*0.8))
-		popUp.MessageTextInput.SetWidth(popUpWidth - 4)
-		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
+		popUp.MessageTextInput.SetWidth(popUpWidth - 6)
+		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 6)
 
 		// Rendered content
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitle)
@@ -90,8 +90,8 @@ func RenderGitAmendCommitPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxAmendCommitPopUpWidth, int(float64(m.Width)*0.8))
-		popUp.MessageTextInput.SetWidth(popUpWidth - 4)
-		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 4)
+		popUp.MessageTextInput.SetWidth(popUpWidth - 6)
+		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 6)
 
 		// Rendered content
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CommitPopUpMessageTitleAmendVersion)

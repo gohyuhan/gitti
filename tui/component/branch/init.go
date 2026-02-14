@@ -1,10 +1,8 @@
 package branch
 
 import (
-	"fmt"
-
 	"charm.land/bubbles/v2/list"
-	"github.com/gohyuhan/gitti/i18n"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -24,6 +22,8 @@ func InitBranchList(m *types.GittiModel) {
 
 	previousSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 	selectedBranchPosition := -1
+
+	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
 
 	if previousSelectedBranch != nil {
 		previousSelectedBranchInfo := previousSelectedBranch.(GitBranchItem)
@@ -51,7 +51,8 @@ func InitBranchList(m *types.GittiModel) {
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
 	m.CurrentRepoBranchesInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoBranchesInfoList.SetShowFilter(false)
-	m.CurrentRepoBranchesInfoList.Title = utils.TruncateString(fmt.Sprintf("[1] \uf418 %s:", i18n.LANGUAGEMAPPING.Branches), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+
+	m.CurrentRepoBranchesInfoList.Title = ansi.Truncate(ConstructLocalBranchComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoBranchesInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoBranchesInfoList.Styles.PaginationStyle = style.PaginationStyle
 	m.CurrentRepoBranchesInfoList.Styles.TitleBar = style.NewStyle

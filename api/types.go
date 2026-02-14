@@ -10,6 +10,7 @@ type GitOperations struct {
 	GitStash               *git.GitStash
 	GitRemote              *git.GitRemote
 	GitCommitLog           *git.GitCommitLog
+	GitTag                 *git.GitTag
 	GitStateUniversalUtils *git.GitStateUniversalUtils
 }
 

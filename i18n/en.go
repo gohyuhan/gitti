@@ -62,12 +62,13 @@ var eN = LanguageMapping{
 	ModifiedFiles:                       "Modified Files",
 	CommitLog:                           "Commit Log",
 	Stash:                               "Stash",
+	Tag:                                 "Tag",
 	FileTypeUnSupportedPreview:          "The current selected file type is not supported for preview",
 	TerminalSizeWarning:                 "Terminal too small — resize to continue.",
 	CurrentTerminalHeight:               "Current height",
 	MinimumTerminalHeight:               "Minimum required height",
 	CurrentTerminalWidth:                "Current width",
-	MinimumTerminalWidth:                "Minimum required height",
+	MinimumTerminalWidth:                "Minimum required width",
 	Loading:                             "Loading...",
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
@@ -82,15 +83,30 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] new branch",
+		"[</>] switch component",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] switch branch",
 		"[n] new branch",
 		"[d] delete branch",
+		"[</>] switch component",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] switch component",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] switch component",
+		"[f] fetch tag",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] switch component",
+		"[d] delete tag",
+		"[ctrl+p] push tag",
+		"[f] fetch tag",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -124,8 +140,9 @@ var eN = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
+		"[t] create tag",
 		"[r] reset to this commit",
-		"[R] reset the latest commit",
+		"[R] reset latest commit",
 		"[ctrl+p] cherry pick ops",
 		"[?] keybinding and instructions",
 	},
@@ -306,8 +323,48 @@ var eN = LanguageMapping{
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] close",
 	},
+	KeyBindingForCreateTagPopUp: []string{
+		"[tab] move to next input",
+		"[shift+tab] move to previous input",
+		"[ctrl+e] create tag",
+		"[esc] close",
+	},
+	KeyBindingForCreateTagConfirmationPopUp: []string{
+		"[enter] confirm create tag",
+		"[esc] close",
+	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select delete tag option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select remote for delete remote tag",
+		"[esc] cancel / close",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select push tag option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select fetch tag option",
+		"[esc] cancel / close",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         enModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             enCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 enStashComponentKeyBinding,
@@ -333,7 +390,7 @@ var eN = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Git Push",
 	GitRemotePushPopUpProcessing:                             "Pushing...",
 	GitRemotePushOptionTitle:                                 "Push Option",
-	ChooseRemoteTitle:                                        "Choose a remote to push to",
+	ChooseRemoteTitle:                                        "Choose a remote",
 	NormalPush:                                               "Push",
 	ForcePushSafe:                                            "Force Push (safe)",
 	ForcePushDangerous:                                       "Force Push (Dangerous)",
@@ -429,6 +486,40 @@ var eN = LanguageMapping{
 	ApplyCherryPickOpsDescription:                            "Apply cherry picked commits to current checkout branch",
 	CherryPickedFromBranch:                                   "Cherry picked from branch  ~>",
 	GitDiscardFileLineChangeConfirmTitle:                     "Are you sure you want to discard the following line change?",
+	CreateTagPopUpNameTitle:                                  "* Tag Name",
+	CreateTagPopUpNameInputPlaceHolder:                       "Enter tag name...",
+	CreateTagPopUpMessageTitle:                               "Tag Message",
+	CreateTagPopUpMessageInputPlaceHolder:                    "Enter tag message...",
+	CreateTagConfirmation:                                    "Are you sure you want to create tag for following: \ncommit hash: %s \ncommit message: %s \n tag name: %s \n tag message: %s",
+	ChooseDeleteTagOptionTitle:                               "Choose the tag deletion option",
+	DeleteTagPopUpDeleteLocalTagOption:                       "Delete local '%s' tag",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "Delete '%s' tag on local repository",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "Delete remote '%s' tag",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "Delete '%s' tag on remote repository",
+	DeleteTagOutputPopUpTitle:                                "Delete Tag [%s]",
+	DeleteTagDeleting:                                        "Deleting tag...",
+	ChoosePushTagOptionTitle:                                 "Choose the tag push option",
+	PushTagPopUpPushTagOption:                                "Push tag '%s'",
+	PushTagPopUpPushTagOptionInfo:                            "Push tag '%s' to remote repository",
+	PushTagPopUpPushAllTagOption:                             "Push all tags",
+	PushTagPopUpPushAllTagOptionInfo:                         "Push all tags to remote repository",
+	PushTagPopUpPushForceTagOption:                           "Force push tag '%s'",
+	PushTagPopUpPushForceTagOptionInfo:                       "Force push tag '%s' to remote repository",
+	PushTagPopUpPushAllForceTagOption:                        "Force push all tags",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "Force push all tags to remote repository",
+	PushTagOutputPopUpTitle:                                  "Push Tag(s)",
+	PushTagPushing:                                           "Pushing tag(s)...",
+	ChooseFetchTagOptionTitle:                                "Choose the tag fetch option",
+	FetchTagPopUpFetchTagOption:                              "Fetch tag(s)",
+	FetchTagPopUpFetchTagOptionInfo:                          "Fetch tag(s) from remote repository",
+	FetchTagPopUpFetchOverwriteTagOption:                     "Fetch and overwrite tag(s)",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "Fetch and overwrite tag(s) on local repository (update existing tags to new commit)",
+	FetchTagPopUpFetchPruneTagOption:                         "Fetch and prune tag(s)",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "Fetch and prune tag(s) on local repository (remove tags that no longer exist on remote)",
+	FetchTagPopUpFetchMirrorTagOption:                        "Fetch and mirror tag(s)",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "Fetch and mirror tag(s) on local repository to match remote repository exactly",
+	FetchTagOutputPopUpTitle:                                 "Fetch Tag(s)",
+	FetchTagFetching:                                         "Fetching tag(s)...",
 }
 
 // for about gitti
@@ -623,6 +714,50 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between local branch and tag component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for en
+var enTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Tag Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between local branch and tag component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "delete tag",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "fetch tag",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "push tag",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "move up or down the list",
 		LineType:        INFO,
@@ -701,13 +836,18 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "t",
+		TitleOrInfoLine: "create tag",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "reset to this commit",
 		LineType:        INFO,
 	},
 	{
 		KeyBindingLine:  "R",
-		TitleOrInfoLine: "reset the latest commit",
+		TitleOrInfoLine: "reset latest commit",
 		LineType:        INFO,
 	},
 	{
@@ -1065,7 +1205,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "create branch",
 		InstructionLines: []string{
-			"1. Navigate to Branches component (press `1`)",
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
 			"2. Press `n` to open branch creation options",
 			"3. Select:",
 			"   - Create new branch (stay on current)",
@@ -1080,7 +1220,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "switch branch",
 		InstructionLines: []string{
-			"1. Navigate to Branches component (press `1`)",
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
 			"2. Select the target branch using `↑/↓`",
 			"3. Press `enter` to initiate switch",
 			"4. Select switch type:",
@@ -1094,7 +1234,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "delete branch",
 		InstructionLines: []string{
-			"1. Navigate to Branches component (press `1`)",
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
 			"2. Select the branch to delete using `↑/↓`",
 			"   - Cannot delete currently checked out branch",
 			"3. Press `d` to initiate deletion",
@@ -1188,6 +1328,62 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. Press `ctrl+k` to skip the current commit",
 			"2. The operation continues with the next commit",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "create tag",
+		InstructionLines: []string{
+			"1. Navigate to Commit Log component (press `3`)",
+			"2. Select the commit to tag using `↑/↓`",
+			"3. Press `t` to open tag menu",
+			"4. Enter the tag name",
+			"5. Press `enter` to confirm",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "delete tag",
+		InstructionLines: []string{
+			"1. Navigate to Tag component (press `1`) or switch to Tag component (press `< >`)",
+			"2. Select the tag to delete using `↑/↓`",
+			"3. Press `d` to open delete tag menu",
+			"4. Select delete option:",
+			"   - Delete local tag",
+			"   - Delete remote tag",
+			"5. Press `enter` to confirm",
+			"6. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "push tag",
+		InstructionLines: []string{
+			"1. Navigate to Tag component (press `1`) or switch to Tag component (press `< >`)",
+			"2. Select the tag to push using `↑/↓`",
+			"3. Press `ctrl+p` to open push tag menu",
+			"4. Select push option:",
+			"   - Push selected tag",
+			"   - Push all tags",
+			"   - Force push selected tag",
+			"   - Force push all tags",
+			"5. Press `enter` to confirm",
+			"6. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "fetch tag",
+		InstructionLines: []string{
+			"1. Navigate to Tag component (press `1`) or switch to Tag component (press `< >`)",
+			"2. Press `f` to open fetch tag menu",
+			"3. Select fetch option:",
+			"   - Fetch tag(s)",
+			"   - Fetch tag(s) prune - Remove tags that no longer exist in remote",
+			"   - Fetch tag(s) overwrite - Overwrite existing tags with remote tags that differ",
+			"   - Fetch tag(s) mirror - Mirror all tags from remote",
+			"4. Press `enter` to confirm",
+			"5. Press `esc` to close output",
 		},
 		LineType: INFO,
 	},

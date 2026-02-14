@@ -18,8 +18,8 @@ func RenderAddRemotePromptPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8))
-		popUp.RemoteNameTextInput.SetWidth(popUpWidth - 4)
-		popUp.RemoteUrlTextInput.SetWidth(popUpWidth - 4)
+		popUp.RemoteNameTextInput.SetWidth(popUpWidth - 6)
+		popUp.RemoteUrlTextInput.SetWidth(popUpWidth - 6)
 
 		noInitialRemote := popUp.NoInitialRemote
 

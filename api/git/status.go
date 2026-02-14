@@ -13,4 +13,7 @@ const (
 	GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE     = "GIT_EDIT_LINE_DETAILS_AND_FILES_UPDATE"
 	GIT_STATE_UPDATE                           = "GIT_STATE_UPDATE"
 	GIT_FETCH                                  = "GIT_FETCH" // user triggered, not from daemon
+	GIT_TAG_UPDATE                             = "GIT_TAG_UPDATE"
+	GIT_TAG_PUSH_OUTPUT_UPDATE                 = "GIT_TAG_PUSH_OUTPUT_UPDATE"
+	GIT_TAG_FETCH_OUTPUT_UPDATE                = "GIT_TAG_FETCH_OUTPUT_UPDATE"
 )

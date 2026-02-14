@@ -1,10 +1,8 @@
 package commitlog
 
 import (
-	"fmt"
-
 	"charm.land/bubbles/v2/list"
-	"github.com/gohyuhan/gitti/i18n"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -25,6 +23,8 @@ func InitGitCommitLogList(m *types.GittiModel) bool {
 		prevHash = previousSelectedCommitLog.(GitCommitLogItem).Hash
 	}
 	selectedCommitLogPosition := -1
+
+	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
 
 	if previousSelectedCommitLog != nil {
 		for index, commitLog := range latestGitCommitLog {
@@ -77,7 +77,7 @@ func InitGitCommitLogList(m *types.GittiModel) bool {
 	m.CurrentRepoCommitLogInfoList.SetShowStatusBar(false)
 	m.CurrentRepoCommitLogInfoList.SetFilteringEnabled(false)
 	m.CurrentRepoCommitLogInfoList.SetShowFilter(false)
-	m.CurrentRepoCommitLogInfoList.Title = utils.TruncateString(fmt.Sprintf("[3] \ue729 %s:", i18n.LANGUAGEMAPPING.CommitLog), m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
+	m.CurrentRepoCommitLogInfoList.Title = ansi.Truncate(ConstructCommitLogComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoCommitLogInfoList.Styles.Title = style.TitleStyle
 	m.CurrentRepoCommitLogInfoList.Styles.PaginationStyle = style.PaginationStyle
 	m.CurrentRepoCommitLogInfoList.Styles.TitleBar = style.NewStyle

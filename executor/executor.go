@@ -32,7 +32,7 @@ func (c *CmdExecutor) RunGitCmd(gitArgs []string, colorized bool) *exec.Cmd {
 	cmd := exec.Command("git", gitArgs...)
 	cmd.Dir = c.repoPath
 
-	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
+	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 	return cmd
 }
 
@@ -52,7 +52,7 @@ func (c *CmdExecutor) RunGitCmdWithContext(ctx context.Context, gitArgs []string
 	cmd := exec.CommandContext(ctx, "git", gitArgs...)
 	cmd.Dir = c.repoPath
 
-	cmd.Env = append(os.Environ(), "GIT_TERMINAL_PROMPT=0")
+	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
 	return cmd
 }

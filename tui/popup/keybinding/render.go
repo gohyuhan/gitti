@@ -97,25 +97,31 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 	var selectedComponenti18nKeybinding []i18n.KeyBindingMappingFormat
 	var selectedComponentKeyBindingKeyMapLargestLen *int
 	switch m.CurrentSelectedComponent {
-	case constant.LocalBranchComponent:
-		selectedComponentKeyBindingKeyMapLargestLen = &m.LocalBranchComponentKeyBindingKeyMapLargestLen
-		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.LocalBranchComponentKeyBinding
-	case constant.ModifiedFilesComponent:
+	case constant.LocalBranchOrTagComponentPanel:
+		switch m.CurrentLocalBranchOrTagComponentShowing {
+		case constant.SHOW_LOCAL_BRANCH:
+			selectedComponentKeyBindingKeyMapLargestLen = &m.LocalBranchComponentKeyBindingKeyMapLargestLen
+			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.LocalBranchComponentKeyBinding
+		case constant.SHOW_TAG:
+			selectedComponentKeyBindingKeyMapLargestLen = &m.TagComponentKeyBindingKeyMapLargestLen
+			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.TagComponentKeyBinding
+		}
+	case constant.ModifiedFilesComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.ModifiedFilesComponentKeyBindingKeyMapLargestLen
 		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.ModifiedFilesComponentKeyBinding
-	case constant.CommitLogComponent:
+	case constant.CommitLogComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.CommitLogComponentKeyBindingKeyMapLargestLen
 		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.CommitLogComponentKeyBinding
-	case constant.StashComponent:
+	case constant.StashComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.StashComponentKeyBindingKeyMapLargestLen
 		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.StashComponentKeyBinding
-	case constant.DetailComponent, constant.DetailComponentTwo:
+	case constant.DetailComponentPanel, constant.DetailComponentPanelTwo:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.DetailComponentKeyBindingKeyMapLargestLen
 		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.DetailComponentKeyBinding
-	case constant.LogComponent:
+	case constant.LogComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.LogComponentKeyBindingKeyMapLargestLen
 		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.LogComponentKeyBinding
-	case constant.GitStatusComponent:
+	case constant.GitStatusComponentPanel:
 		return
 	}
 

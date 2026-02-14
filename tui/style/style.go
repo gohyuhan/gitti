@@ -31,7 +31,9 @@ var (
 	PaginationStyle   = NewStyle
 
 	// Styles
-	TitleStyle                                     = NewStyle.Foreground(ColorPurpleVibrant).Bold(true)
+	TitleStyle                                     = NewStyle.Bold(true)
+	TitleCurrentComponentStyle                     = NewStyle.Foreground(ColorPurpleVibrant)
+	TitleNonCurrentComponentStyle                  = NewStyle.Foreground(ColorPurpleSoft).Faint(true)
 	PromptTitleStyle                               = NewStyle.Foreground(ColorPurpleSoft).Bold(true)
 	BottomKeyBindingStyle                          = NewStyle.Foreground(ColorCyanSoft)
 	PanelBorderStyle                               = NewStyle.Border(lipgloss.RoundedBorder()).Padding(0).Margin(0).BorderForeground(ColorBlueGrayMuted)

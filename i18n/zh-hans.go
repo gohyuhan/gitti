@@ -62,6 +62,7 @@ var zH_HANS = LanguageMapping{
 	ModifiedFiles:                       "已修改的文件",
 	CommitLog:                           "提交记录",
 	Stash:                               "暂存",
+	Tag:                                 "标签",
 	FileTypeUnSupportedPreview:          "当前选择的文件类型不支持预览",
 	TerminalSizeWarning:                 "终端窗口太小 — 请调整大小后继续.",
 	CurrentTerminalHeight:               "当前高度",
@@ -82,15 +83,30 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新建分支",
+		"[</>] 切换组件",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切换分支",
 		"[n] 新建分支",
 		"[d] 删除分支",
+		"[</>] 切换组件",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] 切换组件",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] 切换组件",
+		"[f] 获取标签",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] 切换组件",
+		"[d] 删除标签",
+		"[ctrl+p] 推送标签",
+		"[f] 获取标签",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -124,6 +140,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下移动",
 		"[enter] 查看提交日志内容",
+		"[t] 创建标签",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 遴选操作",
@@ -306,8 +323,48 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 关闭",
 	},
+	KeyBindingForCreateTagPopUp: []string{
+		"[tab] 移动到下一个输入框",
+		"[shift+tab] 移动到上一个输入框",
+		"[ctrl+e] 创建标签",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForCreateTagConfirmationPopUp: []string{
+		"[enter] 确认创建标签",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择删除标签选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择用于删除远程标签的远程",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择推送标签选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择获取标签选项",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHansModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHansCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHansStashComponentKeyBinding,
@@ -321,7 +378,7 @@ var zH_HANS = LanguageMapping{
 	CommitPopUpProcessing:                                    "提交中...",
 	CommitPopUpMessageTitleAmendVersion:                      "* 修改提交信息",
 	CommitPopUpMessageInputPlaceHolderAmendVersion:           "编辑提交信息",
-	CommitPopUpDescriptionTitleAmendVersion:                  "修改改描述",
+	CommitPopUpDescriptionTitleAmendVersion:                  "修改描述",
 	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion: "> 更新你的提交描述...",
 	AddRemotePopUpPrompt:                                     "* 未检测到远程, 请添加一个.",
 	AddRemotePopUpRemoteNameTitle:                            "远程名称",
@@ -333,7 +390,7 @@ var zH_HANS = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Git 推送",
 	GitRemotePushPopUpProcessing:                             "推送中...",
 	GitRemotePushOptionTitle:                                 "推送选项",
-	ChooseRemoteTitle:                                        "选择要推送到的远程",
+	ChooseRemoteTitle:                                        "选择远程",
 	NormalPush:                                               "推送",
 	ForcePushSafe:                                            "强制推送（安全）",
 	ForcePushDangerous:                                       "强制推送（危险）",
@@ -429,6 +486,40 @@ var zH_HANS = LanguageMapping{
 	ApplyCherryPickOpsDescription:                            "将已遴选的提交应用到当前检出的分支",
 	CherryPickedFromBranch:                                   "遴选自分支  ~>",
 	GitDiscardFileLineChangeConfirmTitle:                     "您确定要丢弃以下行更改吗？",
+	CreateTagPopUpNameTitle:                                  "* 标签名称",
+	CreateTagPopUpNameInputPlaceHolder:                       "输入标签名称...",
+	CreateTagPopUpMessageTitle:                               "标签消息",
+	CreateTagPopUpMessageInputPlaceHolder:                    "输入标签消息...",
+	CreateTagConfirmation:                                    "您确定要为以下内容创建标签吗？\n提交哈希: %s \n提交信息: %s \n 标签名称: %s \n 标签消息: %s",
+	ChooseDeleteTagOptionTitle:                               "选择标签删除选项",
+	DeleteTagPopUpDeleteLocalTagOption:                       "删除本地 '%s' 标签",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "删除本地仓库中的 '%s' 标签",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "删除远程 '%s' 标签",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "删除远程仓库中的 '%s' 标签",
+	DeleteTagOutputPopUpTitle:                                "删除标签 [%s]",
+	DeleteTagDeleting:                                        "正在删除标签...",
+	ChoosePushTagOptionTitle:                                 "选择标签推送选项",
+	PushTagPopUpPushTagOption:                                "推送标签 '%s'",
+	PushTagPopUpPushTagOptionInfo:                            "推送标签 '%s' 到远程仓库",
+	PushTagPopUpPushAllTagOption:                             "推送所有标签",
+	PushTagPopUpPushAllTagOptionInfo:                         "推送所有标签到远程仓库",
+	PushTagPopUpPushForceTagOption:                           "强制推送标签 '%s'",
+	PushTagPopUpPushForceTagOptionInfo:                       "强制推送标签 '%s' 到远程仓库",
+	PushTagPopUpPushAllForceTagOption:                        "强制推送所有标签",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "强制推送所有标签到远程仓库",
+	PushTagOutputPopUpTitle:                                  "推送标签",
+	PushTagPushing:                                           "正在推送标签...",
+	ChooseFetchTagOptionTitle:                                "选择标签获取选项",
+	FetchTagPopUpFetchTagOption:                              "获取标签",
+	FetchTagPopUpFetchTagOptionInfo:                          "从远程仓库获取标签",
+	FetchTagPopUpFetchOverwriteTagOption:                     "获取并覆盖标签",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "在本地仓库获取并覆盖标签（将现有标签更新到新提交）",
+	FetchTagPopUpFetchPruneTagOption:                         "获取并修剪标签",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "在本地仓库获取并修剪标签（移除远程已不存在的标签）",
+	FetchTagPopUpFetchMirrorTagOption:                        "获取并镜像标签",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地仓库获取并镜像标签，以与远程仓库完全匹配",
+	FetchTagOutputPopUpTitle:                                 "获取标签",
+	FetchTagFetching:                                         "正在获取标签...",
 }
 
 // for about gitti
@@ -437,7 +528,7 @@ var aboutGittiZhHans = []string{
 	"Copyright (c) 2025 Yu Han Goh.",
 	fmt.Sprintf(" %s \033[38;2;180;150;255m%s\033[0m\n", constant.APPNAME, constant.APPVERSION),
 	"Gitti 起源于作者在使用 Neovim 工作时的个人需求.",
-	"当时为了进行更直观的 Git 操作, 不得不切换到外部的 Git GU, ",
+	"当时为了进行更直观的 Git 操作, 不得不切换到外部的 Git GUI, ",
 	"导致打断工作流程.",
 	"Gitti 通过在终端中直接提供一个直观, 轻量的 TUI, ",
 	"弥合了这一差距.\n",
@@ -624,6 +715,50 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for zh-hans
+var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 标签组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "删除标签",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "获取标签",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "推送标签",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移动列表",
 		LineType:        INFO,
@@ -699,6 +834,11 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "查看提交日志内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "t",
+		TitleOrInfoLine: "创建标签",
 		LineType:        INFO,
 	},
 	{
@@ -1066,7 +1206,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "创建分支 (create branch)",
 		InstructionLines: []string{
-			"1. 导航到分支组件（按 `1`）",
+			"1. 导航到分支组件（按 `1`）或切换到分支组件（按 `< >`）",
 			"2. 按 `n` 打开分支创建选项",
 			"3. 选择:",
 			"   - 创建新分支（留在当前分支）",
@@ -1081,7 +1221,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "切换分支 (switch branch)",
 		InstructionLines: []string{
-			"1. 导航到分支组件（按 `1`）",
+			"1. 导航到分支组件（按 `1`）或切换到分支组件（按 `< >`）",
 			"2. 使用 `↑/↓` 选择目标分支",
 			"3. 按 `enter` 开始切换",
 			"4. 选择切换类型:",
@@ -1095,7 +1235,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "删除分支 (delete branch)",
 		InstructionLines: []string{
-			"1. 导航到分支组件（按 `1`）",
+			"1. 导航到分支组件（按 `1`）或切换到分支组件（按 `< >`）",
 			"2. 使用 `↑/↓` 选择要删除的分支",
 			"   - 无法删除当前检出的分支",
 			"3. 按 `d` 开始删除",
@@ -1189,6 +1329,62 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. 按 `ctrl+k` 跳过当前提交",
 			"2. 操作继续进行下一个提交",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "创建标签 (create tag)",
+		InstructionLines: []string{
+			"1. 导航到提交日志组件 (按 `3`) ",
+			"2. 使用 `↑/↓` 选择要打标签的提交",
+			"3. 按 `t` 打开标签菜单",
+			"4. 输入标签名称",
+			"5. 按 `enter` 确认",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "删除标签 (delete tag)",
+		InstructionLines: []string{
+			"1. 导航到标签组件 (按 `1`) 或切换到标签组件 (按 `< >`)",
+			"2. 使用 `↑/↓` 选择要删除的标签",
+			"3. 按 `d` 打开删除标签菜单",
+			"4. 选择删除选项:",
+			"   - 删除本地标签",
+			"   - 删除远程标签",
+			"5. 按 `enter` 确认",
+			"6. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "推送标签 (push tag)",
+		InstructionLines: []string{
+			"1. 导航到标签组件（按 `1`）或切换到标签组件（按 `< >`）",
+			"2. 使用 `↑/↓` 选择要推送的标签",
+			"3. 按 `ctrl+p` 打开推送标签菜单",
+			"4. 选择推送选项：",
+			"   - 推送选中的标签",
+			"   - 推送所有标签",
+			"   - 强制推送选中的标签",
+			"   - 强制推送所有标签",
+			"5. 按 `enter` 确认",
+			"6. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "获取标签 (fetch tag)",
+		InstructionLines: []string{
+			"1. 导航到标签组件（按 `1`）或切换到标签组件（按 `< >`）",
+			"2. 按 `f` 打开获取标签菜单",
+			"3. 选择获取选项：",
+			"   - 获取标签",
+			"   - 获取标签并修剪 (prune) - 删除远程中不再存在的标签",
+			"   - 获取标签并覆盖 (overwrite) - 用远程标签覆盖不同的现有标签",
+			"   - 获取标签并镜像 (mirror) - 镜像远程中的所有标签",
+			"4. 按 `enter` 确认",
+			"5. 按 `esc` 关闭输出",
 		},
 		LineType: INFO,
 	},

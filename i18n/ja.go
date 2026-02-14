@@ -62,6 +62,7 @@ var jA = LanguageMapping{
 	ModifiedFiles:                       "変更されたファイル",
 	CommitLog:                           "コミットログ",
 	Stash:                               "スタッシュ",
+	Tag:                                 "タグ",
 	FileTypeUnSupportedPreview:          "現在選択されているファイル形式はプレビューに対応していません",
 	TerminalSizeWarning:                 "端末サイズが小さすぎます - サイズを変更してください.",
 	CurrentTerminalHeight:               "現在の高さ",
@@ -82,15 +83,30 @@ var jA = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新しいブランチ",
+		"[</>] コンポーネントを切り替え",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] ブランチ切り替え",
 		"[n] 新しいブランチ",
 		"[d] ブランチを削除",
+		"[</>] コンポーネントを切り替え",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[?] キー操作と説明",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[f] タグをフェッチ",
+		"[?] キー操作と説明",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] コンポーネントを切り替え",
+		"[d] タグを削除",
+		"[ctrl+p] タグをプッシュ",
+		"[f] タグをフェッチ",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -124,6 +140,7 @@ var jA = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
+		"[t] タグを作成",
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
@@ -306,8 +323,48 @@ var jA = LanguageMapping{
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 閉じる",
 	},
+	KeyBindingForCreateTagPopUp: []string{
+		"[tab] 次の入力欄に移動",
+		"[shift+tab] 前の入力欄に移動",
+		"[ctrl+e] タグを作成",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForCreateTagConfirmationPopUp: []string{
+		"[enter] タグの作成を確定",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 削除タグオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] リモートタグ削除のリモートを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] プッシュタグオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] タグフェッチオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             jaCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 jaStashComponentKeyBinding,
@@ -333,7 +390,7 @@ var jA = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Gitプッシュ",
 	GitRemotePushPopUpProcessing:                             "プッシュ中...",
 	GitRemotePushOptionTitle:                                 "プッシュオプション",
-	ChooseRemoteTitle:                                        "プッシュ先のリモートを選択",
+	ChooseRemoteTitle:                                        "リモートを選択",
 	NormalPush:                                               "プッシュ",
 	ForcePushSafe:                                            "強制プッシュ（安全）",
 	ForcePushDangerous:                                       "強制プッシュ（危険）",
@@ -429,6 +486,40 @@ var jA = LanguageMapping{
 	ApplyCherryPickOpsDescription:                            "チェリーピックされたコミットを現在のチェックアウトブランチに適用します",
 	CherryPickedFromBranch:                                   "チェリーピック元のブランチ  ~>",
 	GitDiscardFileLineChangeConfirmTitle:                     "以下の行の変更を破棄してもよろしいですか？",
+	CreateTagPopUpNameTitle:                                  "* タグ名",
+	CreateTagPopUpNameInputPlaceHolder:                       "タグ名を入力...",
+	CreateTagPopUpMessageTitle:                               "タグメッセージ",
+	CreateTagPopUpMessageInputPlaceHolder:                    "タグメッセージを入力...",
+	CreateTagConfirmation:                                    "以下の内容でタグを作成してもよろしいですか？\nコミットハッシュ: %s \nコミットメッセージ: %s \n タグ名: %s \n タグメッセージ: %s",
+	ChooseDeleteTagOptionTitle:                               "タグ削除オプションを選択",
+	DeleteTagPopUpDeleteLocalTagOption:                       "ローカルの '%s' タグを削除",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "ローカルリポジトリの '%s' タグを削除します",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "リモートの '%s' タグを削除",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "リモートリポジトリの '%s' タグを削除します",
+	DeleteTagOutputPopUpTitle:                                "タグ [%s] を削除",
+	DeleteTagDeleting:                                        "タグを削除中...",
+	ChoosePushTagOptionTitle:                                 "タグのプッシュオプションを選択してください",
+	PushTagPopUpPushTagOption:                                "タグ '%s' をプッシュ",
+	PushTagPopUpPushTagOptionInfo:                            "リモートリポジトリにタグ '%s' をプッシュします",
+	PushTagPopUpPushAllTagOption:                             "すべてのタグをプッシュ",
+	PushTagPopUpPushAllTagOptionInfo:                         "リモートリポジトリにすべてのタグをプッシュします",
+	PushTagPopUpPushForceTagOption:                           "タグ '%s' を強制プッシュ",
+	PushTagPopUpPushForceTagOptionInfo:                       "リモートリポジトリにタグ '%s' を強制プッシュします",
+	PushTagPopUpPushAllForceTagOption:                        "すべてのタグを強制プッシュ",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "リモートリポジトリにすべてのタグを強制プッシュします",
+	PushTagOutputPopUpTitle:                                  "タグのプッシュ",
+	PushTagPushing:                                           "タグをプッシュ中...",
+	ChooseFetchTagOptionTitle:                                "タグのフェッチオプションを選択してください",
+	FetchTagPopUpFetchTagOption:                              "タグをフェッチ",
+	FetchTagPopUpFetchTagOptionInfo:                          "リモートリポジトリからタグをフェッチします",
+	FetchTagPopUpFetchOverwriteTagOption:                     "タグをフェッチして上書き",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "ローカルリポジトリのタグをフェッチして上書きします (既存のタグを新しいコミットに更新)",
+	FetchTagPopUpFetchPruneTagOption:                         "タグをフェッチして整理 (prune)",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "ローカルリポジトリのタグをフェッチして整理します (リモートに存在しないタグを削除)",
+	FetchTagPopUpFetchMirrorTagOption:                        "タグをフェッチしてミラーリング",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "ローカルリポジトリのタグをリモートリポジトリと完全に一致するようにフェッチしてミラーリングします",
+	FetchTagOutputPopUpTitle:                                 "タグのフェッチ",
+	FetchTagFetching:                                         "タグをフェッチ中...",
 }
 
 // for about gitti
@@ -625,6 +716,50 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for ja
+var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- タグコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "タグを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "タグをフェッチ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "タグをプッシュ",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "リストを上下に移動",
 		LineType:        INFO,
@@ -700,6 +835,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "コミットログの内容を表示",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "t",
+		TitleOrInfoLine: "タグを作成",
 		LineType:        INFO,
 	},
 	{
@@ -1067,7 +1207,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "ブランチを作成 (create branch)",
 		InstructionLines: []string{
-			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
 			"2. `n` を押してブランチ作成オプションを開く",
 			"3. 選択:",
 			"   - 新しいブランチを作成（現在のブランチに留まる）",
@@ -1082,7 +1222,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "ブランチを切り替え (switch branch)",
 		InstructionLines: []string{
-			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
 			"2. `↑/↓` で対象ブランチを選択",
 			"3. `enter` を押して切り替えを開始",
 			"4. 切り替えタイプを選択:",
@@ -1096,7 +1236,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "ブランチを削除 (delete branch)",
 		InstructionLines: []string{
-			"1. ブランチコンポーネントに移動（`1` を押す）",
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
 			"2. `↑/↓` で削除するブランチを選択",
 			"   - 現在チェックアウト中のブランチは削除できません",
 			"3. `d` を押して削除を開始",
@@ -1190,6 +1330,62 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. `ctrl+k` を押して現在のコミットをスキップ",
 			"2. 操作は次のコミットで続行されます",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグの作成 (create tag)",
+		InstructionLines: []string{
+			"1. コミットログコンポーネントに移動 ( `3` を押す)",
+			"2. `↑/↓` を使ってタグを付けるコミットを選択",
+			"3. `t` を押してタグメニューを開く",
+			"4. タグ名を入力",
+			"5. `enter` を押して確定",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグの削除 (delete tag)",
+		InstructionLines: []string{
+			"1. タグコンポーネントに移動 ( `1` を押す) またはタグコンポーネントに切り替え ( `< >` を押す)",
+			"2. `↑/↓` を使って削除するタグを選択",
+			"3. `d` を押してタグ削除メニューを開く",
+			"4. 削除オプションを選択:",
+			"   - ローカルタグを削除",
+			"   - リモートタグを削除",
+			"5. `enter` を押して確定",
+			"6. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグのプッシュ (push tag)",
+		InstructionLines: []string{
+			"1. タグコンポーネントに移動（`1`を押す）またはタグコンポーネントに切り替え（`< >`を押す）",
+			"2. `↑/↓`を使用してプッシュするタグを選択",
+			"3. `ctrl+p`を押してタグプッシュメニューを開く",
+			"4. プッシュオプションを選択:",
+			"   - 選択したタグをプッシュ",
+			"   - すべてのタグをプッシュ",
+			"   - 選択したタグを強制プッシュ",
+			"   - すべてのタグを強制プッシュ",
+			"5. `enter`を押して確定",
+			"6. `esc`を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "タグのフェッチ (fetch tag)",
+		InstructionLines: []string{
+			"1. タグコンポーネントに移動（`1`を押す）またはタグコンポーネントに切り替え（`< >`を押す）",
+			"2. `f` を押してタグフェッチメニューを開く",
+			"3. フェッチオプションを選択:",
+			"   - タグをフェッチ",
+			"   - タグをフェッチして整理 (prune) - リモートに存在しないタグを削除",
+			"   - タグをフェッチして上書き (overwrite) - 既存のタグをリモートのタグで上書き",
+			"   - タグをフェッチしてミラーリング (mirror) - すべてのタグをリモートと同期",
+			"4. `enter` を押して確定",
+			"5. `esc` を押して出力を閉じる",
 		},
 		LineType: INFO,
 	},

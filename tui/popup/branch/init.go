@@ -20,7 +20,7 @@ func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string) {
 	NewBranchNameInput.Focus()
 	NewBranchNameInput.SetVirtualCursor(true)
 
-	NewBranchNameInput.SetWidth(min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	NewBranchNameInput.SetWidth(min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8)) - 6)
 	m.PopUpModel = &CreateNewBranchPopUpModel{
 		NewBranchNameInput: NewBranchNameInput,
 		CreateType:         createType,
@@ -169,7 +169,7 @@ func InitCreateBranchBasedOnRemotePopUp(m *types.GittiModel, remoteOrigin string
 	remoteBranchNameInput.Focus()
 	remoteBranchNameInput.SetVirtualCursor(true)
 
-	remoteBranchNameInput.SetWidth(min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	remoteBranchNameInput.SetWidth(min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8)) - 6)
 
 	popUpModel := &CreateBranchBasedOnRemotePopUpModel{
 		RemoteOrigin:          remoteOrigin,

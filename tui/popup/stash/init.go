@@ -15,7 +15,7 @@ func InitGitStashMessagePopUpModel(m *types.GittiModel, filePathName string, sta
 	stashMessageTextInput.Placeholder = i18n.LANGUAGEMAPPING.GitStashMessagePlaceholder
 	stashMessageTextInput.Focus()
 	stashMessageTextInput.SetVirtualCursor(true)
-	stashMessageTextInput.SetWidth(min(constant.MaxGitStashMessagePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	stashMessageTextInput.SetWidth(min(constant.MaxGitStashMessagePopUpWidth, int(float64(m.Width)*0.8)) - 6)
 
 	popUpModel := &GitStashMessagePopUpModel{
 		StashMessageInput: stashMessageTextInput,

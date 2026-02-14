@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -246,8 +245,6 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	}
 
 	cmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
-	// Disable interactive prompts for credentials
-	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 
 	// Combine stderr into stdout
 	stdout, err := cmd.StdoutPipe()
@@ -308,7 +305,7 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	if waitErr != nil {
 		if exitErr, ok := waitErr.(*exec.ExitError); ok {
 			status := exitErr.ExitCode()
-			gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GIT_PUSH_OPS, waitErr.Error()), true)
+			gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GIT_PUSH_OPS, exitErr.Error()), true)
 			return status
 		}
 		gc.logging.RegisterNewLog(logging.GIT_PUSH_OPS, "", logging.ERROR, fmt.Sprintf("[UNEXPECTED ERROR]: %s", waitErr.Error()), false)

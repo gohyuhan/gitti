@@ -74,6 +74,7 @@ func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogg
 		GitStash:               git.InitGitStash(gitProcessLock, gittiLogging),
 		GitRemote:              git.InitGitRemote(updateChannel, gitProcessLock, gittiLogging),
 		GitCommitLog:           git.InitGitCommitLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount, gittiLogging),
+		GitTag:                 git.InitGitTag(updateChannel, gitProcessLock, gittiLogging),
 		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock, gittiLogging),
 	}
 }

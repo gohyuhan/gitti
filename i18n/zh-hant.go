@@ -62,6 +62,7 @@ var zH_HANT = LanguageMapping{
 	ModifiedFiles:                       "已修改的檔案",
 	CommitLog:                           "提交記錄",
 	Stash:                               "暫存",
+	Tag:                                 "標籤",
 	FileTypeUnSupportedPreview:          "目前選擇的檔案類型不支援預覽",
 	TerminalSizeWarning:                 "終端機太小 — 請調整大小以繼續.",
 	CurrentTerminalHeight:               "目前高度",
@@ -82,15 +83,30 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新增分支",
+		"[</>] 切換元件",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切換分支",
 		"[n] 新增分支",
 		"[d] 刪除分支",
+		"[</>] 切換元件",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
+		"[</>] 切換元件",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingTagComponentNone: []string{
+		"[</>] 切換元件",
+		"[f] 獲取標籤",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingTagComponentDefault: []string{
+		"[</>] 切換元件",
+		"[d] 刪除標籤",
+		"[ctrl+p] 推送標籤",
+		"[f] 獲取標籤",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -124,6 +140,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingCommitLogComponent: []string{
 		"[↑/↓] 上下移動",
 		"[enter] 查看提交日誌內容",
+		"[t] 建立標籤",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 揀選操作",
@@ -168,7 +185,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForCommitPopUp: []string{
 		"[tab] 移至下一個輸入框",
 		"[shift+tab] 移至上一個輸入框",
-		"[ctrl+e] 提交更新的變更",
+		"[ctrl+e] 提交變更",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForAmendCommitPopUp: []string{
@@ -306,8 +323,48 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForKeybindingAndFeatureInstructionsPopUp: []string{
 		"[esc] 關閉",
 	},
+	KeyBindingForCreateTagPopUp: []string{
+		"[tab] 移至下一個輸入框",
+		"[shift+tab] 移至上一個輸入框",
+		"[ctrl+e] 建立標籤",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForCreateTagConfirmationPopUp: []string{
+		"[enter] 確定建立標籤",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForChooseDeleteTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇刪除標籤選項",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForChooseRemoteForDeleteRemoteTagPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇用於刪除遠端標籤的遠端",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForDeleteTagOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForChoosePushTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇推送標籤選項",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForPushTagOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForChooseFetchTagOptionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇獲取標籤選項",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForFetchTagOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
+	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHantModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHantCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHantStashComponentKeyBinding,
@@ -333,7 +390,7 @@ var zH_HANT = LanguageMapping{
 	GitRemotePushPopUpTitle:                                  "Git 推送",
 	GitRemotePushPopUpProcessing:                             "推送中...",
 	GitRemotePushOptionTitle:                                 "推送選項",
-	ChooseRemoteTitle:                                        "選擇要推送到的遠端",
+	ChooseRemoteTitle:                                        "選擇遠端",
 	NormalPush:                                               "推送",
 	ForcePushSafe:                                            "強制推送（安全）",
 	ForcePushDangerous:                                       "強制推送（危險）",
@@ -429,6 +486,40 @@ var zH_HANT = LanguageMapping{
 	ApplyCherryPickOpsDescription:                            "將已揀選的提交應用到當前檢出的分支",
 	CherryPickedFromBranch:                                   "揀選自分支  ~>",
 	GitDiscardFileLineChangeConfirmTitle:                     "您確定要捨棄以下行變更嗎？",
+	CreateTagPopUpNameTitle:                                  "* 標籤名稱",
+	CreateTagPopUpNameInputPlaceHolder:                       "輸入標籤名稱...",
+	CreateTagPopUpMessageTitle:                               "標籤訊息",
+	CreateTagPopUpMessageInputPlaceHolder:                    "輸入標籤訊息...",
+	CreateTagConfirmation:                                    "您確定要為以下內容建立標籤嗎？\n提交哈希: %s \n提交訊息: %s \n 標籤名稱: %s \n 標籤訊息: %s",
+	ChooseDeleteTagOptionTitle:                               "選擇標籤刪除選項",
+	DeleteTagPopUpDeleteLocalTagOption:                       "刪除本地 '%s' 標籤",
+	DeleteTagPopUpDeleteLocalTagOptionInfo:                   "刪除本地儲存庫中的 '%s' 標籤",
+	DeleteTagPopUpDeleteRemoteTagOption:                      "刪除遠端 '%s' 標籤",
+	DeleteTagPopUpDeleteRemoteTagOptionInfo:                  "刪除遠端儲存庫中的 '%s' 標籤",
+	DeleteTagOutputPopUpTitle:                                "刪除標籤 [%s]",
+	DeleteTagDeleting:                                        "正在刪除標籤...",
+	ChoosePushTagOptionTitle:                                 "選擇標籤推送選項",
+	PushTagPopUpPushTagOption:                                "推送標籤 '%s'",
+	PushTagPopUpPushTagOptionInfo:                            "推送標籤 '%s' 到遠端倉庫",
+	PushTagPopUpPushAllTagOption:                             "推送所有標籤",
+	PushTagPopUpPushAllTagOptionInfo:                         "推送所有標籤到遠端倉庫",
+	PushTagPopUpPushForceTagOption:                           "強制推送標籤 '%s'",
+	PushTagPopUpPushForceTagOptionInfo:                       "強制推送標籤 '%s' 到遠端倉庫",
+	PushTagPopUpPushAllForceTagOption:                        "強制推送所有標籤",
+	PushTagPopUpPushAllForceTagOptionInfo:                    "強制推送所有標籤到遠端倉庫",
+	PushTagOutputPopUpTitle:                                  "推送標籤",
+	PushTagPushing:                                           "正在推送標籤...",
+	ChooseFetchTagOptionTitle:                                "選擇標籤獲取選項",
+	FetchTagPopUpFetchTagOption:                              "獲取標籤",
+	FetchTagPopUpFetchTagOptionInfo:                          "從遠端倉庫獲取標籤",
+	FetchTagPopUpFetchOverwriteTagOption:                     "獲取並覆蓋標籤",
+	FetchTagPopUpFetchOverwriteTagOptionInfo:                 "在本地儲存庫獲取並覆蓋標籤（將現有標籤更新到新提交）",
+	FetchTagPopUpFetchPruneTagOption:                         "獲取並修剪標籤",
+	FetchTagPopUpFetchPruneTagOptionInfo:                     "在本地儲存庫獲取並修剪標籤（移除遠端已不存在的標籤）",
+	FetchTagPopUpFetchMirrorTagOption:                        "獲取並鏡像標籤",
+	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地儲存庫獲取並鏡像標籤，以與遠端儲存庫完全匹配",
+	FetchTagOutputPopUpTitle:                                 "獲取標籤",
+	FetchTagFetching:                                         "正在獲取標籤...",
 }
 
 // for about gitti
@@ -500,6 +591,11 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "ctrl+c",
+		TitleOrInfoLine: "強制退出 [!!]",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "ctrl+g",
 		TitleOrInfoLine: "在瀏覽器中開啟作者的 GitHub [!!]",
 		LineType:        INFO,
@@ -507,11 +603,6 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+l",
 		TitleOrInfoLine: "在瀏覽器中開啟作者的 LinkedIn [!!]",
-		LineType:        INFO,
-	},
-	{
-		KeyBindingLine:  "ctrl+c",
-		TitleOrInfoLine: "強制退出 [!!]",
 		LineType:        INFO,
 	},
 	{
@@ -624,6 +715,50 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+}
+
+// Tag Component Key Binding for zh-hant
+var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 標籤組件面板快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "刪除標籤",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "f",
+		TitleOrInfoLine: "擷取標籤",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "推送標籤",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移動列表",
 		LineType:        INFO,
@@ -699,6 +834,11 @@ var zhHantCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "查看提交日誌內容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "t",
+		TitleOrInfoLine: "建立標籤",
 		LineType:        INFO,
 	},
 	{
@@ -1066,7 +1206,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "建立分支 (create branch)",
 		InstructionLines: []string{
-			"1. 導航到分支組件（按 `1`）",
+			"1. 導航到分支組件（按 `1`）或切換到分支組件（按 `< >`）",
 			"2. 按 `n` 開啟分支建立選項",
 			"3. 選擇:",
 			"   - 建立新分支（留在當前分支）",
@@ -1081,7 +1221,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "切換分支 (switch branch)",
 		InstructionLines: []string{
-			"1. 導航到分支組件（按 `1`）",
+			"1. 導航到分支組件（按 `1`）或切換到分支組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇目標分支",
 			"3. 按 `enter` 開始切換",
 			"4. 選擇切換類型:",
@@ -1095,7 +1235,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "刪除分支 (delete branch)",
 		InstructionLines: []string{
-			"1. 導航到分支組件（按 `1`）",
+			"1. 導航到分支組件（按 `1`）或切換到分支組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇要刪除的分支",
 			"   - 無法刪除當前檢出的分支",
 			"3. 按 `d` 開始刪除",
@@ -1189,6 +1329,62 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"",
 			"1. 按 `ctrl+k` 跳過當前提交",
 			"2. 操作繼續進行下一個提交",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "建立標籤 (create tag)",
+		InstructionLines: []string{
+			"1. 導覽到提交日誌組件 (按 `3`) ",
+			"2. 使用 `↑/↓` 選擇要打標籤的提交",
+			"3. 按 `t` 打開標籤選單",
+			"4. 輸入標籤名稱",
+			"5. 按 `enter` 確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "刪除標籤 (delete tag)",
+		InstructionLines: []string{
+			"1. 導覽到標籤組件 (按 `1`) 或切換到標籤組件 (按 `< >`)",
+			"2. 使用 `↑/↓` 選擇要刪除的標籤",
+			"3. 按 `d` 打開刪除標籤選單",
+			"4. 選擇刪除選項:",
+			"   - 刪除本地標籤",
+			"   - 刪除遠端標籤",
+			"5. 按 `enter` 確認",
+			"6. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "推送標籤 (push tag)",
+		InstructionLines: []string{
+			"1. 導覽至標籤組件（按 `1`）或切換至標籤組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要推送的標籤",
+			"3. 按 `ctrl+p` 開啟推送標籤菜單",
+			"4. 選擇推送選項：",
+			"   - 推送選中的標籤",
+			"   - 推送所有標籤",
+			"   - 強制推送選中的標籤",
+			"   - 強制推送所有標籤",
+			"5. 按 `enter` 確認",
+			"6. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "擷取標籤 (fetch tag)",
+		InstructionLines: []string{
+			"1. 導覽至標籤組件（按 `1`）或切換至標籤組件（按 `< >`）",
+			"2. 按 `f` 打開擷取標籤選單",
+			"3. 選擇擷取選項：",
+			"   - 擷取標籤",
+			"   - 擷取標籤並修剪 (prune) - 刪除遠端已不存在的標籤",
+			"   - 擷取標籤並覆蓋 (overwrite) - 以遠端標籤覆蓋不同的現有標籤",
+			"   - 擷取標籤並鏡像 (mirror) - 鏡像遠端的所有標籤",
+			"4. 按 `enter` 確認",
+			"5. 按 `esc` 關閉輸出",
 		},
 		LineType: INFO,
 	},
