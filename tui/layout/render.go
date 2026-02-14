@@ -386,6 +386,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForFetchTagOutputPopUp
 		case constant.RemoveRemoteConfirmationPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForRemoveRemoteConfirmationPopUp
+		case constant.RemoteAsTrackingUpstreamConfirmationPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp
 		}
 	} else {
 		//-----------------------------

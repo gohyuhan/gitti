@@ -98,3 +98,14 @@ func GitRemoveRemoteService(m *types.GittiModel, remoteName string) {
 		m.GitOperations.GitRemote.GitRemoveRemote(remoteName)
 	}()
 }
+
+// ------------------------------------
+//
+//	For setting remote as tracking upstream
+//
+// ------------------------------------
+func GitSetRemoteAsTrackingUpstreamService(m *types.GittiModel, remoteName string) {
+	go func() {
+		m.GitOperations.GitRemote.GitSetRemoteAsTrackingUpstream(remoteName, m.CheckOutBranch)
+	}()
+}

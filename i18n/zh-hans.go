@@ -121,6 +121,7 @@ var zH_HANS = LanguageMapping{
 		"[</>] 切换组件",
 		"[n] 新建远程",
 		"[d] 移除远程",
+		"[enter] 设置为上游追踪分支",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -380,6 +381,10 @@ var zH_HANS = LanguageMapping{
 		"[enter] 移除远程",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp: []string{
+		"[enter] 将远程设置为上游追踪",
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -540,6 +545,7 @@ var zH_HANS = LanguageMapping{
 	FetchTagOutputPopUpTitle:                                 "获取标签",
 	FetchTagFetching:                                         "正在获取标签...",
 	RemoveRemoteTitle:                                        "你确定要移除远程仓库 [%s] 吗？",
+	SetRemoteUpstreamTrackingTitle:                           "将以下远程设置为分支 [%s] 的上游追踪分支吗？",
 }
 
 // for about gitti
@@ -810,6 +816,11 @@ var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "移除远程",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "设置为上游追踪分支",
 		LineType:        INFO,
 	},
 	{

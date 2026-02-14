@@ -169,6 +169,7 @@ type LanguageMapping struct {
 	KeyBindingForChooseFetchTagOptionPopUp                  []string
 	KeyBindingForFetchTagOutputPopUp                        []string
 	KeyBindingForRemoveRemoteConfirmationPopUp              []string
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp  []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -366,5 +367,6 @@ type LanguageMapping struct {
 	FetchTagOutputPopUpTitle                 string
 	FetchTagFetching                         string
 	// for remote
-	RemoveRemoteTitle string
+	RemoveRemoteTitle              string
+	SetRemoteUpstreamTrackingTitle string
 }

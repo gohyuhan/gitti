@@ -174,3 +174,20 @@ func RenderRemoveRemoteConfirmationPopUp(m *types.GittiModel) string {
 	}
 	return ""
 }
+
+func RenderRemoteAsTrackingUpstreamConfirmationPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*RemoteAsTrackingUpstreamConfirmationPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxRemoteAsTrackingUpstreamConfirmationPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.SetRemoteUpstreamTrackingTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(m.CheckOutBranch)))
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(popUp.RemoteName),
+			style.NewStyle.Foreground(style.ColorPurpleSoft).Render(popUp.RemoteUrl),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}

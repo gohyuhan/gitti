@@ -171,6 +171,33 @@ func (gr *GitRemote) GitRemoveRemote(remoteName string) {
 	}
 }
 
+// ----------------------------------
+//
+//		Related to set remote as tracking upStream for current branch
+//	   * currently we always assume the local branch and remote branch will be the same identical name
+//	     so it will be something like git branch --set-upstream-to=origin/<main> <main>
+//
+// ----------------------------------
+func (gr *GitRemote) GitSetRemoteAsTrackingUpstream(remoteName string, branchName string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	upstream := fmt.Sprintf("--set-upstream-to=%s/%s", remoteName, branchName)
+	gitArgs := []string{"branch", upstream, branchName}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, err.Error()), true)
+	}
+}
+
 // CheckRemoteExist checks for existing remotes by running 'git remote -v'.
 // It parses the output to identify unique remote name-URL combinations and
 // determines if they are intended for fetching, pushing, or both.

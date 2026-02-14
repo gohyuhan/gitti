@@ -112,3 +112,13 @@ type RemoveRemoteConfirmationPopUpModel struct {
 	Fetch      bool
 	Push       bool
 }
+
+// ---------------------------------
+//
+// remote as tracking upstream confirmation
+//
+// ---------------------------------
+type RemoteAsTrackingUpstreamConfirmationPopUpModel struct {
+	RemoteName string
+	RemoteUrl  string
+}

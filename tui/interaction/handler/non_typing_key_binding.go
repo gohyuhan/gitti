@@ -629,6 +629,15 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.ShowPopUp.Store(true)
 					branchPopUp.InitChooseSwitchBranchTypePopUpModel(m, currentSelectedLocalBranch.BranchName)
 				}
+			case constant.SHOW_REMOTE:
+				currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if currentSelectedRemote != nil {
+					selectedRemote := currentSelectedRemote.(remote.GitRemoteItem)
+					m.PopUpType = constant.RemoteAsTrackingUpstreamConfirmationPopUp
+					m.IsTyping.Store(false)
+					m.ShowPopUp.Store(true)
+					remotePopUp.InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m, selectedRemote.Name, selectedRemote.Url)
+				}
 			}
 		case constant.LogComponentPanel:
 			m.CurrentSelectedComponent = constant.DetailComponentPanel
@@ -1035,6 +1044,17 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.PopUpType = constant.NoPopUp
 				return m, nil
 			}
+		case constant.RemoteAsTrackingUpstreamConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*remotePopUp.RemoteAsTrackingUpstreamConfirmationPopUpModel)
+			if ok {
+				services.GitSetRemoteAsTrackingUpstreamService(m, popUp.RemoteName)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+				m.PopUpType = constant.NoPopUp
+				return m, nil
+			}
+
 		}
 	}
 	return m, nil
@@ -1201,7 +1221,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.ChooseRemoteForDeleteRemoteTagPopUp,
 			constant.ChoosePushTagOptionPopUp,
 			constant.ChooseFetchTagOptionPopUp,
-			constant.RemoveRemoteConfirmationPopUp:
+			constant.RemoveRemoteConfirmationPopUp,
+			constant.RemoteAsTrackingUpstreamConfirmationPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

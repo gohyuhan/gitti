@@ -121,6 +121,7 @@ var zH_HANT = LanguageMapping{
 		"[</>] 切換元件",
 		"[n] 新增遠端",
 		"[d] 移除遠端",
+		"[enter] 設定為上游追蹤分支",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -380,6 +381,10 @@ var zH_HANT = LanguageMapping{
 		"[enter] 移除遠端",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp: []string{
+		"[enter] 將遠端設定為上游追蹤",
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -540,6 +545,7 @@ var zH_HANT = LanguageMapping{
 	FetchTagOutputPopUpTitle:                                 "獲取標籤",
 	FetchTagFetching:                                         "正在獲取標籤...",
 	RemoveRemoteTitle:                                        "你確定要移除遠端存放庫 [%s] 嗎？",
+	SetRemoteUpstreamTrackingTitle:                           "將以下遠端設定為分支 [%s] 的上游追蹤分支嗎？",
 }
 
 // for about gitti
@@ -810,6 +816,11 @@ var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "移除遠端",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "設定為上游追蹤分支",
 		LineType:        INFO,
 	},
 	{

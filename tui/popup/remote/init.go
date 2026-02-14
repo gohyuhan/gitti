@@ -77,3 +77,10 @@ func InitRemoveRemoteConfirmationPopUpModel(m *types.GittiModel, name string, ur
 		Push:       push,
 	}
 }
+
+func InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m *types.GittiModel, name string, url string) {
+	m.PopUpModel = &RemoteAsTrackingUpstreamConfirmationPopUpModel{
+		RemoteName: name,
+		RemoteUrl:  url,
+	}
+}

@@ -121,6 +121,7 @@ var jA = LanguageMapping{
 		"[</>] コンポーネントを切り替え",
 		"[n] 新しいリモート",
 		"[d] リモートを削除",
+		"[enter] 上流として追跡を設定",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -380,6 +381,10 @@ var jA = LanguageMapping{
 		"[enter] リモートを削除",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp: []string{
+		"[enter] リモートを上流追跡として設定",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -540,6 +545,7 @@ var jA = LanguageMapping{
 	FetchTagOutputPopUpTitle:                                 "タグのフェッチ",
 	FetchTagFetching:                                         "タグをフェッチ中...",
 	RemoveRemoteTitle:                                        "リモート [%s] を削除してもよろしいですか？",
+	SetRemoteUpstreamTrackingTitle:                           "以下のリモートをブランチ [%s] の上流追跡として設定しますか？",
 }
 
 // for about gitti
@@ -811,6 +817,11 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "リモートを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "上流として追跡を設定",
 		LineType:        INFO,
 	},
 	{

@@ -121,6 +121,7 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[n] new remote",
 		"[d] remove remote",
+		"[enter] set as tracking upstream",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -380,6 +381,10 @@ var eN = LanguageMapping{
 		"[enter] remove remote",
 		"[esc] cancel / close",
 	},
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp: []string{
+		"[enter] set remote as upstream tracking",
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -540,6 +545,7 @@ var eN = LanguageMapping{
 	FetchTagOutputPopUpTitle:                                 "Fetch Tag(s)",
 	FetchTagFetching:                                         "Fetching tag(s)...",
 	RemoveRemoteTitle:                                        "Are you sure you want to remove remote [%s]?",
+	SetRemoteUpstreamTrackingTitle:                           "Set the following remote as upstream tracking for branch [%s]?",
 }
 
 // for about gitti
@@ -809,6 +815,11 @@ var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "remove remote",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "set as tracking upstream",
 		LineType:        INFO,
 	},
 	{
