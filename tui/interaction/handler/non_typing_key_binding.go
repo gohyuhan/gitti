@@ -314,6 +314,18 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		}
 	} else {
 		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+			switch m.CurrentLocalBranchOrTagComponentShowing {
+			case constant.SHOW_REMOTE:
+				selectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if selectedRemote != nil {
+					remoteItem := selectedRemote.(remote.GitRemoteItem)
+					m.PopUpType = constant.EditRemotePromptPopUp
+					remotePopUp.InitEditRemotePromptPopUpModel(m, remoteItem.Name, remoteItem.Url)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+				}
+			}
 		case constant.ModifiedFilesComponentPanel:
 			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if currentSelectedFileItem != nil {

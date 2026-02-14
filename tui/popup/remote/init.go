@@ -84,3 +84,28 @@ func InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m *types.GittiModel, nam
 		RemoteUrl:  url,
 	}
 }
+
+// init the popup model for prompting user to edit remote name or url
+func InitEditRemotePromptPopUpModel(m *types.GittiModel, oldRemoteName string, oldRemoteUrl string) {
+	RemoteNameTextInput := textinput.New()
+	RemoteNameTextInput.Placeholder = i18n.LANGUAGEMAPPING.EditRemotePopUpRemoteNamePlaceHolder
+	RemoteNameTextInput.SetValue(oldRemoteName)
+	RemoteNameTextInput.Focus()
+	RemoteNameTextInput.SetVirtualCursor(true)
+
+	RemoteUrlTextInput := textinput.New()
+	RemoteUrlTextInput.Placeholder = i18n.LANGUAGEMAPPING.EditRemotePopUpRemoteUrlPlaceHolder
+	RemoteUrlTextInput.SetValue(oldRemoteUrl)
+	RemoteUrlTextInput.Blur()
+	RemoteUrlTextInput.SetVirtualCursor(true)
+
+	popUpModel := &EditRemotePromptPopUpModel{
+		OldRemoteName:           oldRemoteName,
+		OldRemoteUrl:            oldRemoteUrl,
+		NewRemoteNameTextInput:  RemoteNameTextInput,
+		NewRemoteUrlTextInput:   RemoteUrlTextInput,
+		TotalInputCount:         2,
+		CurrentActiveInputIndex: 1,
+	}
+	m.PopUpModel = popUpModel
+}

@@ -191,3 +191,28 @@ func RenderRemoteAsTrackingUpstreamConfirmationPopUp(m *types.GittiModel) string
 	}
 	return ""
 }
+
+func RenderEditRemotePromptPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*EditRemotePromptPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxEditRemotePromptPopUpWidth, int(float64(m.Width)*0.8))
+		popUp.NewRemoteNameTextInput.SetWidth(popUpWidth - 6)
+		popUp.NewRemoteUrlTextInput.SetWidth(popUpWidth - 6)
+
+		// Rendered content
+		newRemoteNameTitle := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.EditRemotePopUpRemoteNameTitle)
+		newRemoteNameInputView := popUp.NewRemoteNameTextInput.View()
+		newRemoteUrlTitle := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.EditRemotePopUpRemoteUrlTitle)
+		newRemoteUrlTitleInputView := popUp.NewRemoteUrlTextInput.View()
+
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			newRemoteNameTitle,
+			newRemoteNameInputView,
+			newRemoteUrlTitle,
+			newRemoteUrlTitleInputView,
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}

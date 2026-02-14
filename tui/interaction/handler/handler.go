@@ -92,6 +92,21 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 				return m, cmd
 			}
 		}
+	case constant.EditRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*remotePopUp.EditRemotePromptPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.NewRemoteNameTextInput, cmd = popUp.NewRemoteNameTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.NewRemoteUrlTextInput, cmd = popUp.NewRemoteUrlTextInput.Update(msg)
+				return m, cmd
+			}
+		}
 	case constant.CreateNewBranchPopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.CreateNewBranchPopUpModel)
 		if ok {

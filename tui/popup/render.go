@@ -113,6 +113,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = remote.RenderRemoveRemoteConfirmationPopUp(m)
 	case constant.RemoteAsTrackingUpstreamConfirmationPopUp:
 		popUp = remote.RenderRemoteAsTrackingUpstreamConfirmationPopUp(m)
+	case constant.EditRemotePromptPopUp:
+		popUp = remote.RenderEditRemotePromptPopUp(m)
 	}
 	return popUp
 }

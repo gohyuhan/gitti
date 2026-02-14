@@ -50,6 +50,7 @@ const (
 	FetchTagOutputPopUp                        = "FetchTagOutputPopUp"                        // IsTyping will be false
 	RemoveRemoteConfirmationPopUp              = "RemoveRemoteConfirmationPopUp"              // IsTyping will be false
 	RemoteAsTrackingUpstreamConfirmationPopUp  = "RemoteAsTrackingUpstreamConfirmationPopUp"  // IsTyping will be false
+	EditRemotePromptPopUp                      = "EditRemotePromptPopUp"                      // IsTyping will be true
 )
 
 const (
@@ -114,6 +115,7 @@ const (
 	MaxFetchTagOutputPopUpWidth                        = 150
 	MaxRemoveRemoteConfirmationPopUpWidth              = 150
 	MaxRemoteAsTrackingUpstreamConfirmationPopUpWidth  = 150
+	MaxEditRemotePromptPopUpWidth                      = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10

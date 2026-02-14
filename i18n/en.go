@@ -121,6 +121,7 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[n] new remote",
 		"[d] remove remote",
+		"[e] edit remote",
 		"[enter] set as tracking upstream",
 		"[?] keybinding and instructions",
 	},
@@ -385,6 +386,10 @@ var eN = LanguageMapping{
 		"[enter] set remote as upstream tracking",
 		"[esc] cancel / close",
 	},
+	KeyBindingForEditRemotePromptPopUp: []string{
+		"[enter] edit",
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -546,6 +551,10 @@ var eN = LanguageMapping{
 	FetchTagFetching:                                         "Fetching tag(s)...",
 	RemoveRemoteTitle:                                        "Are you sure you want to remove remote [%s]?",
 	SetRemoteUpstreamTrackingTitle:                           "Set the following remote as upstream tracking for branch [%s]?",
+	EditRemotePopUpRemoteNameTitle:                           "New Remote Name",
+	EditRemotePopUpRemoteUrlTitle:                            "New Remote URL",
+	EditRemotePopUpRemoteNamePlaceHolder:                     "Enter new remote name...",
+	EditRemotePopUpRemoteUrlPlaceHolder:                      "Enter new remote url...",
 }
 
 // for about gitti
@@ -815,6 +824,11 @@ var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "remove remote",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "edit remote",
 		LineType:        INFO,
 	},
 	{
@@ -1351,20 +1365,6 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 		LineType: INFO,
 	},
 	{
-		Feature: "add remote",
-		InstructionLines: []string{
-			"1. Press `p` when no remote exists",
-			"2. The 'Add Remote' popup appears automatically",
-			"3. Enter remote name (e.g., 'origin')",
-			"4. Press `tab` to move to URL field",
-			"5. Enter remote URL:",
-			"   - HTTPS: https://example.com/repo.git",
-			"   - SSH: git@example.com:repo.git",
-			"6. Press `enter` to add remote",
-		},
-		LineType: INFO,
-	},
-	{
 		Feature: "continue git operation",
 		InstructionLines: []string{
 			"When git operation is paused (merge, rebase, cherry-pick, etc.):",
@@ -1449,6 +1449,53 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - Fetch tag(s) mirror - Mirror all tags from remote",
 			"4. Press `enter` to confirm",
 			"5. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "add remote",
+		InstructionLines: []string{
+			"1. Navigate to Remote component (press `1`) or switch to Remote component (press `< >`)",
+			"2. Press `n`",
+			"3. Enter remote name (e.g., 'origin')",
+			"4. Press `tab` to move to URL field",
+			"5. Enter remote URL:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. Press `enter` to confirm",
+			"7. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "edit remote",
+		InstructionLines: []string{
+			"1. Navigate to Remote component (press `1`) or switch to Remote component (press `< >`)",
+			"2. Select the remote to edit using `↑/↓`",
+			"3. Press `e`",
+			"4. Enter the new remote name or url or both",
+			"5. Press `enter` to confirm",
+			"6. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "remove remote",
+		InstructionLines: []string{
+			"1. Navigate to Remote component (press `1`) or switch to Remote component (press `< >`)",
+			"2. Select the remote to remove using `↑/↓`",
+			"3. Press `d`",
+			"4. Press `enter` to confirm",
+			"5. Press `esc` to close output",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "set remote as tracking upstream",
+		InstructionLines: []string{
+			"1. Navigate to Remote component (press `1`) or switch to Remote component (press `< >`)",
+			"2. Select the remote to set as tracking upstream using `↑/↓`",
+			"3. Press `enter`",
 		},
 		LineType: INFO,
 	},

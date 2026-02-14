@@ -109,3 +109,20 @@ func GitSetRemoteAsTrackingUpstreamService(m *types.GittiModel, remoteName strin
 		m.GitOperations.GitRemote.GitSetRemoteAsTrackingUpstream(remoteName, m.CheckOutBranch)
 	}()
 }
+
+// ------------------------------------
+//
+//	For editing remote name and url
+//
+// ------------------------------------
+func GitEditRemoteNameAndUrlService(m *types.GittiModel, oldRemoteName string, newRemoteName string, oldRemoteUrl string, newRemoteUrl string) {
+	go func() {
+		if oldRemoteName != newRemoteName {
+			m.GitOperations.GitRemote.GitChangeRemoteName(oldRemoteName, newRemoteName)
+		}
+
+		if oldRemoteUrl != newRemoteUrl {
+			m.GitOperations.GitRemote.GitChangeRemoteUrl(newRemoteName, newRemoteUrl)
+		}
+	}()
+}

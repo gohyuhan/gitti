@@ -198,6 +198,63 @@ func (gr *GitRemote) GitSetRemoteAsTrackingUpstream(remoteName string, branchNam
 	}
 }
 
+// ----------------------------------
+//
+//	Related to change remote name
+//
+// ----------------------------------
+func (gr *GitRemote) GitChangeRemoteName(oldRemoteName string, newRemoteName string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_NAME_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	gitArgs := []string{"remote", "rename", oldRemoteName, newRemoteName}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_NAME_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_NAME_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHANGE_REMOTE_NAME_OPS, err.Error()), true)
+	}
+}
+
+// ----------------------------------
+//
+//	Related to change remote url
+//
+// ----------------------------------
+func (gr *GitRemote) GitChangeRemoteUrl(remoteName string, newRemoteUrl string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	if !isValidGitRemoteURL(newRemoteUrl) {
+		errMsg := "Invalid remote URL format"
+		if i18n.LANGUAGEMAPPING != nil {
+			errMsg = i18n.LANGUAGEMAPPING.AddRemotePopUpInvalidRemoteUrlFormat
+		}
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHANGE_REMOTE_URL_OPS, errMsg), false)
+		return
+	}
+
+	gitArgs := []string{"remote", "set-url", remoteName, newRemoteUrl}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHANGE_REMOTE_URL_OPS, err.Error()), true)
+	}
+}
+
 // CheckRemoteExist checks for existing remotes by running 'git remote -v'.
 // It parses the output to identify unique remote name-URL combinations and
 // determines if they are intended for fetching, pushing, or both.

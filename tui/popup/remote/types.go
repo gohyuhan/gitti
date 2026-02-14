@@ -122,3 +122,17 @@ type RemoteAsTrackingUpstreamConfirmationPopUpModel struct {
 	RemoteName string
 	RemoteUrl  string
 }
+
+// ---------------------------------
+//
+// remote as tracking upstream confirmation
+//
+// ---------------------------------
+type EditRemotePromptPopUpModel struct {
+	OldRemoteName           string          // the old remote name
+	OldRemoteUrl            string          // the old remote url
+	NewRemoteNameTextInput  textinput.Model // input index 1
+	NewRemoteUrlTextInput   textinput.Model // input index 2
+	TotalInputCount         int             // to tell us how many input were there
+	CurrentActiveInputIndex int             // to tell us which input should be shown as highlighted/focus and be updated
+}

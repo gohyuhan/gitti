@@ -121,6 +121,7 @@ var zH_HANT = LanguageMapping{
 		"[</>] 切換元件",
 		"[n] 新增遠端",
 		"[d] 移除遠端",
+		"[e] 編輯遠端",
 		"[enter] 設定為上游追蹤分支",
 		"[?] 快捷鍵與說明",
 	},
@@ -385,6 +386,10 @@ var zH_HANT = LanguageMapping{
 		"[enter] 將遠端設定為上游追蹤",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForEditRemotePromptPopUp: []string{
+		"[enter] 編輯",
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -546,6 +551,10 @@ var zH_HANT = LanguageMapping{
 	FetchTagFetching:                                         "正在獲取標籤...",
 	RemoveRemoteTitle:                                        "你確定要移除遠端存放庫 [%s] 嗎？",
 	SetRemoteUpstreamTrackingTitle:                           "將以下遠端設定為分支 [%s] 的上游追蹤分支嗎？",
+	EditRemotePopUpRemoteNameTitle:                           "新遠端名稱",
+	EditRemotePopUpRemoteUrlTitle:                            "新遠端網址",
+	EditRemotePopUpRemoteNamePlaceHolder:                     "輸入新的遠端名稱...",
+	EditRemotePopUpRemoteUrlPlaceHolder:                      "輸入新的遠端網址...",
 }
 
 // for about gitti
@@ -1352,20 +1361,6 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 		LineType: INFO,
 	},
 	{
-		Feature: "新增遠端 (add remote)",
-		InstructionLines: []string{
-			"1. 當不存在遠端時按 `p`",
-			"2. '新增遠端'彈出視窗自動出現",
-			"3. 輸入遠端名稱（例如：'origin'）",
-			"4. 按 `tab` 移動到 URL 欄位",
-			"5. 輸入遠端 URL:",
-			"   - HTTPS: https://example.com/repo.git",
-			"   - SSH: git@example.com:repo.git",
-			"6. 按 `enter` 新增遠端",
-		},
-		LineType: INFO,
-	},
-	{
 		Feature: "繼續 Git 操作 (continue git operation)",
 		InstructionLines: []string{
 			"當 Git 操作暫停時（合併、變基、揀選等）:",
@@ -1450,6 +1445,53 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 擷取標籤並鏡像 (mirror) - 鏡像遠端的所有標籤",
 			"4. 按 `enter` 確認",
 			"5. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "新增遠端 (add remote)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 按 `n`",
+			"3. 輸入遠端名稱（例如：'origin'）",
+			"4. 按 `tab` 移動到 URL 欄位",
+			"5. 輸入遠端 URL:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. 按 `enter` 確認",
+			"7. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "編輯遠端 (edit remote)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要編輯的遠端",
+			"3. 按 `e`",
+			"4. 輸入新的遠端名稱或網址或兩者都輸入",
+			"5. 按 `enter` 確認",
+			"6. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "移除遠端 (remove remote)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要移除的遠端",
+			"3. 按 `d`",
+			"4. 按 `enter` 確認",
+			"5. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "將遠端設定為上游追蹤 (set remote as tracking upstream)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要設定為上游追蹤的遠端",
+			"3. 按 `enter`",
 		},
 		LineType: INFO,
 	},
