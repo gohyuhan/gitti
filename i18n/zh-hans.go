@@ -63,6 +63,9 @@ var zH_HANS = LanguageMapping{
 	CommitLog:                           "提交记录",
 	Stash:                               "暂存",
 	Tag:                                 "标签",
+	Remote:                              "远程",
+	Fetch:                               "获取",
+	Push:                                "推送",
 	FileTypeUnSupportedPreview:          "当前选择的文件类型不支持预览",
 	TerminalSizeWarning:                 "终端窗口太小 — 请调整大小后继续.",
 	CurrentTerminalHeight:               "当前高度",
@@ -107,6 +110,19 @@ var zH_HANS = LanguageMapping{
 		"[d] 删除标签",
 		"[ctrl+p] 推送标签",
 		"[f] 获取标签",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingRemoteComponentNone: []string{
+		"[</>] 切换组件",
+		"[n] 新建远程",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingRemoteComponentDefault: []string{
+		"[</>] 切换组件",
+		"[n] 新建远程",
+		"[d] 移除远程",
+		"[e] 编辑远程",
+		"[enter] 设置为上游追踪分支",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -362,9 +378,22 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForFetchTagOutputPopUp: []string{
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForRemoveRemoteConfirmationPopUp: []string{
+		"[enter] 移除远程",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp: []string{
+		"[enter] 将远程设置为上游追踪",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForEditRemotePromptPopUp: []string{
+		"[enter] 编辑",
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
+	RemoteComponentKeyBinding:                                zhHansRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHansModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHansCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHansStashComponentKeyBinding,
@@ -520,6 +549,12 @@ var zH_HANS = LanguageMapping{
 	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地仓库获取并镜像标签，以与远程仓库完全匹配",
 	FetchTagOutputPopUpTitle:                                 "获取标签",
 	FetchTagFetching:                                         "正在获取标签...",
+	RemoveRemoteTitle:                                        "你确定要移除远程仓库 [%s] 吗？",
+	SetRemoteUpstreamTrackingTitle:                           "将以下远程设置为分支 [%s] 的上游追踪分支吗？",
+	EditRemotePopUpRemoteNameTitle:                           "新远程名称",
+	EditRemotePopUpRemoteUrlTitle:                            "新远程地址",
+	EditRemotePopUpRemoteNamePlaceHolder:                     "输入新的远程名称...",
+	EditRemotePopUpRemoteUrlPlaceHolder:                      "输入新的远程地址...",
 }
 
 // for about gitti
@@ -716,7 +751,7 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		TitleOrInfoLine: "在本地分支、标签和远程组件之间切换",
 		LineType:        INFO,
 	},
 	{
@@ -740,7 +775,7 @@ var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		TitleOrInfoLine: "在本地分支、标签和远程组件之间切换",
 		LineType:        INFO,
 	},
 	{
@@ -756,6 +791,45 @@ var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "推送标签",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+}
+
+// Remote Component Key Binding for zh-hans
+var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 远程组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支、标签和远程组件之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新建远程",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "移除远程",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "设置为上游追踪分支",
 		LineType:        INFO,
 	},
 	{
@@ -1287,20 +1361,6 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 		LineType: INFO,
 	},
 	{
-		Feature: "添加远程 (add remote)",
-		InstructionLines: []string{
-			"1. 当不存在远程时按 `p`",
-			"2. '添加远程'弹窗自动出现",
-			"3. 输入远程名称（例如：'origin'）",
-			"4. 按 `tab` 移动到 URL 字段",
-			"5. 输入远程 URL:",
-			"   - HTTPS: https://example.com/repo.git",
-			"   - SSH: git@example.com:repo.git",
-			"6. 按 `enter` 添加远程",
-		},
-		LineType: INFO,
-	},
-	{
 		Feature: "继续 Git 操作 (continue git operation)",
 		InstructionLines: []string{
 			"当 Git 操作暂停时（合并、变基、遴选等）:",
@@ -1385,6 +1445,53 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 获取标签并镜像 (mirror) - 镜像远程中的所有标签",
 			"4. 按 `enter` 确认",
 			"5. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "添加远程仓库 (add remote)",
+		InstructionLines: []string{
+			"1. 导航到远程组件（按 `1`）或切换到远程组件（按 `< >`）",
+			"2. 按 `n`",
+			"3. 输入远程名称（例如：'origin'）",
+			"4. 按 `tab` 移动到 URL 字段",
+			"5. 输入远程 URL:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. 按 `enter` 确认",
+			"7. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "编辑远程仓库 (edit remote)",
+		InstructionLines: []string{
+			"1. 导航到远程组件（按 `1`）或切换到远程组件（按 `< >`）",
+			"2. 使用 `↑/↓` 选择要编辑的远程",
+			"3. 按 `e`",
+			"4. 输入新的远程名称或地址或两者都输入",
+			"5. 按 `enter` 确认",
+			"6. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "移除远程仓库 (remove remote)",
+		InstructionLines: []string{
+			"1. 导航到远程组件（按 `1`）或切换到远程组件（按 `< >`）",
+			"2. 使用 `↑/↓` 选择要移除的远程",
+			"3. 按 `d`",
+			"4. 按 `enter` 确认",
+			"5. 按 `esc` 关闭输出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "将远程设置为上游追踪 (set remote as tracking upstream)",
+		InstructionLines: []string{
+			"1. 导航到远程组件（按 `1`）或切换到远程组件（按 `< >`）",
+			"2. 使用 `↑/↓` 选择要设置为上游追踪的远程",
+			"3. 按 `enter`",
 		},
 		LineType: INFO,
 	},

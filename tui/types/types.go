@@ -38,6 +38,7 @@ type GittiModel struct {
 	DetailComponentPanelHeight                       int
 	LocalBranchesComponentPanelHeight                int
 	TagsComponentPanelHeight                         int
+	RemoteComponentPanelHeight                       int
 	ModifiedFilesComponentPanelHeight                int
 	CommitLogComponentPanelHeight                    int
 	StashComponentPanelHeight                        int
@@ -47,6 +48,7 @@ type GittiModel struct {
 	CurrentRepoModifiedFilesInfoList                 list.Model
 	CurrentRepoCommitLogInfoList                     list.Model
 	CurrentRepoStashInfoList                         list.Model
+	CurrentRepoRemoteInfoList                        list.Model
 	DetailPanelParentComponent                       string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
 	DetailPanelViewport                              viewport.Model
 	DetailPanelViewportOffset                        int
@@ -64,6 +66,7 @@ type GittiModel struct {
 	GlobalKeyBindingKeyMapLargestLen                 int                // this was use for global key binding pop up styling, we save it once so we don't have to recompute
 	LocalBranchComponentKeyBindingKeyMapLargestLen   int                // this was use for local branch component key binding pop up styling, we save it once so we don't have to recompute
 	TagComponentKeyBindingKeyMapLargestLen           int                // this was use for tag component key binding pop up styling, we save it once so we don't have to recompute
+	RemoteComponentKeyBindingKeyMapLargestLen        int                // this was use for remote component key binding pop up styling, we save it once so we don't have to recompute
 	ModifiedFilesComponentKeyBindingKeyMapLargestLen int                // this was use for modified files component key binding pop up styling, we save it once so we don't have to recompute
 	CommitLogComponentKeyBindingKeyMapLargestLen     int                // this was use for commit log component key binding pop up styling, we save it once so we don't have to recompute
 	StashComponentKeyBindingKeyMapLargestLen         int                // this was use for stash component key binding pop up styling, we save it once so we don't have to recompute
@@ -101,6 +104,7 @@ type GittiComponentsCurrentListNavigationIndexPosition struct {
 	CommitLogComponent     int
 	StashComponent         int
 	TagComponent           int
+	RemoteComponent        int
 }
 
 // ---------------------------------

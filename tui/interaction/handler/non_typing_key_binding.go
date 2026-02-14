@@ -10,6 +10,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
+	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -41,8 +42,8 @@ func handleNonTypingGlobalKeyBindingInteraction(m *types.GittiModel) (*types.Git
 
 func handleNonTyping1KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
-		if m.CurrentSelectedComponent != constant.LocalBranchOrTagComponentPanel {
-			m.CurrentSelectedComponent = constant.LocalBranchOrTagComponentPanel
+		if m.CurrentSelectedComponent != constant.LocalBranchOrTagOrRemoteComponentPanel {
+			m.CurrentSelectedComponent = constant.LocalBranchOrTagOrRemoteComponentPanel
 			m.CurrentSelectedComponentIndex = 1
 			m.DetailPanelParentComponent = ""
 			layout.LeftPanelDynamicResize(m)
@@ -149,7 +150,7 @@ func handleNonTypingCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				selectedBranchItem := m.CurrentRepoBranchesInfoList.SelectedItem()
@@ -170,6 +171,15 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					tagItem := selectedTagItem.(tag.GitTagItem)
 					tagPopUp.InitChooseDeleteTagOptionPopUpModel(m, tagItem.TagName)
 					m.PopUpType = constant.ChooseDeleteTagOptionPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+				}
+			case constant.SHOW_REMOTE:
+				selectedRemoteItem := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if selectedRemoteItem != nil {
+					remoteItem := selectedRemoteItem.(remote.GitRemoteItem)
+					remotePopUp.InitRemoveRemoteConfirmationPopUpModel(m, remoteItem.Name, remoteItem.Url, remoteItem.Fetch, remoteItem.Push)
+					m.PopUpType = constant.RemoveRemoteConfirmationPopUp
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
 				}
@@ -304,6 +314,18 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		}
 	} else {
 		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+			switch m.CurrentLocalBranchOrTagComponentShowing {
+			case constant.SHOW_REMOTE:
+				selectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if selectedRemote != nil {
+					remoteItem := selectedRemote.(remote.GitRemoteItem)
+					m.PopUpType = constant.EditRemotePromptPopUp
+					remotePopUp.InitEditRemotePromptPopUpModel(m, remoteItem.Name, remoteItem.Url)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+				}
+			}
 		case constant.ModifiedFilesComponentPanel:
 			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if currentSelectedFileItem != nil {
@@ -331,9 +353,9 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 
 func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
-		if (m.CurrentSelectedComponent == constant.LocalBranchOrTagComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagComponentPanel) &&
+		if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
 			m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
-			if !m.GitOperations.GitRemote.CheckRemoteExist() {
+			if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 				// if no remote found, we add one
 				m.PopUpType = constant.AddRemotePromptPopUp
 				if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
@@ -346,7 +368,7 @@ func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			} else {
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				remotes := m.GitOperations.GitRemote.Remote()
+				remotes := m.GitOperations.GitRemote.FetchRemote()
 				if len(remotes) == 1 {
 					m.PopUpType = constant.ChooseFetchTagOptionPopUp
 					// only one remote found so, we will default to that remote
@@ -372,7 +394,7 @@ func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				m.PopUpType = constant.ChooseNewBranchTypePopUp
@@ -380,6 +402,15 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				m.ShowPopUp.Store(true)
 				if _, ok := m.PopUpModel.(*branchPopUp.ChooseNewBranchTypeOptionPopUpModel); !ok {
 					branchPopUp.InitChooseNewBranchTypePopUpModel(m)
+				}
+			case constant.SHOW_REMOTE:
+				m.PopUpType = constant.AddRemotePromptPopUp
+				m.IsTyping.Store(true)
+				m.ShowPopUp.Store(true)
+				if m.GitOperations.GitRemote.CheckRemoteExist(false) {
+					remotePopUp.InitAddRemotePromptPopUpModel(m, false)
+				} else {
+					remotePopUp.InitAddRemotePromptPopUpModel(m, true)
 				}
 			}
 		}
@@ -391,7 +422,7 @@ func handleNonTypingpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	if !m.ShowPopUp.Load() {
 		// first we need to check if there are any push/pull origin origin for this repo
 		// if not we prompt the user to add a new remote origin
-		if !m.GitOperations.GitRemote.CheckRemoteExist() {
+		if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 			m.PopUpType = constant.AddRemotePromptPopUp
 			// if the current pop up model is not commit pop up model, then init it
 			if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
@@ -404,7 +435,7 @@ func handleNonTypingpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		} else {
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
-			remotes := m.GitOperations.GitRemote.Remote()
+			remotes := m.GitOperations.GitRemote.PushRemote()
 			if len(remotes) == 1 {
 				m.PopUpType = constant.ChoosePushTypePopUp
 				// if the current pop up model is not commit pop up model, then init it and start git push service
@@ -425,7 +456,7 @@ func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	if !m.ShowPopUp.Load() {
 		// first we need to check if there are any push/pull origin for this repo
 		// if not we prompt the user to add a new remote origin
-		if !m.GitOperations.GitRemote.CheckRemoteExist() {
+		if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 			m.PopUpType = constant.AddRemotePromptPopUp
 			// if the current pop up model is not commit pop up model, then init it
 			if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
@@ -598,7 +629,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.CurrentSelectedComponent = constant.DetailComponentPanel
 				m.DetailPanelParentComponent = constant.StashComponentPanel
 			}
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(branch.GitBranchItem)
@@ -609,6 +640,15 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.IsTyping.Store(false)
 					m.ShowPopUp.Store(true)
 					branchPopUp.InitChooseSwitchBranchTypePopUpModel(m, currentSelectedLocalBranch.BranchName)
+				}
+			case constant.SHOW_REMOTE:
+				currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if currentSelectedRemote != nil {
+					selectedRemote := currentSelectedRemote.(remote.GitRemoteItem)
+					m.PopUpType = constant.RemoteAsTrackingUpstreamConfirmationPopUp
+					m.IsTyping.Store(false)
+					m.ShowPopUp.Store(true)
+					remotePopUp.InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m, selectedRemote.Name, selectedRemote.Url)
 				}
 			}
 		case constant.LogComponentPanel:
@@ -671,7 +711,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
 				newBranchType := selectedOption.(branchPopUp.GitNewBranchTypeOptionItem).NewBranchType
 				if newBranchType == git.NEWBRANCHBASEDONREMOTE {
-					if !m.GitOperations.GitRemote.CheckRemoteExist() {
+					if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 						// if no remote found, we add one
 						m.PopUpType = constant.AddRemotePromptPopUp
 						if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
@@ -683,7 +723,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.IsTyping.Store(true)
 					} else {
 						m.ShowPopUp.Store(true)
-						remotes := m.GitOperations.GitRemote.Remote()
+						remotes := m.GitOperations.GitRemote.FetchRemote()
 						if len(remotes) == 1 {
 							m.IsTyping.Store(true)
 							m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
@@ -913,7 +953,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					case git.TAGDELETEREMOTE:
 						// first we need to check if there are any origin for this repo
 						// if not we prompt the user to add a new remote origin
-						if !m.GitOperations.GitRemote.CheckRemoteExist() {
+						if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 							m.PopUpType = constant.AddRemotePromptPopUp
 							if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
 								remotePopUp.InitAddRemotePromptPopUpModel(m, true)
@@ -925,7 +965,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						} else {
 							m.ShowPopUp.Store(true)
 							m.IsTyping.Store(false)
-							remotes := m.GitOperations.GitRemote.Remote()
+							remotes := m.GitOperations.GitRemote.PushRemote()
 							if len(remotes) == 1 {
 								m.PopUpType = constant.DeleteTagOutputPopUp
 								tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
@@ -1006,6 +1046,27 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					return m, nil
 				}
 			}
+		case constant.RemoveRemoteConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*remotePopUp.RemoveRemoteConfirmationPopUpModel)
+			if ok {
+				services.GitRemoveRemoteService(m, popUp.RemoteName)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+				m.PopUpType = constant.NoPopUp
+				return m, nil
+			}
+		case constant.RemoteAsTrackingUpstreamConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*remotePopUp.RemoteAsTrackingUpstreamConfirmationPopUpModel)
+			if ok {
+				services.GitSetRemoteAsTrackingUpstreamService(m, popUp.RemoteName)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+				m.PopUpType = constant.NoPopUp
+				return m, nil
+			}
+
 		}
 	}
 	return m, nil
@@ -1171,7 +1232,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.ChooseDeleteTagOptionPopUp,
 			constant.ChooseRemoteForDeleteRemoteTagPopUp,
 			constant.ChoosePushTagOptionPopUp,
-			constant.ChooseFetchTagOptionPopUp:
+			constant.ChooseFetchTagOptionPopUp,
+			constant.RemoveRemoteConfirmationPopUp,
+			constant.RemoteAsTrackingUpstreamConfirmationPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -1206,7 +1269,7 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			// we don't use the list native Update() because we track the current selected index
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
@@ -1221,6 +1284,13 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 					latestIndex := m.CurrentRepoTagInfoList.Index() - 1
 					m.CurrentRepoTagInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.TagComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+			case constant.SHOW_REMOTE:
+				if m.CurrentRepoRemoteInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoRemoteInfoList.Index() - 1
+					m.CurrentRepoRemoteInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.RemoteComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
@@ -1285,7 +1355,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			// we don't use the list native Update() because we track the current selected index
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
@@ -1300,6 +1370,13 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 					latestIndex := m.CurrentRepoTagInfoList.Index() + 1
 					m.CurrentRepoTagInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.TagComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+			case constant.SHOW_REMOTE:
+				if m.CurrentRepoRemoteInfoList.Index() < len(m.CurrentRepoRemoteInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoRemoteInfoList.Index() + 1
+					m.CurrentRepoRemoteInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.RemoteComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
@@ -1475,12 +1552,15 @@ func handleNonTypingSlashKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-			// do nothing, as local branch will be the most left option in the local branch or tagcomponent panel
+			// do nothing, as local branch will be the most left option in the local branch or tag or remote component panel
 			case constant.SHOW_TAG:
 				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_LOCAL_BRANCH
+				services.FetchDetailComponentPanelInfoService(m, true)
+			case constant.SHOW_REMOTE:
+				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_TAG
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		}
@@ -1491,13 +1571,16 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_TAG
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_TAG:
-				// do nothing, as tag is currently the most right option in the local branch or tag component panel
+				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_REMOTE
+				services.FetchDetailComponentPanelInfoService(m, true)
+			case constant.SHOW_REMOTE:
+				// do nothing, as remote is currently the most right option in the local branch or tag or remote component panel
 			}
 		}
 	}
@@ -1546,13 +1629,13 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.IsTyping.Store(false)
 				logPopUp.InitGitCherryPickOptionSelectionPopUp(m)
 			}
-		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagComponentPanel) &&
+		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
 			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
 			selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
 			if selectedTag == nil {
 				return m, nil
 			}
-			if !m.GitOperations.GitRemote.CheckRemoteExist() {
+			if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 				// if no remote found, we add one
 				m.PopUpType = constant.AddRemotePromptPopUp
 				if popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel); !ok {
@@ -1565,7 +1648,7 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			} else {
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				remotes := m.GitOperations.GitRemote.Remote()
+				remotes := m.GitOperations.GitRemote.PushRemote()
 				if len(remotes) == 1 {
 					m.PopUpType = constant.ChoosePushTagOptionPopUp
 					// only one remote found so, we will default to that remote

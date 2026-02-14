@@ -25,22 +25,11 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		services.GitAmendCommitCancelService(m)
 	case constant.AddRemotePromptPopUp:
 		services.GitAddRemoteCancelService(m)
-	case constant.CreateNewBranchPopUp:
-		m.ShowPopUp.Store(false)
-		m.IsTyping.Store(false)
-		m.PopUpType = constant.NoPopUp
-		m.PopUpModel = nil
-	case constant.GitStashMessagePopUp:
-		m.ShowPopUp.Store(false)
-		m.IsTyping.Store(false)
-		m.PopUpType = constant.NoPopUp
-		m.PopUpModel = nil
-	case constant.CreateBranchBasedOnRemotePopUp:
-		m.ShowPopUp.Store(false)
-		m.IsTyping.Store(false)
-		m.PopUpType = constant.NoPopUp
-		m.PopUpModel = nil
-	case constant.CreateTagPopUp:
+	case constant.CreateNewBranchPopUp,
+		constant.GitStashMessagePopUp,
+		constant.CreateBranchBasedOnRemotePopUp,
+		constant.CreateTagPopUp,
+		constant.EditRemotePromptPopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -88,6 +77,19 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 			case 2:
 				popUp.RemoteNameTextInput.Blur()
 				popUp.RemoteUrlTextInput.Focus()
+			}
+		}
+	case constant.EditRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*remotePopUp.EditRemotePromptPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.NewRemoteNameTextInput.Focus()
+				popUp.NewRemoteUrlTextInput.Blur()
+			case 2:
+				popUp.NewRemoteNameTextInput.Blur()
+				popUp.NewRemoteUrlTextInput.Focus()
 			}
 		}
 	case constant.CreateTagPopUp:
@@ -148,7 +150,19 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				popUp.RemoteUrlTextInput.Focus()
 			}
 		}
-
+	case constant.EditRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*remotePopUp.EditRemotePromptPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.NewRemoteNameTextInput.Focus()
+				popUp.NewRemoteUrlTextInput.Blur()
+			case 2:
+				popUp.NewRemoteNameTextInput.Blur()
+				popUp.NewRemoteUrlTextInput.Focus()
+			}
+		}
 	case constant.CreateTagPopUp:
 		popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagPopUpModel)
 		if ok {
@@ -225,11 +239,22 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyMsg)
 			popUp.CurrentActiveInputIndex = 1
 			// start a seperate thread that stage the current selected files and commit them and set the value of msg and desc to "" if committed successfully
 			// also do not start any git operation is message is no provided
-			if !popUp.IsProcessing.Load() && len(popUp.RemoteNameTextInput.Value()) > 0 && len(popUp.RemoteUrlTextInput.Value()) > 0 {
+			if !popUp.IsProcessing.Load() && utf8.RuneCountInString(popUp.RemoteNameTextInput.Value()) > 0 && utf8.RuneCountInString(popUp.RemoteUrlTextInput.Value()) > 0 {
 				services.GitAddRemoteService(m)
 			}
 		}
+	case constant.EditRemotePromptPopUp:
+		popUp, ok := m.PopUpModel.(*remotePopUp.EditRemotePromptPopUpModel)
+		if ok {
+			newRemoteName := popUp.NewRemoteNameTextInput.Value()
+			newRemoteUrl := popUp.NewRemoteUrlTextInput.Value()
 
+			services.GitEditRemoteNameAndUrlService(m, popUp.OldRemoteName, newRemoteName, popUp.OldRemoteUrl, newRemoteUrl)
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			m.PopUpModel = nil
+		}
 	case constant.CreateNewBranchPopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.CreateNewBranchPopUpModel)
 		if ok {

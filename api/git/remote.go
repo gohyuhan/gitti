@@ -14,7 +14,9 @@ import (
 type GitRemote struct {
 	updateChannel                 chan string
 	gitProcessLock                *GitProcessLock
-	remote                        []GitRemoteInfo
+	remote                        []GitRemoteInfo // all remote info
+	fetchRemote                   []GitRemoteInfo // if the url is for fetch
+	pushRemote                    []GitRemoteInfo // if the url is for push
 	remoteSyncStatus              RemoteSyncStatus
 	upStreamRemoteIcon            string
 	currentBranchUpStream         string
@@ -23,8 +25,10 @@ type GitRemote struct {
 }
 
 type GitRemoteInfo struct {
-	Name string
-	Url  string
+	Name  string
+	Url   string
+	Fetch bool
+	Push  bool
 }
 
 type RemoteSyncStatus struct {
@@ -58,6 +62,24 @@ func (gr *GitRemote) Remote() []GitRemoteInfo {
 
 // ----------------------------------
 //
+//	Return fetch related remote only
+//
+// ----------------------------------
+func (gr *GitRemote) FetchRemote() []GitRemoteInfo {
+	return gr.fetchRemote
+}
+
+// ----------------------------------
+//
+//	Return push related remote only
+//
+// ----------------------------------
+func (gr *GitRemote) PushRemote() []GitRemoteInfo {
+	return gr.pushRemote
+}
+
+// ----------------------------------
+//
 //	Return remote sync status
 //
 // ----------------------------------
@@ -85,7 +107,7 @@ func (gr *GitRemote) CurrentBranchUpStream() string {
 
 // ----------------------------------
 //
-//	Related to Git Remote
+//	Related to add Remote
 //
 // ----------------------------------
 func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url string) ([]string, int) {
@@ -125,34 +147,181 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 	return gitAddRemoteOutput, 0
 }
 
-func (gr *GitRemote) CheckRemoteExist() bool {
+// ----------------------------------
+//
+//	Related to delete Remote
+//
+// ----------------------------------
+func (gr *GitRemote) GitRemoveRemote(remoteName string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.REMOVE_REMOTE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	gitArgs := []string{"remote", "remove", remoteName}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.REMOVE_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.REMOVE_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REMOVE_REMOTE_OPS, err.Error()), true)
+	}
+}
+
+// ----------------------------------
+//
+//		Related to set remote as tracking upStream for current branch
+//	   * currently we always assume the local branch and remote branch will be the same identical name
+//	     so it will be something like git branch --set-upstream-to=origin/<main> <main>
+//
+// ----------------------------------
+func (gr *GitRemote) GitSetRemoteAsTrackingUpstream(remoteName string, branchName string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	upstream := fmt.Sprintf("--set-upstream-to=%s/%s", remoteName, branchName)
+	gitArgs := []string{"branch", upstream, branchName}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, err.Error()), true)
+	}
+}
+
+// ----------------------------------
+//
+//	Related to change remote name
+//
+// ----------------------------------
+func (gr *GitRemote) GitChangeRemoteName(oldRemoteName string, newRemoteName string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_NAME_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	gitArgs := []string{"remote", "rename", oldRemoteName, newRemoteName}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_NAME_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_NAME_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHANGE_REMOTE_NAME_OPS, err.Error()), true)
+	}
+}
+
+// ----------------------------------
+//
+//	Related to change remote url
+//
+// ----------------------------------
+func (gr *GitRemote) GitChangeRemoteUrl(remoteName string, newRemoteUrl string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	if !isValidGitRemoteURL(newRemoteUrl) {
+		errMsg := "Invalid remote URL format"
+		if i18n.LANGUAGEMAPPING != nil {
+			errMsg = i18n.LANGUAGEMAPPING.AddRemotePopUpInvalidRemoteUrlFormat
+		}
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHANGE_REMOTE_URL_OPS, errMsg), false)
+		return
+	}
+
+	gitArgs := []string{"remote", "set-url", remoteName, newRemoteUrl}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHANGE_REMOTE_URL_OPS, err.Error()), true)
+	}
+}
+
+// CheckRemoteExist checks for existing remotes by running 'git remote -v'.
+// It parses the output to identify unique remote name-URL combinations and
+// determines if they are intended for fetching, pushing, or both.
+// It populates the gr.remote, gr.fetchRemote, and gr.pushRemote slices accordingly.
+func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 	gitArgs := []string{"remote", "-v"}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmd.Output()
-	gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if !passiveRunning {
+		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	}
 	if err != nil {
-		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHECK_REMOTE_OPS, err.Error()), true)
+		if !passiveRunning {
+			gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHECK_REMOTE_OPS, err.Error()), true)
+		}
 		return false
 	}
 
 	remotes := strings.SplitSeq(strings.TrimSpace(string(gitOutput)), "\n")
 	var remoteStruct []GitRemoteInfo
+	var fetchRemoteStruct []GitRemoteInfo
+	var pushRemoteStruct []GitRemoteInfo
+
+	uniqueRemoteMap := make(map[string]GitRemoteInfo)
+
 	for remote := range remotes {
 		remoteLinePart := strings.Fields(remote)
-		if len(remoteLinePart) < 2 {
+		if len(remoteLinePart) < 3 {
 			continue
 		}
 
-		r := GitRemoteInfo{
-			Name: remoteLinePart[0],
-			Url:  remoteLinePart[1],
+		// check if the remote unique combination (remote name + url) already exist in the map
+		// if not create one
+		key := fmt.Sprintf("%s-%s", remoteLinePart[0], remoteLinePart[1])
+		r, ok := uniqueRemoteMap[key]
+		if !ok {
+			r = GitRemoteInfo{
+				Name:  remoteLinePart[0],
+				Url:   remoteLinePart[1],
+				Fetch: false,
+				Push:  false,
+			}
 		}
 
-		if strings.TrimSpace(remoteLinePart[2]) == "(push)" {
-			remoteStruct = append(remoteStruct, r)
+		// check if the remote is fetch or push and update the info
+		typePart := strings.TrimSpace(remoteLinePart[2])
+		if typePart == "(fetch)" {
+			r.Fetch = true
+		}
+		if typePart == "(push)" {
+			r.Push = true
+		}
+		uniqueRemoteMap[key] = r
+	}
+
+	for _, r := range uniqueRemoteMap {
+		remoteStruct = append(remoteStruct, r)
+		if r.Fetch {
+			fetchRemoteStruct = append(fetchRemoteStruct, r)
+		}
+		if r.Push {
+			pushRemoteStruct = append(pushRemoteStruct, r)
 		}
 	}
 	gr.remote = remoteStruct
+	gr.fetchRemote = fetchRemoteStruct
+	gr.pushRemote = pushRemoteStruct
 	return len(gr.remote) > 0
 }
 

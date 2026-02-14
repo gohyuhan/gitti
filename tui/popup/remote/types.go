@@ -54,8 +54,10 @@ type ChooseRemotePopUpModel struct {
 type (
 	GitRemoteItemDelegate struct{}
 	GitRemoteItem         struct {
-		Name string
-		Url  string
+		Name  string
+		Url   string
+		Fetch bool
+		Push  bool
 	}
 )
 
@@ -97,4 +99,40 @@ func (d GitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	}
 
 	fmt.Fprint(w, fn(fullStr))
+}
+
+// ---------------------------------
+//
+// remove remote confirmation
+//
+// ---------------------------------
+type RemoveRemoteConfirmationPopUpModel struct {
+	RemoteName string
+	RemoteUrl  string
+	Fetch      bool
+	Push       bool
+}
+
+// ---------------------------------
+//
+// remote as tracking upstream confirmation
+//
+// ---------------------------------
+type RemoteAsTrackingUpstreamConfirmationPopUpModel struct {
+	RemoteName string
+	RemoteUrl  string
+}
+
+// ---------------------------------
+//
+// remote as tracking upstream confirmation
+//
+// ---------------------------------
+type EditRemotePromptPopUpModel struct {
+	OldRemoteName           string          // the old remote name
+	OldRemoteUrl            string          // the old remote url
+	NewRemoteNameTextInput  textinput.Model // input index 1
+	NewRemoteUrlTextInput   textinput.Model // input index 2
+	TotalInputCount         int             // to tell us how many input were there
+	CurrentActiveInputIndex int             // to tell us which input should be shown as highlighted/focus and be updated
 }

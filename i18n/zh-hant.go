@@ -63,6 +63,9 @@ var zH_HANT = LanguageMapping{
 	CommitLog:                           "提交記錄",
 	Stash:                               "暫存",
 	Tag:                                 "標籤",
+	Remote:                              "遠端",
+	Fetch:                               "獲取",
+	Push:                                "推送",
 	FileTypeUnSupportedPreview:          "目前選擇的檔案類型不支援預覽",
 	TerminalSizeWarning:                 "終端機太小 — 請調整大小以繼續.",
 	CurrentTerminalHeight:               "目前高度",
@@ -107,6 +110,19 @@ var zH_HANT = LanguageMapping{
 		"[d] 刪除標籤",
 		"[ctrl+p] 推送標籤",
 		"[f] 獲取標籤",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingRemoteComponentNone: []string{
+		"[</>] 切換元件",
+		"[n] 新增遠端",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingRemoteComponentDefault: []string{
+		"[</>] 切換元件",
+		"[n] 新增遠端",
+		"[d] 移除遠端",
+		"[e] 編輯遠端",
+		"[enter] 設定為上游追蹤分支",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -362,9 +378,22 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForFetchTagOutputPopUp: []string{
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForRemoveRemoteConfirmationPopUp: []string{
+		"[enter] 移除遠端",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp: []string{
+		"[enter] 將遠端設定為上游追蹤",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForEditRemotePromptPopUp: []string{
+		"[enter] 編輯",
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
+	RemoteComponentKeyBinding:                                zhHantRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHantModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHantCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHantStashComponentKeyBinding,
@@ -520,6 +549,12 @@ var zH_HANT = LanguageMapping{
 	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地儲存庫獲取並鏡像標籤，以與遠端儲存庫完全匹配",
 	FetchTagOutputPopUpTitle:                                 "獲取標籤",
 	FetchTagFetching:                                         "正在獲取標籤...",
+	RemoveRemoteTitle:                                        "你確定要移除遠端存放庫 [%s] 嗎？",
+	SetRemoteUpstreamTrackingTitle:                           "將以下遠端設定為分支 [%s] 的上游追蹤分支嗎？",
+	EditRemotePopUpRemoteNameTitle:                           "新遠端名稱",
+	EditRemotePopUpRemoteUrlTitle:                            "新遠端網址",
+	EditRemotePopUpRemoteNamePlaceHolder:                     "輸入新的遠端名稱...",
+	EditRemotePopUpRemoteUrlPlaceHolder:                      "輸入新的遠端網址...",
 }
 
 // for about gitti
@@ -716,7 +751,7 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		TitleOrInfoLine: "在本地分支、標籤和遠端組件之間切換",
 		LineType:        INFO,
 	},
 	{
@@ -740,7 +775,7 @@ var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		TitleOrInfoLine: "在本地分支、標籤和遠端組件之間切換",
 		LineType:        INFO,
 	},
 	{
@@ -756,6 +791,45 @@ var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "推送標籤",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+}
+
+// Remote Component Key Binding for zh-hant
+var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 遠端組件面板快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支、標籤和遠端組件之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新增遠端",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "移除遠端",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "設定為上游追蹤分支",
 		LineType:        INFO,
 	},
 	{
@@ -1287,20 +1361,6 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 		LineType: INFO,
 	},
 	{
-		Feature: "新增遠端 (add remote)",
-		InstructionLines: []string{
-			"1. 當不存在遠端時按 `p`",
-			"2. '新增遠端'彈出視窗自動出現",
-			"3. 輸入遠端名稱（例如：'origin'）",
-			"4. 按 `tab` 移動到 URL 欄位",
-			"5. 輸入遠端 URL:",
-			"   - HTTPS: https://example.com/repo.git",
-			"   - SSH: git@example.com:repo.git",
-			"6. 按 `enter` 新增遠端",
-		},
-		LineType: INFO,
-	},
-	{
 		Feature: "繼續 Git 操作 (continue git operation)",
 		InstructionLines: []string{
 			"當 Git 操作暫停時（合併、變基、揀選等）:",
@@ -1385,6 +1445,53 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 擷取標籤並鏡像 (mirror) - 鏡像遠端的所有標籤",
 			"4. 按 `enter` 確認",
 			"5. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "新增遠端 (add remote)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 按 `n`",
+			"3. 輸入遠端名稱（例如：'origin'）",
+			"4. 按 `tab` 移動到 URL 欄位",
+			"5. 輸入遠端 URL:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. 按 `enter` 確認",
+			"7. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "編輯遠端 (edit remote)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要編輯的遠端",
+			"3. 按 `e`",
+			"4. 輸入新的遠端名稱或網址或兩者都輸入",
+			"5. 按 `enter` 確認",
+			"6. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "移除遠端 (remove remote)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要移除的遠端",
+			"3. 按 `d`",
+			"4. 按 `enter` 確認",
+			"5. 按 `esc` 關閉輸出",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "將遠端設定為上游追蹤 (set remote as tracking upstream)",
+		InstructionLines: []string{
+			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
+			"2. 使用 `↑/↓` 選擇要設定為上游追蹤的遠端",
+			"3. 按 `enter`",
 		},
 		LineType: INFO,
 	},

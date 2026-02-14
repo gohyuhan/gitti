@@ -144,8 +144,10 @@ func (d DeleteTagOptionDelegate) Render(w io.Writer, m list.Model, index int, li
 type (
 	GitRemoteForDeleteRemoteTagItemDelegate struct{}
 	GitRemoteForDeleteRemoteTagItem         struct {
-		Name string
-		Url  string
+		Name  string
+		Url   string
+		Fetch bool
+		Push  bool
 	}
 )
 

@@ -63,6 +63,9 @@ var jA = LanguageMapping{
 	CommitLog:                           "コミットログ",
 	Stash:                               "スタッシュ",
 	Tag:                                 "タグ",
+	Remote:                              "リモート",
+	Fetch:                               "フェッチ",
+	Push:                                "プッシュ",
 	FileTypeUnSupportedPreview:          "現在選択されているファイル形式はプレビューに対応していません",
 	TerminalSizeWarning:                 "端末サイズが小さすぎます - サイズを変更してください.",
 	CurrentTerminalHeight:               "現在の高さ",
@@ -107,6 +110,19 @@ var jA = LanguageMapping{
 		"[d] タグを削除",
 		"[ctrl+p] タグをプッシュ",
 		"[f] タグをフェッチ",
+		"[?] キー操作と説明",
+	},
+	KeyBindingRemoteComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[n] 新しいリモート",
+		"[?] キー操作と説明",
+	},
+	KeyBindingRemoteComponentDefault: []string{
+		"[</>] コンポーネントを切り替え",
+		"[n] 新しいリモート",
+		"[d] リモートを削除",
+		"[e] リモートを編集",
+		"[enter] 上流として追跡を設定",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -362,9 +378,22 @@ var jA = LanguageMapping{
 	KeyBindingForFetchTagOutputPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForRemoveRemoteConfirmationPopUp: []string{
+		"[enter] リモートを削除",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp: []string{
+		"[enter] リモートを上流追跡として設定",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForEditRemotePromptPopUp: []string{
+		"[enter] 編集",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
+	RemoteComponentKeyBinding:                                jaRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             jaCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 jaStashComponentKeyBinding,
@@ -520,6 +549,12 @@ var jA = LanguageMapping{
 	FetchTagPopUpFetchMirrorTagOptionInfo:                    "ローカルリポジトリのタグをリモートリポジトリと完全に一致するようにフェッチしてミラーリングします",
 	FetchTagOutputPopUpTitle:                                 "タグのフェッチ",
 	FetchTagFetching:                                         "タグをフェッチ中...",
+	RemoveRemoteTitle:                                        "リモート [%s] を削除してもよろしいですか？",
+	SetRemoteUpstreamTrackingTitle:                           "以下のリモートをブランチ [%s] の上流追跡として設定しますか？",
+	EditRemotePopUpRemoteNameTitle:                           "新しいリモート名",
+	EditRemotePopUpRemoteUrlTitle:                            "新しいリモートURL",
+	EditRemotePopUpRemoteNamePlaceHolder:                     "新しいリモート名を入力...",
+	EditRemotePopUpRemoteUrlPlaceHolder:                      "新しいリモートURLを入力...",
 }
 
 // for about gitti
@@ -717,7 +752,7 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		TitleOrInfoLine: "ローカルブランチ、タグ、リモートコンポーネントを切り替える",
 		LineType:        INFO,
 	},
 	{
@@ -741,7 +776,7 @@ var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		TitleOrInfoLine: "ローカルブランチ、タグ、リモートコンポーネントを切り替える",
 		LineType:        INFO,
 	},
 	{
@@ -757,6 +792,45 @@ var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "タグをプッシュ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Remote Component Key Binding for ja
+var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- リモートコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチ、タグ、リモートコンポーネントを切り替える",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新しいリモートを追加",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "リモートを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "上流として追跡を設定",
 		LineType:        INFO,
 	},
 	{
@@ -1288,20 +1362,6 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 		LineType: INFO,
 	},
 	{
-		Feature: "リモートを追加 (add remote)",
-		InstructionLines: []string{
-			"1. リモートが存在しないときに `p` を押す",
-			"2. 「リモートを追加」ポップアップが自動的に表示されます",
-			"3. リモート名を入力（例: 'origin'）",
-			"4. `tab` を押してURLフィールドに移動",
-			"5. リモートURLを入力:",
-			"   - HTTPS: https://example.com/repo.git",
-			"   - SSH: git@example.com:repo.git",
-			"6. `enter` を押してリモートを追加",
-		},
-		LineType: INFO,
-	},
-	{
 		Feature: "Git操作を続行 (continue git operation)",
 		InstructionLines: []string{
 			"Git操作が一時停止している場合（マージ、リベース、チェリーピックなど）:",
@@ -1386,6 +1446,53 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - タグをフェッチしてミラーリング (mirror) - すべてのタグをリモートと同期",
 			"4. `enter` を押して確定",
 			"5. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "リモートを追加 (add remote)",
+		InstructionLines: []string{
+			"1. リモートコンポーネントに移動 (`1` を押す) またはリモートコンポーネントに切り替え (`< >` を押す)",
+			"2. `n` を押す",
+			"3. リモート名を入力（例: 'origin'）",
+			"4. `tab` を押してURLフィールドに移動",
+			"5. リモートURLを入力:",
+			"   - HTTPS: https://example.com/repo.git",
+			"   - SSH: git@example.com:repo.git",
+			"6. `enter` を押して確定",
+			"7. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "リモートを編集 (edit remote)",
+		InstructionLines: []string{
+			"1. リモートコンポーネントに移動 (`1` を押す) またはリモートコンポーネントに切り替え (`< >` を押す)",
+			"2. `↑/↓` を使用して編集するリモートを選択",
+			"3. `e` を押す",
+			"4. 新しいリモート名またはURLまたは両方を入力",
+			"5. `enter` を押して確定",
+			"6. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "リモートを削除 (remove remote)",
+		InstructionLines: []string{
+			"1. リモートコンポーネントに移動 (`1` を押す) またはリモートコンポーネントに切り替え (`< >` を押す)",
+			"2. `↑/↓` を使用して削除するリモートを選択",
+			"3. `d` を押す",
+			"4. `enter` を押して確定",
+			"5. `esc` を押して出力を閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "リモートを上流追跡として設定 (set remote as tracking upstream)",
+		InstructionLines: []string{
+			"1. リモートコンポーネントに移動 (`1` を押す) またはリモートコンポーネントに切り替え (`< >` を押す)",
+			"2. `↑/↓` を使用して上流追跡として設定するリモートを選択",
+			"3. `enter` を押す",
 		},
 		LineType: INFO,
 	},
