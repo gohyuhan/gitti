@@ -63,6 +63,9 @@ var zH_HANS = LanguageMapping{
 	CommitLog:                           "提交记录",
 	Stash:                               "暂存",
 	Tag:                                 "标签",
+	Remote:                              "远程",
+	Fetch:                               "获取",
+	Push:                                "推送",
 	FileTypeUnSupportedPreview:          "当前选择的文件类型不支持预览",
 	TerminalSizeWarning:                 "终端窗口太小 — 请调整大小后继续.",
 	CurrentTerminalHeight:               "当前高度",
@@ -107,6 +110,17 @@ var zH_HANS = LanguageMapping{
 		"[d] 删除标签",
 		"[ctrl+p] 推送标签",
 		"[f] 获取标签",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingRemoteComponentNone: []string{
+		"[</>] 切换组件",
+		"[n] 新建远程",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingRemoteComponentDefault: []string{
+		"[</>] 切换组件",
+		"[n] 新建远程",
+		"[d] 删除远程",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -365,6 +379,7 @@ var zH_HANS = LanguageMapping{
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
+	RemoteComponentKeyBinding:                                zhHansRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHansModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHansCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHansStashComponentKeyBinding,
@@ -716,7 +731,7 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		TitleOrInfoLine: "在本地分支、标签和远程组件之间切换",
 		LineType:        INFO,
 	},
 	{
@@ -740,7 +755,7 @@ var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和标签组件之间切换",
+		TitleOrInfoLine: "在本地分支、标签和远程组件之间切换",
 		LineType:        INFO,
 	},
 	{
@@ -756,6 +771,40 @@ var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "推送标签",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+}
+
+// Remote Component Key Binding for zh-hans
+var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 远程组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支、标签和远程组件之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新建远程",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "删除远程",
 		LineType:        INFO,
 	},
 	{

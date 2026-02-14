@@ -62,7 +62,7 @@ func GittiMainPageView(m *types.GittiModel) string {
 
 	// --- Components ---
 	GitStatusPanel := renderGitStatusComponentPanel(m)
-	localBranchesPanel := renderLocalBranchesComponentPanel(m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight, m)
+	localBranchesPanel := renderLocalBranchesOrTagOrRemoteComponentPanel(m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight, m)
 	modifiedFilesPanel := renderModifiedFilesComponentPanel(m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight, m)
 	commitLogPanel := renderCommitLogComponentPanel(m.WindowLeftPanelWidth, m.CommitLogComponentPanelHeight, m)
 	stashFilesPanel := renderStashComponentPanel(m.WindowLeftPanelWidth, m.StashComponentPanelHeight, m)

@@ -63,6 +63,9 @@ var jA = LanguageMapping{
 	CommitLog:                           "コミットログ",
 	Stash:                               "スタッシュ",
 	Tag:                                 "タグ",
+	Remote:                              "リモート",
+	Fetch:                               "フェッチ",
+	Push:                                "プッシュ",
 	FileTypeUnSupportedPreview:          "現在選択されているファイル形式はプレビューに対応していません",
 	TerminalSizeWarning:                 "端末サイズが小さすぎます - サイズを変更してください.",
 	CurrentTerminalHeight:               "現在の高さ",
@@ -107,6 +110,17 @@ var jA = LanguageMapping{
 		"[d] タグを削除",
 		"[ctrl+p] タグをプッシュ",
 		"[f] タグをフェッチ",
+		"[?] キー操作と説明",
+	},
+	KeyBindingRemoteComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[n] 新しいリモート",
+		"[?] キー操作と説明",
+	},
+	KeyBindingRemoteComponentDefault: []string{
+		"[</>] コンポーネントを切り替え",
+		"[n] 新しいリモート",
+		"[d] リモートを削除",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -365,6 +379,7 @@ var jA = LanguageMapping{
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
+	RemoteComponentKeyBinding:                                jaRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             jaCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 jaStashComponentKeyBinding,
@@ -717,7 +732,7 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		TitleOrInfoLine: "ローカルブランチ、タグ、リモートコンポーネントを切り替える",
 		LineType:        INFO,
 	},
 	{
@@ -741,7 +756,7 @@ var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "ローカルブランチとタグコンポーネントを切り替える",
+		TitleOrInfoLine: "ローカルブランチ、タグ、リモートコンポーネントを切り替える",
 		LineType:        INFO,
 	},
 	{
@@ -757,6 +772,40 @@ var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "タグをプッシュ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Remote Component Key Binding for ja
+var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- リモートコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチ、タグ、リモートコンポーネントを切り替える",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新しいリモートを追加",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "リモートを削除",
 		LineType:        INFO,
 	},
 	{

@@ -11,6 +11,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/log"
+	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -84,12 +85,14 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			theCurrentSelectedComponent = m.CurrentSelectedComponent
 		}
 		switch theCurrentSelectedComponent {
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				contentLine = generateAboutGittiContent()
 			case constant.SHOW_TAG:
 				contentLine = generateTagDetailPanelContent(ctx, m)
+			case constant.SHOW_REMOTE:
+				contentLine = generateRemoteDetailPanelContent(m)
 			}
 		case constant.ModifiedFilesComponentPanel:
 			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
@@ -161,6 +164,74 @@ func generateTagDetailPanelContent(ctx context.Context, m *types.GittiModel) str
 
 		vpLine.WriteRune('\n')
 	}
+	return vpLine.String()
+}
+
+func generateRemoteDetailPanelContent(m *types.GittiModel) string {
+	currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+	var remoteItem remote.GitRemoteItem
+	if currentSelectedRemote != nil {
+		remoteItem = currentSelectedRemote.(remote.GitRemoteItem)
+	} else {
+		return ""
+	}
+
+	var vpLine strings.Builder
+
+	vpLine.WriteString("[")
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(remoteItem.Name))
+	vpLine.WriteString("]")
+	vpLine.WriteRune('\n')
+	vpLine.WriteRune('\n')
+	// Calculate the length of all labels to align URL, Fetch, and Push values
+	urlLabel := "URL:"
+	fetchLabel := i18n.LANGUAGEMAPPING.Fetch
+	pushLabel := i18n.LANGUAGEMAPPING.Push
+	urlLen := len([]rune(urlLabel))
+	fetchLen := len([]rune(fetchLabel))
+	pushLen := len([]rune(pushLabel))
+	maxLen := max(urlLen, max(fetchLen, pushLen)) + 1 // plus 1 for spacing
+
+	// Render URL with padding
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(urlLabel))
+	for i := 0; i < maxLen-urlLen; i++ {
+		vpLine.WriteString(" ")
+	}
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(remoteItem.Url))
+	vpLine.WriteRune('\n')
+
+	// Render Fetch with padding
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(fetchLabel))
+	for i := 0; i < maxLen-fetchLen; i++ {
+		vpLine.WriteString(" ")
+	}
+	if remoteItem.Fetch {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+	} else {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+		vpLine.WriteString(" ")
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+	}
+	vpLine.WriteRune('\n')
+
+	// Render Push with padding
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(pushLabel))
+	for i := 0; i < maxLen-pushLen; i++ {
+		vpLine.WriteString(" ")
+	}
+	if remoteItem.Push {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+	} else {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+		vpLine.WriteString(" ")
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+	}
+	vpLine.WriteRune('\n')
+
 	return vpLine.String()
 }
 

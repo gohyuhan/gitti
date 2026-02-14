@@ -63,6 +63,9 @@ var zH_HANT = LanguageMapping{
 	CommitLog:                           "提交記錄",
 	Stash:                               "暫存",
 	Tag:                                 "標籤",
+	Remote:                              "遠端",
+	Fetch:                               "獲取",
+	Push:                                "推送",
 	FileTypeUnSupportedPreview:          "目前選擇的檔案類型不支援預覽",
 	TerminalSizeWarning:                 "終端機太小 — 請調整大小以繼續.",
 	CurrentTerminalHeight:               "目前高度",
@@ -107,6 +110,17 @@ var zH_HANT = LanguageMapping{
 		"[d] 刪除標籤",
 		"[ctrl+p] 推送標籤",
 		"[f] 獲取標籤",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingRemoteComponentNone: []string{
+		"[</>] 切換元件",
+		"[n] 新增遠端",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingRemoteComponentDefault: []string{
+		"[</>] 切換元件",
+		"[n] 新增遠端",
+		"[d] 刪除遠端",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -365,6 +379,7 @@ var zH_HANT = LanguageMapping{
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
+	RemoteComponentKeyBinding:                                zhHantRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHantModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHantCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHantStashComponentKeyBinding,
@@ -716,7 +731,7 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		TitleOrInfoLine: "在本地分支、標籤和遠端組件之間切換",
 		LineType:        INFO,
 	},
 	{
@@ -740,7 +755,7 @@ var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "在本地分支和標籤組件之間切換",
+		TitleOrInfoLine: "在本地分支、標籤和遠端組件之間切換",
 		LineType:        INFO,
 	},
 	{
@@ -756,6 +771,40 @@ var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "推送標籤",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+}
+
+// Remote Component Key Binding for zh-hant
+var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 遠端組件面板快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支、標籤和遠端組件之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新增遠端",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "刪除遠端",
 		LineType:        INFO,
 	},
 	{

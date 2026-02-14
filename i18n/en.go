@@ -63,6 +63,9 @@ var eN = LanguageMapping{
 	CommitLog:                           "Commit Log",
 	Stash:                               "Stash",
 	Tag:                                 "Tag",
+	Remote:                              "Remote",
+	Fetch:                               "Fetch",
+	Push:                                "Push",
 	FileTypeUnSupportedPreview:          "The current selected file type is not supported for preview",
 	TerminalSizeWarning:                 "Terminal too small — resize to continue.",
 	CurrentTerminalHeight:               "Current height",
@@ -107,6 +110,17 @@ var eN = LanguageMapping{
 		"[d] delete tag",
 		"[ctrl+p] push tag",
 		"[f] fetch tag",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingRemoteComponentNone: []string{
+		"[</>] switch component",
+		"[n] new remote",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingRemoteComponentDefault: []string{
+		"[</>] switch component",
+		"[n] new remote",
+		"[d] delete remote",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -365,6 +379,7 @@ var eN = LanguageMapping{
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
+	RemoteComponentKeyBinding:                                enRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         enModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             enCommitLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 enStashComponentKeyBinding,
@@ -715,7 +730,7 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "switch between local branch and tag component",
+		TitleOrInfoLine: "switch between local branch, tag and remote component",
 		LineType:        INFO,
 	},
 	{
@@ -739,7 +754,7 @@ var enTagComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "</>",
-		TitleOrInfoLine: "switch between local branch and tag component",
+		TitleOrInfoLine: "switch between local branch, tag and remote component",
 		LineType:        INFO,
 	},
 	{
@@ -755,6 +770,40 @@ var enTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "push tag",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+}
+
+// Remote Component Key Binding for en
+var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Remote Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between local branch, tag and remote component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "new remote",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "delete remote",
 		LineType:        INFO,
 	},
 	{

@@ -16,4 +16,5 @@ const (
 	GIT_TAG_UPDATE                             = "GIT_TAG_UPDATE"
 	GIT_TAG_PUSH_OUTPUT_UPDATE                 = "GIT_TAG_PUSH_OUTPUT_UPDATE"
 	GIT_TAG_FETCH_OUTPUT_UPDATE                = "GIT_TAG_FETCH_OUTPUT_UPDATE"
+	GIT_REMOTE_UPDATE                          = "GIT_REMOTE_UPDATE"
 )

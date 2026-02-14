@@ -151,13 +151,17 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 // It parses the output to identify unique remote name-URL combinations and
 // determines if they are intended for fetching, pushing, or both.
 // It populates the gr.remote, gr.fetchRemote, and gr.pushRemote slices accordingly.
-func (gr *GitRemote) CheckRemoteExist() bool {
+func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 	gitArgs := []string{"remote", "-v"}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmd.Output()
-	gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if !passiveRunning {
+		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	}
 	if err != nil {
-		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHECK_REMOTE_OPS, err.Error()), true)
+		if !passiveRunning {
+			gr.logging.RegisterNewLog(logging.CHECK_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CHECK_REMOTE_OPS, err.Error()), true)
+		}
 		return false
 	}
 

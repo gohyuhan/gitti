@@ -70,9 +70,9 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 }
 
 // Render the Local Branches panel
-func renderLocalBranchesComponentPanel(width int, height int, m *types.GittiModel) string {
+func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.LocalBranchOrTagComponentPanel {
+	if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	var content string
@@ -81,6 +81,8 @@ func renderLocalBranchesComponentPanel(width int, height int, m *types.GittiMode
 		content = m.CurrentRepoBranchesInfoList.View()
 	case constant.SHOW_TAG:
 		content = m.CurrentRepoTagInfoList.View()
+	case constant.SHOW_REMOTE:
+		content = m.CurrentRepoRemoteInfoList.View()
 	}
 	return borderStyle.
 		Width(width).
@@ -392,7 +394,7 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		switch m.CurrentSelectedComponent {
 		case constant.GitStatusComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStatusComponent
-		case constant.LocalBranchOrTagComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
@@ -412,6 +414,13 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentNone
 				} else {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentDefault
+				}
+			case constant.SHOW_REMOTE:
+				CurrentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if CurrentSelectedRemote == nil {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingRemoteComponentNone
+				} else {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingRemoteComponentDefault
 				}
 			}
 		case constant.ModifiedFilesComponentPanel:

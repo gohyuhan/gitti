@@ -90,6 +90,9 @@ type LanguageMapping struct {
 	CommitLog                   string
 	Stash                       string
 	Tag                         string
+	Remote                      string
+	Fetch                       string
+	Push                        string
 	FileTypeUnSupportedPreview  string
 	TerminalSizeWarning         string
 	CurrentTerminalHeight       string
@@ -112,6 +115,8 @@ type LanguageMapping struct {
 	KeyBindingLocalBranchComponentNone                      []string
 	KeyBindingTagComponentNone                              []string
 	KeyBindingTagComponentDefault                           []string
+	KeyBindingRemoteComponentNone                           []string
+	KeyBindingRemoteComponentDefault                        []string
 	KeyBindingModifiedFilesComponentConflict                []string
 	KeyBindingModifiedFilesComponentIsStaged                []string
 	KeyBindingModifiedFilesComponentDefault                 []string
@@ -172,6 +177,8 @@ type LanguageMapping struct {
 	LocalBranchComponentKeyBinding []KeyBindingMappingFormat
 	// Tag Component KeyBinding
 	TagComponentKeyBinding []KeyBindingMappingFormat
+	// Remote Component KeyBinding
+	RemoteComponentKeyBinding []KeyBindingMappingFormat
 	// Modified Files Component KeyBinding
 	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Commit Log Component KeyBinding

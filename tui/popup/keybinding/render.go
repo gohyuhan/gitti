@@ -97,7 +97,7 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 	var selectedComponenti18nKeybinding []i18n.KeyBindingMappingFormat
 	var selectedComponentKeyBindingKeyMapLargestLen *int
 	switch m.CurrentSelectedComponent {
-	case constant.LocalBranchOrTagComponentPanel:
+	case constant.LocalBranchOrTagOrRemoteComponentPanel:
 		switch m.CurrentLocalBranchOrTagComponentShowing {
 		case constant.SHOW_LOCAL_BRANCH:
 			selectedComponentKeyBindingKeyMapLargestLen = &m.LocalBranchComponentKeyBindingKeyMapLargestLen
@@ -105,6 +105,9 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 		case constant.SHOW_TAG:
 			selectedComponentKeyBindingKeyMapLargestLen = &m.TagComponentKeyBindingKeyMapLargestLen
 			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.TagComponentKeyBinding
+		case constant.SHOW_REMOTE:
+			selectedComponentKeyBindingKeyMapLargestLen = &m.RemoteComponentKeyBindingKeyMapLargestLen
+			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.RemoteComponentKeyBinding
 		}
 	case constant.ModifiedFilesComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.ModifiedFilesComponentKeyBindingKeyMapLargestLen

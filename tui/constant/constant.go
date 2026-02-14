@@ -145,11 +145,11 @@ const (
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
 const (
-	GitStatusComponentPanel        = "C0" // component panel index 0
-	LocalBranchOrTagComponentPanel = "C1" // component panel index 1 (local branch component and tag component share the same panel)
-	ModifiedFilesComponentPanel    = "C2" // component panel index 2
-	CommitLogComponentPanel        = "C3" // component panel index 3
-	StashComponentPanel            = "C4" // component panel index 4
+	GitStatusComponentPanel                = "C0" // component panel index 0
+	LocalBranchOrTagOrRemoteComponentPanel = "C1" // component panel index 1 (local branch component and tag component share the same panel)
+	ModifiedFilesComponentPanel            = "C2" // component panel index 2
+	CommitLogComponentPanel                = "C3" // component panel index 3
+	StashComponentPanel                    = "C4" // component panel index 4
 
 	LogComponentPanel = "L0" // this can be selected by keybinding but not by number
 
@@ -162,7 +162,7 @@ const (
 // will be used by the key binding navigation of going to previous or next component panel
 var ComponentPanelNavigationList = []string{
 	GitStatusComponentPanel,
-	LocalBranchOrTagComponentPanel,
+	LocalBranchOrTagOrRemoteComponentPanel,
 	ModifiedFilesComponentPanel,
 	CommitLogComponentPanel,
 	StashComponentPanel,
@@ -204,4 +204,5 @@ const (
 const (
 	SHOW_LOCAL_BRANCH = "SHOW_LOCAL_BRANCH"
 	SHOW_TAG          = "SHOW_TAG"
+	SHOW_REMOTE       = "SHOW_REMOTE"
 )
