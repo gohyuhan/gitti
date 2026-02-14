@@ -54,8 +54,10 @@ type ChooseRemotePopUpModel struct {
 type (
 	GitRemoteItemDelegate struct{}
 	GitRemoteItem         struct {
-		Name string
-		Url  string
+		Name  string
+		Url   string
+		Fetch bool
+		Push  bool
 	}
 )
 

@@ -346,7 +346,7 @@ func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			} else {
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				remotes := m.GitOperations.GitRemote.Remote()
+				remotes := m.GitOperations.GitRemote.FetchRemote()
 				if len(remotes) == 1 {
 					m.PopUpType = constant.ChooseFetchTagOptionPopUp
 					// only one remote found so, we will default to that remote
@@ -404,7 +404,7 @@ func handleNonTypingpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		} else {
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
-			remotes := m.GitOperations.GitRemote.Remote()
+			remotes := m.GitOperations.GitRemote.PushRemote()
 			if len(remotes) == 1 {
 				m.PopUpType = constant.ChoosePushTypePopUp
 				// if the current pop up model is not commit pop up model, then init it and start git push service
@@ -683,7 +683,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.IsTyping.Store(true)
 					} else {
 						m.ShowPopUp.Store(true)
-						remotes := m.GitOperations.GitRemote.Remote()
+						remotes := m.GitOperations.GitRemote.FetchRemote()
 						if len(remotes) == 1 {
 							m.IsTyping.Store(true)
 							m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
@@ -925,7 +925,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						} else {
 							m.ShowPopUp.Store(true)
 							m.IsTyping.Store(false)
-							remotes := m.GitOperations.GitRemote.Remote()
+							remotes := m.GitOperations.GitRemote.PushRemote()
 							if len(remotes) == 1 {
 								m.PopUpType = constant.DeleteTagOutputPopUp
 								tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
@@ -1565,7 +1565,7 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			} else {
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				remotes := m.GitOperations.GitRemote.Remote()
+				remotes := m.GitOperations.GitRemote.PushRemote()
 				if len(remotes) == 1 {
 					m.PopUpType = constant.ChoosePushTagOptionPopUp
 					// only one remote found so, we will default to that remote

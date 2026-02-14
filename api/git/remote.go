@@ -14,7 +14,9 @@ import (
 type GitRemote struct {
 	updateChannel                 chan string
 	gitProcessLock                *GitProcessLock
-	remote                        []GitRemoteInfo
+	remote                        []GitRemoteInfo // all remote info
+	fetchRemote                   []GitRemoteInfo // if the url is for fetch
+	pushRemote                    []GitRemoteInfo // if the url is for push
 	remoteSyncStatus              RemoteSyncStatus
 	upStreamRemoteIcon            string
 	currentBranchUpStream         string
@@ -23,8 +25,10 @@ type GitRemote struct {
 }
 
 type GitRemoteInfo struct {
-	Name string
-	Url  string
+	Name  string
+	Url   string
+	Fetch bool
+	Push  bool
 }
 
 type RemoteSyncStatus struct {
@@ -54,6 +58,24 @@ func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock, lo
 // ----------------------------------
 func (gr *GitRemote) Remote() []GitRemoteInfo {
 	return gr.remote
+}
+
+// ----------------------------------
+//
+//	Return fetch related remote only
+//
+// ----------------------------------
+func (gr *GitRemote) FetchRemote() []GitRemoteInfo {
+	return gr.fetchRemote
+}
+
+// ----------------------------------
+//
+//	Return push related remote only
+//
+// ----------------------------------
+func (gr *GitRemote) PushRemote() []GitRemoteInfo {
+	return gr.pushRemote
 }
 
 // ----------------------------------
@@ -125,6 +147,10 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 	return gitAddRemoteOutput, 0
 }
 
+// CheckRemoteExist checks for existing remotes by running 'git remote -v'.
+// It parses the output to identify unique remote name-URL combinations and
+// determines if they are intended for fetching, pushing, or both.
+// It populates the gr.remote, gr.fetchRemote, and gr.pushRemote slices accordingly.
 func (gr *GitRemote) CheckRemoteExist() bool {
 	gitArgs := []string{"remote", "-v"}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -137,22 +163,53 @@ func (gr *GitRemote) CheckRemoteExist() bool {
 
 	remotes := strings.SplitSeq(strings.TrimSpace(string(gitOutput)), "\n")
 	var remoteStruct []GitRemoteInfo
+	var fetchRemoteStruct []GitRemoteInfo
+	var pushRemoteStruct []GitRemoteInfo
+
+	var uniqueRemoteMap = make(map[string]GitRemoteInfo)
+
 	for remote := range remotes {
 		remoteLinePart := strings.Fields(remote)
-		if len(remoteLinePart) < 2 {
+		if len(remoteLinePart) < 3 {
 			continue
 		}
 
-		r := GitRemoteInfo{
-			Name: remoteLinePart[0],
-			Url:  remoteLinePart[1],
+		// check if the remote unique combination (remote name + url) already exist in the map
+		// if not create one
+		key := fmt.Sprintf("%s-%s", remoteLinePart[0], remoteLinePart[1])
+		r, ok := uniqueRemoteMap[key]
+		if !ok {
+			r = GitRemoteInfo{
+				Name:  remoteLinePart[0],
+				Url:   remoteLinePart[1],
+				Fetch: false,
+				Push:  false,
+			}
 		}
 
-		if strings.TrimSpace(remoteLinePart[2]) == "(push)" {
-			remoteStruct = append(remoteStruct, r)
+		// check if the remote is fetch or push and update the info
+		typePart := strings.TrimSpace(remoteLinePart[2])
+		if typePart == "(fetch)" {
+			r.Fetch = true
+		}
+		if typePart == "(push)" {
+			r.Push = true
+		}
+		uniqueRemoteMap[key] = r
+	}
+
+	for _, r := range uniqueRemoteMap {
+		remoteStruct = append(remoteStruct, r)
+		if r.Fetch {
+			fetchRemoteStruct = append(fetchRemoteStruct, r)
+		}
+		if r.Push {
+			pushRemoteStruct = append(pushRemoteStruct, r)
 		}
 	}
 	gr.remote = remoteStruct
+	gr.fetchRemote = fetchRemoteStruct
+	gr.pushRemote = pushRemoteStruct
 	return len(gr.remote) > 0
 }
 
