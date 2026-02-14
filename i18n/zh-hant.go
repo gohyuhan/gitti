@@ -120,7 +120,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingRemoteComponentDefault: []string{
 		"[</>] 切換元件",
 		"[n] 新增遠端",
-		"[d] 刪除遠端",
+		"[d] 移除遠端",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -376,6 +376,10 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForFetchTagOutputPopUp: []string{
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForRemoveRemoteConfirmationPopUp: []string{
+		"[enter] 移除遠端",
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -535,6 +539,7 @@ var zH_HANT = LanguageMapping{
 	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地儲存庫獲取並鏡像標籤，以與遠端儲存庫完全匹配",
 	FetchTagOutputPopUpTitle:                                 "獲取標籤",
 	FetchTagFetching:                                         "正在獲取標籤...",
+	RemoveRemoteTitle:                                        "你確定要移除遠端存放庫 [%s] 嗎？",
 }
 
 // for about gitti
@@ -804,7 +809,7 @@ var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "d",
-		TitleOrInfoLine: "刪除遠端",
+		TitleOrInfoLine: "移除遠端",
 		LineType:        INFO,
 	},
 	{

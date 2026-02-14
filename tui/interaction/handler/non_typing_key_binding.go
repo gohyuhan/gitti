@@ -10,6 +10,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
+	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -170,6 +171,15 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					tagItem := selectedTagItem.(tag.GitTagItem)
 					tagPopUp.InitChooseDeleteTagOptionPopUpModel(m, tagItem.TagName)
 					m.PopUpType = constant.ChooseDeleteTagOptionPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+				}
+			case constant.SHOW_REMOTE:
+				selectedRemoteItem := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if selectedRemoteItem != nil {
+					remoteItem := selectedRemoteItem.(remote.GitRemoteItem)
+					remotePopUp.InitRemoveRemoteConfirmationPopUpModel(m, remoteItem.Name, remoteItem.Url, remoteItem.Fetch, remoteItem.Push)
+					m.PopUpType = constant.RemoveRemoteConfirmationPopUp
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
 				}
@@ -380,6 +390,15 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				m.ShowPopUp.Store(true)
 				if _, ok := m.PopUpModel.(*branchPopUp.ChooseNewBranchTypeOptionPopUpModel); !ok {
 					branchPopUp.InitChooseNewBranchTypePopUpModel(m)
+				}
+			case constant.SHOW_REMOTE:
+				m.PopUpType = constant.AddRemotePromptPopUp
+				m.IsTyping.Store(true)
+				m.ShowPopUp.Store(true)
+				if m.GitOperations.GitRemote.CheckRemoteExist(false) {
+					remotePopUp.InitAddRemotePromptPopUpModel(m, false)
+				} else {
+					remotePopUp.InitAddRemotePromptPopUpModel(m, true)
 				}
 			}
 		}
@@ -1006,6 +1025,16 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					return m, nil
 				}
 			}
+		case constant.RemoveRemoteConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*remotePopUp.RemoveRemoteConfirmationPopUpModel)
+			if ok {
+				services.GitRemoveRemoteService(m, popUp.RemoteName)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+				m.PopUpType = constant.NoPopUp
+				return m, nil
+			}
 		}
 	}
 	return m, nil
@@ -1171,7 +1200,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.ChooseDeleteTagOptionPopUp,
 			constant.ChooseRemoteForDeleteRemoteTagPopUp,
 			constant.ChoosePushTagOptionPopUp,
-			constant.ChooseFetchTagOptionPopUp:
+			constant.ChooseFetchTagOptionPopUp,
+			constant.RemoveRemoteConfirmationPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

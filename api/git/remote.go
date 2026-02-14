@@ -107,7 +107,7 @@ func (gr *GitRemote) CurrentBranchUpStream() string {
 
 // ----------------------------------
 //
-//	Related to Git Remote
+//	Related to add Remote
 //
 // ----------------------------------
 func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url string) ([]string, int) {
@@ -147,6 +147,30 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 	return gitAddRemoteOutput, 0
 }
 
+// ----------------------------------
+//
+//	Related to delete Remote
+//
+// ----------------------------------
+func (gr *GitRemote) GitRemoveRemote(remoteName string) {
+	if !gr.gitProcessLock.CanProceedWithGitOps() {
+		gr.logging.RegisterNewLog(logging.REMOVE_REMOTE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gr.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	gitArgs := []string{"remote", "remove", remoteName}
+	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gr.logging.RegisterNewLog(logging.REMOVE_REMOTE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := cmd.Run()
+	if err != nil {
+		gr.logging.RegisterNewLog(logging.REMOVE_REMOTE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REMOVE_REMOTE_OPS, err.Error()), true)
+	}
+}
+
 // CheckRemoteExist checks for existing remotes by running 'git remote -v'.
 // It parses the output to identify unique remote name-URL combinations and
 // determines if they are intended for fetching, pushing, or both.
@@ -170,7 +194,7 @@ func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 	var fetchRemoteStruct []GitRemoteInfo
 	var pushRemoteStruct []GitRemoteInfo
 
-	var uniqueRemoteMap = make(map[string]GitRemoteInfo)
+	uniqueRemoteMap := make(map[string]GitRemoteInfo)
 
 	for remote := range remotes {
 		remoteLinePart := strings.Fields(remote)

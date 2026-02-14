@@ -120,7 +120,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingRemoteComponentDefault: []string{
 		"[</>] 切换组件",
 		"[n] 新建远程",
-		"[d] 删除远程",
+		"[d] 移除远程",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -376,6 +376,10 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForFetchTagOutputPopUp: []string{
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForRemoveRemoteConfirmationPopUp: []string{
+		"[enter] 移除远程",
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -535,6 +539,7 @@ var zH_HANS = LanguageMapping{
 	FetchTagPopUpFetchMirrorTagOptionInfo:                    "在本地仓库获取并镜像标签，以与远程仓库完全匹配",
 	FetchTagOutputPopUpTitle:                                 "获取标签",
 	FetchTagFetching:                                         "正在获取标签...",
+	RemoveRemoteTitle:                                        "你确定要移除远程仓库 [%s] 吗？",
 }
 
 // for about gitti
@@ -804,7 +809,7 @@ var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "d",
-		TitleOrInfoLine: "删除远程",
+		TitleOrInfoLine: "移除远程",
 		LineType:        INFO,
 	},
 	{

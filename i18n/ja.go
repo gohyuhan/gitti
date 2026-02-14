@@ -376,6 +376,10 @@ var jA = LanguageMapping{
 	KeyBindingForFetchTagOutputPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForRemoveRemoteConfirmationPopUp: []string{
+		"[enter] リモートを削除",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -535,6 +539,7 @@ var jA = LanguageMapping{
 	FetchTagPopUpFetchMirrorTagOptionInfo:                    "ローカルリポジトリのタグをリモートリポジトリと完全に一致するようにフェッチしてミラーリングします",
 	FetchTagOutputPopUpTitle:                                 "タグのフェッチ",
 	FetchTagFetching:                                         "タグをフェッチ中...",
+	RemoveRemoteTitle:                                        "リモート [%s] を削除してもよろしいですか？",
 }
 
 // for about gitti

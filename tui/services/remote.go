@@ -87,3 +87,14 @@ func GitAddRemoteCancelService(m *types.GittiModel) {
 		popUp.ProcessSuccess.Store(false)
 	}
 }
+
+// ------------------------------------
+//
+//	For Removal of Remote
+//
+// ------------------------------------
+func GitRemoveRemoteService(m *types.GittiModel, remoteName string) {
+	go func() {
+		m.GitOperations.GitRemote.GitRemoveRemote(remoteName)
+	}()
+}

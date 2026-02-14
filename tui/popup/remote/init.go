@@ -68,3 +68,12 @@ func InitChooseRemotePopUpModel(m *types.GittiModel, remoteList []git.GitRemoteI
 		Action:     action,
 	}
 }
+
+func InitRemoveRemoteConfirmationPopUpModel(m *types.GittiModel, name string, url string, fetch bool, push bool) {
+	m.PopUpModel = &RemoveRemoteConfirmationPopUpModel{
+		RemoteName: name,
+		RemoteUrl:  url,
+		Fetch:      fetch,
+		Push:       push,
+	}
+}

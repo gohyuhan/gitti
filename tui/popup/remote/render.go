@@ -1,6 +1,9 @@
 package remote
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
@@ -101,6 +104,71 @@ func RenderChooseRemotePopUp(m *types.GittiModel) string {
 			lipgloss.Left,
 			title,
 			popUp.RemoteList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+func RenderRemoveRemoteConfirmationPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*RemoveRemoteConfirmationPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxRemoveRemoteConfirmationPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.RemoveRemoteTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(popUp.RemoteName)))
+
+		var remoteInfo strings.Builder
+		urlLabel := "URL:"
+		fetchLabel := i18n.LANGUAGEMAPPING.Fetch
+		pushLabel := i18n.LANGUAGEMAPPING.Push
+		urlLen := len([]rune(urlLabel))
+		fetchLen := len([]rune(fetchLabel))
+		pushLen := len([]rune(pushLabel))
+		maxLen := max(urlLen, max(fetchLen, pushLen)) + 1 // plus 1 for spacing
+
+		// Render URL with padding
+		remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(urlLabel))
+		for i := 0; i < maxLen-urlLen; i++ {
+			remoteInfo.WriteString(" ")
+		}
+		remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(popUp.RemoteUrl))
+		remoteInfo.WriteRune('\n')
+
+		// Render Fetch with padding
+		remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(fetchLabel))
+		for i := 0; i < maxLen-fetchLen; i++ {
+			remoteInfo.WriteString(" ")
+		}
+		if popUp.Fetch {
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		} else {
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+			remoteInfo.WriteString(" ")
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		}
+		remoteInfo.WriteRune('\n')
+
+		// Render Push with padding
+		remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(pushLabel))
+		for i := 0; i < maxLen-pushLen; i++ {
+			remoteInfo.WriteString(" ")
+		}
+		if popUp.Push {
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		} else {
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+			remoteInfo.WriteString(" ")
+			remoteInfo.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		}
+
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			"",
+			remoteInfo.String(),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}

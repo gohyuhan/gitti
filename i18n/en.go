@@ -120,7 +120,7 @@ var eN = LanguageMapping{
 	KeyBindingRemoteComponentDefault: []string{
 		"[</>] switch component",
 		"[n] new remote",
-		"[d] delete remote",
+		"[d] remove remote",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -376,6 +376,10 @@ var eN = LanguageMapping{
 	KeyBindingForFetchTagOutputPopUp: []string{
 		"[esc] cancel / close",
 	},
+	KeyBindingForRemoveRemoteConfirmationPopUp: []string{
+		"[enter] remove remote",
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -535,6 +539,7 @@ var eN = LanguageMapping{
 	FetchTagPopUpFetchMirrorTagOptionInfo:                    "Fetch and mirror tag(s) on local repository to match remote repository exactly",
 	FetchTagOutputPopUpTitle:                                 "Fetch Tag(s)",
 	FetchTagFetching:                                         "Fetching tag(s)...",
+	RemoveRemoteTitle:                                        "Are you sure you want to remove remote [%s]?",
 }
 
 // for about gitti
@@ -803,7 +808,7 @@ var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "d",
-		TitleOrInfoLine: "delete remote",
+		TitleOrInfoLine: "remove remote",
 		LineType:        INFO,
 	},
 	{

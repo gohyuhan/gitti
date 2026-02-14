@@ -100,3 +100,15 @@ func (d GitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, list
 
 	fmt.Fprint(w, fn(fullStr))
 }
+
+// ---------------------------------
+//
+// remove remote confirmation
+//
+// ---------------------------------
+type RemoveRemoteConfirmationPopUpModel struct {
+	RemoteName string
+	RemoteUrl  string
+	Fetch      bool
+	Push       bool
+}
