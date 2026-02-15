@@ -81,6 +81,9 @@ type GittiModel struct {
 	DetailPanelViewportOGStringArray                 []string
 	DetailPanelTwoViewportOGStringArray              []string
 	CherryPickedCommitInfo                           CherryPickedCommitInfo
+	GitCommitRequireSigning                          bool
+	GitTagRequireSigning                             bool
+	GitPushRequireSigning                            bool
 }
 
 // ---------------------------------
@@ -130,4 +133,9 @@ type GittiLineEditingIndexPositionAndInfo struct {
 // ---------------------------------
 type EditorFinishedMsg struct {
 	Err error
+}
+
+type GitOperationRequiredSigningFinishedMsg struct {
+	GitOperationOpsTypeForLogging string // for logging purpose
+	Err                           error
 }

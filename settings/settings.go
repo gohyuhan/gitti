@@ -37,6 +37,7 @@ type GittiConfigSettings struct {
 	AllowCommitGraphWrite           bool      `json:"allow_commit_graph_write"`
 	MaxLogCount                     int       `json:"max_log_count"`
 	ShowXLog                        int       `json:"show_x_log"`
+	OverrideSigningUISuspend        bool      `json:"override_signing_ui_suspend"`
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
@@ -54,6 +55,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	AllowCommitGraphWrite:           true,
 	MaxLogCount:                     300,
 	ShowXLog:                        3,
+	OverrideSigningUISuspend:        false,
 }
 
 // getConfigPath returns the config.json path (creates directories if needed)

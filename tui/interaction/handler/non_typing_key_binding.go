@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"slices"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
@@ -142,7 +144,16 @@ func handleNonTypingcKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 
 func handleNonTypingCKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
-		services.GitStateUniversalUtilsContinueService(m)
+		if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+			gitArgs := m.GitOperations.GitStateUniversalUtils.GitUniversalContinueWithSigning()
+			if len(gitArgs) < 1 {
+				return m, nil
+			}
+			return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.COMMIT_WITH_SIGNING_OPS)
+		} else {
+			services.GitStateUniversalUtilsContinueService(m)
+			return m, nil
+		}
 	}
 	return m, nil
 }
@@ -698,11 +709,16 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.ChoosePushTypePopUp:
 			popUp, ok := m.PopUpModel.(*pushPopUp.ChoosePushTypePopUpModel)
 			if ok {
-				m.PopUpType = constant.GitRemotePushPopUp
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(false)
 				selectedOption := popUp.PushOptionList.SelectedItem()
-				return services.InitGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(pushPopUp.GitPushOptionItem).PushType)
+				if m.GitPushRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitCommit.GitPushWithSigning(popUp.RemoteName, selectedOption.(pushPopUp.GitPushOptionItem).PushType, m.CheckOutBranch)
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.GIT_PUSH_WITH_SIGNING_OPS)
+				} else {
+					m.PopUpType = constant.GitRemotePushPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					return services.InitGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(pushPopUp.GitPushOptionItem).PushType)
+				}
 			}
 
 		case constant.ChooseNewBranchTypePopUp:
@@ -766,17 +782,23 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.ChooseGitPullTypePopUp:
 			popUp, ok := m.PopUpModel.(*pullPopUp.ChooseGitPullTypePopUpModel)
 			if ok {
-				m.PopUpType = constant.GitPullOutputPopUp
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(false)
 				selectedOption := popUp.PullTypeOptionList.SelectedItem().(pullPopUp.GitPullTypeOptionItem)
-				pullPopUp.InitGitPullOutputPopUpModel(m)
-				popUp, ok := m.PopUpModel.(*pullPopUp.GitPullOutputPopUpModel)
-				if ok {
-					popUp.IsProcessing.Store(true) // set it directly first
-					// start the git pull service
-					services.GitPullService(m, selectedOption.PullType)
-					return m, popUp.Spinner.Tick
+
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitPull.GitPullWithSigning(selectedOption.PullType)
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.GIT_PULL_WITH_SIGNING_OPS)
+				} else {
+					m.PopUpType = constant.GitPullOutputPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					pullPopUp.InitGitPullOutputPopUpModel(m)
+					popUp, ok := m.PopUpModel.(*pullPopUp.GitPullOutputPopUpModel)
+					if ok {
+						popUp.IsProcessing.Store(true) // set it directly first
+						// start the git pull service
+						services.GitPullService(m, selectedOption.PullType)
+						return m, popUp.Spinner.Tick
+					}
 				}
 			}
 		case constant.GitDiscardTypeOptionPopUp:
@@ -905,11 +927,34 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				}
 			}
 		case constant.GitCherryPickApplyConfirmPopUp:
-			services.GitCherryPickService(m, m.CherryPickedCommitInfo.CherryPickedCommitMap)
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpModel = nil
-			m.PopUpType = constant.NoPopUp
+			if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+				var sortedCherryPickedCommitLogs []git.CherryPickedCommitLog
+				// turn the hashmap into array first
+				for _, commitLogItem := range m.CherryPickedCommitInfo.CherryPickedCommitMap {
+					sortedCherryPickedCommitLogs = append(sortedCherryPickedCommitLogs, commitLogItem)
+				}
+
+				// sort the array based on user selection sequence
+				slices.SortFunc(sortedCherryPickedCommitLogs, func(a, b git.CherryPickedCommitLog) int {
+					return a.UserSelectedSequence - b.UserSelectedSequence
+				})
+
+				// harvest the commit hash
+				var cherryPickedCommitHashes []string
+				for _, commitLog := range sortedCherryPickedCommitLogs {
+					cherryPickedCommitHashes = append(cherryPickedCommitHashes, commitLog.Hash)
+				}
+
+				gitArgs := m.GitOperations.GitCommitLog.GitCherryPickWithSigning(cherryPickedCommitHashes)
+				return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CHERRY_PICK_WITH_SIGNING_OPS)
+			} else {
+				services.GitCherryPickService(m, m.CherryPickedCommitInfo.CherryPickedCommitMap)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+				m.PopUpType = constant.NoPopUp
+				return m, nil
+			}
 		case constant.GitDiscardFileLineChangeConfirmPopUp:
 			if m.IsLineEditingState.Load() {
 				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -926,10 +971,16 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.CreateTagConfirmationPopUp:
 			popUp, ok := m.PopUpModel.(*tagPopUp.CreateTagConfirmationPopUpModel)
 			if ok {
-				services.CreateNewTagService(m, popUp.CommitHash, popUp.TagName, popUp.TagMessage)
-				m.PopUpType = constant.NoPopUp
-				m.ShowPopUp.Store(false)
-				m.IsTyping.Store(false)
+				if m.GitTagRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitTag.CreateNewTagWithSigning(popUp.CommitHash, popUp.TagName, popUp.TagMessage)
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CREATE_NEW_TAG_WITH_SIGNING_OPS)
+				} else {
+					services.CreateNewTagService(m, popUp.CommitHash, popUp.TagName, popUp.TagMessage)
+					m.PopUpType = constant.NoPopUp
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					return m, nil
+				}
 			}
 		case constant.ChooseDeleteTagOptionPopUp:
 			popUp, ok := m.PopUpModel.(*tagPopUp.ChooseDeleteTagOptionPopUpModel)
@@ -967,14 +1018,19 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 							m.IsTyping.Store(false)
 							remotes := m.GitOperations.GitRemote.PushRemote()
 							if len(remotes) == 1 {
-								m.PopUpType = constant.DeleteTagOutputPopUp
-								tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
-								services.DeleteTagService(m, remotes[0].Name, popUp.TagName, git.TAGDELETEREMOTE)
+								if m.GitPushRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+									gitArgs := m.GitOperations.GitTag.GitDeleteRemoteTagWithSigning(remotes[0].Name, popUp.TagName)
+									return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.TAG_REMOTE_DELETE_WITH_SIGNING_OPS)
+								} else {
+									m.PopUpType = constant.DeleteTagOutputPopUp
+									tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
+									services.DeleteTagService(m, remotes[0].Name, popUp.TagName, git.TAGDELETEREMOTE)
 
-								// to return the tick for the spinner
-								tagOutputPopUp, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel)
-								if ok {
-									return m, tagOutputPopUp.Spinner.Tick
+									// to return the tick for the spinner
+									tagOutputPopUp, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel)
+									if ok {
+										return m, tagOutputPopUp.Spinner.Tick
+									}
 								}
 							} else if len(remotes) > 1 {
 								m.PopUpType = constant.ChooseRemoteForDeleteRemoteTagPopUp
@@ -991,15 +1047,20 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				if selectedRemote != nil {
 					remote := selectedRemote.(tagPopUp.GitRemoteForDeleteRemoteTagItem)
 					m.PopUpType = constant.DeleteTagOutputPopUp
-					tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
-					m.ShowPopUp.Store(true)
-					m.IsTyping.Store(false)
-					services.DeleteTagService(m, remote.Name, popUp.TagName, git.TAGDELETEREMOTE)
+					if m.GitPushRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+						gitArgs := m.GitOperations.GitTag.GitDeleteRemoteTagWithSigning(remote.Name, popUp.TagName)
+						return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.TAG_REMOTE_DELETE_WITH_SIGNING_OPS)
+					} else {
+						tagPopUp.InitDeleteTagOutputPopUpModel(m, popUp.TagName)
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						services.DeleteTagService(m, remote.Name, popUp.TagName, git.TAGDELETEREMOTE)
 
-					// to return the tick for the spinner
-					tagOutputPopUp, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel)
-					if ok {
-						return m, tagOutputPopUp.Spinner.Tick
+						// to return the tick for the spinner
+						tagOutputPopUp, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel)
+						if ok {
+							return m, tagOutputPopUp.Spinner.Tick
+						}
 					}
 				}
 			}
@@ -1011,11 +1072,16 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				tagName := popUp.TagName
 				if selectedPushType != nil {
 					m.PopUpType = constant.PushTagOutputPopUp
-					tagPopUp.InitPushTagOutputPopUpModel(m)
-					popUp, ok := m.PopUpModel.(*tagPopUp.PushTagOutputPopUpModel)
-					if ok {
-						services.GitPushTagService(m, originName, tagName, selectedPushType.(tagPopUp.PushTagOptionItem).PushTagType)
-						return m, popUp.Spinner.Tick
+					if m.GitPushRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+						gitArgs := m.GitOperations.GitTag.GitPushTagWithSigning(originName, tagName, selectedPushType.(tagPopUp.PushTagOptionItem).PushTagType)
+						return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.TAG_PUSH_WITH_SIGNING_OPS)
+					} else {
+						tagPopUp.InitPushTagOutputPopUpModel(m)
+						popUp, ok := m.PopUpModel.(*tagPopUp.PushTagOutputPopUpModel)
+						if ok {
+							services.GitPushTagService(m, originName, tagName, selectedPushType.(tagPopUp.PushTagOptionItem).PushTagType)
+							return m, popUp.Spinner.Tick
+						}
 					}
 				} else {
 					m.ShowPopUp.Store(false)

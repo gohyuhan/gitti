@@ -48,8 +48,12 @@ func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context
 			contentString.WriteString(" ")
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(log.OpsType))
 			contentString.WriteRune('\n')
-			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
-			contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(log.OpsDescription))
+			logDescriptionArray := strings.Split(log.OpsDescription, "\n")
+			for _, logDescription := range logDescriptionArray {
+				contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
+				contentString.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(logDescription))
+				contentString.WriteRune('\n')
+			}
 		case logging.ERROR:
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsTimeString))
 			contentString.WriteString("  ")
@@ -57,8 +61,12 @@ func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context
 			contentString.WriteString(" ")
 			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsType))
 			contentString.WriteRune('\n')
-			contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
-			contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(log.OpsDescription))
+			logDescriptionArray := strings.Split(log.OpsDescription, "\n")
+			for _, logDescription := range logDescriptionArray {
+				contentString.WriteString(strings.Repeat(" ", opsTimeStringCharCount+2))
+				contentString.WriteString(style.NewStyle.Foreground(style.ColorError).Render(logDescription))
+				contentString.WriteRune('\n')
+			}
 		}
 
 		contentString.WriteRune('\n')

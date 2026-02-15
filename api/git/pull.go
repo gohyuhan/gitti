@@ -140,6 +140,21 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 	return 0
 }
 
+// GitPullWithSigning constructs the git pull command arguments for execution in the terminal.
+// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+func (gp *GitPull) GitPullWithSigning(pullType string) []string {
+	var gitPullArgs []string
+	switch pullType {
+	case GITPULL:
+		gitPullArgs = []string{"pull", "--progress", "--no-edit"}
+	case GITPULLREBASE:
+		gitPullArgs = []string{"pull", "--progress", "--rebase", "--autostash", "--no-edit"}
+	case GITPULLMERGE:
+		gitPullArgs = []string{"pull", "--progress", "--no-rebase", "--no-edit"}
+	}
+	return gitPullArgs
+}
+
 // --------------------------------
 //
 // # Clear the Git Process Output
