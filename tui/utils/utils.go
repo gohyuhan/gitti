@@ -1,14 +1,19 @@
 package utils
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"os/exec"
 	"strings"
 
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
+	tea "charm.land/bubbletea/v2"
 
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
 	"golang.org/x/text/width"
@@ -48,6 +53,8 @@ func TruncateString(s string, maxWidth int) string {
 	return string(result)
 }
 
+// ListCounterHelper returns a function that generates a counter display e.g. ("3/10")
+// showing the current item position in the list for the main left panel.
 func ListCounterHelper(m *types.GittiModel, list *list.Model) func() []key.Binding {
 	return func() []key.Binding {
 		currentIndex := list.Index() + 1
@@ -66,6 +73,8 @@ func ListCounterHelper(m *types.GittiModel, list *list.Model) func() []key.Bindi
 	}
 }
 
+// PopUpListCounterHelper returns a function that generates a counter display e.g. ("3/10")
+// showing the current item position in the list for pop-up dialogs.
 func PopUpListCounterHelper(m *types.GittiModel, list *list.Model, maxWidth int) func() []key.Binding {
 	return func() []key.Binding {
 		currentIndex := list.Index() + 1
@@ -85,6 +94,8 @@ func PopUpListCounterHelper(m *types.GittiModel, list *list.Model, maxWidth int)
 	}
 }
 
+// ReturnEditorLaunchCommand creates a command to launch the specified editor with the given file.
+// Returns the exec.Cmd to run and a boolean indicating if it's a non-terminal editor (true for GUI editors like VS Code).
 func ReturnEditorLaunchCommand(fileName string, userSetEditor string) (*exec.Cmd, bool) {
 	filepath := "."
 	if fileName != "" {
@@ -127,7 +138,28 @@ func ReturnEditorLaunchCommand(fileName string, userSetEditor string) (*exec.Cmd
 	return cmd, isNonTerminalEditor
 }
 
+// ReinitCherryPickedCommitInfo resets the cherry-pick tracking information in the model,
+// clearing all previously stored cherry-pick data.
 func ReinitCherryPickedCommitInfo(m *types.GittiModel) {
 	m.CherryPickedCommitInfo.LatestSequenceCounter = 0
 	m.CherryPickedCommitInfo.CherryPickedCommitMap = make(map[string]git.CherryPickedCommitLog)
+}
+
+func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand []string, GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
+	cmd := exec.Command("git", gitCommand...)
+	var stderr bytes.Buffer
+	cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
+
+	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(gitCommand, " "), logging.INFO, "", true)
+	return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
+		if err != nil {
+			if stderrStr := strings.TrimSpace(stderr.String()); stderrStr != "" {
+				err = fmt.Errorf("%w\n\n%s", err, stderrStr)
+			}
+		}
+		return types.GitOperationRequiredSigningFinishedMsg{
+			GitOperationOpsTypeForLogging: GitOperationOpsTypeForLogging,
+			Err:                           err,
+		}
+	})
 }

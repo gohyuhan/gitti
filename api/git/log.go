@@ -505,6 +505,15 @@ func (gCL *GitCommitLog) GitCherryPick(cherryPickedCommitHashes []string) {
 	}
 }
 
+// GitCherryPickWithSigning constructs the git cherry-pick command arguments for execution in the terminal.
+// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+func (gCL *GitCommitLog) GitCherryPickWithSigning(cherryPickedCommitHashes []string) []string {
+	topoOrderedCherryPickedCommitHashes := gCL.topoOrderCherryPickedCommit(cherryPickedCommitHashes)
+	gitArgs := []string{"cherry-pick"}
+	gitArgs = append(gitArgs, topoOrderedCherryPickedCommitHashes...)
+	return gitArgs
+}
+
 // ----------------------------------
 //
 // Helper to topo order cherry picked commit to prevent cherry pick conflict

@@ -84,6 +84,32 @@ func (gSUU *GitStateUniversalUtils) GitUniversalContinue() {
 	}
 }
 
+// GitUniversalContinueWithSigning constructs a git continue command for terminal execution when signing is required.
+// When signing is enabled, gitti UI is suspended and the continue operation is executed directly in the terminal,
+// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+// This function detects the current git operation in progress and builds the appropriate continue command.
+func (gSUU *GitStateUniversalUtils) GitUniversalContinueWithSigning() []string {
+	var gitArgs []string
+
+	if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "rebase-apply/applying") {
+		gitArgs = []string{"am", "--continue"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "rebase-merge") {
+		gitArgs = []string{"rebase", "--continue"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "rebase-apply") {
+		gitArgs = []string{"rebase", "--continue"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "MERGE_HEAD") {
+		gitArgs = []string{"merge", "--continue"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "CHERRY_PICK_HEAD") {
+		gitArgs = []string{"cherry-pick", "--continue"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "REVERT_HEAD") {
+		gitArgs = []string{"revert", "--continue"}
+	} else if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "NOTES_MERGE_WORKTREE") {
+		gitArgs = []string{"notes", "merge", "--commit"}
+	}
+
+	return gitArgs
+}
+
 // --------------------------------
 //
 // GitUniversalAbort aborts the current Git operation (rebase, merge, am, etc.)

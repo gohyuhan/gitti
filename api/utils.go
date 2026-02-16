@@ -16,6 +16,7 @@ import (
 	"github.com/gohyuhan/gitti/settings"
 )
 
+// check if git was installed
 func IsGitInstalled(repoPath string) {
 	gitArgs := []string{"--version"}
 
@@ -45,6 +46,7 @@ func IsRepoGitInitialized(repoPath string) GitRepoPath {
 	return gitPathInfo
 }
 
+// to prompt user if they want to git init current dir if .git is not detected
 func PromptUserForGitInitConfirmation(repoPath string) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -79,6 +81,7 @@ func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogg
 	}
 }
 
+// to check and validate if the input branch name is valid and also to generate the valid branch name
 func IsBranchNameValid(branchName string) (string, bool) {
 	// Git-invalid characters anywhere (except space which we replace with "-")
 	// These characters must be removed entirely.
@@ -152,6 +155,9 @@ func IsBranchNameValid(branchName string) (string, bool) {
 	return modified, isValid
 }
 
+// get the top-level and absolute git path
+// top-level eg: /Users/<username>/Projects/<example-project>
+// absolute-path eg: /Users/<username>/Projects/<example-project>/.git
 func getGitPathInfo() (GitRepoPath, error) {
 	// get the most absolute git folder path
 	absGitPathArgs := []string{"rev-parse", "--absolute-git-dir"}
@@ -179,4 +185,44 @@ func getGitPathInfo() (GitRepoPath, error) {
 	}
 
 	return gitRepoPath, nil
+}
+
+// check git operation if require signing
+func CheckSigningRequiredOperation() (bool, bool, bool) {
+	var commitRequireSigning bool
+	var tagRequireSigning bool
+	var pushRequireSigning bool
+
+	commitSigningGitArgs := []string{"config", "--type=bool", "commit.gpgsign"}
+	tagSigningGitArgs := []string{"config", "--type=bool", "tag.gpgsign"}
+	pushSigningGitArgs := []string{"config", "get", "push.gpgsign"}
+
+	commitSigningCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(commitSigningGitArgs, false)
+	tagSigningCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(tagSigningGitArgs, false)
+	pushSigningCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(pushSigningGitArgs, false)
+
+	commitRequireSigningOutput, commitRequireSigningErr := commitSigningCmdExecutor.Output()
+	tagRequireSigningOutput, tagRequireSigningErr := tagSigningCmdExecutor.Output()
+	pushRequireSigningOutput, pushRequireSigningErr := pushSigningCmdExecutor.Output()
+
+	if commitRequireSigningErr != nil {
+		commitRequireSigning = false
+	} else {
+		commitRequireSigning = strings.ToLower(strings.TrimSpace(string(commitRequireSigningOutput))) == "true"
+	}
+
+	if tagRequireSigningErr != nil {
+		tagRequireSigning = false
+	} else {
+		tagRequireSigning = strings.ToLower(strings.TrimSpace(string(tagRequireSigningOutput))) == "true"
+	}
+
+	if pushRequireSigningErr != nil {
+		pushRequireSigning = false
+	} else {
+		output := strings.ToLower(strings.TrimSpace(string(pushRequireSigningOutput)))
+		pushRequireSigning = output == "true" || output == "if-asked"
+	}
+
+	return commitRequireSigning, tagRequireSigning, pushRequireSigning
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/logging"
@@ -87,7 +88,7 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 	if isAmendCommit {
 		gitArgs = []string{"commit", "--amend", "-m", message}
 	}
-	if len(description) > 0 {
+	if utf8.RuneCountInString(description) > 0 {
 		gitArgs = append(gitArgs, "-m", description)
 	}
 
@@ -177,6 +178,21 @@ func (gc *GitCommit) ClearGitCommitOutput() {
 	gc.gitCommitOutputMu.Lock()
 	defer gc.gitCommitOutputMu.Unlock()
 	gc.gitCommitOutput = []string{}
+}
+
+// GitCommitWithSigning constructs a git commit command for terminal execution when signing is required.
+// When commit signing is enabled, gitti UI is suspended and the commit is executed directly in the terminal,
+// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+func (gc *GitCommit) GitCommitWithSigning(message, description string, isAmendCommit bool) []string {
+	gitArgs := []string{"commit", "-m", message}
+	if isAmendCommit {
+		gitArgs = []string{"commit", "--amend", "-m", message}
+	}
+	if utf8.RuneCountInString(description) > 0 {
+		gitArgs = append(gitArgs, "-m", description)
+	}
+
+	return gitArgs
 }
 
 // ----------------------------------
@@ -313,6 +329,36 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	}
 
 	return 0
+}
+
+// GitPushWithSigning constructs a git push command for terminal execution when signing is required.
+// When push signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
+// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+func (gc *GitCommit) GitPushWithSigning(originName string, pushType string, currentCheckOutBranch string) []string {
+	var gitArgs []string
+
+	// check if the checkoutbranch has upstream if not include "-u" flag
+	_, hasUpstream := hasUpStream()
+	if !hasUpstream {
+		gitArgs = []string{"push", "-u"}
+	} else {
+		gitArgs = []string{"push"}
+	}
+	switch pushType {
+	case FORCEPUSHSAFE:
+		gitArgs = append(gitArgs, []string{"--progress", "--force-with-lease", originName}...)
+	case FORCEPUSHDANGEROUS:
+		gitArgs = append(gitArgs, []string{"--progress", "--force", originName}...)
+	default:
+		gitArgs = append(gitArgs, []string{"--progress", originName}...)
+	}
+
+	// include the current checkout branch name at the end if there was no upstream so that git know which branch to push
+	if !hasUpstream {
+		gitArgs = append(gitArgs, currentCheckOutBranch)
+	}
+
+	return gitArgs
 }
 
 func (gc *GitCommit) ClearGitRemotePushOutput() {

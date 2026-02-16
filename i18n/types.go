@@ -42,17 +42,18 @@ type LanguageMapping struct {
 	UpdaterAutoUpdaterDisable           string
 	UpdaterAutoUpdaterSetError          string
 	// flag expalnation
-	FlagVersion               string
-	FlagLangCode              string
-	FlagInitDefaultBranch     string
-	FlagAutoUpdate            string
-	FlagUpdate                string
-	FlagGlobal                string
-	FlagEditor                string
-	FlagMaxCommitLogCount     string
-	FlagAllowCommitGraphWrite string
-	FlagMaxLogCount           string
-	FlagShowXLog              string
+	FlagVersion                  string
+	FlagLangCode                 string
+	FlagInitDefaultBranch        string
+	FlagAutoUpdate               string
+	FlagUpdate                   string
+	FlagGlobal                   string
+	FlagEditor                   string
+	FlagMaxCommitLogCount        string
+	FlagAllowCommitGraphWrite    string
+	FlagMaxLogCount              string
+	FlagShowXLog                 string
+	FlagOverrideSigningUISuspend string
 	// Run Error
 	FailToGetCWD                string
 	TuiRunFail                  string
@@ -70,20 +71,23 @@ type LanguageMapping struct {
 	EditorSetError    string
 	EditorSetSuccess  string
 	// Gitti terminal text
-	GitNotInstalledError           string
-	GitNotInitPrompt               string
-	GitInitRefuse                  string
-	GitInitPromptInvalidInput      string
-	GitCertainStateStillInProgress string
-	MaxCommitLogCountSet           string
-	MaxCommitLogCountSetError      string
-	AllowCommitGraphWriteEnabled   string
-	AllowCommitGraphWriteDisabled  string
-	AllowCommitGraphWriteSetError  string
-	MaxLogCountSet                 string
-	MaxLogCountSetError            string
-	ShowXLogSet                    string
-	ShowXLogSetError               string
+	GitNotInstalledError             string
+	GitNotInitPrompt                 string
+	GitInitRefuse                    string
+	GitInitPromptInvalidInput        string
+	GitCertainStateStillInProgress   string
+	MaxCommitLogCountSet             string
+	MaxCommitLogCountSetError        string
+	AllowCommitGraphWriteEnabled     string
+	AllowCommitGraphWriteDisabled    string
+	AllowCommitGraphWriteSetError    string
+	MaxLogCountSet                   string
+	MaxLogCountSetError              string
+	ShowXLogSet                      string
+	ShowXLogSetError                 string
+	OverrideSigningUISuspendEnabled  string
+	OverrideSigningUISuspendDisabled string
+	OverrideSigningUISuspendSetError string
 	// Gitti UI text
 	Branches                    string
 	ModifiedFiles               string

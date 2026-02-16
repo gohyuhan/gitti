@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"fmt"
+
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/logging"
@@ -23,6 +25,7 @@ import (
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 
 	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/viewport"
@@ -117,6 +120,11 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	gittiModel.IsDetailComponentPanelInfoFetchProcessing.Store(false)
 	gittiModel.ShowDetailPanelTwo.Store(false)
 	gittiModel.IsLineEditingState.Store(false)
+
+	commitRequireSigning, tagRequireSigning, pushRequireSigning := api.CheckSigningRequiredOperation()
+	gittiModel.GitCommitRequireSigning = commitRequireSigning
+	gittiModel.GitTagRequireSigning = tagRequireSigning
+	gittiModel.GitPushRequireSigning = pushRequireSigning
 
 	return &GittiAppModel{model: gittiModel}
 }
@@ -217,6 +225,21 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return gAM, nil
 	case types.EditorFinishedMsg:
+		return gAM, nil
+	case types.GitOperationRequiredSigningFinishedMsg:
+		if msg.Err != nil {
+			m.GittiLogger.RegisterNewLog(msg.GitOperationOpsTypeForLogging, "", logging.ERROR, fmt.Sprintf("[%s ERROR] %s", msg.GitOperationOpsTypeForLogging, msg.Err.Error()), false)
+		} else {
+			// After a signed Git operation (executed directly in the terminal) completes successfully,
+			// we perform a global state reset. This safely clears any active popups and resets temporary data
+			// (like cherry-pick selections) for all supported operations, eliminating the need for operation-specific cleanup logic.
+
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpModel = nil
+			m.PopUpType = constant.NoPopUp
+			utils.ReinitCherryPickedCommitInfo(m)
+		}
 		return gAM, nil
 	case tea.MouseMsg:
 		model, cmd := interaction.GittiMouseInteraction(msg, m)

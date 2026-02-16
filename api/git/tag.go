@@ -127,8 +127,15 @@ func (gt *GitTag) CreateNewTag(commitHash string, newTagName string, tagMessage 
 	if createNewTagCmdErr != nil {
 		gt.logging.RegisterNewLog(logging.CREATE_NEW_TAG_OPS, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CREATE_NEW_TAG_OPS, createNewTagCmdErr.Error()), true)
 	}
+}
 
-	return
+// CreateNewTagWithSigning constructs a git tag command for terminal execution when signing is required.
+// When tag signing is enabled, gitti UI is suspended and the tag is created directly in the terminal,
+// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+func (gt *GitTag) CreateNewTagWithSigning(commitHash string, newTagName string, tagMessage string) []string {
+	gitArgs := []string{"tag", "-a", newTagName, commitHash, "-m", tagMessage}
+
+	return gitArgs
 }
 
 // ----------------------------------
@@ -264,6 +271,29 @@ func (gt *GitTag) ClearGitPushTagOutput() {
 	gt.tagPushOutputMu.Lock()
 	defer gt.tagPushOutputMu.Unlock()
 	gt.tagPushOutput = []string{}
+}
+
+// GitPushTagWithSigning constructs a git push tag command for terminal execution when signing is required.
+// When tag signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
+// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+func (gt *GitTag) GitPushTagWithSigning(originName string, tagName string, pushType string) []string {
+	var gitArgs []string
+
+	switch pushType {
+	case TAGPUSH:
+		gitArgs = []string{"push", "--progress", originName, tagName}
+	case TAGPUSHALL:
+		gitArgs = []string{"push", "--progress", originName, "--tags"}
+	case TAGPUSHFORCE:
+		gitArgs = []string{"push", "--progress", originName, tagName, "--force"}
+	case TAGPUSHALLFORCE:
+		gitArgs = []string{"push", "--progress", originName, "--tags", "--force"}
+	default:
+		// default will be same as TAGPUSHALL
+		gitArgs = []string{"push", "--progress", originName, "--tags"}
+	}
+
+	return gitArgs
 }
 
 // ----------------------------------
@@ -412,4 +442,8 @@ func (gt *GitTag) GitDeleteTag(ctx context.Context, originName string, tagName s
 	}
 
 	return parsedDeleteTagOutput, true
+}
+
+func (gt *GitTag) GitDeleteRemoteTagWithSigning(originName string, tagName string) []string {
+	return []string{"push", originName, "--delete", tagName}
 }

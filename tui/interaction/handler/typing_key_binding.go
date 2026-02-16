@@ -7,6 +7,8 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/logging"
+	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
@@ -15,6 +17,7 @@ import (
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -192,11 +195,16 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			popUp.CurrentActiveInputIndex = 1
 			// start a seperate thread commit them and set the value of msg and desc to "" if committed successfully
 			// also do not start any git operation is message is no provided
-			if !popUp.IsProcessing.Load() && len(popUp.MessageTextInput.Value()) > 0 {
-				services.GitCommitService(m, popUp.IsAmendCommit)
-				popUp.InitialCommitStarted.Store(true)
-				// Start spinner ticking
-				return m, popUp.Spinner.Tick
+			if !popUp.IsProcessing.Load() && utf8.RuneCountInString(popUp.MessageTextInput.Value()) > 0 {
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitCommit.GitCommitWithSigning(popUp.MessageTextInput.Value(), popUp.DescriptionTextAreaInput.Value(), false)
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.COMMIT_WITH_SIGNING_OPS)
+				} else {
+					services.GitCommitService(m, popUp.IsAmendCommit)
+					popUp.InitialCommitStarted.Store(true)
+					// Start spinner ticking
+					return m, popUp.Spinner.Tick
+				}
 			}
 		}
 	case constant.AmendCommitPopUp:
@@ -206,11 +214,16 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			popUp.MessageTextInput.Focus()
 			popUp.DescriptionTextAreaInput.Blur()
 			popUp.CurrentActiveInputIndex = 1
-			if !popUp.IsProcessing.Load() && len(popUp.MessageTextInput.Value()) > 0 {
-				services.GitAmendCommitService(m, popUp.IsAmendCommit)
-				popUp.InitialCommitStarted.Store(true)
-				// Start spinner ticking
-				return m, popUp.Spinner.Tick
+			if !popUp.IsProcessing.Load() && utf8.RuneCountInString(popUp.MessageTextInput.Value()) > 0 {
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitCommit.GitCommitWithSigning(popUp.MessageTextInput.Value(), popUp.DescriptionTextAreaInput.Value(), true)
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.AMEND_COMMIT_WITH_SIGNING_OPS)
+				} else {
+					services.GitAmendCommitService(m, popUp.IsAmendCommit)
+					popUp.InitialCommitStarted.Store(true)
+					// Start spinner ticking
+					return m, popUp.Spinner.Tick
+				}
 			}
 		}
 	case constant.CreateTagPopUp:

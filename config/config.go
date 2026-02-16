@@ -64,6 +64,21 @@ func SetMaxCommitLogCount(maxCommitLogCount int) {
 	os.Exit(0)
 }
 
+func SetOverrideSigningUISuspend(override string) {
+	if strings.ToLower(override) == "true" {
+		settings.UpdateOverrideSigningUISuspend(true)
+		fmt.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendEnabled)
+		os.Exit(0)
+	} else if strings.ToLower(override) == "false" {
+		settings.UpdateOverrideSigningUISuspend(false)
+		fmt.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendDisabled)
+		os.Exit(0)
+	} else {
+		fmt.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendSetError)
+		os.Exit(1)
+	}
+}
+
 func SetAllowCommitGraphWrite(allow string) {
 	if strings.ToLower(allow) == "true" {
 		settings.UpdateAllowCommitGraphWrite(true)
