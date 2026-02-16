@@ -60,6 +60,7 @@ func main() {
 	allowCommitGraphWrite := flag.String("allow-commit-graph-write", "", i18n.LANGUAGEMAPPING.FlagAllowCommitGraphWrite)
 	setMaxLogCount := flag.Int("max-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxLogCount)
 	setShowXLog := flag.Int("show-x-log", 0, i18n.LANGUAGEMAPPING.FlagShowXLog)
+	overrideSigningUISuspend := flag.String("override-signing-ui-suspend", "", i18n.LANGUAGEMAPPING.FlagOverrideSigningUISuspend)
 
 	flag.Parse()
 
@@ -89,6 +90,8 @@ func main() {
 		config.SetMaxLogCount(*setMaxLogCount)
 	case *setShowXLog > 0:
 		config.SetShowXLog(*setShowXLog)
+	case *overrideSigningUISuspend != "":
+		config.SetOverrideSigningUISuspend(*overrideSigningUISuspend)
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string, 32)

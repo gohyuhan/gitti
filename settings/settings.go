@@ -260,3 +260,11 @@ func UpdateShowXLog(x int) {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
 	}
 }
+
+func UpdateOverrideSigningUISuspend(override bool) {
+	GITTICONFIGSETTINGS.OverrideSigningUISuspend = override
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
