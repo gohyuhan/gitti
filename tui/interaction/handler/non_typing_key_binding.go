@@ -19,10 +19,10 @@ import (
 	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
-	logPopUp "github.com/gohyuhan/gitti/tui/popup/log"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
@@ -283,11 +283,11 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	} else {
 		switch m.PopUpType {
 		case constant.GitEditCherryPickPopUp:
-			popUp, ok := m.PopUpModel.(*logPopUp.GitEditCherryPickPopUpModel)
+			popUp, ok := m.PopUpModel.(*commitLogPopUp.GitEditCherryPickPopUpModel)
 			if ok {
 				selectedCherryPickedCommiyLogItem := popUp.CherryPickedCommitLog.SelectedItem()
 				if selectedCherryPickedCommiyLogItem != nil {
-					selectedCherryPickedCommiyLogHash := selectedCherryPickedCommiyLogItem.(logPopUp.GitEditCherryPickItem).Hash
+					selectedCherryPickedCommiyLogHash := selectedCherryPickedCommiyLogItem.(commitLogPopUp.GitEditCherryPickItem).Hash
 					_, exist := m.CherryPickedCommitInfo.CherryPickedCommitMap[selectedCherryPickedCommiyLogHash]
 					if exist {
 						delete(m.CherryPickedCommitInfo.CherryPickedCommitMap, selectedCherryPickedCommiyLogHash)
@@ -300,7 +300,7 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 						m.PopUpModel = nil
 					} else {
 						// reinit the list after a removal
-						logPopUp.InitGitEditCherryPickPopUp(m, popUp.CherryPickedCommitLog.Index())
+						commitLogPopUp.InitGitEditCherryPickPopUp(m, popUp.CherryPickedCommitLog.Index())
 					}
 				}
 			}
@@ -314,12 +314,12 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		switch m.PopUpType {
 		case constant.GitCherryPickPopUp:
 			m.PopUpType = constant.GitEditCherryPickPopUp
-			logPopUp.InitGitEditCherryPickPopUp(m, 0)
+			commitLogPopUp.InitGitEditCherryPickPopUp(m, 0)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		case constant.GitCherryPickApplyConfirmPopUp:
 			m.PopUpType = constant.GitEditCherryPickPopUp
-			logPopUp.InitGitEditCherryPickPopUp(m, 0)
+			commitLogPopUp.InitGitEditCherryPickPopUp(m, 0)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		}
@@ -609,7 +609,7 @@ func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.
 	} else if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.GitEditCherryPickPopUp:
-			_, ok := m.PopUpModel.(*logPopUp.GitEditCherryPickPopUpModel)
+			_, ok := m.PopUpModel.(*commitLogPopUp.GitEditCherryPickPopUpModel)
 			if ok {
 				utils.ReinitCherryPickedCommitInfo(m)
 				m.ShowPopUp.Store(false)
@@ -904,18 +904,18 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.IsTyping.Store(false)
 			}
 		case constant.GitCherryPickOptionSelectionPopUp:
-			popUp, ok := m.PopUpModel.(*logPopUp.GitCherryPickOptionSelectionPopUpModel)
+			popUp, ok := m.PopUpModel.(*commitLogPopUp.GitCherryPickOptionSelectionPopUpModel)
 			if ok {
 				selectedCherryPickType := popUp.CherryPickedOpsOption.SelectedItem()
 				if selectedCherryPickType != nil {
-					cherryPickType := selectedCherryPickType.(logPopUp.CherryPickOpsOptionItem).CherryPickOpsType
+					cherryPickType := selectedCherryPickType.(commitLogPopUp.CherryPickOpsOptionItem).CherryPickOpsType
 					switch cherryPickType {
 					case constant.CHERRYPICK:
 						m.PopUpType = constant.GitCherryPickPopUp
-						logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+						commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
 					case constant.EDITCHERRYPICK:
 						m.PopUpType = constant.GitEditCherryPickPopUp
-						logPopUp.InitGitEditCherryPickPopUp(m, 0)
+						commitLogPopUp.InitGitEditCherryPickPopUp(m, 0)
 					case constant.APPLYCHERRYPICK:
 						m.ShowPopUp.Store(true)
 						m.PopUpType = constant.GitCherryPickApplyConfirmPopUp
@@ -1132,7 +1132,36 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.PopUpType = constant.NoPopUp
 				return m, nil
 			}
-
+		case constant.GitRevertParentOptionSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*commitLogPopUp.GitRevertParentOptionSelectionPopUpModel)
+			if ok {
+				selectedParent := popUp.GitRevertParentOption.SelectedItem()
+				if selectedParent != nil {
+					parsedSelectedParent := selectedParent.(commitLogPopUp.GitRevertParentOptionItem)
+					commitLogPopUp.InitGitRevertConfirmationPopUp(m, popUp.CommitHash, parsedSelectedParent.ParentOrder)
+				} else {
+					commitLogPopUp.InitGitRevertConfirmationPopUp(m, popUp.CommitHash, 1)
+				}
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.GitRevertConfirmationPopUp
+				return m, nil
+			}
+		case constant.GitRevertConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*commitLogPopUp.GitRevertConfirmationPopUpModel)
+			if ok {
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitCommitLog.GitRevertCommitWithSigning(popUp.CommitHash, popUp.ParentOrder)
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.REVERT_COMMIT_WITH_SIGNING_OPS)
+				} else {
+					services.GitRevertCommitService(m, popUp.CommitHash, popUp.ParentOrder)
+					return m, nil
+				}
+			}
 		}
 	}
 	return m, nil
@@ -1194,11 +1223,11 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	} else {
 		switch m.PopUpType {
 		case constant.GitCherryPickPopUp:
-			popUp, ok := m.PopUpModel.(*logPopUp.GitCherryPickPopUpModel)
+			popUp, ok := m.PopUpModel.(*commitLogPopUp.GitCherryPickPopUpModel)
 			if ok {
 				selectedCommitLog := popUp.CurrentBranchCherryPickCommitLog.SelectedItem()
 				if selectedCommitLog != nil {
-					cherryPickedCommitLog := selectedCommitLog.(logPopUp.GitCherryPickItem)
+					cherryPickedCommitLog := selectedCommitLog.(commitLogPopUp.GitCherryPickItem)
 					CherryPickedCommitLogItem, ok := m.CherryPickedCommitInfo.CherryPickedCommitMap[cherryPickedCommitLog.Hash]
 					if ok {
 						delete(m.CherryPickedCommitInfo.CherryPickedCommitMap, CherryPickedCommitLogItem.Hash)
@@ -1300,7 +1329,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.ChoosePushTagOptionPopUp,
 			constant.ChooseFetchTagOptionPopUp,
 			constant.RemoveRemoteConfirmationPopUp,
-			constant.RemoteAsTrackingUpstreamConfirmationPopUp:
+			constant.RemoteAsTrackingUpstreamConfirmationPopUp,
+			constant.GitRevertParentOptionSelectionPopUp,
+			constant.GitRevertConfirmationPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -1672,12 +1703,12 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		switch m.PopUpType {
 		case constant.GitEditCherryPickPopUp:
 			m.PopUpType = constant.GitCherryPickPopUp
-			logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+			commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		case constant.GitCherryPickApplyConfirmPopUp:
 			m.PopUpType = constant.GitCherryPickPopUp
-			logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+			commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		}
@@ -1688,12 +1719,12 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.GitCherryPickPopUp
 				m.IsTyping.Store(false)
-				logPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+				commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
 			} else {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.GitCherryPickOptionSelectionPopUp
 				m.IsTyping.Store(false)
-				logPopUp.InitGitCherryPickOptionSelectionPopUp(m)
+				commitLogPopUp.InitGitCherryPickOptionSelectionPopUp(m)
 			}
 		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
 			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
@@ -1723,6 +1754,38 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					// if remote is more than 1 let user choose which remote
 					m.PopUpType = constant.ChooseRemotePopUp
 					remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.TAGPUSHACTION)
+				}
+			}
+		}
+	}
+	return m, nil
+}
+
+func handleNonTypingCtrlrKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.CommitLogComponentPanel:
+			selectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
+			if selectedCommitLog != nil {
+				parsedCommitLog := selectedCommitLog.(commitlog.GitCommitLogItem)
+				commitHashParentInfos := services.GetCommitHashParentInfoService(m, parsedCommitLog.Hash)
+				if commitHashParentInfos != nil {
+					if len(commitHashParentInfos) > 1 {
+						commitLogPopUp.InitGitRevertParentOptionSelectionPopUp(m, parsedCommitLog.Hash, commitHashParentInfos)
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.GitRevertParentOptionSelectionPopUp
+					} else {
+						commitLogPopUp.InitGitRevertConfirmationPopUp(m, parsedCommitLog.Hash, 0)
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.GitRevertConfirmationPopUp
+					}
+				} else {
+					commitLogPopUp.InitGitRevertConfirmationPopUp(m, parsedCommitLog.Hash, 0)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.GitRevertConfirmationPopUp
 				}
 			}
 		}

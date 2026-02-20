@@ -51,6 +51,8 @@ const (
 	RemoveRemoteConfirmationPopUp              = "RemoveRemoteConfirmationPopUp"              // IsTyping will be false
 	RemoteAsTrackingUpstreamConfirmationPopUp  = "RemoteAsTrackingUpstreamConfirmationPopUp"  // IsTyping will be false
 	EditRemotePromptPopUp                      = "EditRemotePromptPopUp"                      // IsTyping will be true
+	GitRevertParentOptionSelectionPopUp        = "GitRevertParentOptionSelectionPopUp"        // IsTyping will be false
+	GitRevertConfirmationPopUp                 = "GitRevertConfirmationPopUp"                 // IsTyping will be false
 )
 
 const (
@@ -116,6 +118,8 @@ const (
 	MaxRemoveRemoteConfirmationPopUpWidth              = 150
 	MaxRemoteAsTrackingUpstreamConfirmationPopUpWidth  = 150
 	MaxEditRemotePromptPopUpWidth                      = 150
+	MaxGitRevertParentOptionSelectionPopUpWidth        = 150
+	MaxGitRevertConfirmationPopUpWidth                 = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10
@@ -147,6 +151,7 @@ const (
 	PopUpPushTagOutputViewportHeight                   = 10
 	PopUpChooseFetchTagOptionHeight                    = 10
 	PopUpFetchTagOutputViewportHeight                  = 10
+	PopUpGitRevertParentOptionSelectionHeight          = 10
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

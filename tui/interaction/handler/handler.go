@@ -280,7 +280,8 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 		return handleNonTypingCtrlpKeyBindingInteraction(m)
 	case "ctrl+k":
 		return handleNonTypingCtrlkKeyBindingInteraction(m)
-
+	case "ctrl+r":
+		return handleNonTypingCtrlrKeyBindingInteraction(m)
 	}
 	return m, nil
 }

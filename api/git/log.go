@@ -40,6 +40,12 @@ type GitCommitLog struct {
 	logging            *logging.GittiLogging
 }
 
+type CommitHashParentInfo struct {
+	ParentCommitHash    string
+	ParentCommitMessage string
+	ParentOrder         int
+}
+
 // ----------------------------------
 //
 //	Init Git Commit Log
@@ -551,4 +557,73 @@ func (gCL *GitCommitLog) WriteCommitGraph() {
 	gitArgs := []string{"commit-graph", "write", "--reachable", "--split"}
 	writeCommitGraphCmdExec := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	writeCommitGraphCmdExec.Run()
+}
+
+// ----------------------------------
+//
+// # Git Revert for commit
+//
+// ----------------------------------
+func (gCL *GitCommitLog) GitRevertCommit(commitHash string, parentOrder int) {
+	// parentOrder is only need when reverting a merge commit, other commit reverting only require the hash commit
+	var gitArgs []string
+	if parentOrder > 0 {
+		parentOrderString := strconv.Itoa(parentOrder)
+		gitArgs = []string{"revert", "--no-edit", "-m", parentOrderString, commitHash}
+	} else {
+		gitArgs = []string{"revert", "--no-edit", commitHash}
+	}
+
+	revertCommitCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gCL.logging.RegisterNewLog(logging.REVERT_COMMIT_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	err := revertCommitCmdExecutor.Run()
+	if err != nil {
+		gCL.logging.RegisterNewLog(logging.REVERT_COMMIT_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REVERT_COMMIT_OPS, err.Error()), true)
+	}
+}
+
+// ----------------------------------
+//
+// # To get the parent(s) info for the commit hash
+//
+// ----------------------------------
+func (gCL *GitCommitLog) GetCommitHashParentInfo(commitHash string) []CommitHashParentInfo {
+	parentTarget := commitHash + "^@"
+
+	gitArgs := []string{"show", "-s", "--format=%H||%s", parentTarget}
+	commitHashParentInfoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	output, err := commitHashParentInfoCmdExecutor.Output()
+	if err != nil {
+		return nil
+	}
+
+	parsedCommitHashParentInfo := processGeneralGitOpsOutputIntoStringArray(output)
+
+	var parentCommitInfoArray []CommitHashParentInfo
+	for index := range parsedCommitHashParentInfo {
+		parentCommitInfo := strings.Split(parsedCommitHashParentInfo[index], "||")
+		commitHashParentInfo := CommitHashParentInfo{
+			ParentCommitHash:    parentCommitInfo[0],
+			ParentCommitMessage: parentCommitInfo[1],
+			ParentOrder:         index + 1,
+		}
+
+		parentCommitInfoArray = append(parentCommitInfoArray, commitHashParentInfo)
+	}
+
+	return parentCommitInfoArray
+}
+
+// GitRevertCommitWithSigning constructs the git revert command arguments for execution in the terminal.
+// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+func (gCL *GitCommitLog) GitRevertCommitWithSigning(commitHash string, parentOrder int) []string {
+	var gitArgs []string
+	if parentOrder > 0 {
+		parentOrderString := strconv.Itoa(parentOrder)
+		gitArgs = []string{"revert", "--no-edit", "-m", parentOrderString, commitHash}
+	} else {
+		gitArgs = []string{"revert", "--no-edit", commitHash}
+	}
+	return gitArgs
 }

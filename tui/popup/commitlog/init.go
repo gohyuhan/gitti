@@ -1,4 +1,4 @@
-package log
+package commitlog
 
 import (
 	"slices"
@@ -140,6 +140,52 @@ func InitGitEditCherryPickPopUp(m *types.GittiModel, selectionIndex int) {
 
 	popUpModel := &GitEditCherryPickPopUpModel{
 		CherryPickedCommitLog: gECPL,
+	}
+
+	m.PopUpModel = popUpModel
+}
+
+func InitGitRevertParentOptionSelectionPopUp(m *types.GittiModel, commitHash string, commitParentInfos []git.CommitHashParentInfo) {
+	items := make([]list.Item, 0, len(commitParentInfos))
+
+	for index := range commitParentInfos {
+		commitParentInfo := commitParentInfos[index]
+		item := GitRevertParentOptionItem{
+			CommitHash:    commitParentInfo.ParentCommitHash,
+			CommitMessage: commitParentInfo.ParentCommitMessage,
+			ParentOrder:   commitParentInfo.ParentOrder,
+		}
+
+		items = append(items, item)
+	}
+
+	width := (min(constant.MaxGitRevertParentOptionSelectionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	// we are dividing by 3 because the list is a single string that have 2 \n that break into 3 line
+	height := max(constant.PopUpGitRevertParentOptionSelectionHeight, int((float64(m.Height)*0.8)/3)-3)
+	gRPOL := list.New(items, GitRevertParentOptionDelegate{}, width, height)
+	gRPOL.SetShowPagination(false)
+	gRPOL.SetShowStatusBar(false)
+	gRPOL.SetFilteringEnabled(false)
+	gRPOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	gRPOL.SetShowHelp(true)
+	gRPOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	gRPOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	gRPOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &gRPOL, constant.MaxGitRevertParentOptionSelectionPopUpWidth)
+
+	popUpModel := &GitRevertParentOptionSelectionPopUpModel{
+		GitRevertParentOption: gRPOL,
+		CommitHash:            commitHash,
+	}
+
+	m.PopUpModel = popUpModel
+}
+
+func InitGitRevertConfirmationPopUp(m *types.GittiModel, commitHash string, parentOrder int) {
+	popUpModel := &GitRevertConfirmationPopUpModel{
+		CommitHash:  commitHash,
+		ParentOrder: parentOrder,
 	}
 
 	m.PopUpModel = popUpModel

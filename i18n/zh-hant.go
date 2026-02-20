@@ -161,6 +161,7 @@ var zH_HANT = LanguageMapping{
 		"[↑/↓] 上下移動",
 		"[enter] 查看提交日誌內容",
 		"[t] 建立標籤",
+		"[ctrl+r] 還原此提交",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 揀選操作",
@@ -394,6 +395,15 @@ var zH_HANT = LanguageMapping{
 		"[enter] 編輯",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForGitRevertParentOptionSelectionPopUp: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 選擇要還原到的父提交",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForGitRevertConfirmationPopUp: []string{
+		"[enter] 確認還原",
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -559,6 +569,8 @@ var zH_HANT = LanguageMapping{
 	EditRemotePopUpRemoteUrlTitle:                            "新遠端網址",
 	EditRemotePopUpRemoteNamePlaceHolder:                     "輸入新的遠端名稱...",
 	EditRemotePopUpRemoteUrlPlaceHolder:                      "輸入新的遠端網址...",
+	GitRevertParentOptionSelectionTitle:                      "選擇要還原到的父提交",
+	GitRevertConfirmationTitle:                               "您確定要還原以下提交嗎？\n 提交: [%s]",
 }
 
 // for about gitti
@@ -917,6 +929,11 @@ var zhHantCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "t",
 		TitleOrInfoLine: "建立標籤",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+r",
+		TitleOrInfoLine: "還原此提交",
 		LineType:        INFO,
 	},
 	{
@@ -1496,6 +1513,17 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"1. 導航至遠端組件（按 `1`）或切換至遠端組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇要設定為上游追蹤的遠端",
 			"3. 按 `enter`",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "還原提交 (revert commit)",
+		InstructionLines: []string{
+			"1. 導覽至提交記錄組件（按 `3`）",
+			"2. 使用 `↑/↓` 選擇要還原的提交",
+			"3. 按 `ctrl+r`",
+			"   - 如果是合併提交，使用 `↑/↓` 選擇要還原到的父提交",
+			"4. 按 `enter` 確認",
 		},
 		LineType: INFO,
 	},

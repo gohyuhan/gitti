@@ -161,6 +161,7 @@ var jA = LanguageMapping{
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
 		"[t] タグを作成",
+		"[ctrl+r] このコミットをリバート",
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
@@ -394,6 +395,15 @@ var jA = LanguageMapping{
 		"[enter] 編集",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitRevertParentOptionSelectionPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] リバート先の親コミットを選択",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitRevertConfirmationPopUp: []string{
+		"[enter] リバートを確定",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -559,6 +569,8 @@ var jA = LanguageMapping{
 	EditRemotePopUpRemoteUrlTitle:                            "新しいリモートURL",
 	EditRemotePopUpRemoteNamePlaceHolder:                     "新しいリモート名を入力...",
 	EditRemotePopUpRemoteUrlPlaceHolder:                      "新しいリモートURLを入力...",
+	GitRevertParentOptionSelectionTitle:                      "リバート先の親コミットを選択してください",
+	GitRevertConfirmationTitle:                               "以下のコミットをリバートしてもよろしいですか？\n コミット: [%s]",
 }
 
 // for about gitti
@@ -918,6 +930,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "t",
 		TitleOrInfoLine: "タグを作成",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+r",
+		TitleOrInfoLine: "このコミットをリバート",
 		LineType:        INFO,
 	},
 	{
@@ -1497,6 +1514,17 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"1. リモートコンポーネントに移動 (`1` を押す) またはリモートコンポーネントに切り替え (`< >` を押す)",
 			"2. `↑/↓` を使用して上流追跡として設定するリモートを選択",
 			"3. `enter` を押す",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "コミットをリバート (revert commit)",
+		InstructionLines: []string{
+			"1. コミットログコンポーネントに移動 (`3` を押す)",
+			"2. `↑/↓` を使用してリバートするコミットを選択",
+			"3. `ctrl+r` を押す",
+			"   - マージコミットの場合は `↑/↓` を使用してリバート先の親コミットを選択してください",
+			"4. `enter` を押して確定",
 		},
 		LineType: INFO,
 	},
