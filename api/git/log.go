@@ -614,3 +614,16 @@ func (gCL *GitCommitLog) GetCommitHashParentInfo(commitHash string) []CommitHash
 
 	return parentCommitInfoArray
 }
+
+// GitRevertCommitWithSigning constructs the git revert command arguments for execution in the terminal.
+// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+func (gCL *GitCommitLog) GitRevertCommitWithSigning(commitHash string, parentOrder int) []string {
+	var gitArgs []string
+	if parentOrder > 0 {
+		parentOrderString := strconv.Itoa(parentOrder)
+		gitArgs = []string{"revert", "--no-edit", "-m", parentOrderString, commitHash}
+	} else {
+		gitArgs = []string{"revert", "--no-edit", commitHash}
+	}
+	return gitArgs
+}

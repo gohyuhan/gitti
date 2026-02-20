@@ -1150,12 +1150,17 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.GitRevertConfirmationPopUp:
 			popUp, ok := m.PopUpModel.(*commitLogPopUp.GitRevertConfirmationPopUpModel)
 			if ok {
-				services.GitRevertCommitService(m, popUp.CommitHash, popUp.ParentOrder)
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
-				return m, nil
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitCommitLog.GitRevertCommitWithSigning(popUp.CommitHash, popUp.ParentOrder)
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.REVERT_COMMIT_WITH_SIGNING_OPS)
+				} else {
+					services.GitRevertCommitService(m, popUp.CommitHash, popUp.ParentOrder)
+					return m, nil
+				}
 			}
 		}
 	}
