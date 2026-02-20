@@ -4,10 +4,10 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
+	"github.com/gohyuhan/gitti/tui/popup/commitlog"
 	"github.com/gohyuhan/gitti/tui/popup/discard"
 	"github.com/gohyuhan/gitti/tui/popup/files"
 	"github.com/gohyuhan/gitti/tui/popup/keybinding"
-	"github.com/gohyuhan/gitti/tui/popup/log"
 	"github.com/gohyuhan/gitti/tui/popup/pull"
 	"github.com/gohyuhan/gitti/tui/popup/push"
 	"github.com/gohyuhan/gitti/tui/popup/remote"
@@ -82,13 +82,13 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 	case constant.GitResetToSelectedCommitConfirmPromptPopUp:
 		popUp = commit.RenderGitResetToSelectedCommitConfirmPromptPopUp(m)
 	case constant.GitCherryPickOptionSelectionPopUp:
-		popUp = log.RenderGitCherryPickOptionSelectionPopUp(m)
+		popUp = commitlog.RenderGitCherryPickOptionSelectionPopUp(m)
 	case constant.GitCherryPickPopUp:
-		popUp = log.RenderGitCherryPickPopUp(m)
+		popUp = commitlog.RenderGitCherryPickPopUp(m)
 	case constant.GitEditCherryPickPopUp:
-		popUp = log.RenderGitEditCherryPickPopUp(m)
+		popUp = commitlog.RenderGitEditCherryPickPopUp(m)
 	case constant.GitCherryPickApplyConfirmPopUp:
-		popUp = log.RenderGitCherryPickApplyConfirmPopUp(m)
+		popUp = commitlog.RenderGitCherryPickApplyConfirmPopUp(m)
 	case constant.GitDiscardFileLineChangeConfirmPopUp:
 		popUp = files.RenderGitDiscardFileLineChangeConfirmPopUp(m)
 	case constant.CreateTagPopUp:
@@ -115,6 +115,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = remote.RenderRemoteAsTrackingUpstreamConfirmationPopUp(m)
 	case constant.EditRemotePromptPopUp:
 		popUp = remote.RenderEditRemotePromptPopUp(m)
+	case constant.GitRevertParentOptionSelectionPopUp:
+		popUp = commitlog.RenderGitRevertParentOptionSelectionPopUp(m)
+	case constant.GitRevertConfirmationPopUp:
+		popUp = commitlog.RenderGitRevertConfirmationPopUp(m)
 	}
 	return popUp
 }

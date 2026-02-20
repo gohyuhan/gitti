@@ -390,6 +390,10 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp
 		case constant.EditRemotePromptPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForEditRemotePromptPopUp
+		case constant.GitRevertParentOptionSelectionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRevertParentOptionSelectionPopUp
+		case constant.GitRevertConfirmationPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRevertConfirmationPopUp
 		}
 	} else {
 		//-----------------------------

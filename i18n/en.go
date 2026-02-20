@@ -161,6 +161,7 @@ var eN = LanguageMapping{
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
 		"[t] create tag",
+		"[ctrl+r] revert this commit",
 		"[r] reset to this commit",
 		"[R] reset latest commit",
 		"[ctrl+p] cherry pick ops",
@@ -394,6 +395,15 @@ var eN = LanguageMapping{
 		"[enter] edit",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitRevertParentOptionSelectionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select parent commit to revert to",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitRevertConfirmationPopUp: []string{
+		"[enter] confirm revert",
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -559,6 +569,8 @@ var eN = LanguageMapping{
 	EditRemotePopUpRemoteUrlTitle:                            "New Remote URL",
 	EditRemotePopUpRemoteNamePlaceHolder:                     "Enter new remote name...",
 	EditRemotePopUpRemoteUrlPlaceHolder:                      "Enter new remote url...",
+	GitRevertParentOptionSelectionTitle:                      "Select the parent commit to revert to",
+	GitRevertConfirmationTitle:                               "Are you sure you want to revert the following commit?\n commit: [%s]",
 }
 
 // for about gitti
@@ -921,6 +933,11 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "t",
 		TitleOrInfoLine: "create tag",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+r",
+		TitleOrInfoLine: "revert this commit",
 		LineType:        INFO,
 	},
 	{
@@ -1500,6 +1517,17 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"1. Navigate to Remote component (press `1`) or switch to Remote component (press `< >`)",
 			"2. Select the remote to set as tracking upstream using `↑/↓`",
 			"3. Press `enter`",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "revert commit",
+		InstructionLines: []string{
+			"1. Navigate to Commit Log component (press `3`)",
+			"2. Select the commit to revert using `↑/↓`",
+			"3. Press `ctrl+r`",
+			"   - Select the parent commit to revert to using `↑/↓` if it was a merge commit",
+			"4. Press `enter` to confirm",
 		},
 		LineType: INFO,
 	},

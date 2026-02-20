@@ -175,6 +175,8 @@ type LanguageMapping struct {
 	KeyBindingForRemoveRemoteConfirmationPopUp              []string
 	KeyBindingForRemoteAsTrackingUpstreamConfirmationPopUp  []string
 	KeyBindingForEditRemotePromptPopUp                      []string
+	KeyBindingForGitRevertParentOptionSelectionPopUp        []string
+	KeyBindingForGitRevertConfirmationPopUp                 []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -378,4 +380,7 @@ type LanguageMapping struct {
 	EditRemotePopUpRemoteUrlTitle        string
 	EditRemotePopUpRemoteNamePlaceHolder string
 	EditRemotePopUpRemoteUrlPlaceHolder  string
+	// for commit revert
+	GitRevertParentOptionSelectionTitle string
+	GitRevertConfirmationTitle          string
 }

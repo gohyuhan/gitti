@@ -6,9 +6,9 @@ import (
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
-	"github.com/gohyuhan/gitti/tui/popup/log"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
@@ -188,7 +188,7 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 		}
 
 	case constant.GitCherryPickOptionSelectionPopUp:
-		popUp, ok := m.PopUpModel.(*log.GitCherryPickOptionSelectionPopUpModel)
+		popUp, ok := m.PopUpModel.(*commitLogPopUp.GitCherryPickOptionSelectionPopUpModel)
 		if ok {
 			switch msg.String() {
 			case "up", "k":
@@ -206,7 +206,7 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 			return m, nil
 		}
 	case constant.GitCherryPickPopUp:
-		popUp, ok := m.PopUpModel.(*log.GitCherryPickPopUpModel)
+		popUp, ok := m.PopUpModel.(*commitLogPopUp.GitCherryPickPopUpModel)
 		if ok {
 			switch msg.String() {
 			case "up", "k":
@@ -224,7 +224,7 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 			return m, nil
 		}
 	case constant.GitEditCherryPickPopUp:
-		popUp, ok := m.PopUpModel.(*log.GitEditCherryPickPopUpModel)
+		popUp, ok := m.PopUpModel.(*commitLogPopUp.GitEditCherryPickPopUpModel)
 		if ok {
 			switch msg.String() {
 			case "up", "k":
@@ -312,6 +312,25 @@ func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.Git
 				}
 			}
 			popUp.FetchOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.FetchOptionList, constant.MaxChooseFetchTagOptionPopUpWidth)
+			return m, nil
+		}
+
+	case constant.GitRevertParentOptionSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*commitLogPopUp.GitRevertParentOptionSelectionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.GitRevertParentOption.Index() > 0 {
+					latestIndex := popUp.GitRevertParentOption.Index() - 1
+					popUp.GitRevertParentOption.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.GitRevertParentOption.Index() < len(popUp.GitRevertParentOption.Items())-1 {
+					latestIndex := popUp.GitRevertParentOption.Index() + 1
+					popUp.GitRevertParentOption.Select(latestIndex)
+				}
+			}
+			popUp.GitRevertParentOption.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.GitRevertParentOption, constant.MaxGitRevertParentOptionSelectionPopUpWidth)
 			return m, nil
 		}
 

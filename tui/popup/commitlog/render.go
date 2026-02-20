@@ -1,4 +1,4 @@
-package log
+package commitlog
 
 import (
 	"fmt"
@@ -73,4 +73,31 @@ func RenderGitCherryPickApplyConfirmPopUp(m *types.GittiModel) string {
 		title,
 	)
 	return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+}
+
+func RenderGitRevertParentOptionSelectionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitRevertParentOptionSelectionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitRevertParentOptionSelectionPopUpWidth, int(float64(m.Width)*0.8))
+		popUpHeight := max(constant.PopUpGitRevertParentOptionSelectionHeight, int((float64(m.Height)*0.8)/2))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitRevertParentOptionSelectionTitle)
+		popUp.GitRevertParentOption.SetWidth(popUpWidth - 4)
+		popUp.GitRevertParentOption.SetHeight(popUpHeight - 3)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.GitRevertParentOption.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+func RenderGitRevertConfirmationPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*GitRevertConfirmationPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxGitRevertConfirmationPopUpWidth, int(float64(m.Width)*0.8))
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitRevertConfirmationTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(popUp.CommitHash)))
+	}
+	return ""
 }

@@ -1,4 +1,4 @@
-package log
+package commitlog
 
 import (
 	"fmt"
@@ -223,4 +223,78 @@ func (d CherryPickOpsOptionDelegate) Render(w io.Writer, m list.Model, index int
 	}
 
 	fmt.Fprint(w, fn(fullStr))
+}
+
+// ---------------------------------
+//
+// pop up to choose to the parent for git revert (when there is more than 1 parent, eg, merge commit)
+//
+// ---------------------------------
+type GitRevertParentOptionSelectionPopUpModel struct {
+	GitRevertParentOption list.Model
+	CommitHash            string
+}
+
+// ---------------------------------
+//
+// bubble tea list for selecting parent to revert to
+//
+// ---------------------------------
+type (
+	GitRevertParentOptionDelegate struct{}
+	GitRevertParentOptionItem     struct {
+		CommitHash    string
+		CommitMessage string
+		ParentOrder   int
+	}
+)
+
+func (i GitRevertParentOptionItem) FilterValue() string {
+	return i.CommitHash
+}
+
+// for list component of Git branch
+func (d GitRevertParentOptionDelegate) Height() int                             { return 1 }
+func (d GitRevertParentOptionDelegate) Spacing() int                            { return 0 }
+func (d GitRevertParentOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d GitRevertParentOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(GitRevertParentOptionItem)
+	if !ok {
+		return
+	}
+
+	commitMsgStr := fmt.Sprintf("   %s", i.CommitMessage)
+	commitHashStr := fmt.Sprintf("    %s", i.CommitHash)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
+
+	commitMsgStr = utils.TruncateString(commitMsgStr, componentWidth)
+	commitHashStr = utils.TruncateString(commitHashStr, componentWidth)
+
+	nameRendered := style.ItemStyle.Render(commitMsgStr)
+	infoRendered := style.ItemStyle.Faint(true).Render(commitHashStr)
+	fullStr := nameRendered + "\n" + "  " + infoRendered
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(fullStr))
+}
+
+// ---------------------------------
+//
+// pop up to confirm git revert
+//
+// ---------------------------------
+type GitRevertConfirmationPopUpModel struct {
+	CommitHash  string
+	ParentOrder int
 }

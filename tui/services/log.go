@@ -31,3 +31,13 @@ func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string
 		utils.ReinitCherryPickedCommitInfo(m)
 	}()
 }
+
+func GitRevertCommitService(m *types.GittiModel, commitHash string, parentOrder int) {
+	go func() {
+		m.GitOperations.GitCommitLog.GitRevertCommit(commitHash, parentOrder)
+	}()
+}
+
+func GetCommitHashParentInfoService(m *types.GittiModel, commitHash string) []git.CommitHashParentInfo {
+	return m.GitOperations.GitCommitLog.GetCommitHashParentInfo(commitHash)
+}
