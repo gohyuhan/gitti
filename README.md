@@ -206,6 +206,15 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.5.0]
+
+- optimize: revamp of instructions/keybindings popup
+- feature: manual fetch all
+- feature: remote management
+- feature: revert commit
+- feature: tag management
+- feature: support commit and tag signing (GPG/SSH)
+
 ### [v0.4.1]
 
 - hotfix: prevent deadlock in main thread by moving checking into goroutine when user navigate a list quickly which cause detail panel to constantly cancel and fetch relevant content
