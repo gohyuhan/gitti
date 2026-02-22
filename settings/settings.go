@@ -34,6 +34,7 @@ type GittiConfigSettings struct {
 	AutoUpdate                      bool      `json:"auto_update"`
 	Editor                          string    `json:"editor"`
 	MaxCommitLogCount               int       `json:"max_commit_log_count"`
+	MaxRefLogCount                  int       `json:"max_reflog_count"`
 	AllowCommitGraphWrite           bool      `json:"allow_commit_graph_write"`
 	MaxLogCount                     int       `json:"max_log_count"`
 	ShowXLog                        int       `json:"show_x_log"`
@@ -52,6 +53,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	AutoUpdate:                      true,
 	Editor:                          "vim",
 	MaxCommitLogCount:               2500,
+	MaxRefLogCount:                  2500,
 	AllowCommitGraphWrite:           true,
 	MaxLogCount:                     300,
 	ShowXLog:                        3,
@@ -231,6 +233,14 @@ func UpdateEditor(editor string) {
 
 func UpdateMaxCommitLogCount(maxCount int) {
 	GITTICONFIGSETTINGS.MaxCommitLogCount = maxCount
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
+
+func UpdateMaxRefLogCount(maxCount int) {
+	GITTICONFIGSETTINGS.MaxRefLogCount = maxCount
 	cfgPath, err := getConfigPath()
 	if err == nil {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)

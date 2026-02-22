@@ -50,6 +50,7 @@ type LanguageMapping struct {
 	FlagGlobal                   string
 	FlagEditor                   string
 	FlagMaxCommitLogCount        string
+	FlagMaxRefLogCount           string
 	FlagAllowCommitGraphWrite    string
 	FlagMaxLogCount              string
 	FlagShowXLog                 string
@@ -78,6 +79,8 @@ type LanguageMapping struct {
 	GitCertainStateStillInProgress   string
 	MaxCommitLogCountSet             string
 	MaxCommitLogCountSetError        string
+	MaxRefLogCountSet                string
+	MaxRefLogCountSetError           string
 	AllowCommitGraphWriteEnabled     string
 	AllowCommitGraphWriteDisabled    string
 	AllowCommitGraphWriteSetError    string

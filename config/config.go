@@ -64,6 +64,17 @@ func SetMaxCommitLogCount(maxCommitLogCount int) {
 	os.Exit(0)
 }
 
+// set the max reflog count to be retrieve and display
+func SetMaxRefLogCount(maxRefLogCount int) {
+	if maxRefLogCount < 10 {
+		fmt.Println(i18n.LANGUAGEMAPPING.MaxRefLogCountSetError)
+		os.Exit(1)
+	}
+	settings.UpdateMaxRefLogCount(maxRefLogCount)
+	fmt.Printf(i18n.LANGUAGEMAPPING.MaxRefLogCountSet+"\n", maxRefLogCount)
+	os.Exit(0)
+}
+
 func SetOverrideSigningUISuspend(override string) {
 	if strings.ToLower(override) == "true" {
 		settings.UpdateOverrideSigningUISuspend(true)

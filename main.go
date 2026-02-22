@@ -57,6 +57,7 @@ func main() {
 	applyToSystemGit := flag.Bool("global", false, i18n.LANGUAGEMAPPING.FlagGlobal)
 	setEditor := flag.Bool("editor", false, i18n.LANGUAGEMAPPING.FlagEditor)
 	setMaxCommitLogCount := flag.Int("max-commit-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxCommitLogCount)
+	setMaxRefLogCount := flag.Int("max-reflog-count", 0, i18n.LANGUAGEMAPPING.FlagMaxRefLogCount)
 	allowCommitGraphWrite := flag.String("allow-commit-graph-write", "", i18n.LANGUAGEMAPPING.FlagAllowCommitGraphWrite)
 	setMaxLogCount := flag.Int("max-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxLogCount)
 	setShowXLog := flag.Int("show-x-log", 0, i18n.LANGUAGEMAPPING.FlagShowXLog)
@@ -84,6 +85,8 @@ func main() {
 		config.ChooseAndSetEditor()
 	case *setMaxCommitLogCount > 0:
 		config.SetMaxCommitLogCount(*setMaxCommitLogCount)
+	case *setMaxRefLogCount > 0:
+		config.SetMaxRefLogCount(*setMaxRefLogCount)
 	case *allowCommitGraphWrite != "":
 		config.SetAllowCommitGraphWrite(*allowCommitGraphWrite)
 	case *setMaxLogCount > 0:
