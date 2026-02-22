@@ -9,9 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
-
-// init the list component for Branch Component
+// ----------------------------------
+//
+//	init the list component for Branch Component
+//
+// ----------------------------------
 func InitRemoteList(m *types.GittiModel) bool {
 	latestRemoteArray := []list.Item{}
 

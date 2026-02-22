@@ -168,6 +168,11 @@ type GraphRenderer struct {
 	currentLanes []Lane
 }
 
+// ----------------------------------
+//
+//	Create a new GraphRenderer for rendering commit lane visualization
+//
+// ----------------------------------
 func NewGraphRenderer() *GraphRenderer {
 	return &GraphRenderer{
 		currentLanes: make([]Lane, 0),
@@ -436,6 +441,11 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) ([]Cell, int) {
 	return cells, commitLaneIdx
 }
 
+// ----------------------------------
+//
+//	Retrieve the detailed diff or stat for a specific commit by its hash
+//
+// ----------------------------------
 func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash string) []string {
 	var gitArgs []string
 
@@ -511,8 +521,12 @@ func (gCL *GitCommitLog) GitCherryPick(cherryPickedCommitHashes []string) {
 	}
 }
 
-// GitCherryPickWithSigning constructs the git cherry-pick command arguments for execution in the terminal.
-// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+// ----------------------------------
+//
+//	GitCherryPickWithSigning constructs the git cherry-pick command arguments for execution in the terminal.
+//	This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+//
+// ----------------------------------
 func (gCL *GitCommitLog) GitCherryPickWithSigning(cherryPickedCommitHashes []string) []string {
 	topoOrderedCherryPickedCommitHashes := gCL.topoOrderCherryPickedCommit(cherryPickedCommitHashes)
 	gitArgs := []string{"cherry-pick"}

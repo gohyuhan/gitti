@@ -18,7 +18,11 @@ import (
 //	For Creating New Git branch
 //
 // ------------------------------------
-// pop up that confirm the option for creating a new branch, just create or create and move everything to the new branch
+// ----------------------------------
+//
+//	pop up that confirm the option for creating a new branch, just create or create and move everything to the new branch
+//
+// ----------------------------------
 func RenderChooseNewBranchTypePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseNewBranchTypeOptionPopUpModel)
 	if ok {
@@ -35,7 +39,11 @@ func RenderChooseNewBranchTypePopUp(m *types.GittiModel) string {
 	return ""
 }
 
-// to prompt user for new branch name and then proceed to trigger the creation of branch and optionally move changes
+// ----------------------------------
+//
+//	to prompt user for new branch name and then proceed to trigger the creation of branch and optionally move changes
+//
+// ----------------------------------
 func RenderCreateNewBranchPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
 	if ok {
@@ -66,7 +74,11 @@ func RenderCreateNewBranchPopUp(m *types.GittiModel) string {
 //	For Switching Git branch
 //
 // ------------------------------------
-// pop up that confirm the option for switching a branch, just switch or switch to the branch while bringing all the changes
+// ----------------------------------
+//
+//	pop up that confirm the option for switching a branch, just switch or switch to the branch while bringing all the changes
+//
+// ----------------------------------
 func RenderChooseSwitchBranchTypePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseSwitchBranchTypePopUpModel)
 	if ok {
@@ -83,9 +95,13 @@ func RenderChooseSwitchBranchTypePopUp(m *types.GittiModel) string {
 	return ""
 }
 
-// pop up to render the output of the switch branch operation
-// because we allow switching with bring changes over, there is conflict possiblities there fore we need to show the output
-// so that the user is aware of it
+// ----------------------------------
+//
+//	pop up to render the output of the switch branch operation
+//	because we allow switching with bring changes over, there is conflict possiblities there fore we need to show the output
+//	so that the user is aware of it
+//
+// ----------------------------------
 func RenderSwitchBranchOutputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {

@@ -8,6 +8,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
+// ------------------------------------
+//
+//	Cherry-pick selected commits in the user-specified sequence order
+//
+// ------------------------------------
 func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string]git.CherryPickedCommitLog) {
 	go func() {
 		var sortedCherryPickedCommitLogs []git.CherryPickedCommitLog
@@ -32,12 +37,22 @@ func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string
 	}()
 }
 
+// ------------------------------------
+//
+//	Revert a specific commit by its hash
+//
+// ------------------------------------
 func GitRevertCommitService(m *types.GittiModel, commitHash string, parentOrder int) {
 	go func() {
 		m.GitOperations.GitCommitLog.GitRevertCommit(commitHash, parentOrder)
 	}()
 }
 
+// ------------------------------------
+//
+//	Return the parent info for a specific commit hash
+//
+// ------------------------------------
 func GetCommitHashParentInfoService(m *types.GittiModel, commitHash string) []git.CommitHashParentInfo {
 	return m.GitOperations.GitCommitLog.GetCommitHashParentInfo(commitHash)
 }

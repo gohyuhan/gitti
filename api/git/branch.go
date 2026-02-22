@@ -21,6 +21,11 @@ type GitBranch struct {
 	gitProcessLock  *GitProcessLock
 }
 
+// ----------------------------------
+//
+//	Initialize the git branch handler with shared dependencies
+//
+// ----------------------------------
 func InitGitBranch(gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitBranch {
 	gitBranch := GitBranch{
 		isRepoUnborn:   false,

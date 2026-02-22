@@ -53,6 +53,11 @@ func GitRemotePushService(m *types.GittiModel, remoteName string, pushType strin
 	}(ctx)
 }
 
+// ------------------------------------
+//
+//	Cancel the current git push operation and clean up pop-up state
+//
+// ------------------------------------
 func GitRemotePushCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel)
 	if ok {
@@ -73,6 +78,11 @@ func GitRemotePushCancelService(m *types.GittiModel) {
 	}
 }
 
+// ------------------------------------
+//
+//	Initialize the push pop-up model and start the push operation
+//
+// ------------------------------------
 func InitGitRemotePushPopUpModelAndStartGitRemotePushService(m *types.GittiModel, remoteName string, pushType string) (*types.GittiModel, tea.Cmd) {
 	m.GitOperations.GitCommit.ClearGitRemotePushOutput()
 	if popUp, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel); !ok {

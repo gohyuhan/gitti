@@ -19,6 +19,11 @@ func Contains[T comparable](slice []T, item T) bool {
 	return false
 }
 
+// ----------------------------------
+//
+//	Open a URL in the system's default browser in a non-blocking goroutine
+//
+// ----------------------------------
 func OpenBrowser(url string) {
 	go func() {
 		var cmdExecutor *exec.Cmd
@@ -39,6 +44,11 @@ func OpenBrowser(url string) {
 	}()
 }
 
+// ----------------------------------
+//
+//	Return the platform-specific Downloads directory path, creating it if needed
+//
+// ----------------------------------
 func GetDownloadsDir() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {

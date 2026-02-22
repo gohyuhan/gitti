@@ -60,9 +60,13 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	OverrideSigningUISuspend:        false,
 }
 
-// getConfigPath returns the config.json path (creates directories if needed)
+// ----------------------------------
 //
-// *Example on MacOs : /Users/<USER_NAME>/Library/Application Support/gitti/config.json
+//	getConfigPath returns the config.json path (creates directories if needed)
+//
+//	*Example on MacOs : /Users/<USER_NAME>/Library/Application Support/gitti/config.json
+//
+// ----------------------------------
 func getConfigPath() (string, error) {
 	dir, err := os.UserConfigDir()
 	if err != nil {
@@ -75,7 +79,11 @@ func getConfigPath() (string, error) {
 	return filepath.Join(appDir, "config.json"), nil
 }
 
-// InitOrReadConfig loads existing config, ensures schema correctness, or creates default.
+// ----------------------------------
+//
+//	InitOrReadConfig loads existing config, ensures schema correctness, or creates default.
+//
+// ----------------------------------
 func InitOrReadConfig() {
 	GITTICONFIGSETTINGS = &GittiDefaultConfigSettings
 
@@ -134,8 +142,12 @@ func InitOrReadConfig() {
 	GITTICONFIGSETTINGS = &cfg
 }
 
-// ensureConfigIntegrity checks every field against the default.
-// If a field is zero or invalid (type mismatch), it assigns the default value.
+// ----------------------------------
+//
+//	ensureConfigIntegrity checks every field against the default.
+//	If a field is zero or invalid (type mismatch), it assigns the default value.
+//
+// ----------------------------------
 func ensureConfigIntegrity(cfg *GittiConfigSettings, def *GittiConfigSettings) bool {
 	cfgVal := reflect.ValueOf(cfg).Elem()
 	defVal := reflect.ValueOf(def).Elem()
@@ -172,10 +184,20 @@ func ensureConfigIntegrity(cfg *GittiConfigSettings, def *GittiConfigSettings) b
 	return changed
 }
 
+// ----------------------------------
+//
+//	Write the default config settings to disk
+//
+// ----------------------------------
 func writeDefaultConfig(cfgPath string) {
 	saveConfig(cfgPath, GittiDefaultConfigSettings)
 }
 
+// ----------------------------------
+//
+//	Persist the given config settings to disk as JSON
+//
+// ----------------------------------
 func saveConfig(cfgPath string, cfg GittiConfigSettings) {
 	file, err := os.Create(cfgPath)
 	if err != nil {
@@ -188,6 +210,11 @@ func saveConfig(cfgPath string, cfg GittiConfigSettings) {
 	_ = enc.Encode(cfg)
 }
 
+// ----------------------------------
+//
+//	Update and persist the language code setting
+//
+// ----------------------------------
 func UpdateLanguageCode(languageCode string) {
 	GITTICONFIGSETTINGS.LanguageCode = strings.ToUpper(languageCode)
 	cfgPath, err := getConfigPath()
@@ -196,6 +223,11 @@ func UpdateLanguageCode(languageCode string) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the default branch name, optionally applying it to git global config
+//
+// ----------------------------------
 func UpdateDefaultBranch(branchName string, applyToGit bool, cwd string) {
 	GITTICONFIGSETTINGS.GitInitDefaultBranch = branchName
 	cfgPath, err := getConfigPath()
@@ -207,6 +239,11 @@ func UpdateDefaultBranch(branchName string, applyToGit bool, cwd string) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the last update check time to current UTC time
+//
+// ----------------------------------
 func UpdateLastFetchTime() {
 	GITTICONFIGSETTINGS.LastUpdateCheckTime = time.Now().UTC()
 	cfgPath, err := getConfigPath()
@@ -215,6 +252,11 @@ func UpdateLastFetchTime() {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the auto update setting
+//
+// ----------------------------------
 func UpdateAutoUpdate(autoUpdate bool) {
 	GITTICONFIGSETTINGS.AutoUpdate = autoUpdate
 	cfgPath, err := getConfigPath()
@@ -223,6 +265,11 @@ func UpdateAutoUpdate(autoUpdate bool) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the editor preference
+//
+// ----------------------------------
 func UpdateEditor(editor string) {
 	GITTICONFIGSETTINGS.Editor = editor
 	cfgPath, err := getConfigPath()
@@ -231,6 +278,11 @@ func UpdateEditor(editor string) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the maximum commit log count
+//
+// ----------------------------------
 func UpdateMaxCommitLogCount(maxCount int) {
 	GITTICONFIGSETTINGS.MaxCommitLogCount = maxCount
 	cfgPath, err := getConfigPath()
@@ -239,6 +291,11 @@ func UpdateMaxCommitLogCount(maxCount int) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the maximum reflog count
+//
+// ----------------------------------
 func UpdateMaxRefLogCount(maxCount int) {
 	GITTICONFIGSETTINGS.MaxRefLogCount = maxCount
 	cfgPath, err := getConfigPath()
@@ -247,6 +304,11 @@ func UpdateMaxRefLogCount(maxCount int) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the commit graph write permission setting
+//
+// ----------------------------------
 func UpdateAllowCommitGraphWrite(allow bool) {
 	GITTICONFIGSETTINGS.AllowCommitGraphWrite = allow
 	cfgPath, err := getConfigPath()
@@ -255,6 +317,11 @@ func UpdateAllowCommitGraphWrite(allow bool) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the maximum log count
+//
+// ----------------------------------
 func UpdateMaxLogCount(maxLog int) {
 	GITTICONFIGSETTINGS.MaxLogCount = maxLog
 	cfgPath, err := getConfigPath()
@@ -263,6 +330,11 @@ func UpdateMaxLogCount(maxLog int) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the number of latest logs to display
+//
+// ----------------------------------
 func UpdateShowXLog(x int) {
 	GITTICONFIGSETTINGS.ShowXLog = x
 	cfgPath, err := getConfigPath()
@@ -271,6 +343,11 @@ func UpdateShowXLog(x int) {
 	}
 }
 
+// ----------------------------------
+//
+//	Update and persist the signing UI suspend override setting
+//
+// ----------------------------------
 func UpdateOverrideSigningUISuspend(override bool) {
 	GITTICONFIGSETTINGS.OverrideSigningUISuspend = override
 	cfgPath, err := getConfigPath()

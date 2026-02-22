@@ -15,7 +15,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// init the popup model for git commit
+// ----------------------------------
+//
+//	init the popup model for git commit
+//
+// ----------------------------------
 func InitGitCommitPopUpModel(m *types.GittiModel) {
 	commitMsg := ""
 	commitDesc := ""
@@ -63,7 +67,11 @@ func InitGitCommitPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-// init the popup model for git amend commit
+// ----------------------------------
+//
+//	init the popup model for git amend commit
+//
+// ----------------------------------
 func InitGitAmendCommitPopUpModel(m *types.GittiModel) {
 	commitMsgAndDesc := m.GitOperations.GitCommit.GetLatestCommitMsgAndDesc()
 	commitMsg := commitMsgAndDesc.Message
@@ -112,7 +120,11 @@ func InitGitAmendCommitPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-// for reset latest commit option list popup
+// ----------------------------------
+//
+//	for reset latest commit option list popup
+//
+// ----------------------------------
 func InitGitResetLatestCommitTypeOptionPopUpModel(m *types.GittiModel) {
 	gitResetLatestCommitTypeOption := []GitResetLatestCommitTypeOptionItem{
 		{
@@ -157,7 +169,11 @@ func InitGitResetLatestCommitTypeOptionPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-// for git reset latest commit confirmation prompt
+// ----------------------------------
+//
+//	for git reset latest commit confirmation prompt
+//
+// ----------------------------------
 func InitGitResetLatestCommitConfirmPromptPopUpModel(m *types.GittiModel, resetType string) {
 	popUpModel := &GitResetLatestCommitConfirmPromptPopUpModel{
 		GitResetLatestCommitType: resetType,
@@ -165,7 +181,11 @@ func InitGitResetLatestCommitConfirmPromptPopUpModel(m *types.GittiModel, resetT
 	m.PopUpModel = popUpModel
 }
 
-// for reset selected commit option list popup
+// ----------------------------------
+//
+//	for reset selected commit option list popup
+//
+// ----------------------------------
 func InitGitResetToSelectedCommitTypeOptionPopUpModel(m *types.GittiModel, selectedCommitHash string, commitInfoMessage string, commitInfoAuthor string) {
 	gitResetToSelectedCommitTypeOption := []GitResetToSelectedCommitTypeOptionItem{
 		{
@@ -213,7 +233,11 @@ func InitGitResetToSelectedCommitTypeOptionPopUpModel(m *types.GittiModel, selec
 	m.PopUpModel = popUpModel
 }
 
-// for git reset selected commit confirmation prompt
+// ----------------------------------
+//
+//	for git reset selected commit confirmation prompt
+//
+// ----------------------------------
 func InitGitResetToSelectedCommitConfirmPromptPopUpModel(m *types.GittiModel, resetType string, selectedCommitHash string, commitInfoMessage string, commitInfoAuthor string) {
 	popUpModel := &GitResetToSelectedCommitConfirmPromptPopUpModel{
 		GitResetToSelectedCommitType: resetType,

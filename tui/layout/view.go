@@ -12,9 +12,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// -----------------------------------------------------------------------------
-// Gitti Main Page View
-// -----------------------------------------------------------------------------
+// ----------------------------------
+//
+//	Gitti Main Page View component
+//
+// ----------------------------------
 func GittiMainPageView(m *types.GittiModel) string {
 	if m.Width < constant.MinWidth || m.Height < constant.MinHeight {
 		title := style.NewStyle.

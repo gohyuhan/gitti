@@ -68,6 +68,11 @@ func GitAddRemoteService(m *types.GittiModel) {
 	}(ctx)
 }
 
+// ------------------------------------
+//
+//	Cancel the current add remote operation and clean up pop-up state
+//
+// ------------------------------------
 func GitAddRemoteCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
 	if ok {

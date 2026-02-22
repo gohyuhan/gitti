@@ -8,6 +8,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/style"
 )
 
+// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
+// ----------------------------------
+//
+//	Construct the title string for the local branch component with responsive truncation
+//
+// ----------------------------------
 func ConstructLocalBranchComponentTitle(titleWidthLimit int) string {
 	title := fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
 		style.TitleCurrentComponentStyle.Render("[1]"),

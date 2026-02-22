@@ -16,6 +16,11 @@ type GitProcessLock struct {
 	logging                       *logging.GittiLogging
 }
 
+// ----------------------------------
+//
+//	Initialize the universal git process lock
+//
+// ----------------------------------
 func InitGitProcessLock(logging *logging.GittiLogging) *GitProcessLock {
 	gPL := &GitProcessLock{
 		otherGitProcessRunningWarning: i18n.LANGUAGEMAPPING.OtherGitOpsIsRunningWarning,
@@ -26,6 +31,11 @@ func InitGitProcessLock(logging *logging.GittiLogging) *GitProcessLock {
 	return gPL
 }
 
+// ----------------------------------
+//
+//	Attempt to acquire the git operations lock, returns true if successfully acquired
+//
+// ----------------------------------
 func (gpl *GitProcessLock) CanProceedWithGitOps() bool {
 	if gpl.isGitLockedForProcessing.CompareAndSwap(false, true) {
 		return true
@@ -35,10 +45,20 @@ func (gpl *GitProcessLock) CanProceedWithGitOps() bool {
 	}
 }
 
+// ----------------------------------
+//
+//	Release the git operations lock
+//
+// ----------------------------------
 func (gpl *GitProcessLock) ReleaseGitOpsLock() {
 	gpl.isGitLockedForProcessing.Store(false)
 }
 
+// ----------------------------------
+//
+//	Return the warning message for when another git operation is already running
+//
+// ----------------------------------
 func (gpl *GitProcessLock) OtherProcessRunningWarning() string {
 	return gpl.otherGitProcessRunningWarning
 }

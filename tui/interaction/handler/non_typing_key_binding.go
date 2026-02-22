@@ -34,6 +34,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
+// ----------------------------------
+//
+//	Handle global non-typing key interactions (e.g., '?').
+//	Responsibility: Opens the global Keybinding and Feature Instructions pop-up,
+//	suspending the typing state to display application-wide shortcuts and help info.
+//
+// ----------------------------------
 func handleNonTypingGlobalKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	m.ShowPopUp.Store(true)
 	m.IsTyping.Store(false)
@@ -42,6 +49,14 @@ func handleNonTypingGlobalKeyBindingInteraction(m *types.GittiModel) (*types.Git
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle '1' key interaction.
+//	Responsibility: Switches the active view focus to the first main layout tab
+//	(Local Branch, Tag, or Remote Component Panel), triggering an update to the
+//	detail panel dynamically.
+//
+// ----------------------------------
 func handleNonTyping1KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.LocalBranchOrTagOrRemoteComponentPanel {
@@ -55,6 +70,14 @@ func handleNonTyping1KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle '2' key interaction.
+//	Responsibility: Switches the active view focus to the second main layout tab
+//	(Modified Files Component Panel), triggering an update to the detail panel
+//	to reflect currently modified, added, or deleted repository files.
+//
+// ----------------------------------
 func handleNonTyping2KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.ModifiedFilesComponentPanel {
@@ -68,6 +91,13 @@ func handleNonTyping2KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle '3' key interaction.
+//	Responsibility: Switches the active view focus to the third main layout tab
+//	(Commit Log Component Panel), refreshing the detail view to display git log history.
+//
+// ----------------------------------
 func handleNonTyping3KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.CommitLogComponentPanel {
@@ -81,6 +111,13 @@ func handleNonTyping3KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle '4' key interaction.
+//	Responsibility: Switches the active view focus to the fourth main layout tab
+//	(Stash Component Panel), updating the detail panel to show current git stashes.
+//
+// ----------------------------------
 func handleNonTyping4KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.StashComponentPanel {
@@ -94,6 +131,14 @@ func handleNonTyping4KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'a' key interaction.
+//	Responsibility: Used contextually within popups. Specifically handles 'apply' actions
+//	for git cherry-pick popups, shifting the model state to confirm the application
+//	of cherry-picked commits.
+//
+// ----------------------------------
 func handleNonTypingaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
@@ -112,6 +157,14 @@ func handleNonTypingaKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'A' key interaction.
+//	Responsibility: Initiates the "Amend Commit" flow. Opens the amend commit popup,
+//	clears previous commit output, initializes the input model for the message,
+//	and switches the application to typing state.
+//
+// ----------------------------------
 func handleNonTypingAKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		m.ShowPopUp.Store(true)
@@ -125,6 +178,14 @@ func handleNonTypingAKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'c' key interaction.
+//	Responsibility: Initiates the "New Commit" flow. Opens the standard commit popup,
+//	resets the commit output view, initializes the input model if necessary,
+//	and places the user in typing mode to enter commit details.
+//
+// ----------------------------------
 func handleNonTypingcKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		m.GitOperations.GitCommit.ClearGitCommitOutput()
@@ -142,6 +203,14 @@ func handleNonTypingcKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'C' key interaction.
+//	Responsibility: Handles continuation operations. Primarily triggers "git commit --continue",
+//	"git rebase --continue", or "git cherry-pick --continue". Also handles the specific UI
+//	suspension needed for GPG signing processes during continuations.
+//
+// ----------------------------------
 func handleNonTypingCKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
@@ -158,6 +227,17 @@ func handleNonTypingCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'd' key interaction.
+//	Responsibility: Multi-contextual "discard" or "delete" operation. Depending on the focused panel, it handles:
+//	- Deleting local branches, remote references, or tags (prompting confirmations).
+//	- Dropping git stashes.
+//	- Discarding changes in modified files (with complex checking for staged, unstaged, untracked, and renamed states).
+//	- Discarding specific hunk/line changes when in detail line-editing mode.
+//	Also handles popup dismissals for specific cherry-pick list items.
+//
+// ----------------------------------
 func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -309,6 +389,16 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'e' key interaction.
+//	Responsibility: Contextual "edit" action.
+//	- In popups: Switches a cherry-pick view into "edit cherry-pick" mode.
+//	- In Remote Panel: Opens the prompt to edit an existing remote's URL/Name.
+//	- In Modified Files Panel: Launches the user's defined system editor (handling terminal/GUI diffs).
+//	- In Log Panel: Triggers exporting the internal application logs.
+//
+// ----------------------------------
 func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
@@ -362,6 +452,14 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'f' key interaction.
+//	Responsibility: Initiates the "fetch" operation. Specifically checks if the user is in the
+//	Tag component view. If no remotes exist, prompts to add one. If remotes exist,
+//	either directly fetches tags (if 1 remote) or opens a popup to select which remote to fetch tags from.
+//
+// ----------------------------------
 func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
@@ -395,6 +493,14 @@ func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'L' key interaction.
+//	Responsibility: Enters "Line Editing Mode" (also known as hunk staging mode).
+//	Allows the user to specifically stage, unstage or discard individual lines of a modified file
+//	instead of the entire file, updating the detail panel UI to reflect this state.
+//
+// ----------------------------------
 func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	// enter line stage state
 	services.EnterOrReinitLineEditingStateService(m)
@@ -402,6 +508,14 @@ func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'n' key interaction.
+//	Responsibility: Contextual "new" operation. Depending on the focused view:
+//	- In Local Branch View: Opens popup to create a new branch (optionally based on a remote).
+//	- In Remote View: Opens a prompt to add a new remote connection to the repository.
+//
+// ----------------------------------
 func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -429,6 +543,16 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'p' key interaction.
+//	Responsibility: Initiates the "push" operation.
+//	Checks for existing remotes; if none exist, prompts to add one.
+//	If remotes exist, it figures out the appropriate remote to push to,
+//	often opening a popup for the user to select the push argument (e.g., force push)
+//	or the specific remote if multiple exist.
+//
+// ----------------------------------
 func handleNonTypingpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		// first we need to check if there are any push/pull origin origin for this repo
@@ -463,6 +587,15 @@ func handleNonTypingpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'P' key interaction.
+//	Responsibility: Initiates the "pull" operation.
+//	Checks for existing remotes; if none exist, prompts to add one.
+//	If remotes exist, opens a popup allowing the user to select the type
+//	of pull operation (e.g., normal pull, pull rebase).
+//
+// ----------------------------------
 func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		// first we need to check if there are any push/pull origin for this repo
@@ -487,6 +620,15 @@ func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'r' key interaction.
+//	Responsibility: Contextual "resolve" or "reset" operations depending on the view:
+//	- In Modified Files Panel: Opens the conflict resolution popup for a conflicted file.
+//	- In Commit Log Panel: Opens a popup to reset the repository HEAD to a specifically
+//	  selected older commit (soft, mixed, or hard reset).
+//
+// ----------------------------------
 func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -522,6 +664,15 @@ func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'R' key interaction.
+//	Responsibility: Contextual "reset latest" operation.
+//	Specifically in the Commit Log Panel, this opens a popup allowing the user
+//	to reset the repository HEAD exactly one commit backwards (undoing the latest commit),
+//	offering soft, mixed, or hard reset options.
+//
+// ----------------------------------
 func handleNonTypingRKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -537,6 +688,14 @@ func handleNonTypingRKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 's' key interaction.
+//	Responsibility: Contextual "stash file" operation.
+//	In the Modified Files Panel, if a valid (non-conflicted) uncommitted file is selected,
+//	this triggers a popup to stash *only* that specific file, prompting for a stash message.
+//
+// ----------------------------------
 func handleNonTypingsKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.CurrentSelectedComponent == constant.ModifiedFilesComponentPanel {
 		currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -557,6 +716,14 @@ func handleNonTypingsKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'S' key interaction.
+//	Responsibility: Contextual "stash all" operation.
+//	In the Modified Files Panel, this triggers a popup to stash *all* currently modified
+//	tracked files in the repository, prompting the user for a stash message.
+//
+// ----------------------------------
 func handleNonTypingSKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.CurrentSelectedComponent == constant.ModifiedFilesComponentPanel {
 		currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -572,6 +739,14 @@ func handleNonTypingSKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 't' key interaction.
+//	Responsibility: Initiates the "Create Tag" operation.
+//	In the Commit Log Panel, selecting a specific commit and pressing 't'
+//	opens a popup to create a new git tag referencing that exact commit hash.
+//
+// ----------------------------------
 func handleNonTypingtKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.CurrentSelectedComponent {
 	case constant.CommitLogComponentPanel:
@@ -587,6 +762,14 @@ func handleNonTypingtKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle 'q' or 'Q' key interaction.
+//	Responsibility: Global "quit" or "exit" operation.
+//	If no popup is currently active, this forcefully stops any running git daemon
+//	and triggers Bubble Tea's quit command, closing the application.
+//
+// ----------------------------------
 func handleNonTypingqQKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if api.GITDAEMON != nil {
@@ -597,6 +780,14 @@ func handleNonTypingqQKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Backspace key interaction.
+//	Responsibility: Contextual "pop" or "revert" action.
+//	- In Stash Panel: Triggers a popup to 'pop' (apply and drop) the selected stash.
+//	- In Edit Cherry Pick Popup: Clears the cherry-picked commit list and dismisses the popup.
+//
+// ----------------------------------
 func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponentPanel {
 		selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
@@ -622,6 +813,14 @@ func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Enter key interaction.
+//	Responsibility: Core confirmation and drill-down action. Depends heavily on context:
+//	- Active Popup (e.g., choosing remote, selecting branch type, confirming discard): Executes the chosen workflow or triggers git commands (push, pull, reset, discard, tag operations, etc.).
+//	- Component Panels (when no popup active): Typically drills down into a "detail view" for the selected item (e.g., viewing diffs for a file, showing commit details), or triggers context menus like switching branches.
+//
+// ----------------------------------
 func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1167,6 +1366,14 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Tab key interaction.
+//	Responsibility: Global forward navigation.
+//	Cycles the primary active focus to the *next* main component panel in the UI layout
+//	(e.g., from Branches to Modified Files, then to Commit Log, etc.).
+//
+// ----------------------------------
 func handleNonTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	nextNavigation := m.CurrentSelectedComponentIndex + 1
 	if nextNavigation < len(constant.ComponentPanelNavigationList) {
@@ -1179,6 +1386,13 @@ func handleNonTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Shift+Tab key interaction.
+//	Responsibility: Global backward navigation.
+//	Cycles the primary active focus to the *previous* main component panel in the UI layout.
+//
+// ----------------------------------
 func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	previousNavigation := m.CurrentSelectedComponentIndex - 1
 	if previousNavigation >= 0 {
@@ -1191,6 +1405,15 @@ func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.G
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Space key interaction.
+//	Responsibility: Contextual "toggle" or "apply" action.
+//	- Modified / Detail Panels: Stages or unstages the selected file or specific hunk/line.
+//	- Stash Panel: Triggers applying a stash (without dropping it).
+//	- Cherry Pick Popup: Selects/toggles the currently highlighted commit to be added to the cherry-pick queue.
+//
+// ----------------------------------
 func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1251,6 +1474,16 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Esc key interaction.
+//	Responsibility: Universal "cancel" or "back" operation.
+//	- If operations are processing (pushing, pulling, etc.), blocking esc prevents interruption.
+//	- Cancels out of active background git services if possible.
+//	- Dismisses almost any active open popup, returning the user to the underlying view.
+//	- If in Detail line-editing mode, exits that specific mode back to the parent panel.
+//
+// ----------------------------------
 func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
@@ -1362,6 +1595,15 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Up/k key interaction.
+//	Responsibility: Vertical upward navigation.
+//	- Native lists: Moves selection highlight up one item.
+//	- Detail Viewports (text viewers & line-editing): Scrolls text up by one line.
+//	- Popups: Navigates upward in popup selection lists natively.
+//
+// ----------------------------------
 func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
@@ -1448,6 +1690,15 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Down/j key interaction.
+//	Responsibility: Vertical downward navigation.
+//	- Native lists: Moves selection highlight down one item.
+//	- Detail Viewports (text viewers & line-editing): Scrolls text down by one line.
+//	- Popups: Navigates downward in popup selection lists natively.
+//
+// ----------------------------------
 func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
@@ -1534,6 +1785,13 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Left/h key interaction.
+//	Responsibility: Horizontal left navigation/scrolling.
+//	Scrolls text viewers, detail panels, and wider popup views horizontally to the left.
+//
+// ----------------------------------
 func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
@@ -1574,6 +1832,13 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Right/l key interaction.
+//	Responsibility: Horizontal right navigation/scrolling.
+//	Scrolls text viewers, detail panels, and wider popup views horizontally to the right.
+//
+// ----------------------------------
 func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
@@ -1613,7 +1878,11 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMo
 	return m, nil
 }
 
-// handleNonTypingLeftBracketKeyBindingInteraction handles the '[' key not only for navigation but contextually to switch to the previous detail component panel
+// ----------------------------------
+//
+//	handleNonTypingLeftBracketKeyBindingInteraction handles the '[' key not only for navigation but contextually to switch to the previous detail component panel
+//
+// ----------------------------------
 func handleNonTypingLeftBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		// handle detail component panel switching
@@ -1624,7 +1893,11 @@ func handleNonTypingLeftBracketKeyBindingInteraction(m *types.GittiModel) (*type
 	return m, nil
 }
 
-// handleNonTypingRightBracketKeyBindingInteraction handles the ']' key not only for navigation but contextually to switch to the next detail component panel
+// ----------------------------------
+//
+//	handleNonTypingRightBracketKeyBindingInteraction handles the ']' key not only for navigation but contextually to switch to the next detail component panel
+//
+// ----------------------------------
 func handleNonTypingRightBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		// handle detail component panel switching
@@ -1635,6 +1908,13 @@ func handleNonTypingRightBracketKeyBindingInteraction(m *types.GittiModel) (*typ
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle '/' key interaction.
+//	Responsibility: Focuses the Log Component Panel.
+//	Used as a quick jumping shortcut to view the internal console/error logs of Gitti.
+//
+// ----------------------------------
 func handleNonTypingSlashKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent != constant.LogComponentPanel {
@@ -1646,6 +1926,14 @@ func handleNonTypingSlashKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle '<' key interaction.
+//	Responsibility: Component sub-state cycling (Backward).
+//	In the unified 'Local Branch Or Tag Or Remote' panel, this specifically rotates the visible
+//	list to the left/previous entity (e.g., from Remotes -> Tags -> Branches).
+//
+// ----------------------------------
 func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1665,6 +1953,14 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle '>' key interaction.
+//	Responsibility: Component sub-state cycling (Forward).
+//	In the unified 'Local Branch Or Tag Or Remote' panel, this specifically rotates the visible
+//	list to the right/next entity (e.g., from Branches -> Tags -> Remotes).
+//
+// ----------------------------------
 func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1684,6 +1980,14 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Ctrl+a key interaction.
+//	Responsibility: Global "Abort" operation.
+//	Attempts to actively abort ongoing multi-step git state operations
+//	like an incomplete merge, rebase, or cherry-pick.
+//
+// ----------------------------------
 func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		services.GitStateUniversalUtilsAbortService(m)
@@ -1691,6 +1995,14 @@ func handleNonTypingCtrlaKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Ctrl+k key interaction.
+//	Responsibility: Global "Skip" operation.
+//	Used primarily to skip the current commit during an interactive rebase
+//	or similar multi-step git states where skipping is a valid option.
+//
+// ----------------------------------
 func handleNonTypingCtrlkKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		services.GitStateUniversalUtilsSkipService(m)
@@ -1698,6 +2010,15 @@ func handleNonTypingCtrlkKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Ctrl+p key interaction.
+//	Responsibility: Contextual "cherry-pick mode" management.
+//	- Active Cherry-pick Popup: Switches between simple cherry-pick view and apply-confirm view.
+//	- Log Panel / Branch Panel: Triggers opening the initial cherry-pick interface or option
+//	  selection menu if commits are already queued.
+//
+// ----------------------------------
 func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
@@ -1761,6 +2082,15 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle Ctrl+r key interaction.
+//	Responsibility: Contextual "revert" mechanism.
+//	Specifically triggered in the Commit Log Panel to initiate a `git revert`
+//	of the currently selected commit, handling both standard commits and merge commits
+//	(by optionally prompting for the parent parent-line to revert against).
+//
+// ----------------------------------
 func handleNonTypingCtrlrKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {

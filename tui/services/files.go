@@ -6,6 +6,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Discard a single line change for the selected file in the detail panel
+//
+// ------------------------------------
 func GitDiscardLineFileChangeService(m *types.GittiModel, filePathName string) {
 	switch m.CurrentSelectedComponent {
 	case constant.DetailComponentPanel:

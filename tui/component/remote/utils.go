@@ -8,6 +8,8 @@ import (
 	"github.com/gohyuhan/gitti/tui/style"
 )
 
+// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
+
 func ConstructRemoteComponentTitle(titleWidthLimit int) string {
 	title := fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
 		style.TitleCurrentComponentStyle.Render("[1]"),

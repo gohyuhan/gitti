@@ -7,7 +7,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// init the viewport pop up for showing info of global key binding
+// ----------------------------------
+//
+//	init the viewport pop up for showing info of global key binding
+//
+// ----------------------------------
 func InitKeybindingAndFeatureInstructionsPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = false

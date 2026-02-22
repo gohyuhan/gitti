@@ -28,6 +28,11 @@ type GitFiles struct {
 	logging        *logging.GittiLogging
 }
 
+// ----------------------------------
+//
+//	Initialize the git file status handler with shared dependencies
+//
+// ----------------------------------
 func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitFiles {
 	gitFiles := GitFiles{
 		filesStatus:    make([]FileStatus, 0),
@@ -92,7 +97,11 @@ func (gf *GitFiles) GetGitFilesStatus() {
 	gf.filesStatus = modifiedFilesStatus
 }
 
-// get the file diff content
+// ----------------------------------
+//
+//	get the file diff content
+//
+// ----------------------------------
 func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus, DiffType string) []string {
 	filePathName := fileStatus.FilePathname
 	if fileStatus.IndexState == "R" || fileStatus.IndexState == "C" {
@@ -150,6 +159,11 @@ func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus,
 	return fileDiffLines
 }
 
+// ----------------------------------
+//
+//	Toggle a file's stage/unstage state based on its current status
+//
+// ----------------------------------
 func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -193,6 +207,11 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	}
 }
 
+// ----------------------------------
+//
+//	Stage all modified and untracked files
+//
+// ----------------------------------
 func (gf *GitFiles) StageAllChanges() {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -208,6 +227,11 @@ func (gf *GitFiles) StageAllChanges() {
 	}
 }
 
+// ----------------------------------
+//
+//	Unstage all currently staged files
+//
+// ----------------------------------
 func (gf *GitFiles) UnstageAllChanges() {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -305,9 +329,13 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 	}
 }
 
-// generateStageLinePatchString creates a patch string for a single line from a larger diff.
-// It keeps the target line as a change, converts other changes in the same context to "context lines",
-// and preserves existing context lines. This effectively isolates the chosen line for staging/unstaging.
+// ----------------------------------
+//
+//	generateStageLinePatchString creates a patch string for a single line from a larger diff.
+//	It keeps the target line as a change, converts other changes in the same context to "context lines",
+//	and preserves existing context lines. This effectively isolates the chosen line for staging/unstaging.
+//
+// ----------------------------------
 func generateStageLinePatchString(diffContentStringArray []string, actualStageLineIndex int, filePathName string) string {
 	var stageLinePatchString strings.Builder
 	// We need to track if the previous line was skipped to handle "\ No newline" markers correctly.
@@ -648,6 +676,11 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 	}
 }
 
+// ----------------------------------
+//
+//	Resolve a conflicted file using the specified resolution strategy
+//
+// ----------------------------------
 func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -760,12 +793,16 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 	}
 }
 
-// generateDiscardLinePatchString constructs a unified diff patch that inverses the change of a single line.
-// To make the patch apply cleanly even if there are other changes in the same chunk:
-// 1. The TARGET line's operator is swapped (+ becomes -, - becomes +) to "undo" it.
-// 2. OTHER added lines (+) are converted to context space (' ') because they already exist in the target state.
-// 3. OTHER deleted lines (-) are skipped because they do not exist in the target state.
-// 4. Special /dev/null paths are transformed to actual file paths for newly added/deleted files.
+// ----------------------------------
+//
+//	generateDiscardLinePatchString constructs a unified diff patch that inverses the change of a single line.
+//	To make the patch apply cleanly even if there are other changes in the same chunk:
+//	1. The TARGET line's operator is swapped (+ becomes -, - becomes +) to "undo" it.
+//	2. OTHER added lines (+) are converted to context space (' ') because they already exist in the target state.
+//	3. OTHER deleted lines (-) are skipped because they do not exist in the target state.
+//	4. Special /dev/null paths are transformed to actual file paths for newly added/deleted files.
+//
+// ----------------------------------
 func generateDiscardLinePatchString(diffContentStringArray []string, actualDiscardLineIndex int, filePathName string) string {
 	var discardLinePatchString strings.Builder
 

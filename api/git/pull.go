@@ -21,6 +21,11 @@ type GitPull struct {
 	logging         *logging.GittiLogging
 }
 
+// ----------------------------------
+//
+//	Initialize the git pull handler with shared dependencies
+//
+// ----------------------------------
 func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitPull {
 	gitPull := &GitPull{
 		gitPullOutput:  []string{},

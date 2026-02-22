@@ -13,7 +13,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// init the popup model for creating a new branch
+// ----------------------------------
+//
+//	init the popup model for creating a new branch
+//
+// ----------------------------------
 func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string) {
 	NewBranchNameInput := textinput.New()
 	NewBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.CreateNewBranchPrompt
@@ -27,7 +31,11 @@ func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string) {
 	}
 }
 
-// init the popup model for choosing new branch creation option
+// ----------------------------------
+//
+//	init the popup model for choosing new branch creation option
+//
+// ----------------------------------
 func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 	newBranchTypeOption := []GitNewBranchTypeOptionItem{
 		{
@@ -69,7 +77,11 @@ func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 	}
 }
 
-// init the popup model for switching branch
+// ----------------------------------
+//
+//	init the popup model for switching branch
+//
+// ----------------------------------
 func InitChooseSwitchBranchTypePopUpModel(m *types.GittiModel, branchName string) {
 	switchBranchTypeOption := []GitSwitchBranchTypeOptionItem{
 		{

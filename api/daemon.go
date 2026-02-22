@@ -43,6 +43,11 @@ type GitDaemon struct {
 
 var GITDAEMON *GitDaemon
 
+// ----------------------------------
+//
+//	Initialize the file system watcher daemon for monitoring git repository changes
+//
+// ----------------------------------
 func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations, allowCommitGraphWrite bool, daemonReceiverChannel chan string, gittiLogger *logging.GittiLogging) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -88,6 +93,11 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 	GITDAEMON = gd
 }
 
+// ----------------------------------
+//
+//	Register the repo directory paths for file watching, skipping objects and hooks directories
+//
+// ----------------------------------
 func (gd *GitDaemon) watchPath() {
 	err := gd.watcher.Add(gd.repoPath)
 	if err != nil {
@@ -107,6 +117,11 @@ func (gd *GitDaemon) watchPath() {
 	}
 }
 
+// ----------------------------------
+//
+//	Start the daemon's event loop to listen for file changes and trigger git info refresh
+//
+// ----------------------------------
 func (gd *GitDaemon) Start() {
 	go func() {
 		// Initial call to get info of git
@@ -175,6 +190,11 @@ func (gd *GitDaemon) Start() {
 	}()
 }
 
+// ----------------------------------
+//
+//	Reset the debounce timer to coalesce rapid file system events
+//
+// ----------------------------------
 func (gd *GitDaemon) resetDebounce() {
 	if !gd.watcherTimer.Stop() {
 		select {
@@ -185,6 +205,11 @@ func (gd *GitDaemon) resetDebounce() {
 	gd.watcherTimer.Reset(gd.debounceDur)
 }
 
+// ----------------------------------
+//
+//	Fetch latest git info concurrently across all operations (files, branches, remote, logs, stash, tags)
+//
+// ----------------------------------
 func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 	go func() {
 		if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
@@ -276,6 +301,11 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 	return false
 }
 
+// ----------------------------------
+//
+//	Write commit graph once on daemon start to improve git log retrieval performance
+//
+// ----------------------------------
 func (gd *GitDaemon) commitGraphWriteOnce() {
 	go func() {
 		if gd.allowCommitGraphWrite {
@@ -284,6 +314,11 @@ func (gd *GitDaemon) commitGraphWriteOnce() {
 	}()
 }
 
+// ----------------------------------
+//
+//	Stop the daemon and close the file watcher
+//
+// ----------------------------------
 func (gd *GitDaemon) Stop() {
 	close(gd.stopChannel)
 }

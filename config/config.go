@@ -12,6 +12,11 @@ import (
 	"github.com/gohyuhan/gitti/settings"
 )
 
+// ----------------------------------
+//
+//	Set the application language code for i18n and persist to config
+//
+// ----------------------------------
 func SetLanguage(langCode string) {
 	if i18n.IsLanguageCodeSupported(langCode) {
 		settings.UpdateLanguageCode(langCode)
@@ -23,14 +28,22 @@ func SetLanguage(langCode string) {
 	}
 }
 
-// set the default git init branch name only for gitti
+// ----------------------------------
+//
+//	set the default git init branch name only for gitti
+//
+// ----------------------------------
 func SetInitBranch(branchName string) {
 	settings.UpdateDefaultBranch(branchName, false, "")
 	fmt.Printf(i18n.LANGUAGEMAPPING.GittiDefaultBranchSet+"\n", branchName)
 	os.Exit(0)
 }
 
-// set the default git init branch name only for gitti
+// ----------------------------------
+//
+//	set the default git init branch name only for gitti
+//
+// ----------------------------------
 func SetAutoUpdate(autoUpdateString string) {
 	if strings.ToLower(autoUpdateString) == "true" {
 		settings.UpdateAutoUpdate(true)
@@ -46,14 +59,22 @@ func SetAutoUpdate(autoUpdateString string) {
 	}
 }
 
-// set the default git init branch name for both gitti and git
+// ----------------------------------
+//
+//	set the default git init branch name for both gitti and git
+//
+// ----------------------------------
 func SetGlobalInitBranch(branchName string, cwd string) {
 	settings.UpdateDefaultBranch(branchName, true, cwd)
 	fmt.Printf(i18n.LANGUAGEMAPPING.GittiDefaultAndGitDefaultBranchSet+"\n", branchName)
 	os.Exit(0)
 }
 
-// set the max commit log count to be retrieve and display
+// ----------------------------------
+//
+//	set the max commit log count to be retrieve and display
+//
+// ----------------------------------
 func SetMaxCommitLogCount(maxCommitLogCount int) {
 	if maxCommitLogCount < 10 {
 		fmt.Println(i18n.LANGUAGEMAPPING.MaxCommitLogCountSetError)
@@ -64,7 +85,11 @@ func SetMaxCommitLogCount(maxCommitLogCount int) {
 	os.Exit(0)
 }
 
-// set the max reflog count to be retrieve and display
+// ----------------------------------
+//
+//	set the max reflog count to be retrieve and display
+//
+// ----------------------------------
 func SetMaxRefLogCount(maxRefLogCount int) {
 	if maxRefLogCount < 10 {
 		fmt.Println(i18n.LANGUAGEMAPPING.MaxRefLogCountSetError)
@@ -75,6 +100,11 @@ func SetMaxRefLogCount(maxRefLogCount int) {
 	os.Exit(0)
 }
 
+// ----------------------------------
+//
+//	Set the override for signing UI suspend behavior and persist to config
+//
+// ----------------------------------
 func SetOverrideSigningUISuspend(override string) {
 	if strings.ToLower(override) == "true" {
 		settings.UpdateOverrideSigningUISuspend(true)
@@ -90,6 +120,11 @@ func SetOverrideSigningUISuspend(override string) {
 	}
 }
 
+// ----------------------------------
+//
+//	Enable or disable commit graph write and persist to config
+//
+// ----------------------------------
 func SetAllowCommitGraphWrite(allow string) {
 	if strings.ToLower(allow) == "true" {
 		settings.UpdateAllowCommitGraphWrite(true)
@@ -105,6 +140,11 @@ func SetAllowCommitGraphWrite(allow string) {
 	}
 }
 
+// ----------------------------------
+//
+//	Set the maximum number of log entries to retain and persist to config
+//
+// ----------------------------------
 func SetMaxLogCount(maxLog int) {
 	if maxLog < settings.GITTICONFIGSETTINGS.ShowXLog {
 		fmt.Printf(i18n.LANGUAGEMAPPING.MaxLogCountSetError+"\n", maxLog, settings.GITTICONFIGSETTINGS.ShowXLog)
@@ -116,6 +156,11 @@ func SetMaxLogCount(maxLog int) {
 	}
 }
 
+// ----------------------------------
+//
+//	Set the number of latest log entries to display in the log component and persist to config
+//
+// ----------------------------------
 func SetShowXLog(x int) {
 	if x > settings.GITTICONFIGSETTINGS.MaxLogCount {
 		fmt.Printf(i18n.LANGUAGEMAPPING.ShowXLogSetError+"\n", x, settings.GITTICONFIGSETTINGS.MaxLogCount)
@@ -127,6 +172,11 @@ func SetShowXLog(x int) {
 	}
 }
 
+// ----------------------------------
+//
+//	Initialize git verification, repo path resolution, and all API operations
+//
+// ----------------------------------
 func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *logging.GittiLogging, daemonUpdateChannel chan string) (*api.GitOperations, api.GitRepoPath) {
 	// check if git is installed in system if not, exit(1)
 	api.IsGitInstalled(repoPath)
@@ -141,11 +191,21 @@ func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *log
 	return gitOperations, gitRepoPathInfo
 }
 
+// ----------------------------------
+//
+//	Load settings from config file and initialize language mapping
+//
+// ----------------------------------
 func InitGlobalSettingAndLanguage() {
 	settings.InitOrReadConfig()
 	i18n.InitGittiLanguageMapping(settings.GITTICONFIGSETTINGS.LanguageCode)
 }
 
+// ----------------------------------
+//
+//	Interactive CLI menu to select and persist the default editor
+//
+// ----------------------------------
 func ChooseAndSetEditor() {
 	editors := []string{
 		"Vim",

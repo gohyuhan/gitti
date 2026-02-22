@@ -52,6 +52,11 @@ func GitPullService(m *types.GittiModel, pullType string) {
 	}(ctx)
 }
 
+// ------------------------------------
+//
+//	Cancel the current git pull operation and clean up pop-up state
+//
+// ------------------------------------
 func GitPullCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*pullPopUp.GitPullOutputPopUpModel)
 	if ok {

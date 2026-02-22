@@ -36,6 +36,11 @@ type RemoteSyncStatus struct {
 	Remote string
 }
 
+// ----------------------------------
+//
+//	Initialize the git remote handler with shared dependencies
+//
+// ----------------------------------
 func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitRemote {
 	gitRemote := GitRemote{
 		updateChannel:                 updateChannel,
@@ -255,10 +260,14 @@ func (gr *GitRemote) GitChangeRemoteUrl(remoteName string, newRemoteUrl string) 
 	}
 }
 
-// CheckRemoteExist checks for existing remotes by running 'git remote -v'.
-// It parses the output to identify unique remote name-URL combinations and
-// determines if they are intended for fetching, pushing, or both.
-// It populates the gr.remote, gr.fetchRemote, and gr.pushRemote slices accordingly.
+// ----------------------------------
+//
+//	CheckRemoteExist checks for existing remotes by running 'git remote -v'.
+//	It parses the output to identify unique remote name-URL combinations and
+//	determines if they are intended for fetching, pushing, or both.
+//	It populates the gr.remote, gr.fetchRemote, and gr.pushRemote slices accordingly.
+//
+// ----------------------------------
 func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 	gitArgs := []string{"remote", "-v"}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)

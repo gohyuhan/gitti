@@ -8,6 +8,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Create a new tag at the specified commit with a name and message
+//
+// ------------------------------------
 func CreateNewTagService(m *types.GittiModel, commitHash string, tagName string, tagMessage string) {
 	go func() {
 		m.GitOperations.GitTag.CreateNewTag(commitHash, tagName, tagMessage)
@@ -136,6 +141,11 @@ func GitPushTagService(m *types.GittiModel, originName string, tagName string, p
 	}(ctx)
 }
 
+// ------------------------------------
+//
+//	Cancel the current tag push operation and clean up pop-up state
+//
+// ------------------------------------
 func GitPushTagCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*tagPopUp.PushTagOutputPopUpModel)
 	if ok {
@@ -209,6 +219,11 @@ func GitFetchTagService(m *types.GittiModel, originName string, fetchType string
 	}(ctx)
 }
 
+// ------------------------------------
+//
+//	Cancel the current tag fetch operation and clean up pop-up state
+//
+// ------------------------------------
 func GitFetchTagCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel)
 	if ok {

@@ -9,9 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
-
-// init the list component for Branch Component
+// ----------------------------------
+//
+//	init the list component for Branch Component
+//
+// ----------------------------------
 func InitBranchList(m *types.GittiModel) {
 	currentCheckOut := m.GitOperations.GitBranch.CurrentCheckOut()
 	latestBranchArray := []list.Item{

@@ -28,6 +28,11 @@ type GitTag struct {
 	tagFetchOutputMu sync.RWMutex
 }
 
+// ----------------------------------
+//
+//	Initialize the git tag handler with shared dependencies
+//
+// ----------------------------------
 func InitGitTag(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitTag {
 	gitTag := GitTag{
 		updateChannel:  updateChannel,
@@ -129,9 +134,13 @@ func (gt *GitTag) CreateNewTag(commitHash string, newTagName string, tagMessage 
 	}
 }
 
-// CreateNewTagWithSigning constructs a git tag command for terminal execution when signing is required.
-// When tag signing is enabled, gitti UI is suspended and the tag is created directly in the terminal,
-// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+// ----------------------------------
+//
+//	CreateNewTagWithSigning constructs a git tag command for terminal execution when signing is required.
+//	When tag signing is enabled, gitti UI is suspended and the tag is created directly in the terminal,
+//	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+//
+// ----------------------------------
 func (gt *GitTag) CreateNewTagWithSigning(commitHash string, newTagName string, tagMessage string) []string {
 	gitArgs := []string{"tag", "-a", newTagName, commitHash, "-m", tagMessage}
 
@@ -267,15 +276,24 @@ func (gt *GitTag) GitPushTag(ctx context.Context, originName string, tagName str
 	return 0
 }
 
+// ----------------------------------
+//
+//	Clear the stored tag push output buffer
+//
+// ----------------------------------
 func (gt *GitTag) ClearGitPushTagOutput() {
 	gt.tagPushOutputMu.Lock()
 	defer gt.tagPushOutputMu.Unlock()
 	gt.tagPushOutput = []string{}
 }
 
-// GitPushTagWithSigning constructs a git push tag command for terminal execution when signing is required.
-// When tag signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
-// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+// ----------------------------------
+//
+//	GitPushTagWithSigning constructs a git push tag command for terminal execution when signing is required.
+//	When tag signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
+//	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+//
+// ----------------------------------
 func (gt *GitTag) GitPushTagWithSigning(originName string, tagName string, pushType string) []string {
 	var gitArgs []string
 
@@ -395,6 +413,11 @@ func (gt *GitTag) GitFetchTag(ctx context.Context, originName string, fetchType 
 	return 0
 }
 
+// ----------------------------------
+//
+//	Clear the stored tag fetch output buffer
+//
+// ----------------------------------
 func (gt *GitTag) ClearGitFetchTagOutput() {
 	gt.tagFetchOutputMu.Lock()
 	defer gt.tagFetchOutputMu.Unlock()
@@ -444,6 +467,11 @@ func (gt *GitTag) GitDeleteTag(ctx context.Context, originName string, tagName s
 	return parsedDeleteTagOutput, true
 }
 
+// ----------------------------------
+//
+//	Construct args for signing-required remote tag deletion in the terminal
+//
+// ----------------------------------
 func (gt *GitTag) GitDeleteRemoteTagWithSigning(originName string, tagName string) []string {
 	return []string{"push", originName, "--delete", tagName}
 }

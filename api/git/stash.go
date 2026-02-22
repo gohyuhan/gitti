@@ -22,6 +22,11 @@ type GitStash struct {
 	logging        *logging.GittiLogging
 }
 
+// ----------------------------------
+//
+//	Initialize the git stash handler with shared dependencies
+//
+// ----------------------------------
 func InitGitStash(gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitStash {
 	gitStash := &GitStash{
 		allStash:       []StashInfo{},
@@ -32,6 +37,11 @@ func InitGitStash(gitProcessLock *GitProcessLock, logging *logging.GittiLogging)
 	return gitStash
 }
 
+// ----------------------------------
+//
+//	Return all stash entries
+//
+// ----------------------------------
 func (gs *GitStash) AllStash() []StashInfo {
 	copied := make([]StashInfo, len(gs.allStash))
 	copy(copied, gs.allStash)

@@ -41,6 +41,11 @@ func GitUnstageAllChangesService(m *types.GittiModel) {
 	}()
 }
 
+// ------------------------------------
+//
+//	Strip ANSI escape codes from a string array for clean text processing
+//
+// ------------------------------------
 func stripAnsi(strArray []string) []string {
 	const ansi = "[\u001B\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[a-zA-Z\\d]*)*)?\u0007)|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PRZcf-ntgry=><~]))"
 	re := regexp.MustCompile(ansi)
@@ -50,6 +55,11 @@ func stripAnsi(strArray []string) []string {
 	return strArray
 }
 
+// ------------------------------------
+//
+//	Stage or unstage a single diff line for the selected file
+//
+// ------------------------------------
 func GitStageLineOrUnstageLineService(m *types.GittiModel, filePathName string) {
 	switch m.CurrentSelectedComponent {
 	case constant.DetailComponentPanel:

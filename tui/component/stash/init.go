@@ -10,10 +10,12 @@ import (
 	"charm.land/bubbles/v2/list"
 )
 
-// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
-
-// init the list component for Stash info Component
-// return bool was to tell if we need to reinit the detail component panel or not
+// ----------------------------------
+//
+//	init the list component for Stash info Component
+//	return bool was to tell if we need to reinit the detail component panel or not
+//
+// ----------------------------------
 func InitStashList(m *types.GittiModel) bool {
 	latestStashArray := m.GitOperations.GitStash.AllStash()
 	items := make([]list.Item, 0, len(latestStashArray))

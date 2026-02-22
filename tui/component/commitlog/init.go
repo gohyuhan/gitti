@@ -9,9 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
-
-// init the list component for commit log Component
+// ----------------------------------
+//
+//	init the list component for commit log Component
+//
+// ----------------------------------
 func InitGitCommitLogList(m *types.GittiModel) bool {
 	latestGitCommitLog := m.GitOperations.GitCommitLog.GitCommitLogOutput()
 	latestGitCommitLogItemArray := make([]list.Item, 0, len(latestGitCommitLog))

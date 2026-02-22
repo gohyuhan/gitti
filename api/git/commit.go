@@ -29,6 +29,11 @@ type LatestCommitMsgAndDesc struct {
 	Description string
 }
 
+// ----------------------------------
+//
+//	Initialize the git commit handler with shared dependencies
+//
+// ----------------------------------
 func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitCommit {
 	gitCommit := GitCommit{
 		gitCommitOutput:     []string{},
@@ -174,15 +179,24 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 	return 0
 }
 
+// ----------------------------------
+//
+//	Clear the stored commit output buffer
+//
+// ----------------------------------
 func (gc *GitCommit) ClearGitCommitOutput() {
 	gc.gitCommitOutputMu.Lock()
 	defer gc.gitCommitOutputMu.Unlock()
 	gc.gitCommitOutput = []string{}
 }
 
-// GitCommitWithSigning constructs a git commit command for terminal execution when signing is required.
-// When commit signing is enabled, gitti UI is suspended and the commit is executed directly in the terminal,
-// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+// ----------------------------------
+//
+//	GitCommitWithSigning constructs a git commit command for terminal execution when signing is required.
+//	When commit signing is enabled, gitti UI is suspended and the commit is executed directly in the terminal,
+//	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+//
+// ----------------------------------
 func (gc *GitCommit) GitCommitWithSigning(message, description string, isAmendCommit bool) []string {
 	gitArgs := []string{"commit", "-m", message}
 	if isAmendCommit {
@@ -331,9 +345,13 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	return 0
 }
 
-// GitPushWithSigning constructs a git push command for terminal execution when signing is required.
-// When push signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
-// allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+// ----------------------------------
+//
+//	GitPushWithSigning constructs a git push command for terminal execution when signing is required.
+//	When push signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
+//	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+//
+// ----------------------------------
 func (gc *GitCommit) GitPushWithSigning(originName string, pushType string, currentCheckOutBranch string) []string {
 	var gitArgs []string
 
@@ -361,6 +379,11 @@ func (gc *GitCommit) GitPushWithSigning(originName string, pushType string, curr
 	return gitArgs
 }
 
+// ----------------------------------
+//
+//	Clear the stored remote push output buffer
+//
+// ----------------------------------
 func (gc *GitCommit) ClearGitRemotePushOutput() {
 	gc.gitRemotePushOutputMu.Lock()
 	defer gc.gitRemotePushOutputMu.Unlock()

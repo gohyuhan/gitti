@@ -9,10 +9,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
-
-// init the list component for Modified Files Component
-// return bool was to tell if we need to reinit the detail component panel or not
+// ----------------------------------
+//
+//	init the list component for Modified Files Component
+//	return bool was to tell if we need to reinit the detail component panel or not
+//
+// ----------------------------------
 func InitModifiedFilesList(m *types.GittiModel) bool {
 	latestModifiedFilesArray := m.GitOperations.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))

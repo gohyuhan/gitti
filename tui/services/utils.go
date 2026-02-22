@@ -141,7 +141,11 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 	}(ctx)
 }
 
-// for tsg detail panel view
+// ----------------------------------
+//
+//	for tag detail panel view
+//
+// ----------------------------------
 func generateTagDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
 	var tagItem tag.GitTagItem
@@ -235,7 +239,11 @@ func generateRemoteDetailPanelContent(m *types.GittiModel) string {
 	return vpLine.String()
 }
 
-// for modified file detail panel view
+// ----------------------------------
+//
+//	for modified file detail panel view
+//
+// ----------------------------------
 func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiModel) (string, string, bool) {
 	shouldRenderDetailComponentPanelTwo := false
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -295,7 +303,11 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 	return vpLine1.String(), vpLine2.String(), shouldRenderDetailComponentPanelTwo
 }
 
-// for commit log detail panel view
+// ----------------------------------
+//
+//	for commit log detail panel view
+//
+// ----------------------------------
 func generateCommitLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
 	var commitLogItem commitlog.GitCommitLogItem
@@ -319,7 +331,11 @@ func generateCommitLogDetailPanelContent(ctx context.Context, m *types.GittiMode
 	return vpLine.String()
 }
 
-// for stash detail panel view
+// ----------------------------------
+//
+//	for stash detail panel view
+//
+// ----------------------------------
 func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
 	var stashItem stash.GitStashItem
@@ -355,7 +371,11 @@ func generateLogDetailPanelContent(ctx context.Context, m *types.GittiModel) str
 	return vpLine
 }
 
-// for about gitti content
+// ----------------------------------
+//
+//	for about gitti content
+//
+// ----------------------------------
 func generateAboutGittiContent() string {
 	var vpLine strings.Builder
 

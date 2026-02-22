@@ -13,13 +13,17 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
+// ----------------------------------
+//
+//	typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
+//
+// ----------------------------------
 func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
 		return handleTypingESCKeyBindingInteraction(m)
 
-		// in typing mode, tab is move to next input
+	// in typing mode, tab is move to next input
 	case "tab":
 		return handleTypingTabKeyBindingInteraction(m)
 
@@ -40,7 +44,7 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 	case "ctrl+p":
 		return handleTypingCtrlpKeyBindingInteraction(m)
 
-		// to copy content from current input field to clipboard
+	// to copy content from current input field to clipboard
 	case "ctrl+y":
 		return handleTypingCtrlyKeyBindingInteraction(m)
 	}
@@ -147,6 +151,11 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 	return m, nil
 }
 
+// ----------------------------------
+//
+//	Handle non-typing key binding interactions, dispatching to specific key handlers
+//
+// ----------------------------------
 func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "?":

@@ -26,7 +26,11 @@ func InitGitStashMessagePopUpModel(m *types.GittiModel, filePathName string, sta
 	m.PopUpModel = popUpModel
 }
 
-// for git stash output popup
+// ----------------------------------
+//
+//	for git stash output popup
+//
+// ----------------------------------
 func InitGitStashOperationOutputPopUpModel(m *types.GittiModel, stashOperationType string) {
 	vp := viewport.New()
 	vp.SoftWrap = true
@@ -50,7 +54,11 @@ func InitGitStashOperationOutputPopUpModel(m *types.GittiModel, stashOperationTy
 	m.PopUpModel = popUpModel
 }
 
-// for git stash operation confirm prompt
+// ----------------------------------
+//
+//	for git stash operation confirm prompt
+//
+// ----------------------------------
 func InitGitStashConfirmPromptPopUpModel(m *types.GittiModel, stashOperationType string, filePathName string, stashId string, stashMessage string) {
 	popUpModel := &GitStashConfirmPromptPopUpModel{
 		StashOperationType: stashOperationType,

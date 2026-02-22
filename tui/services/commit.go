@@ -65,6 +65,11 @@ func GitCommitService(m *types.GittiModel, isAmendCommit bool) {
 	}(ctx)
 }
 
+// ------------------------------------
+//
+//	Cancel the current git commit operation and clean up pop-up state
+//
+// ------------------------------------
 func GitCommitCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
 	if ok {
@@ -142,6 +147,11 @@ func GitAmendCommitService(m *types.GittiModel, isAmendCommit bool) {
 	}(ctx)
 }
 
+// ------------------------------------
+//
+//	Cancel the current git amend commit operation and clean up pop-up state
+//
+// ------------------------------------
 func GitAmendCommitCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
 	if ok {
