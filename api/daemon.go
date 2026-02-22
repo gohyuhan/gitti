@@ -238,7 +238,7 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 		if gd.isGitCommitLogPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitCommitLogPassiveRunning.Store(false)
 			gd.gitOperations.GitCommitLog.GetCommitLogs()
-			gd.updateChannel <- git.GIT_LOG_UPDATE
+			gd.updateChannel <- git.GIT_COMMITLOG_UPDATE
 		}
 	}()
 	go func() {

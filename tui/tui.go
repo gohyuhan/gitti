@@ -69,13 +69,14 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	lineEditingIndexCursorVpTwo.MouseWheelDelta = 0
 
 	gittiModel := &types.GittiModel{
-		GittiLogger:                                      gittiLogger,
-		DaemonUpdateChannel:                              daemonUpdateChannel,
-		TuiUpdateChannel:                                 tuiUpdateChannel,
-		UserSetEditor:                                    settings.GITTICONFIGSETTINGS.Editor,
-		CurrentSelectedComponent:                         constant.ModifiedFilesComponentPanel,
-		CurrentSelectedComponentIndex:                    2,
-		CurrentLocalBranchOrTagComponentShowing:          constant.SHOW_LOCAL_BRANCH,
+		GittiLogger:                   gittiLogger,
+		DaemonUpdateChannel:           daemonUpdateChannel,
+		TuiUpdateChannel:              tuiUpdateChannel,
+		UserSetEditor:                 settings.GITTICONFIGSETTINGS.Editor,
+		CurrentSelectedComponent:      constant.ModifiedFilesComponentPanel,
+		CurrentSelectedComponentIndex: 2,
+		CurrentLocalBranchOrTagOrRemoteComponentShowing:  constant.SHOW_LOCAL_BRANCH,
+		CurrentCommitLogOrRefLogComponentShowing:         constant.SHOW_COMMITLOG,
 		TotalComponentCount:                              4,
 		RepoPath:                                         repoPath,
 		RepoName:                                         repoName,
@@ -183,17 +184,17 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			layout.UpdateDetailComponentViewportLayout(m)
 		case git.GIT_BRANCH_UPDATE:
 			branchComponent.InitBranchList(m)
-			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_LOCAL_BRANCH {
+			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_LOCAL_BRANCH {
 				services.FetchDetailComponentPanelInfoService(m, false)
 			}
 		case git.GIT_TAG_UPDATE:
 			needReinit := tagComponent.InitTagList(m)
-			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
+			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_TAG {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_REMOTE_UPDATE:
 			needReinit := remoteComponent.InitRemoteList(m)
-			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_REMOTE {
+			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_REMOTE {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_FILES_STATUS_UPDATE:
@@ -203,9 +204,9 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case git.GIT_STATE_UPDATE:
 			gAM.updateGitRepoState()
-		case git.GIT_LOG_UPDATE:
+		case git.GIT_COMMITLOG_UPDATE:
 			needReinit := commitlogComponent.InitGitCommitLogList(m)
-			if m.CurrentSelectedComponent == constant.CommitLogComponentPanel {
+			if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel && m.CurrentCommitLogOrRefLogComponentShowing == constant.SHOW_COMMITLOG {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_STASH_UPDATE:

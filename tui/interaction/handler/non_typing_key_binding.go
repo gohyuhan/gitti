@@ -100,8 +100,8 @@ func handleNonTyping2KeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 // ----------------------------------
 func handleNonTyping3KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
-		if m.CurrentSelectedComponent != constant.CommitLogComponentPanel {
-			m.CurrentSelectedComponent = constant.CommitLogComponentPanel
+		if m.CurrentSelectedComponent != constant.CommitLogOrRefLogComponentPanel {
+			m.CurrentSelectedComponent = constant.CommitLogOrRefLogComponentPanel
 			m.CurrentSelectedComponentIndex = 3
 			m.DetailPanelParentComponent = ""
 			layout.LeftPanelDynamicResize(m)
@@ -242,7 +242,7 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				selectedBranchItem := m.CurrentRepoBranchesInfoList.SelectedItem()
 				if selectedBranchItem != nil {
@@ -416,7 +416,7 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	} else {
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_REMOTE:
 				selectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
 				if selectedRemote != nil {
@@ -463,7 +463,7 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
-			m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
+			m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_TAG {
 			if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 				// if no remote found, we add one
 				m.PopUpType = constant.AddRemotePromptPopUp
@@ -520,7 +520,7 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				m.PopUpType = constant.ChooseNewBranchTypePopUp
 				m.IsTyping.Store(false)
@@ -645,19 +645,22 @@ func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				m.PopUpType = constant.GitResolveConflictOptionPopUp
 				resolvePopUp.InitGitResolveConflictOptionPopUpModel(m, currentSelectedFile.FilePathname)
 			}
-		case constant.CommitLogComponentPanel:
-			selectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
-			if m.CurrentRepoCommitLogInfoList.Items() != nil {
-				parsedCommit := selectedCommit.(commitlog.GitCommitLogItem)
-				commitPopUp.InitGitResetToSelectedCommitTypeOptionPopUpModel(
-					m,
-					parsedCommit.Hash,
-					parsedCommit.Message,
-					parsedCommit.Author,
-				)
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(false)
-				m.PopUpType = constant.GitResetToSelectedCommitTypeOptionPopUp
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				selectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
+				if m.CurrentRepoCommitLogInfoList.Items() != nil {
+					parsedCommit := selectedCommit.(commitlog.GitCommitLogItem)
+					commitPopUp.InitGitResetToSelectedCommitTypeOptionPopUpModel(
+						m,
+						parsedCommit.Hash,
+						parsedCommit.Message,
+						parsedCommit.Author,
+					)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.GitResetToSelectedCommitTypeOptionPopUp
+				}
 			}
 		}
 	}
@@ -676,12 +679,15 @@ func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingRKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.CommitLogComponentPanel:
-			if len(m.CurrentRepoCommitLogInfoList.Items()) > 1 {
-				commitPopUp.InitGitResetLatestCommitTypeOptionPopUpModel(m)
-				m.ShowPopUp.Store(true)
-				m.IsTyping.Store(false)
-				m.PopUpType = constant.GitResetLatestCommitTypeOptionPopUp
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				if len(m.CurrentRepoCommitLogInfoList.Items()) > 1 {
+					commitPopUp.InitGitResetLatestCommitTypeOptionPopUpModel(m)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.GitResetLatestCommitTypeOptionPopUp
+				}
 			}
 		}
 	}
@@ -749,14 +755,17 @@ func handleNonTypingSKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 // ----------------------------------
 func handleNonTypingtKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.CurrentSelectedComponent {
-	case constant.CommitLogComponentPanel:
-		currentSelectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
-		if currentSelectedCommit != nil {
-			commit := currentSelectedCommit.(commitlog.GitCommitLogItem)
-			m.PopUpType = constant.CreateTagPopUp
-			tagPopUp.InitCreateTagPopUpModel(m, commit.Hash, commit.Message)
-			m.ShowPopUp.Store(true)
-			m.IsTyping.Store(true)
+	case constant.CommitLogOrRefLogComponentPanel:
+		switch m.CurrentCommitLogOrRefLogComponentShowing {
+		case constant.SHOW_COMMITLOG:
+			currentSelectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
+			if currentSelectedCommit != nil {
+				commit := currentSelectedCommit.(commitlog.GitCommitLogItem)
+				m.PopUpType = constant.CreateTagPopUp
+				tagPopUp.InitCreateTagPopUpModel(m, commit.Hash, commit.Message)
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(true)
+			}
 		}
 	}
 	return m, nil
@@ -829,10 +838,13 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.CurrentSelectedComponent = constant.DetailComponentPanel
 				m.DetailPanelParentComponent = constant.ModifiedFilesComponentPanel
 			}
-		case constant.CommitLogComponentPanel:
-			if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
-				m.CurrentSelectedComponent = constant.DetailComponentPanel
-				m.DetailPanelParentComponent = constant.CommitLogComponentPanel
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
+					m.CurrentSelectedComponent = constant.DetailComponentPanel
+					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
+				}
 			}
 		case constant.StashComponentPanel:
 			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
@@ -840,7 +852,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.DetailPanelParentComponent = constant.StashComponentPanel
 			}
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(branch.GitBranchItem)
 				// only proceed if the local branch selected is not current checkedout branch
@@ -1610,7 +1622,7 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			// we don't use the list native Update() because we track the current selected index
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				if m.CurrentRepoBranchesInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() - 1
@@ -1641,13 +1653,16 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 				m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
-		case constant.CommitLogComponentPanel:
-			// we don't use the list native Update() because we need to also track the current selected index
-			if m.CurrentRepoCommitLogInfoList.Index() > 0 {
-				latestIndex := m.CurrentRepoCommitLogInfoList.Index() - 1
-				m.CurrentRepoCommitLogInfoList.Select(latestIndex)
-				m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
-				services.FetchDetailComponentPanelInfoService(m, true)
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				// we don't use the list native Update() because we need to also track the current selected index
+				if m.CurrentRepoCommitLogInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoCommitLogInfoList.Index() - 1
+					m.CurrentRepoCommitLogInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
 			}
 		case constant.StashComponentPanel:
 			// we don't use the list native Update() because we need to also track the current selected index
@@ -1705,7 +1720,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			// we don't use the list native Update() because we track the current selected index
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				if m.CurrentRepoBranchesInfoList.Index() < len(m.CurrentRepoBranchesInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() + 1
@@ -1736,13 +1751,16 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 				m.ListNavigationIndexPosition.ModifiedFilesComponent = latestIndex
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
-		case constant.CommitLogComponentPanel:
-			// we don't use the list native Update() because we need to also track the current selected index
-			if m.CurrentRepoCommitLogInfoList.Index() < len(m.CurrentRepoCommitLogInfoList.Items())-1 {
-				latestIndex := m.CurrentRepoCommitLogInfoList.Index() + 1
-				m.CurrentRepoCommitLogInfoList.Select(latestIndex)
-				m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
-				services.FetchDetailComponentPanelInfoService(m, true)
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				// we don't use the list native Update() because we need to also track the current selected index
+				if m.CurrentRepoCommitLogInfoList.Index() < len(m.CurrentRepoCommitLogInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoCommitLogInfoList.Index() + 1
+					m.CurrentRepoCommitLogInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
 			}
 		case constant.StashComponentPanel:
 			// we don't use the list native Update() because we need to also track the current selected index
@@ -1938,14 +1956,14 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 			// do nothing, as local branch will be the most left option in the local branch or tag or remote component panel
 			case constant.SHOW_TAG:
-				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_LOCAL_BRANCH
+				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_LOCAL_BRANCH
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_REMOTE:
-				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_TAG
+				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_TAG
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		}
@@ -1965,12 +1983,12 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_TAG
+				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_TAG
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_TAG:
-				m.CurrentLocalBranchOrTagComponentShowing = constant.SHOW_REMOTE
+				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_REMOTE
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_REMOTE:
 				// do nothing, as remote is currently the most right option in the local branch or tag or remote component panel
@@ -2034,8 +2052,8 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			m.IsTyping.Store(false)
 		}
 	} else {
-		if (m.CurrentSelectedComponent == constant.CommitLogComponentPanel || m.DetailPanelParentComponent == constant.CommitLogComponentPanel) &&
-			len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
+		if (m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel || m.DetailPanelParentComponent == constant.CommitLogOrRefLogComponentPanel) &&
+			len(m.CurrentRepoCommitLogInfoList.Items()) > 0 && m.CurrentCommitLogOrRefLogComponentShowing == constant.SHOW_COMMITLOG {
 			if len(m.CherryPickedCommitInfo.CherryPickedCommitMap) < 1 {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.GitCherryPickPopUp
@@ -2048,7 +2066,7 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				commitLogPopUp.InitGitCherryPickOptionSelectionPopUp(m)
 			}
 		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
-			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagComponentShowing == constant.SHOW_TAG {
+			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_TAG {
 			selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
 			if selectedTag == nil {
 				return m, nil
@@ -2094,28 +2112,31 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 func handleNonTypingCtrlrKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.CommitLogComponentPanel:
-			selectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
-			if selectedCommitLog != nil {
-				parsedCommitLog := selectedCommitLog.(commitlog.GitCommitLogItem)
-				commitHashParentInfos := services.GetCommitHashParentInfoService(m, parsedCommitLog.Hash)
-				if commitHashParentInfos != nil {
-					if len(commitHashParentInfos) > 1 {
-						commitLogPopUp.InitGitRevertParentOptionSelectionPopUp(m, parsedCommitLog.Hash, commitHashParentInfos)
-						m.ShowPopUp.Store(true)
-						m.IsTyping.Store(false)
-						m.PopUpType = constant.GitRevertParentOptionSelectionPopUp
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				selectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
+				if selectedCommitLog != nil {
+					parsedCommitLog := selectedCommitLog.(commitlog.GitCommitLogItem)
+					commitHashParentInfos := services.GetCommitHashParentInfoService(m, parsedCommitLog.Hash)
+					if commitHashParentInfos != nil {
+						if len(commitHashParentInfos) > 1 {
+							commitLogPopUp.InitGitRevertParentOptionSelectionPopUp(m, parsedCommitLog.Hash, commitHashParentInfos)
+							m.ShowPopUp.Store(true)
+							m.IsTyping.Store(false)
+							m.PopUpType = constant.GitRevertParentOptionSelectionPopUp
+						} else {
+							commitLogPopUp.InitGitRevertConfirmationPopUp(m, parsedCommitLog.Hash, 0)
+							m.ShowPopUp.Store(true)
+							m.IsTyping.Store(false)
+							m.PopUpType = constant.GitRevertConfirmationPopUp
+						}
 					} else {
 						commitLogPopUp.InitGitRevertConfirmationPopUp(m, parsedCommitLog.Hash, 0)
 						m.ShowPopUp.Store(true)
 						m.IsTyping.Store(false)
 						m.PopUpType = constant.GitRevertConfirmationPopUp
 					}
-				} else {
-					commitLogPopUp.InitGitRevertConfirmationPopUp(m, parsedCommitLog.Hash, 0)
-					m.ShowPopUp.Store(true)
-					m.IsTyping.Store(false)
-					m.PopUpType = constant.GitRevertConfirmationPopUp
 				}
 			}
 		}

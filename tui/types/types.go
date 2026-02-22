@@ -19,7 +19,8 @@ type GittiModel struct {
 	TuiUpdateChannel                                 chan string
 	CurrentSelectedComponent                         string
 	CurrentSelectedComponentIndex                    int
-	CurrentLocalBranchOrTagComponentShowing          string
+	CurrentLocalBranchOrTagOrRemoteComponentShowing  string
+	CurrentCommitLogOrRefLogComponentShowing         string
 	TotalComponentCount                              int
 	RepoPath                                         string
 	RepoName                                         string

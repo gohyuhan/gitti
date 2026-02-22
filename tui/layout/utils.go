@@ -113,7 +113,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		m.RemoteComponentPanelHeight = selectedComponentPanelHeight
 	case constant.ModifiedFilesComponentPanel:
 		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-	case constant.CommitLogComponentPanel:
+	case constant.CommitLogOrRefLogComponentPanel:
 		m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 	case constant.StashComponentPanel:
 		m.StashComponentPanelHeight = selectedComponentPanelHeight
@@ -129,7 +129,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.RemoteComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.CommitLogComponentPanel:
+		case constant.CommitLogOrRefLogComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponentPanel:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight
@@ -142,7 +142,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.RemoteComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.CommitLogComponentPanel:
+		case constant.CommitLogOrRefLogComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponentPanel:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight

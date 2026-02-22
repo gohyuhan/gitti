@@ -84,7 +84,7 @@ func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *ty
 		borderStyle = style.SelectedBorderStyle
 	}
 	var content string
-	switch m.CurrentLocalBranchOrTagComponentShowing {
+	switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 	case constant.SHOW_LOCAL_BRANCH:
 		content = m.CurrentRepoBranchesInfoList.View()
 	case constant.SHOW_TAG:
@@ -121,13 +121,20 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 // ----------------------------------
 func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.CommitLogComponentPanel {
+	if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
+
+	var content string
+	switch m.CurrentCommitLogOrRefLogComponentShowing {
+	case constant.SHOW_COMMITLOG:
+		content = m.CurrentRepoCommitLogInfoList.View()
+	}
+
 	return borderStyle.
 		Width(width).
 		Height(height).
-		Render(m.CurrentRepoCommitLogInfoList.View())
+		Render(content)
 }
 
 // Render the detail component part at the right of the window,
@@ -436,7 +443,7 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.GitStatusComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStatusComponent
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 				if CurrentSelectedBranch == nil {
@@ -488,8 +495,11 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					}
 				}
 			}
-		case constant.CommitLogComponentPanel:
-			keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
+			}
 		case constant.DetailComponentPanel:
 			if m.IsLineEditingState.Load() {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditing

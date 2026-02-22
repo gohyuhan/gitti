@@ -98,7 +98,7 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 	var selectedComponentKeyBindingKeyMapLargestLen *int
 	switch m.CurrentSelectedComponent {
 	case constant.LocalBranchOrTagOrRemoteComponentPanel:
-		switch m.CurrentLocalBranchOrTagComponentShowing {
+		switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 		case constant.SHOW_LOCAL_BRANCH:
 			selectedComponentKeyBindingKeyMapLargestLen = &m.LocalBranchComponentKeyBindingKeyMapLargestLen
 			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.LocalBranchComponentKeyBinding
@@ -112,9 +112,12 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 	case constant.ModifiedFilesComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.ModifiedFilesComponentKeyBindingKeyMapLargestLen
 		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.ModifiedFilesComponentKeyBinding
-	case constant.CommitLogComponentPanel:
-		selectedComponentKeyBindingKeyMapLargestLen = &m.CommitLogComponentKeyBindingKeyMapLargestLen
-		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.CommitLogComponentKeyBinding
+	case constant.CommitLogOrRefLogComponentPanel:
+		switch m.CurrentCommitLogOrRefLogComponentShowing {
+		case constant.SHOW_COMMITLOG:
+			selectedComponentKeyBindingKeyMapLargestLen = &m.CommitLogComponentKeyBindingKeyMapLargestLen
+			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.CommitLogComponentKeyBinding
+		}
 	case constant.StashComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.StashComponentKeyBindingKeyMapLargestLen
 		selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.StashComponentKeyBinding

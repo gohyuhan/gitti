@@ -86,7 +86,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		}
 		switch theCurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				contentLine = generateAboutGittiContent()
 			case constant.SHOW_TAG:
@@ -96,8 +96,11 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			}
 		case constant.ModifiedFilesComponentPanel:
 			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
-		case constant.CommitLogComponentPanel:
-			contentLine = generateCommitLogDetailPanelContent(ctx, m)
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				contentLine = generateCommitLogDetailPanelContent(ctx, m)
+			}
 		case constant.StashComponentPanel:
 			contentLine = generateStashDetailPanelContent(ctx, m)
 		case constant.LogComponentPanel:
