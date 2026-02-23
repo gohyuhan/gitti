@@ -25,6 +25,7 @@ type GitDaemon struct {
 	isGitBranchPassiveRunning           atomic.Bool
 	isGitFilesPassiveActiveRunning      atomic.Bool
 	isGitCommitLogPassiveRunning        atomic.Bool
+	isGitRefLogPassiveRunning           atomic.Bool
 	isGitStashPassiveRunning            atomic.Bool
 	isGitRemoteSyncStatusActiveRunning  atomic.Bool
 	isGitTagPassiveRunning              atomic.Bool
@@ -82,6 +83,7 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 	gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 	gd.isGitBranchPassiveRunning.Store(false)
 	gd.isGitCommitLogPassiveRunning.Store(false)
+	gd.isGitRefLogPassiveRunning.Store(false)
 	gd.isGitStashPassiveRunning.Store(false)
 	gd.isGitTagPassiveRunning.Store(false)
 	gd.isGitRemotePassiveRunning.Store(false)
@@ -239,6 +241,13 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 			defer gd.isGitCommitLogPassiveRunning.Store(false)
 			gd.gitOperations.GitCommitLog.GetCommitLogs()
 			gd.updateChannel <- git.GIT_COMMITLOG_UPDATE
+		}
+	}()
+	go func() {
+		if gd.isGitRefLogPassiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitRefLogPassiveRunning.Store(false)
+			gd.gitOperations.GitRefLog.GetLatestRefLog()
+			gd.updateChannel <- git.GIT_REFLOG_UPDATE
 		}
 	}()
 	go func() {

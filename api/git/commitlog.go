@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -447,13 +446,7 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) ([]Cell, int) {
 //
 // ----------------------------------
 func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash string) []string {
-	var gitArgs []string
-
-	if gCL.checkIsLargeCommit(commitHash) {
-		gitArgs = []string{"show", commitHash}
-	} else {
-		gitArgs = []string{"show", "--stat", commitHash}
-	}
+	gitArgs := []string{"show", commitHash, "--stat", "-p"}
 
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	gitOutput, err := cmdExecutor.Output()
@@ -463,44 +456,13 @@ func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash stri
 			gCL.logging.RegisterNewLog(logging.COMMIT_LOG_DETAIL_OPS, strings.Join(gitArgs, " "), logging.WARN, fmt.Sprintf("[%s CANCELLED]: %s", logging.COMMIT_LOG_DETAIL_OPS, ctx.Err().Error()), true)
 			return nil
 		} else {
-			gCL.logging.RegisterNewLog(logging.COMMIT_LOG_DETAIL_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.COMMIT_LOG_DETAIL_OPS, ctx.Err().Error()), true)
+			gCL.logging.RegisterNewLog(logging.COMMIT_LOG_DETAIL_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.COMMIT_LOG_DETAIL_OPS, err.Error()), true)
 			return nil
 		}
 	}
 
 	commitChangesLine := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 	return commitChangesLine
-}
-
-// ----------------------------------
-//
-// # Helper to determine if it was a large commit
-//
-// ----------------------------------
-func (gCL *GitCommitLog) checkIsLargeCommit(commitHash string) bool {
-	const fileThreshold = 25
-
-	gitArgs := []string{"show", "--shortstat", "--format=''", commitHash}
-	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	cmdOutput, cmdErr := cmd.Output()
-
-	if cmdErr != nil {
-		return true
-	}
-
-	re := regexp.MustCompile(`(\d+)\s+files?\s+changed`)
-	matches := re.FindStringSubmatch(string(cmdOutput))
-	if len(matches) < 2 {
-		// No shortstat (e.g. merge commit with no changes)
-		return false
-	}
-
-	filesChanged, err := strconv.Atoi(matches[1])
-	if err != nil {
-		return true
-	}
-
-	return filesChanged > fileThreshold
 }
 
 // ----------------------------------

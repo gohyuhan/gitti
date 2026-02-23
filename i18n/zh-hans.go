@@ -68,6 +68,7 @@ var zH_HANS = LanguageMapping{
 	Branches:                            "分支",
 	ModifiedFiles:                       "已修改的文件",
 	CommitLog:                           "提交记录",
+	RefLog:                              "引用日志",
 	Stash:                               "暂存",
 	Tag:                                 "标签",
 	Remote:                              "远程",
@@ -160,7 +161,12 @@ var zH_HANS = LanguageMapping{
 	KeyBindingModifiedFilesComponentNone: []string{
 		"[?] 快捷键与说明",
 	},
+	KeyBindingCommitLogComponentNone: []string{
+		"[</>] 切换组件",
+		"[?] 快捷键与说明",
+	},
 	KeyBindingCommitLogComponent: []string{
+		"[</>] 切换组件",
 		"[↑/↓] 上下移动",
 		"[enter] 查看提交日志内容",
 		"[t] 创建标签",
@@ -168,6 +174,15 @@ var zH_HANS = LanguageMapping{
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 遴选操作",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingRefLogComponentNone: []string{
+		"[</>] 切换组件",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingRefLogComponent: []string{
+		"[</>] 切换组件",
+		"[↑/↓] 上下移动",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLogComponent: []string{
@@ -922,6 +937,11 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "",
 		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在提交日志和引用日志之间切换",
 		LineType:        INFO,
 	},
 	{

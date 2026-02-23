@@ -68,6 +68,7 @@ var jA = LanguageMapping{
 	Branches:                            "ブランチ",
 	ModifiedFiles:                       "変更されたファイル",
 	CommitLog:                           "コミットログ",
+	RefLog:                              "参照ログ",
 	Stash:                               "スタッシュ",
 	Tag:                                 "タグ",
 	Remote:                              "リモート",
@@ -160,7 +161,12 @@ var jA = LanguageMapping{
 	KeyBindingModifiedFilesComponentNone: []string{
 		"[?] キー操作と説明",
 	},
+	KeyBindingCommitLogComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[?] キー操作と説明",
+	},
 	KeyBindingCommitLogComponent: []string{
+		"[</>] コンポーネントを切り替え",
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
 		"[t] タグを作成",
@@ -168,6 +174,15 @@ var jA = LanguageMapping{
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
+		"[?] キー操作と説明",
+	},
+	KeyBindingRefLogComponentNone: []string{
+		"[</>] コンポーネントを切り替え",
+		"[?] キー操作と説明",
+	},
+	KeyBindingRefLogComponent: []string{
+		"[</>] コンポーネントを切り替え",
+		"[↑/↓] 上下に移動",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLogComponent: []string{
@@ -923,6 +938,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "",
 		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "コミットログと参照ログを切り替える",
 		LineType:        INFO,
 	},
 	{

@@ -1663,6 +1663,14 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 					m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
+			case constant.SHOW_REFLOG:
+				// we don't use the list native Update() because we need to also track the current selected index
+				if m.CurrentRepoRefLogInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoRefLogInfoList.Index() - 1
+					m.CurrentRepoRefLogInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.RefLogComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
 			}
 		case constant.StashComponentPanel:
 			// we don't use the list native Update() because we need to also track the current selected index
@@ -1759,6 +1767,14 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 					latestIndex := m.CurrentRepoCommitLogInfoList.Index() + 1
 					m.CurrentRepoCommitLogInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.CommitLogComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+			case constant.SHOW_REFLOG:
+				// we don't use the list native Update() because we need to also track the current selected index
+				if m.CurrentRepoRefLogInfoList.Index() < len(m.CurrentRepoRefLogInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoRefLogInfoList.Index() + 1
+					m.CurrentRepoRefLogInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.RefLogComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
@@ -1966,6 +1982,14 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_TAG
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+			// do nothing, as commit log will be the most left option in the commit log or reflog component panel
+			case constant.SHOW_REFLOG:
+				m.CurrentCommitLogOrRefLogComponentShowing = constant.SHOW_COMMITLOG
+				services.FetchDetailComponentPanelInfoService(m, true)
+			}
 		}
 	}
 	return m, nil
@@ -1992,6 +2016,14 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_REMOTE:
 				// do nothing, as remote is currently the most right option in the local branch or tag or remote component panel
+			}
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_COMMITLOG:
+				m.CurrentCommitLogOrRefLogComponentShowing = constant.SHOW_REFLOG
+				services.FetchDetailComponentPanelInfoService(m, true)
+			case constant.SHOW_REFLOG:
+				// do nothing, as reflog is currently the most right option in the commit log or reflog component panel
 			}
 		}
 	}

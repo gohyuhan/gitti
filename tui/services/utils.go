@@ -11,6 +11,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/log"
+	"github.com/gohyuhan/gitti/tui/component/reflog"
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
@@ -97,10 +98,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		case constant.ModifiedFilesComponentPanel:
 			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
 		case constant.CommitLogOrRefLogComponentPanel:
-			switch m.CurrentCommitLogOrRefLogComponentShowing {
-			case constant.SHOW_COMMITLOG:
-				contentLine = generateCommitLogDetailPanelContent(ctx, m)
-			}
+			contentLine = generateCommitLogOrRefLogDetailPanelContent(ctx, m)
 		case constant.StashComponentPanel:
 			contentLine = generateStashDetailPanelContent(ctx, m)
 		case constant.LogComponentPanel:
@@ -311,17 +309,29 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 //	for commit log detail panel view
 //
 // ----------------------------------
-func generateCommitLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
-	currentSelectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
-	var commitLogItem commitlog.GitCommitLogItem
-	var vpLine strings.Builder
-	if currentSelectedCommitLog != nil {
-		commitLogItem = currentSelectedCommitLog.(commitlog.GitCommitLogItem)
-	} else {
-		return ""
+func generateCommitLogOrRefLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
+	var hash string
+
+	switch m.CurrentCommitLogOrRefLogComponentShowing {
+	case constant.SHOW_COMMITLOG:
+		currentSelectedCommitLog := m.CurrentRepoCommitLogInfoList.SelectedItem()
+		if currentSelectedCommitLog != nil {
+			hash = currentSelectedCommitLog.(commitlog.GitCommitLogItem).Hash
+		} else {
+			return ""
+		}
+	case constant.SHOW_REFLOG:
+		currentSelectedRefLog := m.CurrentRepoRefLogInfoList.SelectedItem()
+		if currentSelectedRefLog != nil {
+			item := currentSelectedRefLog.(reflog.GitRefLogItem)
+			hash = item.Hash
+		} else {
+			return ""
+		}
 	}
 
-	commitLogDetail := m.GitOperations.GitCommitLog.GitCommitLogDetail(ctx, commitLogItem.Hash)
+	var vpLine strings.Builder
+	commitLogDetail := m.GitOperations.GitCommitLog.GitCommitLogDetail(ctx, hash)
 	if len(commitLogDetail) < 1 {
 		return ""
 	}
