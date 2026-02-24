@@ -67,7 +67,7 @@ func (grl *GitRefLog) GetLatestRefLog() {
 	}
 
 	parsedRefLogOutputArray := processGeneralGitOpsOutputIntoStringArray(reflogOutput)
-for _, entry := range parsedRefLogOutputArray {
+	for _, entry := range parsedRefLogOutputArray {
 		splitedRefLogEntry := strings.SplitAfterN(entry, " ", 2)
 		if len(splitedRefLogEntry) < 2 {
 			continue
