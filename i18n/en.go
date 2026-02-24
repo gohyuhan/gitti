@@ -183,6 +183,7 @@ var eN = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] switch component",
 		"[↑/↓] move up and down",
+		"[ctrl+p] cherry pick and apply",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLogComponent: []string{
@@ -422,12 +423,17 @@ var eN = LanguageMapping{
 		"[enter] confirm revert",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitCherryPickFromRefLogApplyConfirmationPopUp: []string{
+		"[enter] confirm apply",
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                enRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         enModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             enCommitLogComponentKeyBinding,
+	RefLogComponentKeyBinding:                                enRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 enStashComponentKeyBinding,
 	LogComponentKeyBinding:                                   enLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                enDetailComponentKeyBinding,
@@ -589,6 +595,7 @@ var eN = LanguageMapping{
 	EditRemotePopUpRemoteUrlPlaceHolder:                      "Enter new remote url...",
 	GitRevertParentOptionSelectionTitle:                      "Select the parent commit to revert to",
 	GitRevertConfirmationTitle:                               "Are you sure you want to revert the following commit?\n commit: [%s]",
+	GitCherryPickFromRefLogApplyConfirmationTitle:            "Are you sure you want to apply the following cherry pick from reflog?\n Hash: [%s]\n Head: [%s]\n Action: [%s]\n Action Info: [%s]",
 }
 
 // for about gitti
@@ -976,6 +983,40 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "start a cherry-pick operation",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up and down",
+		LineType:        INFO,
+	},
+}
+
+// RefLog Component Key Binding for en
+var enRefLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- RefLog Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between commit log and reflog",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "view reflog content",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "cherry pick from reflog and apply on current branch",
 		LineType:        INFO,
 	},
 	{
@@ -1382,7 +1423,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "reset to commit",
 		InstructionLines: []string{
-			"1. Navigate to Commit Log component (press `3`)",
+			"1. Navigate to Commit Log component (press `3`) or switch to Commit Log component (press `< >`)",
 			"2. Select target commit using `↑/↓`",
 			"3. Press `r` to initiate reset",
 			"4. Select reset type:",
@@ -1397,14 +1438,19 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "cherry pick",
 		InstructionLines: []string{
-			"1. Navigate to Commit Log component (press `3`)",
-			"2. Press `ctrl+p` to open cherry pick menu",
-			"3. Select 'Cherry Pick' and press `enter`",
-			"4. Use `↑/↓` to navigate commits",
-			"5. Press `space` to select/deselect commits",
-			"6. Press `e` to edit selections (optional)",
-			"7. Press `a` to apply selected commits",
-			"8. Confirm to apply cherry picks",
+			"1. Navigate to Commit Log/Reflog component (press `3`) or switch to Commit Log/Reflog component (press `< >`)",
+			"   -- On Commit Log Component",
+			"   2. Press `ctrl+p` to open cherry pick menu",
+			"   3. Select 'Cherry Pick' and press `enter`",
+			"   4. Use `↑/↓` to navigate commits",
+			"   5. Press `space` to select/deselect commits",
+			"   6. Press `e` to edit selections (optional)",
+			"   7. Press `a` to apply selected commits",
+			"   8. Confirm to apply cherry picks",
+			"",
+			"   -- On Reflog Component",
+			"   2. Press `ctrl+p` on a reflog entry to cherry pick and apply",
+			"   3. Confirm to apply cherry picks",
 		},
 		LineType: INFO,
 	},
@@ -1443,7 +1489,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "create tag",
 		InstructionLines: []string{
-			"1. Navigate to Commit Log component (press `3`)",
+			"1. Navigate to Commit Log component (press `3`) or switch to Commit Log component (press `< >`)",
 			"2. Select the commit to tag using `↑/↓`",
 			"3. Press `t` to open tag menu",
 			"4. Enter the tag name",
@@ -1546,7 +1592,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "revert commit",
 		InstructionLines: []string{
-			"1. Navigate to Commit Log component (press `3`)",
+			"1. Navigate to Commit Log component (press `3`) or switch to Commit Log component (press `< >`)",
 			"2. Select the commit to revert using `↑/↓`",
 			"3. Press `ctrl+r`",
 			"   - Select the parent commit to revert to using `↑/↓` if it was a merge commit",

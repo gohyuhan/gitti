@@ -183,6 +183,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] 切换组件",
 		"[↑/↓] 上下移动",
+		"[ctrl+p] 遴选并应用",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLogComponent: []string{
@@ -422,12 +423,17 @@ var zH_HANS = LanguageMapping{
 		"[enter] 确认还原",
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForGitCherryPickFromRefLogApplyConfirmationPopUp: []string{
+		"[enter] 确认应用",
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                zhHansRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHansModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHansCommitLogComponentKeyBinding,
+	RefLogComponentKeyBinding:                                zhHansRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHansStashComponentKeyBinding,
 	LogComponentKeyBinding:                                   zhHansLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                zhHansDetailComponentKeyBinding,
@@ -589,6 +595,7 @@ var zH_HANS = LanguageMapping{
 	EditRemotePopUpRemoteUrlPlaceHolder:                      "输入新的远程地址...",
 	GitRevertParentOptionSelectionTitle:                      "选择要还原到的父提交",
 	GitRevertConfirmationTitle:                               "您确定要还原以下提交吗？\n 提交: [%s]",
+	GitCherryPickFromRefLogApplyConfirmationTitle:            "确定要从引用日志应用以下遴选吗？\n 哈希: [%s]\n Head: [%s]\n 操作: [%s]\n 操作信息: [%s]",
 }
 
 // for about gitti
@@ -972,6 +979,40 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "开始遴选操作",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动",
+		LineType:        INFO,
+	},
+}
+
+// RefLog Component Key Binding for zh-hans
+var zhHansRefLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 引用日志组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在提交日志和引用日志之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "查看引用日志内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "从引用日志遴选并应用到当前分支",
 		LineType:        INFO,
 	},
 	{
@@ -1378,7 +1419,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "重置到提交 (reset to commit)",
 		InstructionLines: []string{
-			"1. 导航到提交日志组件（按 `3`）",
+			"1. 导航到提交日志组件（按 `3`）或切换到提交日志组件（按 `< >`）",
 			"2. 使用 `↑/↓` 选择目标提交",
 			"3. 按 `r` 开始重置",
 			"4. 选择重置类型:",
@@ -1393,14 +1434,19 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "遴选 (cherry pick)",
 		InstructionLines: []string{
-			"1. 导航到提交日志组件（按 `3`）",
-			"2. 按 `ctrl+p` 打开遴选菜单",
-			"3. 选择'遴选'并按 `enter`",
-			"4. 使用 `↑/↓` 导航提交",
-			"5. 按 `space` 选择/取消选择提交",
-			"6. 按 `e` 编辑选择（可选）",
-			"7. 按 `a` 应用选定的提交",
-			"8. 确认应用遴选",
+			"1. 导航到提交日志/引用日志组件（按 `3`）或切换到提交日志/引用日志组件（按 `< >`）",
+			"   -- 在提交日志组件上",
+			"   2. 按 `ctrl+p` 打开遴选菜单",
+			"   3. 选择'遴选'并按 `enter`",
+			"   4. 使用 `↑/↓` 导航提交",
+			"   5. 按 `space` 选择/取消选择提交",
+			"   6. 按 `e` 编辑选择（可选）",
+			"   7. 按 `a` 应用选定的提交",
+			"   8. 确认应用遴选",
+			"",
+			"   -- 在引用日志组件上",
+			"   2. 在引用日志条目上按 `ctrl+p` 进行遴选并应用",
+			"   3. 确认应用遴选",
 		},
 		LineType: INFO,
 	},
@@ -1439,7 +1485,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "创建标签 (create tag)",
 		InstructionLines: []string{
-			"1. 导航到提交日志组件 (按 `3`) ",
+			"1. 导航到提交日志组件（按 `3`）或切换到提交日志组件（按 `< >`）",
 			"2. 使用 `↑/↓` 选择要打标签的提交",
 			"3. 按 `t` 打开标签菜单",
 			"4. 输入标签名称",
@@ -1542,7 +1588,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "还原提交 (revert commit)",
 		InstructionLines: []string{
-			"1. 导航到提交记录组件（按 `3`）",
+			"1. 导航到提交记录组件（按 `3`）或切换到提交记录组件（按 `< >`）",
 			"2. 使用 `↑/↓` 选择要还原的提交",
 			"3. 按 `ctrl+r`",
 			"   - 如果是合并提交，使用 `↑/↓` 选择要还原到的父提交",

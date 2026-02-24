@@ -17,10 +17,12 @@ type GitRefLog struct {
 }
 
 type GitRefLogInfo struct {
-	FullInfo string
-	Head     string
-	InfoDesc string
-	Hash     string
+	FullInfo   string
+	InfoDesc   string // InfoDesc is the description of the reflog entry which is a split of Head from FullInfo
+	Head       string // Head is the head of the reflog entry
+	Action     string // Action is the action of the reflog entry
+	ActionInfo string // ActionInfo is the action info of the reflog entry
+	Hash       string // Hash is the hash associate with the reflog entry
 }
 
 // ----------------------------------
@@ -72,15 +74,22 @@ func (grl *GitRefLog) GetLatestRefLog() {
 		if len(splitedRefLogEntry) < 2 {
 			continue
 		}
-		splitedHeadAndInfoDesc := strings.SplitAfterN(splitedRefLogEntry[1], " ", 2)
+		splitedHeadAndInfoDesc := strings.SplitAfterN(splitedRefLogEntry[1], ":", 2)
 		if len(splitedHeadAndInfoDesc) < 2 {
 			continue
 		}
+		splitedActionAndActionInfoDesc := strings.SplitAfterN(splitedHeadAndInfoDesc[1], ":", 2)
+		if len(splitedActionAndActionInfoDesc) < 2 {
+			continue
+		}
+
 		reflogInfo := GitRefLogInfo{
-			FullInfo: strings.TrimSpace(splitedRefLogEntry[1]),
-			Head:     strings.TrimSpace(splitedHeadAndInfoDesc[0]),
-			InfoDesc: strings.TrimSpace(splitedHeadAndInfoDesc[1]),
-			Hash:     strings.TrimSpace(splitedRefLogEntry[0]),
+			FullInfo:   strings.TrimSpace(splitedRefLogEntry[1]),
+			InfoDesc:   strings.TrimSpace(splitedHeadAndInfoDesc[1]),
+			Head:       strings.Trim(strings.TrimSpace(splitedHeadAndInfoDesc[0]), ":"),
+			Action:     strings.Trim(strings.TrimSpace(splitedActionAndActionInfoDesc[0]), ":"),
+			ActionInfo: strings.TrimSpace(splitedActionAndActionInfoDesc[1]),
+			Hash:       strings.TrimSpace(splitedRefLogEntry[0]),
 		}
 
 		latestRefLog = append(latestRefLog, reflogInfo)

@@ -10,7 +10,7 @@ import (
 
 // ------------------------------------
 //
-//	Cherry-pick selected commits in the user-specified sequence order
+//	Cherry-pick selected commits in the user-specified sequence order (cherry picked from commit logs)
 //
 // ------------------------------------
 func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string]git.CherryPickedCommitLog) {
@@ -34,6 +34,17 @@ func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string
 
 		m.GitOperations.GitCommitLog.GitCherryPick(cherryPickedCommitHashes)
 		utils.ReinitCherryPickedCommitInfo(m)
+	}()
+}
+
+// ------------------------------------
+//
+//	Cherry-pick selected reflog hash (cherry picked from reflogs)
+//
+// ------------------------------------
+func GitCherryPickReflogHashService(m *types.GittiModel, cherryPickedRefLogHash string) {
+	go func() {
+		m.GitOperations.GitCommitLog.GitCherryPick([]string{cherryPickedRefLogHash})
 	}()
 }
 
