@@ -64,15 +64,15 @@ func GittiMainPageView(m *types.GittiModel) string {
 
 	// --- Components ---
 	GitStatusPanel := renderGitStatusComponentPanel(m)
-	localBranchesPanel := renderLocalBranchesOrTagOrRemoteComponentPanel(m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight, m)
+	localBranchesOrTagOrRemotePanel := renderLocalBranchesOrTagOrRemoteComponentPanel(m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight, m)
 	modifiedFilesPanel := renderModifiedFilesComponentPanel(m.WindowLeftPanelWidth, m.ModifiedFilesComponentPanelHeight, m)
-	commitLogPanel := renderCommitLogComponentPanel(m.WindowLeftPanelWidth, m.CommitLogComponentPanelHeight, m)
+	commitLogOrRefLogPanel := renderCommitLogOrRefLogComponentPanel(m.WindowLeftPanelWidth, m.CommitLogComponentPanelHeight, m)
 	stashFilesPanel := renderStashComponentPanel(m.WindowLeftPanelWidth, m.StashComponentPanelHeight, m)
 	detailPanel := renderDetailComponentPanel(m.DetailComponentPanelWidth, m.DetailComponentPanelHeight, m)
 	logPanel := renderLogComponentPanel(m.DetailComponentPanelWidth, m.LogComponentPanelHeight, m)
 	bottomBar := renderKeyBindingComponentPanel(m.Width, m)
 
-	leftPanel := lipgloss.JoinVertical(lipgloss.Left, GitStatusPanel, localBranchesPanel, modifiedFilesPanel, commitLogPanel, stashFilesPanel)
+	leftPanel := lipgloss.JoinVertical(lipgloss.Left, GitStatusPanel, localBranchesOrTagOrRemotePanel, modifiedFilesPanel, commitLogOrRefLogPanel, stashFilesPanel)
 	rightPanel := lipgloss.JoinVertical(lipgloss.Left, detailPanel, logPanel)
 
 	// Combine panels horizontally with explicit top alignment

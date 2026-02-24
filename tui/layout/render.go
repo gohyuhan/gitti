@@ -75,7 +75,7 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 
 // ----------------------------------
 //
-//	Render the Local Branches panel
+//	Render the Local Branches or Tag or Remote panel
 //
 // ----------------------------------
 func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -116,10 +116,10 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 
 // ----------------------------------
 //
-//	Render the Changed Files panel
+//	Render the commit log or reflog panel
 //
 // ----------------------------------
-func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) string {
+func renderCommitLogOrRefLogComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel {
 		borderStyle = style.SelectedBorderStyle
@@ -129,6 +129,8 @@ func renderCommitLogComponentPanel(width int, height int, m *types.GittiModel) s
 	switch m.CurrentCommitLogOrRefLogComponentShowing {
 	case constant.SHOW_COMMITLOG:
 		content = m.CurrentRepoCommitLogInfoList.View()
+	case constant.SHOW_REFLOG:
+		content = m.CurrentRepoRefLogInfoList.View()
 	}
 
 	return borderStyle.
@@ -498,7 +500,17 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
 			case constant.SHOW_COMMITLOG:
-				keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
+				if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponent
+				} else {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingCommitLogComponentNone
+				}
+			case constant.SHOW_REFLOG:
+				if len(m.CurrentRepoRefLogInfoList.Items()) > 0 {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingRefLogComponent
+				} else {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingRefLogComponentNone
+				}
 			}
 		case constant.DetailComponentPanel:
 			if m.IsLineEditingState.Load() {

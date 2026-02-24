@@ -11,6 +11,7 @@ import (
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
 	logComponent "github.com/gohyuhan/gitti/tui/component/log"
+	reflogComponent "github.com/gohyuhan/gitti/tui/component/reflog"
 	remoteComponent "github.com/gohyuhan/gitti/tui/component/remote"
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	tagComponent "github.com/gohyuhan/gitti/tui/component/tag"
@@ -93,6 +94,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		CurrentRepoTagInfoList:                           list.New([]list.Item{}, tagComponent.GitTagItemDelegate{}, 0, 0),
 		CurrentRepoModifiedFilesInfoList:                 list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
 		CurrentRepoCommitLogInfoList:                     list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
+		CurrentRepoRefLogInfoList:                        list.New([]list.Item{}, reflogComponent.GitRefLogItemDelegate{}, 0, 0),
 		CurrentRepoStashInfoList:                         list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
 		CurrentRepoRemoteInfoList:                        list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0),
 		DetailPanelParentComponent:                       "",
@@ -102,7 +104,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		DetailPanelTwoViewportOffset:                     0,
 		DetailComponentPanelLayout:                       constant.HORIZONTAL,
 		CurrentLogComponentViewport:                      logVp,
-		ListNavigationIndexPosition:                      types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0},
+		ListNavigationIndexPosition:                      types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0},
 		PopUpType:                                        constant.NoPopUp,
 		PopUpModel:                                       struct{}{},
 		GitOperations:                                    gitOperations,
@@ -112,6 +114,7 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 		RemoteComponentKeyBindingKeyMapLargestLen:        0,
 		ModifiedFilesComponentKeyBindingKeyMapLargestLen: 0,
 		CommitLogComponentKeyBindingKeyMapLargestLen:     0,
+		RefLogComponentKeyBindingKeyMapLargestLen:        0,
 		StashComponentKeyBindingKeyMapLargestLen:         0,
 		LogComponentKeyBindingKeyMapLargestLen:           0,
 		DetailComponentKeyBindingKeyMapLargestLen:        0,
@@ -171,6 +174,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			remoteComponent.InitRemoteList(m)
 			filesComponent.InitModifiedFilesList(m)
 			commitlogComponent.InitGitCommitLogList(m)
+			reflogComponent.InitGitRefLogList(m)
 			stashComponent.InitStashList(m)
 		}
 	case tea.KeyMsg:
@@ -207,6 +211,11 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_COMMITLOG_UPDATE:
 			needReinit := commitlogComponent.InitGitCommitLogList(m)
 			if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel && m.CurrentCommitLogOrRefLogComponentShowing == constant.SHOW_COMMITLOG {
+				services.FetchDetailComponentPanelInfoService(m, needReinit)
+			}
+		case git.GIT_REFLOG_UPDATE:
+			needReinit := reflogComponent.InitGitRefLogList(m)
+			if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel && m.CurrentCommitLogOrRefLogComponentShowing == constant.SHOW_REFLOG {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_STASH_UPDATE:

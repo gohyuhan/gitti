@@ -95,6 +95,7 @@ type LanguageMapping struct {
 	Branches                    string
 	ModifiedFiles               string
 	CommitLog                   string
+	RefLog                      string
 	Stash                       string
 	Tag                         string
 	Remote                      string
@@ -128,7 +129,10 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentIsStaged                []string
 	KeyBindingModifiedFilesComponentDefault                 []string
 	KeyBindingModifiedFilesComponentNone                    []string
+	KeyBindingCommitLogComponentNone                        []string
 	KeyBindingCommitLogComponent                            []string
+	KeyBindingRefLogComponentNone                           []string
+	KeyBindingRefLogComponent                               []string
 	KeyBindingLogComponent                                  []string
 	KeyBindingKeyDetailComponent                            []string
 	KeyBindingKeyDetailComponentLineEditingEligible         []string

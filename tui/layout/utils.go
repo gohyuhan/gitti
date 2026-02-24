@@ -5,6 +5,7 @@ import (
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
+	reflogComponent "github.com/gohyuhan/gitti/tui/component/reflog"
 	remoteComponent "github.com/gohyuhan/gitti/tui/component/remote"
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	tagComponent "github.com/gohyuhan/gitti/tui/component/tag"
@@ -43,6 +44,7 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.CurrentRepoRemoteInfoList.Title = ansi.Truncate(remoteComponent.ConstructRemoteComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoModifiedFilesInfoList.Title = ansi.Truncate(filesComponent.ConstructModifiedFilesComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoCommitLogInfoList.Title = ansi.Truncate(commitlogComponent.ConstructCommitLogComponentTitle(titleWidthLimit), titleWidthLimit, "...")
+	m.CurrentRepoRefLogInfoList.Title = ansi.Truncate(reflogComponent.ConstructRefLogComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoStashInfoList.Title = ansi.Truncate(stashComponent.ConstructStashComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 
 	// update viewport of detail panel
@@ -104,6 +106,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	m.RemoteComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.ModifiedFilesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent + remainingHeight
 	m.CommitLogComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+	m.RefLogComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.StashComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 
 	switch m.CurrentSelectedComponent {
@@ -115,12 +118,15 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
 	case constant.CommitLogOrRefLogComponentPanel:
 		m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
+		m.RefLogComponentPanelHeight = selectedComponentPanelHeight
 	case constant.StashComponentPanel:
 		m.StashComponentPanelHeight = selectedComponentPanelHeight
 	case constant.GitStatusComponentPanel:
 		// if it was the Gitti status component panel that got selected (because its height is fix),
 		// the next panel will get the selected height which is the branch component panel
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
+		m.TagsComponentPanelHeight = selectedComponentPanelHeight
+		m.RemoteComponentPanelHeight = selectedComponentPanelHeight
 	case constant.DetailComponentPanelTwo:
 		switch m.DetailPanelParentComponent {
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
@@ -131,6 +137,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
 		case constant.CommitLogOrRefLogComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
+			m.RefLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponentPanel:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight
 		}
@@ -144,6 +151,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
 		case constant.CommitLogOrRefLogComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
+			m.RefLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponentPanel:
 			m.StashComponentPanelHeight = selectedComponentPanelHeight
 		}
@@ -164,6 +172,9 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 
 	m.CurrentRepoCommitLogInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoCommitLogInfoList.SetHeight(m.CommitLogComponentPanelHeight)
+
+	m.CurrentRepoRefLogInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoRefLogInfoList.SetHeight(m.RefLogComponentPanelHeight)
 
 	m.CurrentRepoStashInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)

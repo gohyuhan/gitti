@@ -68,6 +68,7 @@ var eN = LanguageMapping{
 	Branches:                            "Branches",
 	ModifiedFiles:                       "Modified Files",
 	CommitLog:                           "Commit Log",
+	RefLog:                              "RefLog",
 	Stash:                               "Stash",
 	Tag:                                 "Tag",
 	Remote:                              "Remote",
@@ -160,7 +161,12 @@ var eN = LanguageMapping{
 	KeyBindingModifiedFilesComponentNone: []string{
 		"[?] keybinding and instructions",
 	},
+	KeyBindingCommitLogComponentNone: []string{
+		"[</>] switch component",
+		"[?] keybinding and instructions",
+	},
 	KeyBindingCommitLogComponent: []string{
+		"[</>] switch component",
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
 		"[t] create tag",
@@ -168,6 +174,15 @@ var eN = LanguageMapping{
 		"[r] reset to this commit",
 		"[R] reset latest commit",
 		"[ctrl+p] cherry pick ops",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingRefLogComponentNone: []string{
+		"[</>] switch component",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingRefLogComponent: []string{
+		"[</>] switch component",
+		"[↑/↓] move up and down",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLogComponent: []string{
@@ -926,6 +941,11 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "",
 		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between commit log and reflog",
 		LineType:        INFO,
 	},
 	{
