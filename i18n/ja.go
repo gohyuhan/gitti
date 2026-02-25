@@ -183,6 +183,9 @@ var jA = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] コンポーネントを切り替え",
 		"[↑/↓] 上下に移動",
+		"[enter] 参照ログの内容を表示",
+		"[r] このコミットにリセット",
+		"[ctrl+p] チェリーピックして適用する",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLogComponent: []string{
@@ -422,12 +425,17 @@ var jA = LanguageMapping{
 		"[enter] リバートを確定",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitCherryPickFromRefLogApplyConfirmationPopUp: []string{
+		"[enter] 適用を確定する",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                jaRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             jaCommitLogComponentKeyBinding,
+	RefLogComponentKeyBinding:                                jaRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 jaStashComponentKeyBinding,
 	LogComponentKeyBinding:                                   jaLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                jaDetailComponentKeyBinding,
@@ -589,6 +597,7 @@ var jA = LanguageMapping{
 	EditRemotePopUpRemoteUrlPlaceHolder:                      "新しいリモートURLを入力...",
 	GitRevertParentOptionSelectionTitle:                      "リバート先の親コミットを選択してください",
 	GitRevertConfirmationTitle:                               "以下のコミットをリバートしてもよろしいですか？\n コミット: [%s]",
+	GitCherryPickFromRefLogApplyConfirmationTitle:            "参照ログから以下のチェリーピックを適用してもよろしいですか？\n ハッシュ: [%s]\n HEAD: [%s]\n アクション: [%s]\n アクション情報: [%s]",
 }
 
 // for about gitti
@@ -863,6 +872,11 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "リモートを編集",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "上流として追跡を設定",
 		LineType:        INFO,
@@ -973,6 +987,45 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "チェリーピック操作を開始",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// RefLog Component Key Binding for ja
+var jaRefLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 参照ログコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "コミットログと参照ログを切り替える",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "参照ログの内容を表示する",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "このコミットにリセット",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "参照ログからチェリーピックして現在のブランチに適用する",
 		LineType:        INFO,
 	},
 	{
@@ -1379,7 +1432,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "コミットにリセット (reset to commit)",
 		InstructionLines: []string{
-			"1. コミットログコンポーネントに移動（`3` を押す）",
+			"1. コミットログコンポーネントに移動（`3` を押す）またはコミットログコンポーネントに切り替え（`< >` を押す）",
 			"2. `↑/↓` で対象コミットを選択",
 			"3. `r` を押してリセットを開始",
 			"4. リセットタイプを選択:",
@@ -1394,14 +1447,19 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "チェリーピック (cherry pick)",
 		InstructionLines: []string{
-			"1. コミットログコンポーネントに移動（`3` を押す）",
-			"2. `ctrl+p` を押してチェリーピックメニューを開く",
-			"3. 「チェリーピック」を選択して `enter` を押す",
-			"4. `↑/↓` でコミットを移動",
-			"5. `space` を押してコミットを選択/選択解除",
-			"6. `e` を押して選択を編集（オプション）",
-			"7. `a` を押して選択したコミットを適用",
-			"8. チェリーピックの適用を確認",
+			"1. コミットログ/参照ログコンポーネントに移動（`3` を押す）またはコミットログ/参照ログコンポーネントに切り替え（`< >` を押す）",
+			"   -- コミットログコンポーネントにて",
+			"   2. `ctrl+p` を押してチェリーピックメニューを開く",
+			"   3. 「チェリーピック」を選択して `enter` を押す",
+			"   4. `↑/↓` でコミットを移動",
+			"   5. `space` を押してコミットを選択/選択解除",
+			"   6. `e` を押して選択を編集（オプション）",
+			"   7. `a` を押して選択したコミットを適用",
+			"   8. チェリーピックの適用を確認",
+			"",
+			"   -- 参照ログコンポーネントにて",
+			"   2. 参照ログエントリで `ctrl+p` を押してチェリーピックして適用する",
+			"   3. チェリーピックの適用を確認",
 		},
 		LineType: INFO,
 	},
@@ -1440,7 +1498,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "タグの作成 (create tag)",
 		InstructionLines: []string{
-			"1. コミットログコンポーネントに移動 ( `3` を押す)",
+			"1. コミットログコンポーネントに移動（`3` を押す）またはコミットログコンポーネントに切り替え（`< >` を押す）",
 			"2. `↑/↓` を使ってタグを付けるコミットを選択",
 			"3. `t` を押してタグメニューを開く",
 			"4. タグ名を入力",
@@ -1543,7 +1601,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "コミットをリバート (revert commit)",
 		InstructionLines: []string{
-			"1. コミットログコンポーネントに移動 (`3` を押す)",
+			"1. コミットログコンポーネントに移動（`3` を押す）またはコミットログコンポーネントに切り替え（`< >` を押す）",
 			"2. `↑/↓` を使用してリバートするコミットを選択",
 			"3. `ctrl+r` を押す",
 			"   - マージコミットの場合は `↑/↓` を使用してリバート先の親コミットを選択してください",

@@ -117,6 +117,9 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 		case constant.SHOW_COMMITLOG:
 			selectedComponentKeyBindingKeyMapLargestLen = &m.CommitLogComponentKeyBindingKeyMapLargestLen
 			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.CommitLogComponentKeyBinding
+		case constant.SHOW_REFLOG:
+			selectedComponentKeyBindingKeyMapLargestLen = &m.RefLogComponentKeyBindingKeyMapLargestLen
+			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.RefLogComponentKeyBinding
 		}
 	case constant.StashComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.StashComponentKeyBindingKeyMapLargestLen

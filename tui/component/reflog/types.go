@@ -21,10 +21,12 @@ import (
 type (
 	GitRefLogItemDelegate struct{}
 	GitRefLogItem         struct {
-		FullInfo string
-		Head     string
-		InfoDesc string
-		Hash     string
+		FullInfo   string
+		InfoDesc   string
+		Head       string
+		Action     string
+		ActionInfo string
+		Hash       string
 	}
 )
 

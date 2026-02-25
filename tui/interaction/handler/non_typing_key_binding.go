@@ -12,6 +12,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
+	"github.com/gohyuhan/gitti/tui/component/reflog"
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
@@ -25,6 +26,7 @@ import (
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
+	reflogPopUp "github.com/gohyuhan/gitti/tui/popup/reflog"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
@@ -649,13 +651,27 @@ func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
 			case constant.SHOW_COMMITLOG:
 				selectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
-				if m.CurrentRepoCommitLogInfoList.Items() != nil {
+				if selectedCommit != nil {
 					parsedCommit := selectedCommit.(commitlog.GitCommitLogItem)
 					commitPopUp.InitGitResetToSelectedCommitTypeOptionPopUpModel(
 						m,
 						parsedCommit.Hash,
 						parsedCommit.Message,
 						parsedCommit.Author,
+					)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.GitResetToSelectedCommitTypeOptionPopUp
+				}
+			case constant.SHOW_REFLOG:
+				selectedRefLog := m.CurrentRepoRefLogInfoList.SelectedItem()
+				if selectedRefLog != nil {
+					parsedRefLog := selectedRefLog.(reflog.GitRefLogItem)
+					commitPopUp.InitGitResetToSelectedCommitTypeOptionPopUpModel(
+						m,
+						parsedRefLog.Hash,
+						"",
+						"",
 					)
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
@@ -842,6 +858,11 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
 			case constant.SHOW_COMMITLOG:
 				if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
+					m.CurrentSelectedComponent = constant.DetailComponentPanel
+					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
+				}
+			case constant.SHOW_REFLOG:
+				if len(m.CurrentRepoRefLogInfoList.Items()) > 0 {
 					m.CurrentSelectedComponent = constant.DetailComponentPanel
 					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
 				}
@@ -1373,6 +1394,22 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					return m, nil
 				}
 			}
+		case constant.GitCherryPickFromRefLogApplyConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*reflogPopUp.GitCherryPickFromRefLogApplyConfirmationPopUpModel)
+			if ok {
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					gitArgs := m.GitOperations.GitCommitLog.GitCherryPickWithSigning([]string{popUp.Hash})
+					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CHERRY_PICK_WITH_SIGNING_OPS)
+				} else {
+					services.GitCherryPickReflogHashService(m, popUp.Hash)
+					return m, nil
+				}
+			}
+
 		}
 	}
 	return m, nil
@@ -1576,7 +1613,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.RemoveRemoteConfirmationPopUp,
 			constant.RemoteAsTrackingUpstreamConfirmationPopUp,
 			constant.GitRevertParentOptionSelectionPopUp,
-			constant.GitRevertConfirmationPopUp:
+			constant.GitRevertConfirmationPopUp,
+			constant.GitCherryPickFromRefLogApplyConfirmationPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -2096,6 +2134,16 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.PopUpType = constant.GitCherryPickOptionSelectionPopUp
 				m.IsTyping.Store(false)
 				commitLogPopUp.InitGitCherryPickOptionSelectionPopUp(m)
+			}
+		} else if (m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel || m.DetailPanelParentComponent == constant.CommitLogOrRefLogComponentPanel) &&
+			len(m.CurrentRepoRefLogInfoList.Items()) > 0 && m.CurrentCommitLogOrRefLogComponentShowing == constant.SHOW_REFLOG {
+			selectedReflog := m.CurrentRepoRefLogInfoList.SelectedItem()
+			if selectedReflog != nil {
+				parsedSelectedReflog := selectedReflog.(reflog.GitRefLogItem)
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.GitCherryPickFromRefLogApplyConfirmationPopUp
+				reflogPopUp.InitGitCherryPickFromRefLogApplyConfirmationPopUpModel(m, parsedSelectedReflog.Hash, parsedSelectedReflog.Head, parsedSelectedReflog.Action, parsedSelectedReflog.ActionInfo)
 			}
 		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
 			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_TAG {

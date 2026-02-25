@@ -183,6 +183,9 @@ var zH_HANT = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] 切換元件",
 		"[↑/↓] 上下移動",
+		"[enter] 查看引用日誌內容",
+		"[r] 重置到此提交",
+		"[ctrl+p] 揀選並應用",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLogComponent: []string{
@@ -422,12 +425,17 @@ var zH_HANT = LanguageMapping{
 		"[enter] 確認還原",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForGitCherryPickFromRefLogApplyConfirmationPopUp: []string{
+		"[enter] 確認應用",
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                zhHantRemoteComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                         zhHantModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                             zhHantCommitLogComponentKeyBinding,
+	RefLogComponentKeyBinding:                                zhHantRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                 zhHantStashComponentKeyBinding,
 	LogComponentKeyBinding:                                   zhHantLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                zhHantDetailComponentKeyBinding,
@@ -589,6 +597,7 @@ var zH_HANT = LanguageMapping{
 	EditRemotePopUpRemoteUrlPlaceHolder:                      "輸入新的遠端網址...",
 	GitRevertParentOptionSelectionTitle:                      "選擇要還原到的父提交",
 	GitRevertConfirmationTitle:                               "您確定要還原以下提交嗎？\n 提交: [%s]",
+	GitCherryPickFromRefLogApplyConfirmationTitle:            "確定要從引用日誌應用以下揀選嗎？\n 哈希: [%s]\n Head: [%s]\n 操作: [%s]\n 操作資訊: [%s]",
 }
 
 // for about gitti
@@ -862,6 +871,11 @@ var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "編輯遠端",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "設定為上游追蹤分支",
 		LineType:        INFO,
@@ -972,6 +986,45 @@ var zhHantCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "開始揀選操作",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移動",
+		LineType:        INFO,
+	},
+}
+
+// RefLog Component Key Binding for zh-hant
+var zhHantRefLogComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 引用日誌組件面板快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在提交日誌和引用日誌之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "查看引用日誌內容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "重置到此提交",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "從引用日誌揀選並套用到當前分支",
 		LineType:        INFO,
 	},
 	{
@@ -1378,7 +1431,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "重置到提交 (reset to commit)",
 		InstructionLines: []string{
-			"1. 導航到提交日誌組件（按 `3`）",
+			"1. 導航到提交日誌組件（按 `3`）或切換到提交日誌組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇目標提交",
 			"3. 按 `r` 開始重置",
 			"4. 選擇重置類型:",
@@ -1393,14 +1446,19 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "揀選 (cherry pick)",
 		InstructionLines: []string{
-			"1. 導航到提交日誌組件（按 `3`）",
-			"2. 按 `ctrl+p` 開啟揀選選單",
-			"3. 選擇'揀選'並按 `enter`",
-			"4. 使用 `↑/↓` 導航提交",
-			"5. 按 `space` 選擇/取消選擇提交",
-			"6. 按 `e` 編輯選擇（可選）",
-			"7. 按 `a` 套用選定的提交",
-			"8. 確認套用揀選",
+			"1. 導航到提交日誌/引用日誌組件（按 `3`）或切換到提交日誌/引用日誌組件（按 `< >`）",
+			"   -- 在提交日誌組件上",
+			"   2. 按 `ctrl+p` 開啟揀選選單",
+			"   3. 選擇'揀選'並按 `enter`",
+			"   4. 使用 `↑/↓` 導航提交",
+			"   5. 按 `space` 選擇/取消選擇提交",
+			"   6. 按 `e` 編輯選擇（可選）",
+			"   7. 按 `a` 套用選定的提交",
+			"   8. 確認套用揀選",
+			"",
+			"   -- 在引用日誌組件上",
+			"   2. 在引用日誌條目上按 `ctrl+p` 進行揀選並應用",
+			"   3. 確認套用揀選",
 		},
 		LineType: INFO,
 	},
@@ -1439,7 +1497,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "建立標籤 (create tag)",
 		InstructionLines: []string{
-			"1. 導覽到提交日誌組件 (按 `3`) ",
+			"1. 導覽到提交日誌組件（按 `3`）或切換到提交日誌組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇要打標籤的提交",
 			"3. 按 `t` 打開標籤選單",
 			"4. 輸入標籤名稱",
@@ -1542,7 +1600,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "還原提交 (revert commit)",
 		InstructionLines: []string{
-			"1. 導覽至提交記錄組件（按 `3`）",
+			"1. 導覽至提交記錄組件（按 `3`）或切換至提交記錄組件（按 `< >`）",
 			"2. 使用 `↑/↓` 選擇要還原的提交",
 			"3. 按 `ctrl+r`",
 			"   - 如果是合併提交，使用 `↑/↓` 選擇要還原到的父提交",

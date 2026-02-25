@@ -434,6 +434,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRevertParentOptionSelectionPopUp
 		case constant.GitRevertConfirmationPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRevertConfirmationPopUp
+		case constant.GitCherryPickFromRefLogApplyConfirmationPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitCherryPickFromRefLogApplyConfirmationPopUp
 		}
 	} else {
 		//-----------------------------
