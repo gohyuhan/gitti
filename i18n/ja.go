@@ -872,6 +872,11 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "リモートを編集",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "上流として追跡を設定",
 		LineType:        INFO,

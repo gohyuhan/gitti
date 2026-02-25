@@ -871,6 +871,11 @@ var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "编辑远程",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "设置为上游追踪分支",
 		LineType:        INFO,
