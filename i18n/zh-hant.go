@@ -183,6 +183,8 @@ var zH_HANT = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] 切換元件",
 		"[↑/↓] 上下移動",
+		"[enter] 查看引用日誌內容",
+		"[r] 重置到此提交",
 		"[ctrl+p] 揀選並應用",
 		"[?] 快捷鍵與說明",
 	},
@@ -869,6 +871,11 @@ var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "編輯遠端",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "設定為上游追蹤分支",
 		LineType:        INFO,
@@ -1008,6 +1015,11 @@ var zhHantRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "查看引用日誌內容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "重置到此提交",
 		LineType:        INFO,
 	},
 	{

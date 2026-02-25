@@ -183,6 +183,8 @@ var jA = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] コンポーネントを切り替え",
 		"[↑/↓] 上下に移動",
+		"[enter] 参照ログの内容を表示",
+		"[r] このコミットにリセット",
 		"[ctrl+p] チェリーピックして適用する",
 		"[?] キー操作と説明",
 	},
@@ -870,6 +872,11 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "リモートを編集",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "上流として追跡を設定",
 		LineType:        INFO,
@@ -1009,6 +1016,11 @@ var jaRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "参照ログの内容を表示する",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "このコミットにリセット",
 		LineType:        INFO,
 	},
 	{
