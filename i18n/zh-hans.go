@@ -183,6 +183,8 @@ var zH_HANS = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] 切换组件",
 		"[↑/↓] 上下移动",
+		"[enter] 查看引用日志内容",
+		"[r] 重置到此提交",
 		"[ctrl+p] 遴选并应用",
 		"[?] 快捷键与说明",
 	},
@@ -1008,6 +1010,11 @@ var zhHansRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "查看引用日志内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "重置到此提交",
 		LineType:        INFO,
 	},
 	{

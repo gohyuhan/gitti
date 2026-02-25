@@ -651,13 +651,27 @@ func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
 			case constant.SHOW_COMMITLOG:
 				selectedCommit := m.CurrentRepoCommitLogInfoList.SelectedItem()
-				if m.CurrentRepoCommitLogInfoList.Items() != nil {
+				if selectedCommit != nil {
 					parsedCommit := selectedCommit.(commitlog.GitCommitLogItem)
 					commitPopUp.InitGitResetToSelectedCommitTypeOptionPopUpModel(
 						m,
 						parsedCommit.Hash,
 						parsedCommit.Message,
 						parsedCommit.Author,
+					)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.GitResetToSelectedCommitTypeOptionPopUp
+				}
+			case constant.SHOW_REFLOG:
+				selectedRefLog := m.CurrentRepoRefLogInfoList.SelectedItem()
+				if selectedRefLog != nil {
+					parsedRefLog := selectedRefLog.(reflog.GitRefLogItem)
+					commitPopUp.InitGitResetToSelectedCommitTypeOptionPopUpModel(
+						m,
+						parsedRefLog.Hash,
+						"",
+						"",
 					)
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)

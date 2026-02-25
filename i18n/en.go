@@ -183,6 +183,8 @@ var eN = LanguageMapping{
 	KeyBindingRefLogComponent: []string{
 		"[</>] switch component",
 		"[↑/↓] move up and down",
+		"[enter] view reflog content",
+		"[r] reset to this commit",
 		"[ctrl+p] cherry pick and apply",
 		"[?] keybinding and instructions",
 	},
@@ -1012,6 +1014,11 @@ var enRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "view reflog content",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "reset to this commit",
 		LineType:        INFO,
 	},
 	{
