@@ -18,7 +18,7 @@ import (
 //	init the popup model for creating a new branch
 //
 // ----------------------------------
-func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string) {
+func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string, commitHash string) {
 	NewBranchNameInput := textinput.New()
 	NewBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.CreateNewBranchPrompt
 	NewBranchNameInput.Focus()
@@ -28,6 +28,7 @@ func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string) {
 	m.PopUpModel = &CreateNewBranchPopUpModel{
 		NewBranchNameInput: NewBranchNameInput,
 		CreateType:         createType,
+		CommitHash:         commitHash,
 	}
 }
 

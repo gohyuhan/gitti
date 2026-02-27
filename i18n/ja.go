@@ -184,6 +184,7 @@ var jA = LanguageMapping{
 		"[</>] コンポーネントを切り替え",
 		"[↑/↓] 上下に移動",
 		"[enter] 参照ログの内容を表示",
+		"[n] コミットハッシュに基づいて新しいブランチを作成",
 		"[r] このコミットにリセット",
 		"[ctrl+p] チェリーピックして適用する",
 		"[?] キー操作と説明",
@@ -1019,6 +1020,11 @@ var jaRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "コミットハッシュに基づいて新しいブランチを作成",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "このコミットにリセット",
 		LineType:        INFO,
@@ -1378,6 +1384,7 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "ブランチを作成 (create branch)",
 		InstructionLines: []string{
+			"-- ブランチコンポーネントにて --",
 			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
 			"2. `n` を押してブランチ作成オプションを開く",
 			"3. 選択:",
@@ -1387,6 +1394,12 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"4. `enter` を押して確認",
 			"5. 新しいブランチ名を入力",
 			"6. `enter` を押して作成",
+			"",
+			"-- 参照ログコンポーネントにて --",
+			"1. 参照ログコンポーネントに移動（`3` を押す）または参照ログコンポーネントに切り替え（`< >` を押す）",
+			"2. 参照ログエントリで `n` を押してコミットハッシュに基づいて新しいブランチを作成",
+			"3. 新しいブランチ名を入力",
+			"4. `enter` を押して作成",
 		},
 		LineType: INFO,
 	},

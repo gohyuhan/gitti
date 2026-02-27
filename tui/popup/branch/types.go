@@ -24,6 +24,7 @@ import (
 type CreateNewBranchPopUpModel struct {
 	NewBranchNameInput textinput.Model
 	CreateType         string
+	CommitHash         string
 }
 
 // ---------------------------------

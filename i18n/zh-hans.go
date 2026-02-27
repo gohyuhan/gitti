@@ -184,6 +184,7 @@ var zH_HANS = LanguageMapping{
 		"[</>] 切换组件",
 		"[↑/↓] 上下移动",
 		"[enter] 查看引用日志内容",
+		"[n] 基于此提交哈希创建新分支",
 		"[r] 重置到此提交",
 		"[ctrl+p] 遴选并应用",
 		"[?] 快捷键与说明",
@@ -1018,6 +1019,11 @@ var zhHansRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "基于此提交哈希创建新分支",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "重置到此提交",
 		LineType:        INFO,
@@ -1377,6 +1383,7 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "创建分支 (create branch)",
 		InstructionLines: []string{
+			"-- 在分支组件上 --",
 			"1. 导航到分支组件（按 `1`）或切换到分支组件（按 `< >`）",
 			"2. 按 `n` 打开分支创建选项",
 			"3. 选择:",
@@ -1386,6 +1393,12 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"4. 按 `enter` 确认",
 			"5. 输入新分支名称",
 			"6. 按 `enter` 创建",
+			"",
+			"-- 在引用日志组件上 --",
+			"1. 导航到引用日志组件（按 `3`）或切换到引用日志组件（按 `< >`）",
+			"2. 在引用日志条目上按 `n` 基于提交哈希创建新分支",
+			"3. 输入新分支名称",
+			"4. 按 `enter` 创建",
 		},
 		LineType: INFO,
 	},

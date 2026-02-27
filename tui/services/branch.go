@@ -1,6 +1,8 @@
 package services
 
 import (
+	"unicode/utf8"
+
 	"github.com/gohyuhan/gitti/api/git"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -54,7 +56,7 @@ func GitSwitchBranchService(m *types.GittiModel, branchName string, switchType s
 // ------------------------------------
 func GitCreateNewBranchService(m *types.GittiModel, validBranchName string) {
 	go func() {
-		if len(validBranchName) < 1 {
+		if utf8.RuneCountInString(validBranchName) < 1 {
 			return
 		}
 		m.GitOperations.GitBranch.GitCreateNewBranch(validBranchName)
@@ -117,5 +119,19 @@ func CreateNewBranchBasedOnRemoteService(m *types.GittiModel, remoteName string,
 			popUp.CreateBranchBasedOnRemoteOutputViewport.SetContentLines(result)
 			popUp.CreateBranchBasedOnRemoteOutputViewport.PageDown()
 		}
+	}()
+}
+
+// ------------------------------------
+//
+//	For create new branch based on commit hash (trigger from reflog component panel)
+//
+// ------------------------------------
+func GitCreateNewBranchBasedOnCommitHashService(m *types.GittiModel, validBranchName string, commitHash string) {
+	go func() {
+		if utf8.RuneCountInString(validBranchName) < 1 || utf8.RuneCountInString(commitHash) < 1 {
+			return
+		}
+		m.GitOperations.GitBranch.GitCreateNewBranchBasedOnCommitHash(validBranchName, commitHash)
 	}()
 }

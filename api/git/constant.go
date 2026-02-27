@@ -17,9 +17,10 @@ const (
 
 // Branch creation operation types
 const (
-	NEWBRANCH              = "NEWBRANCH"              // Create new branch
-	NEWBRANCHANDSWITCH     = "NEWBRANCHANDSWITCH"     // Create and switch to new branch
-	NEWBRANCHBASEDONREMOTE = "NEWBRANCHBASEDONREMOTE" // Create new branch based on a remote branch
+	NEWBRANCH                  = "NEWBRANCH"                  // Create new branch
+	NEWBRANCHANDSWITCH         = "NEWBRANCHANDSWITCH"         // Create and switch to new branch
+	NEWBRANCHBASEDONREMOTE     = "NEWBRANCHBASEDONREMOTE"     // Create new branch based on a remote branch
+	NEWBRANCHBASEDONCOMMITHASH = "NEWBRANCHBASEDONCOMMITHASH" // Create new branch based on commit hash (commit hash was retrieved from reflog)
 )
 
 // Branch switching operation types

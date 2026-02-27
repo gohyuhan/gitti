@@ -184,6 +184,7 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[↑/↓] move up and down",
 		"[enter] view reflog content",
+		"[n] new branch based on commit hash",
 		"[r] reset to this commit",
 		"[ctrl+p] cherry pick and apply",
 		"[?] keybinding and instructions",
@@ -1017,6 +1018,11 @@ var enRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "create new branch based on this commit hash",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "reset to this commit",
 		LineType:        INFO,
@@ -1376,6 +1382,7 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "create branch",
 		InstructionLines: []string{
+			"-- On Branch Component --",
 			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
 			"2. Press `n` to open branch creation options",
 			"3. Select:",
@@ -1385,6 +1392,12 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"4. Press `enter` to confirm",
 			"5. Enter the new branch name",
 			"6. Press `enter` to create",
+			"",
+			"-- On Reflog Component --",
+			"1. Navigate to Reflog component (press `3`) or switch to Reflog component (press `< >`)",
+			"2. Press `n` on a reflog entry to create a new branch based on the commit hash",
+			"3. Enter the new branch name",
+			"4. Press `enter` to create",
 		},
 		LineType: INFO,
 	},
