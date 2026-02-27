@@ -184,6 +184,7 @@ var zH_HANT = LanguageMapping{
 		"[</>] 切換元件",
 		"[↑/↓] 上下移動",
 		"[enter] 查看引用日誌內容",
+		"[n] 基於此提交哈希建立新分支",
 		"[r] 重置到此提交",
 		"[ctrl+p] 揀選並應用",
 		"[?] 快捷鍵與說明",
@@ -1018,6 +1019,11 @@ var zhHantRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "基於此提交哈希建立新分支",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "重置到此提交",
 		LineType:        INFO,
@@ -1377,6 +1383,7 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 	{
 		Feature: "建立分支 (create branch)",
 		InstructionLines: []string{
+			"-- 在分支組件上 --",
 			"1. 導航到分支組件（按 `1`）或切換到分支組件（按 `< >`）",
 			"2. 按 `n` 開啟分支建立選項",
 			"3. 選擇:",
@@ -1386,6 +1393,12 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"4. 按 `enter` 確認",
 			"5. 輸入新分支名稱",
 			"6. 按 `enter` 建立",
+			"",
+			"-- 在引用日誌組件上 --",
+			"1. 導航到引用日誌組件（按 `3`）或切換到引用日誌組件（按 `< >`）",
+			"2. 在引用日誌條目上按 `n` 基於提交哈希建立新分支",
+			"3. 輸入新分支名稱",
+			"4. 按 `enter` 建立",
 		},
 		LineType: INFO,
 	},

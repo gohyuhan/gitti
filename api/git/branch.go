@@ -251,6 +251,29 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 
 // ----------------------------------
 //
+//		Related to Create New Branch based on commit hash ( only create, remain at current branch )
+//	 * used to create branch based on commit hash on reflog
+//
+// ----------------------------------
+func (gb *GitBranch) GitCreateNewBranchBasedOnCommitHash(branchName string, commitHash string) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
+	gitArgs := []string{"branch", branchName, commitHash}
+
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	err := cmdExecutor.Run()
+	gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_BASED_ON_COMMIT_HASH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_BASED_ON_COMMIT_HASH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.CREATE_NEW_BRANCH_BASED_ON_COMMIT_HASH_OPS, err.Error()), true)
+		return
+	}
+}
+
+// ----------------------------------
+//
 //	Related to Switch Branch with the changes ( bring the changes over )
 //
 // ----------------------------------

@@ -315,6 +315,8 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyMsg)
 					services.GitCreateNewBranchService(m, validBranchName)
 				case git.NEWBRANCHANDSWITCH:
 					services.GitCreateNewBranchAndSwitchService(m, validBranchName)
+				case git.NEWBRANCHBASEDONCOMMITHASH:
+					services.GitCreateNewBranchBasedOnCommitHashService(m, validBranchName, popUp.CommitHash)
 				}
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)

@@ -540,6 +540,18 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					remotePopUp.InitAddRemotePromptPopUpModel(m, true)
 				}
 			}
+		case constant.CommitLogOrRefLogComponentPanel:
+			switch m.CurrentCommitLogOrRefLogComponentShowing {
+			case constant.SHOW_REFLOG:
+				selectedReflog := m.CurrentRepoRefLogInfoList.SelectedItem()
+				if selectedReflog != nil {
+					parsedReflog := selectedReflog.(reflog.GitRefLogItem)
+					m.PopUpType = constant.CreateNewBranchPopUp
+					m.IsTyping.Store(true)
+					m.ShowPopUp.Store(true)
+					branchPopUp.InitCreateNewBranchPopUpModel(m, git.NEWBRANCHBASEDONCOMMITHASH, parsedReflog.Hash)
+				}
+			}
 		}
 	}
 	return m, nil
@@ -990,7 +1002,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.PopUpType = constant.CreateNewBranchPopUp
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(true)
-					branchPopUp.InitCreateNewBranchPopUpModel(m, newBranchType)
+					branchPopUp.InitCreateNewBranchPopUpModel(m, newBranchType, "")
 				}
 			}
 
