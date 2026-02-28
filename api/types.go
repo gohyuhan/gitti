@@ -7,6 +7,7 @@ type GitOperations struct {
 	GitCommit              *git.GitCommit
 	GitFiles               *git.GitFiles
 	GitPull                *git.GitPull
+	GitRebase              *git.GitRebase
 	GitStash               *git.GitStash
 	GitRemote              *git.GitRemote
 	GitCommitLog           *git.GitCommitLog

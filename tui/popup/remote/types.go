@@ -6,11 +6,13 @@ import (
 	"io"
 	"strings"
 	"sync/atomic"
+	"unicode/utf8"
 
 	"charm.land/bubbles/v2/list"
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
+	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/utils"
@@ -75,8 +77,15 @@ func (d GitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, list
 		return
 	}
 
-	nameStr := fmt.Sprintf("   %s", i.Name)
-	urlStr := fmt.Sprintf("    %s", i.Url)
+	var nameStr string
+	var urlStr string
+	if utf8.RuneCountInString(i.Name) < 1 && utf8.RuneCountInString(i.Url) < 1 {
+		nameStr = fmt.Sprintf("   %s", i18n.LANGUAGEMAPPING.GitRebaseUseLocalBranch)
+		urlStr = fmt.Sprintf("    %s", i18n.LANGUAGEMAPPING.GitRebaseUseLocalBranchDesc)
+	} else {
+		nameStr = fmt.Sprintf("   %s", i.Name)
+		urlStr = fmt.Sprintf("    %s", i.Url)
+	}
 
 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
 

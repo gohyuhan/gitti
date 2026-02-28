@@ -54,6 +54,8 @@ const (
 	GitRevertParentOptionSelectionPopUp           = "GitRevertParentOptionSelectionPopUp"           // IsTyping will be false
 	GitRevertConfirmationPopUp                    = "GitRevertConfirmationPopUp"                    // IsTyping will be false
 	GitCherryPickFromRefLogApplyConfirmationPopUp = "GitCherryPickFromRefLogApplyConfirmationPopUp" // IsTyping will be false
+	GitRebaseBranchInputPopUp                     = "GitRebaseBranchInputPopUp"                     // IsTyping will be true
+	GitRebaseOutputPopUp                          = "GitRebaseOutputPopUp"                          // IsTyping will be false
 )
 
 const (
@@ -122,6 +124,8 @@ const (
 	MaxGitRevertParentOptionSelectionPopUpWidth           = 150
 	MaxGitRevertConfirmationPopUpWidth                    = 150
 	MaxGitCherryPickFromRefLogApplyConfirmationPopUpWidth = 150
+	MaxGitRebaseBranchInputPopUpWidth                     = 150
+	MaxGitRebaseOutputPopUpWidth                          = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10
@@ -154,6 +158,7 @@ const (
 	PopUpChooseFetchTagOptionHeight                    = 10
 	PopUpFetchTagOutputViewportHeight                  = 10
 	PopUpGitRevertParentOptionSelectionHeight          = 10
+	PopUpGitRebaseOutputViewportHeight                 = 10
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -205,6 +210,7 @@ const (
 	CREATEBRANCHBASEDONREMOTE = "CREATEBRANCHBASEDONREMOTE"
 	TAGPUSHACTION             = "TAGPUSHACTION"
 	TAGFETCHACTION            = "TAGFETCHACTION"
+	REBASEACTION              = "REBASEACTION"
 )
 
 // cherry pick ops options

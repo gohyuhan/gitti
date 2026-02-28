@@ -10,6 +10,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/keybinding"
 	"github.com/gohyuhan/gitti/tui/popup/pull"
 	"github.com/gohyuhan/gitti/tui/popup/push"
+	"github.com/gohyuhan/gitti/tui/popup/rebase"
 	"github.com/gohyuhan/gitti/tui/popup/reflog"
 	"github.com/gohyuhan/gitti/tui/popup/remote"
 	"github.com/gohyuhan/gitti/tui/popup/resolve"
@@ -123,6 +124,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = commitlog.RenderGitRevertConfirmationPopUp(m)
 	case constant.GitCherryPickFromRefLogApplyConfirmationPopUp:
 		popUp = reflog.RenderGitCherryPickFromRefLogApplyConfirmationPopUp(m)
+	case constant.GitRebaseBranchInputPopUp:
+		popUp = rebase.RenderGitRebaseBranchInputPopUp(m)
+	case constant.GitRebaseOutputPopUp:
+		popUp = rebase.RenderGitRebaseOutputPopUp(m)
 	}
 	return popUp
 }

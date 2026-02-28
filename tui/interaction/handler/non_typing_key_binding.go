@@ -26,6 +26,7 @@ import (
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
+	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
 	reflogPopUp "github.com/gohyuhan/gitti/tui/popup/reflog"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
@@ -638,6 +639,7 @@ func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 //
 //	Handle 'r' key interaction.
 //	Responsibility: Contextual "resolve" or "reset" operations depending on the view:
+//	- In Local Branch View: Opens a popup to rebase the current branch to a specific commit. (the selector must be on the current checkout branch to trigger this)
 //	- In Modified Files Panel: Opens the conflict resolution popup for a conflicted file.
 //	- In Commit Log Panel: Opens a popup to reset the repository HEAD to a specifically
 //	  selected older commit (soft, mixed, or hard reset).
@@ -646,6 +648,26 @@ func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+				selectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
+				if selectedBranch != nil {
+					parsedBranch := selectedBranch.(branch.GitBranchItem)
+					if parsedBranch.IsCheckedOut {
+						_ = m.GitOperations.GitRemote.CheckRemoteExist(false)
+						m.IsTyping.Store(false)
+						m.ShowPopUp.Store(true)
+						remotes := m.GitOperations.GitRemote.FetchRemote()
+						m.PopUpType = constant.ChooseRemotePopUp
+						// add a use local branch option which the name and url is "" (empty string) and fetch/push is false
+						remotes = append([]git.GitRemoteInfo{{Name: "", Url: "", Fetch: false, Push: false}}, remotes...)
+						remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.REBASEACTION)
+					} else {
+						return m, nil
+					}
+				}
+			}
 		case constant.ModifiedFilesComponentPanel:
 			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if currentSelectedFileItem != nil {
@@ -947,6 +969,11 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.ShowPopUp.Store(true)
 					m.PopUpType = constant.ChooseFetchTagOptionPopUp
 					tagPopUp.InitChooseFetchTagOptionPopUpModel(m, remoteName)
+				case constant.REBASEACTION:
+					m.IsTyping.Store(true)
+					m.ShowPopUp.Store(true)
+					m.PopUpType = constant.GitRebaseBranchInputPopUp
+					rebasePopUp.InitGitRebaseBranchInputPopUpModel(m, remoteName)
 				}
 			}
 
@@ -1558,6 +1585,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			services.GitFetchTagCancelService(m)
 		case constant.DeleteTagOutputPopUp:
 			services.DeleteTagCancelService(m)
+		case constant.GitRebaseOutputPopUp:
+			services.GitRebaseCancelService(m)
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)

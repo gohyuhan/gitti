@@ -185,6 +185,8 @@ type LanguageMapping struct {
 	KeyBindingForGitRevertParentOptionSelectionPopUp           []string
 	KeyBindingForGitRevertConfirmationPopUp                    []string
 	KeyBindingForGitCherryPickFromRefLogApplyConfirmationPopUp []string
+	KeyBindingForGitRebaseBranchInputPopUp                     []string
+	KeyBindingForGitRebaseOutputPopUp                          []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -395,4 +397,12 @@ type LanguageMapping struct {
 	GitRevertConfirmationTitle          string
 	// for reflog
 	GitCherryPickFromRefLogApplyConfirmationTitle string
+	//for rebase
+	GitRebaseUseLocalBranch                       string
+	GitRebaseUseLocalBranchDesc                   string
+	RebaseBranchNameInputPlaceholder              string
+	GitRebaseBranchInputPopUpTitleForLocalBranch  string
+	GitRebaseBranchInputPopUpTitleForRemoteBranch string
+	GitRebaseTitle                                string
+	GitRebaseProcessing                           string
 }
