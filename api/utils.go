@@ -90,6 +90,7 @@ func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogg
 		GitCommit:              git.InitGitCommit(updateChannel, gitProcessLock, gittiLogging),
 		GitFiles:               git.InitGitFile(updateChannel, gitProcessLock, gittiLogging),
 		GitPull:                git.InitGitPull(updateChannel, gitProcessLock, gittiLogging),
+		GitRebase:              git.InitGitRebase(updateChannel, gitProcessLock, gittiLogging),
 		GitStash:               git.InitGitStash(gitProcessLock, gittiLogging),
 		GitRemote:              git.InitGitRemote(updateChannel, gitProcessLock, gittiLogging),
 		GitCommitLog:           git.InitGitCommitLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount, gittiLogging),

@@ -94,6 +94,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] new branch",
+		"[r] rebase",
 		"[</>] switch component",
 		"[?] keybinding and instructions",
 	},
@@ -430,6 +431,13 @@ var eN = LanguageMapping{
 		"[enter] confirm apply",
 		"[esc] cancel / close",
 	},
+	KeyBindingForGitRebaseBranchInputPopUp: []string{
+		"[enter] rebase",
+		"[esc] cancel / close",
+	},
+	KeyBindingForGitRebaseOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -599,6 +607,13 @@ var eN = LanguageMapping{
 	GitRevertParentOptionSelectionTitle:                      "Select the parent commit to revert to",
 	GitRevertConfirmationTitle:                               "Are you sure you want to revert the following commit?\n commit: [%s]",
 	GitCherryPickFromRefLogApplyConfirmationTitle:            "Are you sure you want to apply the following cherry pick from reflog?\n Hash: [%s]\n Head: [%s]\n Action: [%s]\n Action Info: [%s]",
+	GitRebaseUseLocalBranch:                                  "Use local branch",
+	GitRebaseUseLocalBranchDesc:                              "Use local branch instead of remote branch",
+	RebaseBranchNameInputPlaceholder:                         "Enter branch name to rebase to...",
+	GitRebaseBranchInputPopUpTitleForLocalBranch:             "Enter a local branch name to rebase to",
+	GitRebaseBranchInputPopUpTitleForRemoteBranch:            "Enter a remote branch name to rebase to from remote [%s]",
+	GitRebaseTitle:                                           "Rebase",
+	GitRebaseProcessing:                                      "Rebasing...",
 }
 
 // for about gitti
@@ -790,6 +805,11 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "delete branch",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "rebase (only for current checked out branch)",
 		LineType:        INFO,
 	},
 	{
@@ -1226,10 +1246,23 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"1. Press `P` (Shift+p) to initiate pull",
 			"2. Select pull strategy:",
 			"   - Pull - Standard git pull",
-			"   - Rebase - Pull with rebase",
+			"   - Rebase - Pull with rebase (rebase using current tracked upstream branch)",
 			"   - Merge - Pull with merge",
 			"3. Press `enter` to execute",
 			"4. Press `esc` to close output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "rebase",
+		InstructionLines: []string{
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
+			"2. Navigate to the branch you want to rebase on (rebase only apply to current checked out branch)",
+			"3. Press `r` to rebase",
+			"4. Choose Remote (optional if you want to rebase using local branch)",
+			"5. Enter Branch Name",
+			"6. Press `enter` to execute",
+			"7. Press `esc` to close output popup",
 		},
 		LineType: INFO,
 	},

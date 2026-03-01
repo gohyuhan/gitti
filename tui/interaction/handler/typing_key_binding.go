@@ -12,6 +12,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
@@ -39,7 +40,8 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		constant.GitStashMessagePopUp,
 		constant.CreateBranchBasedOnRemotePopUp,
 		constant.CreateTagPopUp,
-		constant.EditRemotePromptPopUp:
+		constant.EditRemotePromptPopUp,
+		constant.GitRebaseBranchInputPopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -364,6 +366,35 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyMsg)
 			}
 		}
 
+	case constant.GitRebaseBranchInputPopUp:
+		popUp, ok := m.PopUpModel.(*rebasePopUp.GitRebaseBranchInputPopUpModel)
+		if ok {
+			// we direclty close the pop up and trigger the branch creation operation
+			validBranchName, _ := api.IsBranchNameValid(popUp.BranchNameInput.Value())
+			remoteOrigin := popUp.Remote
+			if utf8.RuneCountInString(validBranchName) > 0 {
+				rebasePopUp.InitGitRebaseOutputPopUpModel(m)
+				popUp, ok := m.PopUpModel.(*rebasePopUp.GitRebaseOutputPopUpModel)
+				if ok {
+					if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+						gitArgs := m.GitOperations.GitRebase.GitRebaseWithSigning(remoteOrigin, validBranchName)
+						return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.GIT_REBASE_WITH_SIGNING_OPS)
+					} else {
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.GitRebaseOutputPopUp
+						popUp.IsProcessing.Store(true)
+						services.GitRebaseService(m, remoteOrigin, validBranchName)
+						return m, popUp.Spinner.Tick
+					}
+				} else {
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.NoPopUp
+				}
+			}
+		}
+
 	// the following is to handle the change line for textarea input
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
@@ -495,6 +526,13 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				return m, cmd
 			}
 		}
+	case constant.GitRebaseBranchInputPopUp:
+		popUp, ok := m.PopUpModel.(*rebasePopUp.GitRebaseBranchInputPopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.BranchNameInput, cmd = popUp.BranchNameInput.Update(msg)
+			return m, cmd
+		}
 	}
 	return m, nil
 }
@@ -563,6 +601,11 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			case 2:
 				content = popUp.TagMessageTextAreaInput.Value()
 			}
+		}
+	case constant.GitRebaseBranchInputPopUp:
+		popUp, ok := m.PopUpModel.(*rebasePopUp.GitRebaseBranchInputPopUpModel)
+		if ok {
+			content = popUp.BranchNameInput.Value()
 		}
 	}
 

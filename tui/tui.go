@@ -22,6 +22,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
+	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/services"
@@ -247,6 +248,8 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			tagPopUp.UpdatePushTagOutputViewPort(m)
 		case git.GIT_TAG_FETCH_OUTPUT_UPDATE:
 			tagPopUp.UpdateFetchTagOutputViewPort(m)
+		case git.GIT_REBASE_OUTPUT_UPDATE:
+			rebasePopUp.UpdatePopUpGitRebaseOutputViewport(m)
 		}
 		return gAM, nil
 	case types.EditorFinishedMsg:
@@ -340,6 +343,12 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if tagPopup, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel); ok && tagPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				tagPopup.Spinner, cmd = tagPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.GitRebaseOutputPopUp:
+			if rebasePopup, ok := m.PopUpModel.(*rebasePopUp.GitRebaseOutputPopUpModel); ok && rebasePopup.IsProcessing.Load() {
+				var cmd tea.Cmd
+				rebasePopup.Spinner, cmd = rebasePopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		}

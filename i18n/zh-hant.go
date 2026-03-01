@@ -94,6 +94,7 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新增分支",
+		"[r] 變基 (rebase)",
 		"[</>] 切換元件",
 		"[?] 快捷鍵與說明",
 	},
@@ -430,6 +431,13 @@ var zH_HANT = LanguageMapping{
 		"[enter] 確認應用",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForGitRebaseBranchInputPopUp: []string{
+		"[enter] 變基",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForGitRebaseOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -599,6 +607,13 @@ var zH_HANT = LanguageMapping{
 	GitRevertParentOptionSelectionTitle:                      "選擇要還原到的父提交",
 	GitRevertConfirmationTitle:                               "您確定要還原以下提交嗎？\n 提交: [%s]",
 	GitCherryPickFromRefLogApplyConfirmationTitle:            "確定要從引用日誌應用以下揀選嗎？\n 哈希: [%s]\n Head: [%s]\n 操作: [%s]\n 操作資訊: [%s]",
+	GitRebaseUseLocalBranch:                                  "使用本地分支",
+	GitRebaseUseLocalBranchDesc:                              "使用本地分支而不是遠端分支",
+	RebaseBranchNameInputPlaceholder:                         "輸入要變基到的分支名稱...",
+	GitRebaseBranchInputPopUpTitleForLocalBranch:             "輸入要變基到的本地分支名稱",
+	GitRebaseBranchInputPopUpTitleForRemoteBranch:            "輸入要從遠端 [%s] 變基到的遠端分支名稱",
+	GitRebaseTitle:                                           "變基",
+	GitRebaseProcessing:                                      "變基中...",
 }
 
 // for about gitti
@@ -791,6 +806,11 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "刪除分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "變基 (僅適用於目前簽出的分支)",
 		LineType:        INFO,
 	},
 	{
@@ -1227,10 +1247,23 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"1. 按 `P`（Shift+p）開始拉取",
 			"2. 選擇拉取策略:",
 			"   - Pull - 標準 git pull",
-			"   - Rebase - 使用 rebase 拉取",
+			"   - Rebase - 使用 rebase 拉取 (使用目前追蹤的上游分支進行變基)",
 			"   - Merge - 使用 merge 拉取",
 			"3. 按 `enter` 執行",
 			"4. 按 `esc` 關閉輸出彈出視窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "變基 (rebase)",
+		InstructionLines: []string{
+			"1. 導覽至分支元件（按 `1`）或切換至分支元件（按 `< >`）",
+			"2. 導覽至您想要變基的分支（變基僅適用於目前簽出的分支）",
+			"3. 按 `r` 開始變基",
+			"4. 選擇遠端（若要使用本地分支變基則可跳過）",
+			"5. 輸入分支名稱",
+			"6. 按 `enter` 執行",
+			"7. 按 `esc` 關閉輸出彈出視窗",
 		},
 		LineType: INFO,
 	},

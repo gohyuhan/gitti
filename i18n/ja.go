@@ -94,6 +94,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[n] 新しいブランチ",
+		"[r] リベース",
 		"[</>] コンポーネントを切り替え",
 		"[?] キー操作と説明",
 	},
@@ -430,6 +431,13 @@ var jA = LanguageMapping{
 		"[enter] 適用を確定する",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForGitRebaseBranchInputPopUp: []string{
+		"[enter] リベース",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForGitRebaseOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -599,6 +607,13 @@ var jA = LanguageMapping{
 	GitRevertParentOptionSelectionTitle:                      "リバート先の親コミットを選択してください",
 	GitRevertConfirmationTitle:                               "以下のコミットをリバートしてもよろしいですか？\n コミット: [%s]",
 	GitCherryPickFromRefLogApplyConfirmationTitle:            "参照ログから以下のチェリーピックを適用してもよろしいですか？\n ハッシュ: [%s]\n HEAD: [%s]\n アクション: [%s]\n アクション情報: [%s]",
+	GitRebaseUseLocalBranch:                                  "ローカルブランチを使用",
+	GitRebaseUseLocalBranchDesc:                              "リモートブランチの代わりにローカルブランチを使用する",
+	RebaseBranchNameInputPlaceholder:                         "リベース先のブランチ名を入力...",
+	GitRebaseBranchInputPopUpTitleForLocalBranch:             "リベース先のローカルブランチ名を入力してください",
+	GitRebaseBranchInputPopUpTitleForRemoteBranch:            "リモート [%s] からリベース先のリモートブランチ名を入力してください",
+	GitRebaseTitle:                                           "リベース",
+	GitRebaseProcessing:                                      "リベース中...",
 }
 
 // for about gitti
@@ -792,6 +807,11 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "ブランチを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "r",
+		TitleOrInfoLine: "リベース (現在チェックアウト中のブランチに対してのみ適用)",
 		LineType:        INFO,
 	},
 	{
@@ -1228,10 +1248,23 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"1. `P`（Shift+p）を押してプルを開始",
 			"2. プル戦略を選択:",
 			"   - プル - 標準的な git pull",
-			"   - リベース - リベースでプル",
+			"   - リベース - リベースでプル (現在追跡中の上流ブランチを使用してリベース)",
 			"   - マージ - マージでプル",
 			"3. `enter` を押して実行",
 			"4. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "リベース (rebase)",
+		InstructionLines: []string{
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
+			"2. リベース先のブランチに移動（リベースは現在チェックアウト中のブランチにのみ適用されます）",
+			"3. `r` を押してリベースを開始",
+			"4. リモートを選択（ローカルブランチを使用してリベースする場合は省略可能）",
+			"5. ブランチ名を入力",
+			"6. `enter` を押して実行",
+			"7. `esc` を押して出力を閉じる",
 		},
 		LineType: INFO,
 	},
