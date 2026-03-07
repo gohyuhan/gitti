@@ -210,7 +210,7 @@ func isFilesInConflictState(indexState string, workTree string) bool {
 //
 // ----------------------------------
 func gitFetch(gittiLogger *logging.GittiLogging, userTriggered bool) {
-	gitArgs := []string{"fetch"}
+	gitArgs := []string{"fetch", "--prune"}
 	if userTriggered {
 		gittiLogger.RegisterNewLog(logging.FETCH_OPS, strings.Join(gitArgs, ""), logging.INFO, "", true)
 	}

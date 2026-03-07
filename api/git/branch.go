@@ -16,7 +16,8 @@ type BranchInfo struct {
 type GitBranch struct {
 	isRepoUnborn    bool // meaning this is a newly init repo, no commit on any branch yet
 	currentCheckOut BranchInfo
-	allBranches     []BranchInfo
+	allBranches     []BranchInfo // this refer to all local branch
+	remoteBranches  []BranchInfo
 	logging         *logging.GittiLogging
 	gitProcessLock  *GitProcessLock
 }
@@ -320,4 +321,35 @@ func (gb *GitBranch) DeleteLocalBranch(branchName string) ([]string, bool) {
 		return gitOpsOutput, false
 	}
 	return gitOpsOutput, true
+}
+
+// ----------------------------------
+//
+//		Related to get remote branch
+//	 * this run passively and will not be triggered by user manually, this will be trigger after passive and manual git fetch
+//
+// ----------------------------------
+func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
+	gitArgs := []string{"branch", "-r"}
+	remoteBranchExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	remoteBranchOutput, remoteBranchErr := remoteBranchExecutor.CombinedOutput()
+
+	parsedRemoteBranchOutput := processGeneralGitOpsOutputIntoStringArray(remoteBranchOutput)
+
+	var remoteBranches []BranchInfo
+	if remoteBranchErr != nil {
+		gb.logging.RegisterNewLog(logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, remoteBranchErr.Error()), true)
+		return
+	}
+
+	for _, parsedRemote := range parsedRemoteBranchOutput {
+		remoteBranch := BranchInfo{
+			BranchName:   strings.TrimSpace(parsedRemote),
+			IsCheckedOut: false,
+		}
+
+		remoteBranches = append(remoteBranches, remoteBranch)
+	}
+
+	gb.remoteBranches = remoteBranches
 }

@@ -134,7 +134,7 @@ const (
 	PopUpGitRemotePushOutputViewportHeight             = 10
 	PopUpChooseRemoteHeight                            = 10
 	PopUpChoosePushTypeHeight                          = 6
-	PopUpChooseNewBranchTypeHeight                     = 6
+	PopUpChooseNewBranchTypeHeight                     = 8
 	PopUpChooseSwitchBranchTypeHeight                  = 6
 	PopUpSwitchBranchOutputViewPortHeight              = 10
 	PopUpChooseGitPullTypeHeight                       = 6

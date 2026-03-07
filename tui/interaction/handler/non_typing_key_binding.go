@@ -997,7 +997,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			if ok {
 				selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
 				newBranchType := selectedOption.(branchPopUp.GitNewBranchTypeOptionItem).NewBranchType
-				if newBranchType == git.NEWBRANCHBASEDONREMOTE {
+				if newBranchType == git.NEWBRANCHBASEDONREMOTEUSERINPUT {
 					if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 						// if no remote found, we add one
 						m.PopUpType = constant.AddRemotePromptPopUp

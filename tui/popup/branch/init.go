@@ -50,9 +50,14 @@ func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 			NewBranchType: git.NEWBRANCHANDSWITCH,
 		},
 		{
-			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteTitle,
-			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteDescription,
-			NewBranchType: git.NEWBRANCHBASEDONREMOTE,
+			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserInputTitle,
+			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserInputDescription,
+			NewBranchType: git.NEWBRANCHBASEDONREMOTEUSERINPUT,
+		},
+		{
+			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserSelectionTitle,
+			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserSelectionDescription,
+			NewBranchType: git.NEWBRANCHBASEDONREMOTEUSERSELECT,
 		},
 	}
 

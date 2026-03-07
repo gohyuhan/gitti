@@ -219,7 +219,7 @@ func RenderCreateBranchBasedOnRemotePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*CreateBranchBasedOnRemotePopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxCreateBranchBasedOnRemotePopUpWidth, int(float64(m.Width)*0.8))
-		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteTitle)
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserInputTitle)
 		popUp.RemoteBranchNameInput.SetWidth(popUpWidth - 6)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
