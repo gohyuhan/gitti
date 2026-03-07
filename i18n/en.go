@@ -438,6 +438,11 @@ var eN = LanguageMapping{
 	KeyBindingForGitRebaseOutputPopUp: []string{
 		"[esc] cancel / close",
 	},
+	KeyBindingForChooseRemoteBranchOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select remote branch option",
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -486,6 +491,7 @@ var eN = LanguageMapping{
 	CreateNewBranchBasedOnRemoteUserSelectionDescription:     "Create a new branch based on a remote branch, you will need to select the remote branch from the list",
 	RemoteOriginTitle:                                        "Remote Origin",
 	EnterRemoteBranchTitle:                                   "Enter remote branch name",
+	ChooseRemoteBranchOptionTitle:                            "Choose remote branch",
 	CreatingNewBranchBasedOnRemoteTitle:                      "Creating new branch based on remote",
 	CreatingNewBranchBasedOnRemoteProcessing:                 "Creating new branch based on remote...",
 	ChooseSwitchBranchTypeTitle:                              "How would you like to proceed to switch to %s",

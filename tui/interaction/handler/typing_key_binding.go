@@ -348,7 +348,7 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyMsg)
 			// we direclty close the pop up and trigger the branch creation operation
 			validBranchName, _ := api.IsBranchNameValid(popUp.RemoteBranchNameInput.Value())
 			remoteOrigin := popUp.RemoteOrigin
-			if len(validBranchName) > 0 {
+			if utf8.RuneCountInString(validBranchName) > 0 {
 				branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUp(m)
 				popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
 				if ok {
@@ -356,7 +356,7 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyMsg)
 					m.IsTyping.Store(false)
 					m.PopUpType = constant.CreateBranchBasedOnRemoteOutputPopUp
 					popUp.IsProcessing.Store(true)
-					services.CreateNewBranchBasedOnRemoteService(m, remoteOrigin, validBranchName)
+					services.CreateNewBranchBasedOnRemoteService(m, remoteOrigin, validBranchName, git.NEWBRANCHBASEDONREMOTEUSERINPUT)
 					return m, popUp.Spinner.Tick
 				} else {
 					m.ShowPopUp.Store(false)

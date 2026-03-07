@@ -438,6 +438,11 @@ var jA = LanguageMapping{
 	KeyBindingForGitRebaseOutputPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForChooseRemoteBranchOptionPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] リモートブランチオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -486,6 +491,7 @@ var jA = LanguageMapping{
 	CreateNewBranchBasedOnRemoteUserSelectionDescription:     "リモートブランチに基づいて新しいブランチを作成します。リストからリモートブランチを選択する必要があります。",
 	RemoteOriginTitle:                                        "リモートオリジン",
 	EnterRemoteBranchTitle:                                   "リモートブランチ名を入力",
+	ChooseRemoteBranchOptionTitle:                            "リモートブランチを選択",
 	CreatingNewBranchBasedOnRemoteTitle:                      "リモートに基づいて新しいブランチを作成中",
 	CreatingNewBranchBasedOnRemoteProcessing:                 "リモートに基づいて新しいブランチを作成中...",
 	ChooseSwitchBranchTypeTitle:                              "どの方法で %s に切り替えますか？",

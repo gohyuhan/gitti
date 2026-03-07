@@ -235,6 +235,7 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 		if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(needFetch, false)
+			gd.gitOperations.GitBranch.GetLatestRemoteBranchesInfo()
 			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 		}
 	}()

@@ -58,6 +58,17 @@ func (gb *GitBranch) AllBranches() []BranchInfo {
 
 // ----------------------------------
 //
+//	Return  remoteBranches
+//
+// ----------------------------------
+func (gb *GitBranch) RemoteBranches() []BranchInfo {
+	copied := make([]BranchInfo, len(gb.remoteBranches))
+	copy(copied, gb.remoteBranches)
+	return copied
+}
+
+// ----------------------------------
+//
 //	Return is repo unborn
 //
 // ----------------------------------
@@ -201,8 +212,8 @@ func (gb *GitBranch) GitCreateNewBranchBasedOnRemote(remoteName string, branchNa
 
 	createBranchBasedOnRemoteGitArgs := []string{"branch", branchName, remoteBranchName}
 	createBranchBasedOnRemoteCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(createBranchBasedOnRemoteGitArgs, false)
-	createBranchBasedOnRemoteOutput, createBranchBasedOnRemoteErr := createBranchBasedOnRemoteCmdExecutor.CombinedOutput()
 	gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_BASED_ON_REMOTE_BRANCH_OPS, strings.Join(createBranchBasedOnRemoteGitArgs, " "), logging.INFO, "", true)
+	createBranchBasedOnRemoteOutput, createBranchBasedOnRemoteErr := createBranchBasedOnRemoteCmdExecutor.CombinedOutput()
 
 	parsedCreateBranchBasedOnRemoteOutput := processGeneralGitOpsOutputIntoStringArray(createBranchBasedOnRemoteOutput)
 

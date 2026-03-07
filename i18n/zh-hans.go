@@ -438,6 +438,11 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForGitRebaseOutputPopUp: []string{
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForChooseRemoteBranchOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择远程分支选项",
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -486,6 +491,7 @@ var zH_HANS = LanguageMapping{
 	CreateNewBranchBasedOnRemoteUserSelectionDescription:     "基于远程分支创建新分支，您需要从列表中选择远程分支",
 	RemoteOriginTitle:                                        "远程源",
 	EnterRemoteBranchTitle:                                   "输入远程分支名称",
+	ChooseRemoteBranchOptionTitle:                            "选择远程分支",
 	CreatingNewBranchBasedOnRemoteTitle:                      "正在基于远程分支创建新分支",
 	CreatingNewBranchBasedOnRemoteProcessing:                 "正在基于远程分支创建新分支...",
 	ChooseSwitchBranchTypeTitle:                              "您希望如何切换到 %s？",

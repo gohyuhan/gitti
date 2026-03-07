@@ -1,9 +1,13 @@
 package services
 
 import (
+	"fmt"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/logging"
+	"github.com/gohyuhan/gitti/tui/constant"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -103,8 +107,22 @@ func GitDeleteBranchService(m *types.GittiModel, branchName string) {
 //	For create new branch based on remote branch
 //
 // ------------------------------------
-func CreateNewBranchBasedOnRemoteService(m *types.GittiModel, remoteName string, branchName string) {
+func CreateNewBranchBasedOnRemoteService(m *types.GittiModel, remoteName string, branchName string, newBranchCreateType string) {
 	go func() {
+		if newBranchCreateType == git.NEWBRANCHBASEDONREMOTEUSERSELECT {
+			parts := strings.SplitN(branchName, "/", 2)
+			if len(parts) < 2 {
+				m.GittiLogger.RegisterNewLog(logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, "Invalid Remote Branch Naming"), false)
+				m.IsTyping.Store(false)
+				m.ShowPopUp.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+
+				return
+			}
+			remoteName = parts[0]
+			branchName = parts[1]
+		}
 		result, success := m.GitOperations.GitBranch.GitCreateNewBranchBasedOnRemote(remoteName, branchName)
 		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
 		if ok {
