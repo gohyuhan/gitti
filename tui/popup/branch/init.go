@@ -50,9 +50,14 @@ func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 			NewBranchType: git.NEWBRANCHANDSWITCH,
 		},
 		{
-			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteTitle,
-			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteDescription,
-			NewBranchType: git.NEWBRANCHBASEDONREMOTE,
+			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserInputTitle,
+			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserInputDescription,
+			NewBranchType: git.NEWBRANCHBASEDONREMOTEUSERINPUT,
+		},
+		{
+			Name:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserSelectionTitle,
+			Info:          i18n.LANGUAGEMAPPING.CreateNewBranchBasedOnRemoteUserSelectionDescription,
+			NewBranchType: git.NEWBRANCHBASEDONREMOTEUSERSELECT,
 		},
 	}
 
@@ -213,4 +218,28 @@ func InitCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) {
 	popUpModel.ProcessSuccess.Store(false)
 
 	m.PopUpModel = popUpModel
+}
+
+func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
+	remoteBranches := m.GitOperations.GitBranch.RemoteBranches()
+	items := make([]list.Item, 0, len(remoteBranches))
+	for _, remoteBranch := range remoteBranches {
+		items = append(items, RemoteBranchItem(remoteBranch))
+	}
+	width := (min(constant.MaxChooseRemoteBranchOptionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	cRBOL := list.New(items, RemoteBranchItemDelegate{}, width, constant.PopUpChooseRemoteBranchOptionHeight)
+	cRBOL.SetShowPagination(false)
+	cRBOL.SetShowStatusBar(false)
+	cRBOL.SetFilteringEnabled(false)
+	cRBOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	cRBOL.SetShowHelp(true)
+	cRBOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	cRBOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	cRBOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cRBOL, constant.MaxChooseRemoteBranchOptionPopUpWidth)
+
+	m.PopUpModel = &ChooseRemoteBranchOptionPopUpModel{
+		RemoteBranchOptionList: cRBOL,
+	}
 }

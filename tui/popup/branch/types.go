@@ -213,3 +213,58 @@ func (d GitSwitchBranchTypeOptionDelegate) Render(w io.Writer, m list.Model, ind
 
 	fmt.Fprint(w, fn(fullStr))
 }
+
+// ---------------------------------
+//
+// choose remote branches for create new branch based on remote
+//
+// ---------------------------------
+type ChooseRemoteBranchOptionPopUpModel struct {
+	RemoteBranchOptionList list.Model
+}
+
+// ---------------------------------
+//
+// for list component of remote branches
+//
+// ---------------------------------
+type (
+	RemoteBranchItemDelegate struct{}
+	RemoteBranchItem         struct {
+		BranchName   string
+		IsCheckedOut bool
+	}
+)
+
+func (i RemoteBranchItem) FilterValue() string {
+	return i.BranchName
+}
+
+// for list component of Git branch
+func (d RemoteBranchItemDelegate) Height() int                             { return 1 }
+func (d RemoteBranchItemDelegate) Spacing() int                            { return 0 }
+func (d RemoteBranchItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d RemoteBranchItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(RemoteBranchItem)
+	if !ok {
+		return
+	}
+
+	str := fmt.Sprintf("  %s", i.BranchName)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+	str = utils.TruncateString(str, componentWidth)
+
+	fmt.Fprint(w, fn(str))
+}

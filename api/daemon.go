@@ -168,6 +168,7 @@ func (gd *GitDaemon) Start() {
 					if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 						defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 						gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, false)
+						gd.gitOperations.GitBranch.GetLatestRemoteBranchesInfo()
 						gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 					}
 				}()
@@ -178,6 +179,7 @@ func (gd *GitDaemon) Start() {
 						if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 							defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 							gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, true)
+							gd.gitOperations.GitBranch.GetLatestRemoteBranchesInfo()
 							gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 						} else {
 							gd.gittiLogger.RegisterNewLog(logging.FETCH_OPS, "", logging.WARN, "[WARN]: A background process to fetch is already running", false)
@@ -233,6 +235,7 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 		if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(needFetch, false)
+			gd.gitOperations.GitBranch.GetLatestRemoteBranchesInfo()
 			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 		}
 	}()

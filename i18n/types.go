@@ -187,6 +187,7 @@ type LanguageMapping struct {
 	KeyBindingForGitCherryPickFromRefLogApplyConfirmationPopUp []string
 	KeyBindingForGitRebaseBranchInputPopUp                     []string
 	KeyBindingForGitRebaseOutputPopUp                          []string
+	KeyBindingForChooseRemoteBranchOptionPopUp                 []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -246,16 +247,19 @@ type LanguageMapping struct {
 	ChooseNewBranchTypeTitle string
 	NewBranchInvalidWarning  string
 	// Create Branch Option
-	CreateNewBranchTitle                     string
-	CreateNewBranchDescription               string
-	CreateNewBranchAndSwitchTitle            string
-	CreateNewBranchAndSwitchDescription      string
-	CreateNewBranchBasedOnRemoteTitle        string
-	CreateNewBranchBasedOnRemoteDescription  string
-	RemoteOriginTitle                        string
-	EnterRemoteBranchTitle                   string
-	CreatingNewBranchBasedOnRemoteTitle      string
-	CreatingNewBranchBasedOnRemoteProcessing string
+	CreateNewBranchTitle                                 string
+	CreateNewBranchDescription                           string
+	CreateNewBranchAndSwitchTitle                        string
+	CreateNewBranchAndSwitchDescription                  string
+	CreateNewBranchBasedOnRemoteUserInputTitle           string
+	CreateNewBranchBasedOnRemoteUserInputDescription     string
+	CreateNewBranchBasedOnRemoteUserSelectionTitle       string
+	CreateNewBranchBasedOnRemoteUserSelectionDescription string
+	RemoteOriginTitle                                    string
+	EnterRemoteBranchTitle                               string
+	ChooseRemoteBranchOptionTitle                        string
+	CreatingNewBranchBasedOnRemoteTitle                  string
+	CreatingNewBranchBasedOnRemoteProcessing             string
 	// switch branch
 	ChooseSwitchBranchTypeTitle string
 	// Switch Branch Option

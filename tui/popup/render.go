@@ -128,6 +128,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = rebase.RenderGitRebaseBranchInputPopUp(m)
 	case constant.GitRebaseOutputPopUp:
 		popUp = rebase.RenderGitRebaseOutputPopUp(m)
+	case constant.ChooseRemoteBranchOptionPopUp:
+		popUp = branch.RenderChooseRemoteBranchOptionPopUp(m)
 	}
 	return popUp
 }

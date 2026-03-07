@@ -543,6 +543,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			}
 		case constant.LogComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingLogComponent
+		case constant.ChooseRemoteBranchOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseRemoteBranchOptionPopUp
 		}
 	}
 

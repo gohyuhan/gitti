@@ -56,6 +56,7 @@ const (
 	GitCherryPickFromRefLogApplyConfirmationPopUp = "GitCherryPickFromRefLogApplyConfirmationPopUp" // IsTyping will be false
 	GitRebaseBranchInputPopUp                     = "GitRebaseBranchInputPopUp"                     // IsTyping will be true
 	GitRebaseOutputPopUp                          = "GitRebaseOutputPopUp"                          // IsTyping will be false
+	ChooseRemoteBranchOptionPopUp                 = "ChooseRemoteBranchOptionPopUp"                 // IsTyping will be false
 )
 
 const (
@@ -126,6 +127,7 @@ const (
 	MaxGitCherryPickFromRefLogApplyConfirmationPopUpWidth = 150
 	MaxGitRebaseBranchInputPopUpWidth                     = 150
 	MaxGitRebaseOutputPopUpWidth                          = 150
+	MaxChooseRemoteBranchOptionPopUpWidth                 = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                = 18
 	PopUpGitCommitOutputViewPortHeight                 = 10
@@ -134,7 +136,7 @@ const (
 	PopUpGitRemotePushOutputViewportHeight             = 10
 	PopUpChooseRemoteHeight                            = 10
 	PopUpChoosePushTypeHeight                          = 6
-	PopUpChooseNewBranchTypeHeight                     = 6
+	PopUpChooseNewBranchTypeHeight                     = 8
 	PopUpChooseSwitchBranchTypeHeight                  = 6
 	PopUpSwitchBranchOutputViewPortHeight              = 10
 	PopUpChooseGitPullTypeHeight                       = 6
@@ -159,6 +161,7 @@ const (
 	PopUpFetchTagOutputViewportHeight                  = 10
 	PopUpGitRevertParentOptionSelectionHeight          = 10
 	PopUpGitRebaseOutputViewportHeight                 = 10
+	PopUpChooseRemoteBranchOptionHeight                = 10
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

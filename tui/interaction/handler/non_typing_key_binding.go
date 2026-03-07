@@ -3,6 +3,7 @@ package handler
 import (
 	"slices"
 	"strings"
+	"unicode/utf8"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api"
@@ -997,7 +998,8 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			if ok {
 				selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
 				newBranchType := selectedOption.(branchPopUp.GitNewBranchTypeOptionItem).NewBranchType
-				if newBranchType == git.NEWBRANCHBASEDONREMOTE {
+				switch newBranchType {
+				case git.NEWBRANCHBASEDONREMOTEUSERINPUT:
 					if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 						// if no remote found, we add one
 						m.PopUpType = constant.AddRemotePromptPopUp
@@ -1025,7 +1027,12 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 							}
 						}
 					}
-				} else {
+				case git.NEWBRANCHBASEDONREMOTEUSERSELECT:
+					m.PopUpType = constant.ChooseRemoteBranchOptionPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					branchPopUp.InitChooseRemoteBranchOptionPopUpModel(m)
+				default:
 					m.PopUpType = constant.CreateNewBranchPopUp
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(true)
@@ -1448,7 +1455,30 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					return m, nil
 				}
 			}
-
+		case constant.ChooseRemoteBranchOptionPopUp:
+			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseRemoteBranchOptionPopUpModel)
+			if ok {
+				selectedRemoteBranch := popUp.RemoteBranchOptionList.SelectedItem()
+				if selectedRemoteBranch != nil {
+					branchName := selectedRemoteBranch.(branchPopUp.RemoteBranchItem).BranchName
+					if utf8.RuneCountInString(branchName) > 0 {
+						branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUp(m)
+						popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
+						if ok {
+							m.ShowPopUp.Store(true)
+							m.IsTyping.Store(false)
+							m.PopUpType = constant.CreateBranchBasedOnRemoteOutputPopUp
+							popUp.IsProcessing.Store(true)
+							services.CreateNewBranchBasedOnRemoteService(m, "", branchName, git.NEWBRANCHBASEDONREMOTEUSERSELECT)
+							return m, popUp.Spinner.Tick
+						} else {
+							m.ShowPopUp.Store(false)
+							m.IsTyping.Store(false)
+							m.PopUpType = constant.NoPopUp
+						}
+					}
+				}
+			}
 		}
 	}
 	return m, nil
@@ -1655,7 +1685,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.RemoteAsTrackingUpstreamConfirmationPopUp,
 			constant.GitRevertParentOptionSelectionPopUp,
 			constant.GitRevertConfirmationPopUp,
-			constant.GitCherryPickFromRefLogApplyConfirmationPopUp:
+			constant.GitCherryPickFromRefLogApplyConfirmationPopUp,
+			constant.ChooseRemoteBranchOptionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
