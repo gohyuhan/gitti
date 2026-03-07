@@ -343,6 +343,9 @@ func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 	}
 
 	for _, parsedRemote := range parsedRemoteBranchOutput {
+		if strings.Contains(parsedRemote, "/HEAD") {
+			continue
+		}
 		remoteBranch := BranchInfo{
 			BranchName:   strings.TrimSpace(parsedRemote),
 			IsCheckedOut: false,
