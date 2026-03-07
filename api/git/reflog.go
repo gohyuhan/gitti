@@ -70,15 +70,15 @@ func (grl *GitRefLog) GetLatestRefLog() {
 
 	parsedRefLogOutputArray := processGeneralGitOpsOutputIntoStringArray(reflogOutput)
 	for _, entry := range parsedRefLogOutputArray {
-		splitedRefLogEntry := strings.SplitAfterN(entry, " ", 2)
+		splitedRefLogEntry := strings.SplitN(entry, " ", 2)
 		if len(splitedRefLogEntry) < 2 {
 			continue
 		}
-		splitedHeadAndInfoDesc := strings.SplitAfterN(splitedRefLogEntry[1], ":", 2)
+		splitedHeadAndInfoDesc := strings.SplitN(splitedRefLogEntry[1], ":", 2)
 		if len(splitedHeadAndInfoDesc) < 2 {
 			continue
 		}
-		splitedActionAndActionInfoDesc := strings.SplitAfterN(splitedHeadAndInfoDesc[1], ":", 2)
+		splitedActionAndActionInfoDesc := strings.SplitN(splitedHeadAndInfoDesc[1], ":", 2)
 		if len(splitedActionAndActionInfoDesc) < 2 {
 			continue
 		}
@@ -86,8 +86,8 @@ func (grl *GitRefLog) GetLatestRefLog() {
 		reflogInfo := GitRefLogInfo{
 			FullInfo:   strings.TrimSpace(splitedRefLogEntry[1]),
 			InfoDesc:   strings.TrimSpace(splitedHeadAndInfoDesc[1]),
-			Head:       strings.Trim(strings.TrimSpace(splitedHeadAndInfoDesc[0]), ":"),
-			Action:     strings.Trim(strings.TrimSpace(splitedActionAndActionInfoDesc[0]), ":"),
+			Head:       strings.TrimSpace(splitedHeadAndInfoDesc[0]),
+			Action:     strings.TrimSpace(splitedActionAndActionInfoDesc[0]),
 			ActionInfo: strings.TrimSpace(splitedActionAndActionInfoDesc[1]),
 			Hash:       strings.TrimSpace(splitedRefLogEntry[0]),
 		}
