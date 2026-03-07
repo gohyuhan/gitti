@@ -482,6 +482,8 @@ var jA = LanguageMapping{
 	CreateNewBranchAndSwitchDescription:                      "新しいブランチを作成し、すべての変更を新しいブランチに移動します",
 	CreateNewBranchBasedOnRemoteUserInputTitle:               "リモートブランチに基づいて新しいブランチを作成する (手動入力)",
 	CreateNewBranchBasedOnRemoteUserInputDescription:         "リモートブランチに基づいて新しいブランチを作成します。正確なリモートブランチ名を指定する必要があります。",
+	CreateNewBranchBasedOnRemoteUserSelectionTitle:           "リモートブランチに基づいて新しいブランチを作成する (ユーザー選択)",
+	CreateNewBranchBasedOnRemoteUserSelectionDescription:     "リモートブランチに基づいて新しいブランチを作成します。リストからリモートブランチを選択する必要があります。",
 	RemoteOriginTitle:                                        "リモートオリジン",
 	EnterRemoteBranchTitle:                                   "リモートブランチ名を入力",
 	CreatingNewBranchBasedOnRemoteTitle:                      "リモートに基づいて新しいブランチを作成中",

@@ -482,6 +482,8 @@ var zH_HANT = LanguageMapping{
 	CreateNewBranchAndSwitchDescription:                      "建立新分支並將所有變更移至新分支",
 	CreateNewBranchBasedOnRemoteUserInputTitle:               "基於遠端分支建立新分支 (手動輸入)",
 	CreateNewBranchBasedOnRemoteUserInputDescription:         "基於遠端分支建立新分支，您需要提供確切的遠端分支名稱",
+	CreateNewBranchBasedOnRemoteUserSelectionTitle:           "基於遠端分支建立新分支 (使用者選擇)",
+	CreateNewBranchBasedOnRemoteUserSelectionDescription:     "基於遠端分支建立新分支，您需要從清單中選擇遠端分支",
 	RemoteOriginTitle:                                        "遠端源",
 	EnterRemoteBranchTitle:                                   "輸入遠端分支名稱",
 	CreatingNewBranchBasedOnRemoteTitle:                      "正在基於遠端分支建立新分支",

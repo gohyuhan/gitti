@@ -482,6 +482,8 @@ var zH_HANS = LanguageMapping{
 	CreateNewBranchAndSwitchDescription:                      "创建新分支并将所有更改移动到新分支",
 	CreateNewBranchBasedOnRemoteUserInputTitle:               "基于远程分支创建新分支 (手动输入)",
 	CreateNewBranchBasedOnRemoteUserInputDescription:         "基于远程分支创建新分支，您需要提供确切的远程分支名称",
+	CreateNewBranchBasedOnRemoteUserSelectionTitle:           "基于远程分支创建新分支 (用户选择)",
+	CreateNewBranchBasedOnRemoteUserSelectionDescription:     "基于远程分支创建新分支，您需要从列表中选择远程分支",
 	RemoteOriginTitle:                                        "远程源",
 	EnterRemoteBranchTitle:                                   "输入远程分支名称",
 	CreatingNewBranchBasedOnRemoteTitle:                      "正在基于远程分支创建新分支",
