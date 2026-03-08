@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"unicode/utf8"
@@ -152,4 +153,77 @@ func GitCreateNewBranchBasedOnCommitHashService(m *types.GittiModel, validBranch
 		}
 		m.GitOperations.GitBranch.GitCreateNewBranchBasedOnCommitHash(validBranchName, commitHash)
 	}()
+}
+
+// ------------------------------------
+//
+//	For Git Merge
+//
+// ------------------------------------
+func GitMergeService(m *types.GittiModel, branchesName []string) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
+	if ok {
+		popUp.CancelFunc = cancel
+	}
+
+	go func(ctx context.Context) {
+		defer cancel()
+
+		// set to is processing and remove the log content in UI and also in GITCOMMIT in memory
+		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
+		if ok {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(false)
+			popUp.IsProcessing.Store(true)
+			popUp.IsCancelled.Store(false)
+		} else {
+			return
+		}
+		outputResult, success := m.GitOperations.GitBranch.GitMerge(ctx, branchesName)
+		popUp, ok = m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
+		if ok && !popUp.IsCancelled.Load() {
+			popUp.IsProcessing.Store(false) // update the processing status
+			if success && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(true)
+				popUp.HasError.Store(false)
+			} else if !success && !popUp.IsProcessing.Load() {
+				popUp.ProcessSuccess.Store(false)
+				popUp.HasError.Store(true)
+			}
+
+			var content strings.Builder
+			for index := range outputResult {
+				content.WriteString(outputResult[index])
+				content.WriteRune('\n')
+			}
+
+			popUp.BranchMergeOutputViewport.SetContent(content.String())
+		}
+	}(ctx)
+}
+
+// ------------------------------------
+//
+//	Cancel the current git merge operation and clean up pop-up state
+//
+// ------------------------------------
+func GitMergeCancelService(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
+	if ok {
+		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
+		if popUp.CancelFunc != nil {
+			popUp.CancelFunc() // Cancel the context, which terminates the command and goroutine
+		}
+	}
+	m.ShowPopUp.Store(false) // close the pop up
+	m.IsTyping.Store(false)  // and reset typing mode
+	m.PopUpType = constant.NoPopUp
+	if ok {
+		popUp.BranchMergeOutputViewport.SetContent("") // set the git rebase output viewport to nothing
+		popUp.IsProcessing.Store(false)
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+	}
 }

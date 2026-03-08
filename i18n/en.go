@@ -93,6 +93,7 @@ var eN = LanguageMapping{
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
+		"[m] merge",
 		"[n] new branch",
 		"[r] rebase",
 		"[</>] switch component",
@@ -100,6 +101,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] switch branch",
+		"[m] merge",
 		"[n] new branch",
 		"[d] delete branch",
 		"[</>] switch component",
@@ -443,6 +445,16 @@ var eN = LanguageMapping{
 		"[enter] select remote branch option",
 		"[esc] cancel / close",
 	},
+	KeyBindingForChooseBranchOptionForMergePopUp: []string{
+		"[↑/↓] move up and down",
+		"[tab/shift+tab] navigate between selection section",
+		"[space] select / unselect branch",
+		"[enter] merge",
+		"[esc] cancel / close",
+	},
+	KeyBindingForBranchMergeOutputPopUp: []string{
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -622,6 +634,10 @@ var eN = LanguageMapping{
 	GitRebaseBranchInputPopUpTitleForRemoteBranch:            "Enter a remote branch name to rebase to from remote [%s]",
 	GitRebaseTitle:                                           "Rebase",
 	GitRebaseProcessing:                                      "Rebasing...",
+	ChooseBranchOptionForGitMergeTitle:                       "Select branch to merge into %s",
+	SelectedBranchOptionForGitMergeTitle:                     "Selected branch(es)",
+	GitMergeOutputTitle:                                      "Merge",
+	BranchMerging:                                            "Merging...",
 }
 
 // for about gitti
@@ -818,6 +834,11 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "rebase (only for current checked out branch)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "m",
+		TitleOrInfoLine: "merge branch(es) into current branch",
 		LineType:        INFO,
 	},
 	{
@@ -1659,6 +1680,19 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"3. Press `ctrl+r`",
 			"   - Select the parent commit to revert to using `↑/↓` if it was a merge commit",
 			"4. Press `enter` to confirm",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "merge branch",
+		InstructionLines: []string{
+			"1. Navigate to Branch component (press `1`) or switch to Branch component (press `< >`)",
+			"2. Press `m` to open the branch merge selection popup",
+			"3. Use `↑/↓` to navigate available branches",
+			"4. Press `space` to select / deselect branches to merge into the current branch",
+			"5. Use `tab` / `shift+tab` to switch between the available and selected branch lists",
+			"6. Press `enter` to execute the merge",
+			"7. Press `esc` to cancel",
 		},
 		LineType: INFO,
 	},

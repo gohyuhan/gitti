@@ -514,6 +514,30 @@ func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 
 // ----------------------------------
 //
+//	Handle 'm' key interaction.
+//	Responsibility: Initiates the "Merge" workflow.
+//	In the Local Branch panel, opens the branch selection popup allowing the user to
+//	choose one or more branches to merge into the currently checked-out branch.
+//
+// ----------------------------------
+func handleNonTypingmKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+				m.PopUpType = constant.ChooseBranchOptionForMergePopUp
+				m.IsTyping.Store(false)
+				m.ShowPopUp.Store(true)
+				branchPopUp.InitChooseBranchOptionForMergePopUpModel(m)
+			}
+		}
+	}
+	return m, nil
+}
+
+// ----------------------------------
+//
 //	Handle 'n' key interaction.
 //	Responsibility: Contextual "new" operation. Depending on the focused view:
 //	- In Local Branch View: Opens popup to create a new branch (optionally based on a remote).
@@ -1479,6 +1503,23 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					}
 				}
 			}
+		case constant.ChooseBranchOptionForMergePopUp:
+			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseBranchOptionForMergePopUpModel)
+			if ok {
+				var branchesNames []string
+				for _, branch := range popUp.SelectedBranchList.Items() {
+					branchesNames = append(branchesNames, branch.(branchPopUp.GitMergeBranchOptionItem).BranchName)
+				}
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.BranchMergeOutputPopUp
+				branchPopUp.InitBranchMergeOutputPopUpModel(m)
+				popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
+				if ok {
+					services.GitMergeService(m, branchesNames)
+					return m, popUp.Spinner.Tick
+				}
+			}
 		}
 	}
 	return m, nil
@@ -1487,19 +1528,33 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 // ----------------------------------
 //
 //	Handle Tab key interaction.
-//	Responsibility: Global forward navigation.
-//	Cycles the primary active focus to the *next* main component panel in the UI layout
-//	(e.g., from Branches to Modified Files, then to Commit Log, etc.).
+//	Responsibility: Forward navigation.
+//	- No popup: Cycles the primary active focus to the *next* main component panel in the UI layout
+//	  (e.g., from Branches to Modified Files, then to Commit Log, etc.).
+//	- Merge Popup: Shifts section focus from the branch option list to the selected branch list.
 //
 // ----------------------------------
 func handleNonTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	nextNavigation := m.CurrentSelectedComponentIndex + 1
-	if nextNavigation < len(constant.ComponentPanelNavigationList) {
-		m.CurrentSelectedComponentIndex = nextNavigation
-		m.CurrentSelectedComponent = constant.ComponentPanelNavigationList[nextNavigation]
-		m.DetailPanelParentComponent = ""
-		layout.LeftPanelDynamicResize(m)
-		services.FetchDetailComponentPanelInfoService(m, true)
+	if !m.ShowPopUp.Load() {
+		nextNavigation := m.CurrentSelectedComponentIndex + 1
+		if nextNavigation < len(constant.ComponentPanelNavigationList) {
+			m.CurrentSelectedComponentIndex = nextNavigation
+			m.CurrentSelectedComponent = constant.ComponentPanelNavigationList[nextNavigation]
+			m.DetailPanelParentComponent = ""
+			layout.LeftPanelDynamicResize(m)
+			services.FetchDetailComponentPanelInfoService(m, true)
+		}
+	} else {
+		switch m.PopUpType {
+		case constant.ChooseBranchOptionForMergePopUp:
+			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseBranchOptionForMergePopUpModel)
+			if ok {
+				if popUp.BranchOptionSectionSelected.Load() {
+					popUp.BranchOptionSectionSelected.Store(false)
+					popUp.SelectedBranchSectionSelected.Store(true)
+				}
+			}
+		}
 	}
 	return m, nil
 }
@@ -1507,18 +1562,32 @@ func handleNonTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 // ----------------------------------
 //
 //	Handle Shift+Tab key interaction.
-//	Responsibility: Global backward navigation.
-//	Cycles the primary active focus to the *previous* main component panel in the UI layout.
+//	Responsibility: Backward navigation.
+//	- No popup: Cycles the primary active focus to the *previous* main component panel in the UI layout.
+//	- Merge Popup: Shifts section focus from the selected branch list back to the branch option list.
 //
 // ----------------------------------
 func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	previousNavigation := m.CurrentSelectedComponentIndex - 1
-	if previousNavigation >= 0 {
-		m.CurrentSelectedComponentIndex = previousNavigation
-		m.CurrentSelectedComponent = constant.ComponentPanelNavigationList[previousNavigation]
-		m.DetailPanelParentComponent = ""
-		layout.LeftPanelDynamicResize(m)
-		services.FetchDetailComponentPanelInfoService(m, true)
+	if !m.ShowPopUp.Load() {
+		previousNavigation := m.CurrentSelectedComponentIndex - 1
+		if previousNavigation >= 0 {
+			m.CurrentSelectedComponentIndex = previousNavigation
+			m.CurrentSelectedComponent = constant.ComponentPanelNavigationList[previousNavigation]
+			m.DetailPanelParentComponent = ""
+			layout.LeftPanelDynamicResize(m)
+			services.FetchDetailComponentPanelInfoService(m, true)
+		}
+	} else {
+		switch m.PopUpType {
+		case constant.ChooseBranchOptionForMergePopUp:
+			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseBranchOptionForMergePopUpModel)
+			if ok {
+				if popUp.SelectedBranchSectionSelected.Load() {
+					popUp.BranchOptionSectionSelected.Store(true)
+					popUp.SelectedBranchSectionSelected.Store(false)
+				}
+			}
+		}
 	}
 	return m, nil
 }
@@ -1530,6 +1599,7 @@ func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.G
 //	- Modified / Detail Panels: Stages or unstages the selected file or specific hunk/line.
 //	- Stash Panel: Triggers applying a stash (without dropping it).
 //	- Cherry Pick Popup: Selects/toggles the currently highlighted commit to be added to the cherry-pick queue.
+//	- Merge Popup: Toggles the currently highlighted branch between the available and selected branch lists.
 //
 // ----------------------------------
 func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -1587,6 +1657,11 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					}
 				}
 			}
+		case constant.ChooseBranchOptionForMergePopUp:
+			_, ok := m.PopUpModel.(*branchPopUp.ChooseBranchOptionForMergePopUpModel)
+			if ok {
+				branchPopUp.UpdateChooseBranchOptionForMergePopUpModel(m)
+			}
 		}
 	}
 	return m, nil
@@ -1617,6 +1692,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			services.DeleteTagCancelService(m)
 		case constant.GitRebaseOutputPopUp:
 			services.GitRebaseCancelService(m)
+		case constant.BranchMergeOutputPopUp:
+			services.GitMergeCancelService(m)
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -1686,7 +1763,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.GitRevertParentOptionSelectionPopUp,
 			constant.GitRevertConfirmationPopUp,
 			constant.GitCherryPickFromRefLogApplyConfirmationPopUp,
-			constant.ChooseRemoteBranchOptionPopUp:
+			constant.ChooseRemoteBranchOptionPopUp,
+			constant.ChooseBranchOptionForMergePopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -2024,7 +2102,9 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 
 // ----------------------------------
 //
-//	handleNonTypingLeftBracketKeyBindingInteraction handles the '[' key not only for navigation but contextually to switch to the previous detail component panel
+//	Handle '[' key interaction.
+//	Responsibility: Detail panel backward navigation.
+//	Switches the active focus from DetailComponentPanelTwo back to DetailComponentPanel (the primary detail panel).
 //
 // ----------------------------------
 func handleNonTypingLeftBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -2039,7 +2119,9 @@ func handleNonTypingLeftBracketKeyBindingInteraction(m *types.GittiModel) (*type
 
 // ----------------------------------
 //
-//	handleNonTypingRightBracketKeyBindingInteraction handles the ']' key not only for navigation but contextually to switch to the next detail component panel
+//	Handle ']' key interaction.
+//	Responsibility: Detail panel forward navigation.
+//	Switches the active focus from DetailComponentPanel to DetailComponentPanelTwo (the secondary detail panel), if it is currently visible.
 //
 // ----------------------------------
 func handleNonTypingRightBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {

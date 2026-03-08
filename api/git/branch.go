@@ -375,12 +375,17 @@ func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 //
 // ----------------------------------
 func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]string, bool) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
 	gitArgs := []string{"merge"}
 	gitArgs = append(gitArgs, branchesName...)
 
 	mergeExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
-	mergeOutput, mergeErr := mergeExecutor.CombinedOutput()
 	gb.logging.RegisterNewLog(logging.MERGE_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	mergeOutput, mergeErr := mergeExecutor.CombinedOutput()
 
 	gitMergeOpsOutput := processGeneralGitOpsOutputIntoStringArray(mergeOutput)
 

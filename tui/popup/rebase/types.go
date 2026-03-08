@@ -21,7 +21,7 @@ type GitRebaseOutputPopUpModel struct {
 	HasError                atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
 	ProcessSuccess          atomic.Bool    // has the process sucessfuly executed
 	IsCancelled             atomic.Bool    // flag to indicate if the operation was cancelled by user
-	// CancelFunc is used to cancel the git pull operation
+	// CancelFunc is used to cancel the git rebase operation
 	CancelFunc context.CancelFunc
 }
 

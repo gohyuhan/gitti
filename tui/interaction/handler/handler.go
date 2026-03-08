@@ -205,6 +205,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 	case "L":
 		return handleNonTypingLKeyBindingInteraction(m)
 
+	case "m":
+		return handleNonTypingmKeyBindingInteraction(m)
+
 	case "n":
 		return handleNonTypingnKeyBindingInteraction(m)
 

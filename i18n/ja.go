@@ -93,6 +93,7 @@ var jA = LanguageMapping{
 		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
+		"[m] マージ",
 		"[n] 新しいブランチ",
 		"[r] リベース",
 		"[</>] コンポーネントを切り替え",
@@ -100,6 +101,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] ブランチ切り替え",
+		"[m] マージ",
 		"[n] 新しいブランチ",
 		"[d] ブランチを削除",
 		"[</>] コンポーネントを切り替え",
@@ -443,6 +445,16 @@ var jA = LanguageMapping{
 		"[enter] リモートブランチオプションを選択",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForChooseBranchOptionForMergePopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[tab/shift+tab] 選択セクション間を切り替え",
+		"[space] ブランチの選択 / 選択解除",
+		"[enter] マージ",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForBranchMergeOutputPopUp: []string{
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -622,6 +634,10 @@ var jA = LanguageMapping{
 	GitRebaseBranchInputPopUpTitleForRemoteBranch:            "リモート [%s] からリベース先のリモートブランチ名を入力してください",
 	GitRebaseTitle:                                           "リベース",
 	GitRebaseProcessing:                                      "リベース中...",
+	ChooseBranchOptionForGitMergeTitle:                       "%s にマージするブランチを選択",
+	SelectedBranchOptionForGitMergeTitle:                     "選択されたブランチ",
+	GitMergeOutputTitle:                                      "マージ",
+	BranchMerging:                                            "マージ中...",
 }
 
 // for about gitti
@@ -820,6 +836,11 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "リベース (現在チェックアウト中のブランチに対してのみ適用)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "m",
+		TitleOrInfoLine: "現在のブランチにブランチをマージ",
 		LineType:        INFO,
 	},
 	{
@@ -1661,6 +1682,19 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"3. `ctrl+r` を押す",
 			"   - マージコミットの場合は `↑/↓` を使用してリバート先の親コミットを選択してください",
 			"4. `enter` を押して確定",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ブランチをマージ (merge branch)",
+		InstructionLines: []string{
+			"1. ブランチコンポーネントに移動（`1` を押す）またはブランチコンポーネントに切り替え（`< >` を押す）",
+			"2. `m` を押してブランチマージ選択ポップアップを開く",
+			"3. `↑/↓` を使用して利用可能なブランチを移動",
+			"4. `space` を押して現在のブランチにマージするブランチを選択 / 選択解除",
+			"5. `tab` / `shift+tab` を使用して利用可能なブランチリストと選択済みブランチリストを切り替える",
+			"6. `enter` を押してマージを実行",
+			"7. `esc` を押してキャンセル",
 		},
 		LineType: INFO,
 	},

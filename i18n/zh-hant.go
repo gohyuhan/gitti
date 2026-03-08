@@ -93,6 +93,7 @@ var zH_HANT = LanguageMapping{
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
+		"[m] 合併",
 		"[n] 新增分支",
 		"[r] 變基 (rebase)",
 		"[</>] 切換元件",
@@ -100,6 +101,7 @@ var zH_HANT = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切換分支",
+		"[m] 合併",
 		"[n] 新增分支",
 		"[d] 刪除分支",
 		"[</>] 切換元件",
@@ -443,6 +445,16 @@ var zH_HANT = LanguageMapping{
 		"[enter] 選擇遠端分支選項",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForChooseBranchOptionForMergePopUp: []string{
+		"[↑/↓] 上下移動",
+		"[tab/shift+tab] 在選擇區域之間切換",
+		"[space] 選擇 / 取消選擇分支",
+		"[enter] 合併",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForBranchMergeOutputPopUp: []string{
+		"[esc] 取消 / 關閉",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -622,6 +634,10 @@ var zH_HANT = LanguageMapping{
 	GitRebaseBranchInputPopUpTitleForRemoteBranch:            "輸入要從遠端 [%s] 變基到的遠端分支名稱",
 	GitRebaseTitle:                                           "變基",
 	GitRebaseProcessing:                                      "變基中...",
+	ChooseBranchOptionForGitMergeTitle:                       "選擇要合併到 %s 的分支",
+	SelectedBranchOptionForGitMergeTitle:                     "已選分支",
+	GitMergeOutputTitle:                                      "合併",
+	BranchMerging:                                            "合併中...",
 }
 
 // for about gitti
@@ -819,6 +835,11 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "變基 (僅適用於目前簽出的分支)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "m",
+		TitleOrInfoLine: "將分支合併至目前分支",
 		LineType:        INFO,
 	},
 	{
@@ -1660,6 +1681,19 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"3. 按 `ctrl+r`",
 			"   - 如果是合併提交，使用 `↑/↓` 選擇要還原到的父提交",
 			"4. 按 `enter` 確認",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "合併分支 (merge branch)",
+		InstructionLines: []string{
+			"1. 導覽至分支組件（按 `1`）或切換至分支組件（按 `< >`）",
+			"2. 按 `m` 開啟分支合併選擇彈出視窗",
+			"3. 使用 `↑/↓` 在可用分支間導覽",
+			"4. 按 `space` 選擇 / 取消選擇要合併至目前分支的分支",
+			"5. 使用 `tab` / `shift+tab` 在可用分支列表和已選分支列表之間切換",
+			"6. 按 `enter` 執行合併",
+			"7. 按 `esc` 取消",
 		},
 		LineType: INFO,
 	},

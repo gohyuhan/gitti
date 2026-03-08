@@ -243,3 +243,74 @@ func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
 		RemoteBranchOptionList: cRBOL,
 	}
 }
+
+func InitChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
+	branches := m.GitOperations.GitBranch.AllBranches()
+	items := make([]list.Item, 0, len(branches))
+	for _, branch := range branches {
+		if branch.IsCheckedOut {
+			continue
+		}
+		items = append(items, GitMergeBranchOptionItem{BranchName: branch.BranchName})
+	}
+	width := (min(constant.MaxChooseBranchOptionForMergePopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	// for selecting branch for git merge
+	cBOFMBOL := list.New(items, GitMergeBranchOptionItemDelegate{}, width, constant.PopUpChooseBranchOptionForMergeBranchOptionHeight)
+	cBOFMBOL.SetShowPagination(false)
+	cBOFMBOL.SetShowStatusBar(false)
+	cBOFMBOL.SetFilteringEnabled(false)
+	cBOFMBOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	cBOFMBOL.SetShowHelp(true)
+	cBOFMBOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	cBOFMBOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	cBOFMBOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cBOFMBOL, constant.MaxChooseBranchOptionForMergePopUpWidth)
+
+	// for ALREADY selected branch for git merge
+	cBOFMSBOL := list.New([]list.Item{}, GitMergeBranchOptionItemDelegate{}, width, constant.PopUpChooseBranchOptionForMergeSelectedBranchOptionHeight)
+	cBOFMSBOL.SetShowPagination(false)
+	cBOFMSBOL.SetShowStatusBar(false)
+	cBOFMSBOL.SetFilteringEnabled(false)
+	cBOFMSBOL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	cBOFMSBOL.SetShowHelp(true)
+	cBOFMSBOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	cBOFMSBOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	cBOFMSBOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cBOFMSBOL, constant.MaxChooseBranchOptionForMergePopUpWidth)
+
+	popUpModel := &ChooseBranchOptionForMergePopUpModel{
+		BranchOptionList:   cBOFMBOL,
+		SelectedBranchList: cBOFMSBOL,
+	}
+	popUpModel.BranchOptionSectionSelected.Store(true)
+	popUpModel.SelectedBranchSectionSelected.Store(false)
+	m.PopUpModel = popUpModel
+}
+
+func InitBranchMergeOutputPopUpModel(m *types.GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpBranchMergeOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxBranchMergeOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &BranchMergeOutputPopUpModel{
+		BranchMergeOutputViewport: vp,
+		Spinner:                   s,
+	}
+
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.IsCancelled.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+
+	m.PopUpModel = popUpModel
+}

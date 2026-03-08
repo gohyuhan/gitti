@@ -188,6 +188,8 @@ type LanguageMapping struct {
 	KeyBindingForGitRebaseBranchInputPopUp                     []string
 	KeyBindingForGitRebaseOutputPopUp                          []string
 	KeyBindingForChooseRemoteBranchOptionPopUp                 []string
+	KeyBindingForChooseBranchOptionForMergePopUp               []string
+	KeyBindingForBranchMergeOutputPopUp                        []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -409,4 +411,9 @@ type LanguageMapping struct {
 	GitRebaseBranchInputPopUpTitleForRemoteBranch string
 	GitRebaseTitle                                string
 	GitRebaseProcessing                           string
+	// for git merge
+	ChooseBranchOptionForGitMergeTitle   string
+	SelectedBranchOptionForGitMergeTitle string
+	GitMergeOutputTitle                  string
+	BranchMerging                        string
 }

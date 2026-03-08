@@ -440,6 +440,10 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRebaseBranchInputPopUp
 		case constant.GitRebaseOutputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitRebaseOutputPopUp
+		case constant.ChooseBranchOptionForMergePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseBranchOptionForMergePopUp
+		case constant.BranchMergeOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForBranchMergeOutputPopUp
 		}
 	} else {
 		//-----------------------------

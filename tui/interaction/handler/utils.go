@@ -359,6 +359,40 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			return m, nil
 		}
 
+	case constant.ChooseBranchOptionForMergePopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseBranchOptionForMergePopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.BranchOptionSectionSelected.Load() {
+					if popUp.BranchOptionList.Index() > 0 {
+						latestIndex := popUp.BranchOptionList.Index() - 1
+						popUp.BranchOptionList.Select(latestIndex)
+					}
+				} else if popUp.SelectedBranchSectionSelected.Load() {
+					if popUp.SelectedBranchList.Index() > 0 {
+						latestIndex := popUp.SelectedBranchList.Index() - 1
+						popUp.SelectedBranchList.Select(latestIndex)
+					}
+				}
+			case "down", "j":
+				if popUp.BranchOptionSectionSelected.Load() {
+					if popUp.BranchOptionList.Index() < len(popUp.BranchOptionList.Items())-1 {
+						latestIndex := popUp.BranchOptionList.Index() + 1
+						popUp.BranchOptionList.Select(latestIndex)
+					}
+				} else if popUp.SelectedBranchSectionSelected.Load() {
+					if popUp.SelectedBranchList.Index() < len(popUp.SelectedBranchList.Items())-1 {
+						latestIndex := popUp.SelectedBranchList.Index() + 1
+						popUp.SelectedBranchList.Select(latestIndex)
+					}
+				}
+			}
+			popUp.BranchOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.BranchOptionList, constant.MaxChooseRemoteBranchOptionPopUpWidth)
+			popUp.SelectedBranchList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.SelectedBranchList, constant.MaxChooseRemoteBranchOptionPopUpWidth)
+			return m, nil
+		}
+
 	// following is for viewport
 	case constant.KeybindingAndFeatureInstructionsPopUp:
 		popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
@@ -406,6 +440,12 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
 		if ok {
 			popUp.GitStashOperationOutputViewport, cmd = popUp.GitStashOperationOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.BranchMergeOutputPopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
+		if ok {
+			popUp.BranchMergeOutputViewport, cmd = popUp.BranchMergeOutputViewport.Update(msg)
 			return m, cmd
 		}
 	}
@@ -470,6 +510,12 @@ func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types
 		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
 		if ok {
 			popUp.GitStashOperationOutputViewport, cmd = popUp.GitStashOperationOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.BranchMergeOutputPopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
+		if ok {
+			popUp.BranchMergeOutputViewport, cmd = popUp.BranchMergeOutputViewport.Update(msg)
 			return m, cmd
 		}
 	}
