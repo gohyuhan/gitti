@@ -24,6 +24,7 @@ const (
 	SWITCH_BRANCH_OPS                            = "SWITCH BRANCH"
 	DELETE_LOCAL_BRANCH_OPS                      = "DELETE LOCAL BRANCH"
 	RETRIEVE_LATEST_REMOTE_BRANCH_INFO           = "RETRIEVE LATEST REMOTE BRANCH INFO"
+	MERGE_BRANCH_OPS                             = "MERGE BRANCH"
 
 	// COMMIT RELATED OPS
 	COMMIT_OPS                         = "COMMIT"

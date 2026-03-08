@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -366,4 +367,26 @@ func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 	}
 
 	gb.remoteBranches = remoteBranches
+}
+
+// ----------------------------------
+//
+//	Related to get merge branch
+//
+// ----------------------------------
+func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]string, bool) {
+	gitArgs := []string{"merge"}
+	gitArgs = append(gitArgs, branchesName...)
+
+	mergeExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	mergeOutput, mergeErr := mergeExecutor.CombinedOutput()
+	gb.logging.RegisterNewLog(logging.MERGE_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	gitMergeOpsOutput := processGeneralGitOpsOutputIntoStringArray(mergeOutput)
+
+	if mergeErr != nil {
+		gb.logging.RegisterNewLog(logging.MERGE_BRANCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.MERGE_BRANCH_OPS, mergeErr.Error()), true)
+		return gitMergeOpsOutput, false
+	}
+	return gitMergeOpsOutput, true
 }
