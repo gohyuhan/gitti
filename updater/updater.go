@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"charm.land/lipgloss/v2"
 	"github.com/gohyuhan/gitti/constant"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/settings"
@@ -307,7 +308,7 @@ func replaceBinaryUnix(tempFile, execPath string) error {
 
 	// If we got a permission error, try using sudo
 	if os.IsPermission(err) {
-		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterRequiresSudo)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.UpdaterRequiresSudo)
 		return replaceBinaryWithSudo(tempFile, execPath)
 	}
 

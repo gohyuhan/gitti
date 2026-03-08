@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"charm.land/lipgloss/v2"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
@@ -47,14 +48,14 @@ func SetInitBranch(branchName string) {
 func SetAutoUpdate(autoUpdateString string) {
 	if strings.ToLower(autoUpdateString) == "true" {
 		settings.UpdateAutoUpdate(true)
-		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterEnable)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterEnable)
 		os.Exit(0)
 	} else if strings.ToLower(autoUpdateString) == "false" {
 		settings.UpdateAutoUpdate(false)
-		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterDisable)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterDisable)
 		os.Exit(0)
 	} else {
-		fmt.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterSetError)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.UpdaterAutoUpdaterSetError)
 		os.Exit(1)
 	}
 }
@@ -77,7 +78,7 @@ func SetGlobalInitBranch(branchName string, cwd string) {
 // ----------------------------------
 func SetMaxCommitLogCount(maxCommitLogCount int) {
 	if maxCommitLogCount < 10 {
-		fmt.Println(i18n.LANGUAGEMAPPING.MaxCommitLogCountSetError)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.MaxCommitLogCountSetError)
 		os.Exit(1)
 	}
 	settings.UpdateMaxCommitLogCount(maxCommitLogCount)
@@ -92,7 +93,7 @@ func SetMaxCommitLogCount(maxCommitLogCount int) {
 // ----------------------------------
 func SetMaxRefLogCount(maxRefLogCount int) {
 	if maxRefLogCount < 10 {
-		fmt.Println(i18n.LANGUAGEMAPPING.MaxRefLogCountSetError)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.MaxRefLogCountSetError)
 		os.Exit(1)
 	}
 	settings.UpdateMaxRefLogCount(maxRefLogCount)
@@ -108,14 +109,14 @@ func SetMaxRefLogCount(maxRefLogCount int) {
 func SetOverrideSigningUISuspend(override string) {
 	if strings.ToLower(override) == "true" {
 		settings.UpdateOverrideSigningUISuspend(true)
-		fmt.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendEnabled)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendEnabled)
 		os.Exit(0)
 	} else if strings.ToLower(override) == "false" {
 		settings.UpdateOverrideSigningUISuspend(false)
-		fmt.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendDisabled)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendDisabled)
 		os.Exit(0)
 	} else {
-		fmt.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendSetError)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.OverrideSigningUISuspendSetError)
 		os.Exit(1)
 	}
 }
@@ -128,14 +129,14 @@ func SetOverrideSigningUISuspend(override string) {
 func SetAllowCommitGraphWrite(allow string) {
 	if strings.ToLower(allow) == "true" {
 		settings.UpdateAllowCommitGraphWrite(true)
-		fmt.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteEnabled)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteEnabled)
 		os.Exit(0)
 	} else if strings.ToLower(allow) == "false" {
 		settings.UpdateAllowCommitGraphWrite(false)
-		fmt.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteDisabled)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteDisabled)
 		os.Exit(0)
 	} else {
-		fmt.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteSetError)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.AllowCommitGraphWriteSetError)
 		os.Exit(1)
 	}
 }
@@ -219,8 +220,8 @@ func ChooseAndSetEditor() {
 	}
 
 	// 1. Print the menu
-	fmt.Println(i18n.LANGUAGEMAPPING.EditorTitle)
-	fmt.Println(i18n.LANGUAGEMAPPING.EditorDescription)
+	lipgloss.Println(i18n.LANGUAGEMAPPING.EditorTitle)
+	lipgloss.Println(i18n.LANGUAGEMAPPING.EditorDescription)
 	for i, name := range editors {
 		fmt.Printf("[%d] %s\n", i+1, name)
 	}
@@ -233,7 +234,7 @@ func ChooseAndSetEditor() {
 	// 3. Validate input
 	if err != nil || selection < 1 || selection > len(editors) {
 		// clear the invalid input from buffer if needed, or just loop
-		fmt.Println(i18n.LANGUAGEMAPPING.EditorSetError)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.EditorSetError)
 		os.Exit(1)
 	}
 

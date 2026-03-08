@@ -28,6 +28,7 @@ import (
 	"time"
 
 	tea "charm.land/bubbletea/v2"
+	"charm.land/lipgloss/v2"
 
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/config"
@@ -70,7 +71,7 @@ func main() {
 
 	switch {
 	case *showVersion:
-		fmt.Println(constant.APPVERSION)
+		lipgloss.Println(constant.APPVERSION)
 	case *langCode != "":
 		config.SetLanguage(*langCode)
 	case *defaultInitBranch != "" && *applyToSystemGit:

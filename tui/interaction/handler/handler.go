@@ -19,7 +19,7 @@ import (
 //	typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
 //
 // ----------------------------------
-func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
 		return handleTypingESCKeyBindingInteraction(m)
@@ -164,7 +164,7 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*ty
 //	Handle non-typing key binding interactions, dispatching to specific key handlers
 //
 // ----------------------------------
-func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "?":
 		return handleNonTypingGlobalKeyBindingInteraction(m)
