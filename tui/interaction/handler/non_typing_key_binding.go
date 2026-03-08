@@ -1726,7 +1726,7 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 //	- Popups: Navigates upward in popup selection lists natively.
 //
 // ----------------------------------
-func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1818,7 +1818,7 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 			}
 		}
 	} else {
-		return UpDownKeyMsgUpdateForPopUp(msg, m)
+		return UpDownKeyPressMsgUpdateForPopUp(msg, m)
 	}
 	return m, nil
 }
@@ -1832,7 +1832,7 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel
 //	- Popups: Navigates downward in popup selection lists natively.
 //
 // ----------------------------------
-func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1924,7 +1924,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 			}
 		}
 	} else {
-		return UpDownKeyMsgUpdateForPopUp(msg, m)
+		return UpDownKeyPressMsgUpdateForPopUp(msg, m)
 	}
 	return m, nil
 }
@@ -1936,7 +1936,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 //	Scrolls text viewers, detail panels, and wider popup views horizontally to the left.
 //
 // ----------------------------------
-func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
@@ -1983,7 +1983,7 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiMod
 //	Scrolls text viewers, detail panels, and wider popup views horizontally to the right.
 //
 // ----------------------------------
-func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {

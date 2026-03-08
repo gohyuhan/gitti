@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"charm.land/lipgloss/v2"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
@@ -30,7 +31,7 @@ func IsGitInstalled(repoPath string) {
 	if err != nil {
 		_, notInSystem := err.(*exec.Error) // check if git is not installed wihitn the system, exec Error means it the executable was no within the system
 		if notInSystem {
-			fmt.Println(i18n.LANGUAGEMAPPING.GitNotInstalledError)
+			lipgloss.Println(i18n.LANGUAGEMAPPING.GitNotInstalledError)
 			os.Exit(1)
 		}
 	}
@@ -62,7 +63,7 @@ func IsRepoGitInitialized(repoPath string) GitRepoPath {
 func PromptUserForGitInitConfirmation(repoPath string) {
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println(i18n.LANGUAGEMAPPING.GitNotInitPrompt)
+	lipgloss.Println(i18n.LANGUAGEMAPPING.GitNotInitPrompt)
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSpace(strings.ToUpper(input))
 
@@ -70,10 +71,10 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 	case "Y":
 		git.GitInit(repoPath, settings.GITTICONFIGSETTINGS.GitInitDefaultBranch)
 	case "N":
-		fmt.Println(i18n.LANGUAGEMAPPING.GitInitRefuse)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.GitInitRefuse)
 		os.Exit(0)
 	default:
-		fmt.Println(i18n.LANGUAGEMAPPING.GitInitPromptInvalidInput)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.GitInitPromptInvalidInput)
 		os.Exit(1)
 	}
 }

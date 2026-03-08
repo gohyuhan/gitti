@@ -26,7 +26,7 @@ import (
 //	active popup's internal lists or text viewports, ensuring the correct popup state is updated.
 //
 // ----------------------------------
-func UpDownKeyMsgUpdateForPopUp(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// for within pop up component
 	switch m.PopUpType {

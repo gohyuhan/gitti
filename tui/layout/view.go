@@ -91,14 +91,14 @@ func GittiMainPageView(m *types.GittiModel) string {
 		x := (m.Width - popUpWidth) / 2
 		y := (m.Height - popUpHeight) / 2
 
-		// In V2, lipgloss.Canvas and Layers are powerful but can be expensive if allocated every frame.
-		// However, since we need z-index layering for popups, we use them only when needed.
-		canvas := lipgloss.NewCanvas()
-		canvas.AddLayers(
+		layers := []*lipgloss.Layer{
 			lipgloss.NewLayer(mainView),
 			lipgloss.NewLayer(popUpComponent).X(x).Y(y).Z(1),
-		)
-		return canvas.Render()
+		}
+
+		compositor := lipgloss.NewCompositor(layers...)
+
+		return compositor.Render()
 	}
 
 	return mainView

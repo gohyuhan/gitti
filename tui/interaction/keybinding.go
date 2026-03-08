@@ -16,7 +16,7 @@ import (
 //	the function to handle bubbletea key interactions
 //
 // ----------------------------------
-func GittiKeyInteraction(msg tea.KeyMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func GittiKeyInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	// global key binding
 	switch msg.String() {
 	case "ctrl+c":

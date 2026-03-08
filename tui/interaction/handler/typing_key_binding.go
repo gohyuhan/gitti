@@ -279,7 +279,7 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 //	- Multi-line inputs (e.g., commit message body): Inserts a newline character into the text area.
 //
 // ----------------------------------
-func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyMsg) (*types.GittiModel, tea.Cmd) {
+func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPressMsg) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)

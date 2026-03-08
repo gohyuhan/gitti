@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"charm.land/lipgloss/v2"
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/gohyuhan/gitti/api/git"
@@ -144,7 +145,7 @@ func (gd *GitDaemon) Start() {
 					gd.resetDebounce()
 				}
 			case err := <-gd.watcher.Errors:
-				fmt.Println("Watcher error:", err)
+				lipgloss.Println("Watcher error:", err)
 
 			case <-gd.watcherTimer.C:
 				gd.gitLatestInfoFetch(false)

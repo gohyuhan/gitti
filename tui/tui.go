@@ -178,7 +178,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			reflogComponent.InitGitRefLogList(m)
 			stashComponent.InitStashList(m)
 		}
-	case tea.KeyMsg:
+	case tea.KeyPressMsg:
 		model, cmd := interaction.GittiKeyInteraction(msg, m)
 		gAM.model = model
 		return gAM, cmd
