@@ -388,8 +388,8 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 					}
 				}
 			}
-			popUp.BranchOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.BranchOptionList, constant.MaxChooseRemoteBranchOptionPopUpWidth)
-			popUp.SelectedBranchList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.SelectedBranchList, constant.MaxChooseRemoteBranchOptionPopUpWidth)
+			popUp.BranchOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.BranchOptionList, constant.MaxChooseBranchOptionForMergePopUpWidth)
+			popUp.SelectedBranchList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.SelectedBranchList, constant.MaxChooseBranchOptionForMergePopUpWidth)
 			return m, nil
 		}
 

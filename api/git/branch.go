@@ -395,3 +395,17 @@ func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]str
 	}
 	return gitMergeOpsOutput, true
 }
+
+// ----------------------------------
+//
+//	GitMergeWithSigning constructs a git merge command for terminal execution when signing is required.
+//	When commit signing is enabled, gitti UI is suspended and the commit is executed directly in the terminal,
+//	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+//
+// ----------------------------------
+func (gb *GitBranch) GitMergeWithSigning(branchesName []string) []string {
+	gitArgs := []string{"merge"}
+	gitArgs = append(gitArgs, branchesName...)
+
+	return gitArgs
+}
