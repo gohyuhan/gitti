@@ -1510,7 +1510,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				for _, branch := range popUp.SelectedBranchList.Items() {
 					branchesNames = append(branchesNames, branch.(branchPopUp.GitMergeBranchOptionItem).BranchName)
 				}
-				if m.GitPushRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
 					gitArgs := m.GitOperations.GitBranch.GitMergeWithSigning(branchesNames)
 					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.GIT_MERGE_WITH_SIGNING_OPS)
 				} else {
