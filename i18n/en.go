@@ -748,7 +748,7 @@ var enGlobalKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "shift+tab",
-		TitleOrInfoLine: "move to next previous panel",
+		TitleOrInfoLine: "move to previous component panel",
 		LineType:        INFO,
 	},
 	{

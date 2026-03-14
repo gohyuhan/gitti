@@ -37,13 +37,24 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 ## Features
 
 - 🌳 **Branch Management** - View, switch, and manage branches with ease
-- 📝 **Interactive Staging** - Visually select and stage files
+- 📝 **Interactive Staging** - Visually select and stage files, including line-level staging and unstaging
 - 🔍 **Diff Viewer** - Review changes with syntax-aware diff display
 - 💬 **Commit Interface** - Write commits with a dedicated UI
 - 🚀 **Push/Pull Operations** - Manage remote operations seamlessly
+- 🔄 **Merge** - Merge branches with configurable fast-forward options and signing support
 - 💿 **Changes Stash Operations** - Manage stash operations seamlessly
 - 🔀 **Conflict Resolution** - Detect and resolve merge conflicts with interactive options
+- 🍒 **Cherry-pick** - Apply individual commits across branches
+- ↩️ **Git Reset** - Hard, soft, and mixed reset support
+- 🔙 **Revert Commit** - Revert commits safely
+- 🏷️ **Tag Management** - Create and manage Git tags
+- 🌐 **Remote Management** - View and manage remotes
+- 📡 **Manual Fetch** - Trigger fetch all on demand
+- 🔏 **Commit & Tag Signing** - GPG and SSH signing support
+- 📊 **Commit Log & Branch Graph** - Visualize commit history with branching graph
+- 🔎 **Reflog** - Browse and restore from Git reference logs
 - 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
+- 🪵 **Logging & Log Export** - Built-in logging panel with log export capability
 - 🌍 **Multi-language Support** - English, Japanese, 简体中文, 繁體中文
 - ⚡ **Real-time Updates** - File system monitoring for instant status updates
 - ⌨️ **Keyboard-driven** - Efficient navigation without touching the mouse
@@ -205,6 +216,14 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+
+### [v0.6.0]
+
+- feature: reflog UI component with related functionality
+- feature: rebase current branch onto any other branch (not limited to upstream)
+- feature: create a local branch from a remote by selecting from the remote branch list (QOL)
+- feature: merge branch with configurable fast-forward behavior via `--ff-merge` config option
+- other: upgraded bubbletea, bubbles, and lipgloss dependencies from v2 pre-release to v2 stable
 
 ### [v0.5.0]
 
