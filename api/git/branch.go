@@ -21,6 +21,7 @@ type GitBranch struct {
 	remoteBranches  []BranchInfo
 	logging         *logging.GittiLogging
 	gitProcessLock  *GitProcessLock
+	FfMerge         bool // determine when merge it was fast forward or not, fast forward will not have the merge commit and non fast forward will have one
 }
 
 // ----------------------------------
@@ -28,11 +29,12 @@ type GitBranch struct {
 //	Initialize the git branch handler with shared dependencies
 //
 // ----------------------------------
-func InitGitBranch(gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitBranch {
+func InitGitBranch(gitProcessLock *GitProcessLock, ffMerge bool, logging *logging.GittiLogging) *GitBranch {
 	gitBranch := GitBranch{
 		isRepoUnborn:   false,
 		gitProcessLock: gitProcessLock,
 		logging:        logging,
+		FfMerge:        ffMerge,
 	}
 	return &gitBranch
 }
@@ -379,8 +381,12 @@ func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]str
 		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
 	}
 	defer gb.gitProcessLock.ReleaseGitOpsLock()
-
-	gitArgs := []string{"merge"}
+	var gitArgs []string
+	if gb.FfMerge {
+		gitArgs = []string{"merge", "--ff"}
+	} else {
+		gitArgs = []string{"merge", "--no-ff"}
+	}
 	gitArgs = append(gitArgs, branchesName...)
 
 	mergeExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
@@ -404,7 +410,12 @@ func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]str
 //
 // ----------------------------------
 func (gb *GitBranch) GitMergeWithSigning(branchesName []string) []string {
-	gitArgs := []string{"merge"}
+	var gitArgs []string
+	if gb.FfMerge {
+		gitArgs = []string{"merge", "--ff"}
+	} else {
+		gitArgs = []string{"merge", "--no-ff"}
+	}
 	gitArgs = append(gitArgs, branchesName...)
 
 	return gitArgs

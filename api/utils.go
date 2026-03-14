@@ -87,7 +87,7 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogging *logging.GittiLogging) *GitOperations {
 	gitProcessLock := git.InitGitProcessLock(gittiLogging)
 	return &GitOperations{
-		GitBranch:              git.InitGitBranch(gitProcessLock, gittiLogging),
+		GitBranch:              git.InitGitBranch(gitProcessLock, settings.GITTICONFIGSETTINGS.FfMerge, gittiLogging),
 		GitCommit:              git.InitGitCommit(updateChannel, gitProcessLock, gittiLogging),
 		GitFiles:               git.InitGitFile(updateChannel, gitProcessLock, gittiLogging),
 		GitPull:                git.InitGitPull(updateChannel, gitProcessLock, gittiLogging),

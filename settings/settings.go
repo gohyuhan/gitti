@@ -39,6 +39,7 @@ type GittiConfigSettings struct {
 	MaxLogCount                     int       `json:"max_log_count"`
 	ShowXLog                        int       `json:"show_x_log"`
 	OverrideSigningUISuspend        bool      `json:"override_signing_ui_suspend"`
+	FfMerge                         bool      `json:"ff_merge"`
 }
 
 var GittiDefaultConfigSettings = GittiConfigSettings{
@@ -58,6 +59,7 @@ var GittiDefaultConfigSettings = GittiConfigSettings{
 	MaxLogCount:                     300,
 	ShowXLog:                        3,
 	OverrideSigningUISuspend:        false,
+	FfMerge:                         false,
 }
 
 // ----------------------------------
@@ -350,6 +352,19 @@ func UpdateShowXLog(x int) {
 // ----------------------------------
 func UpdateOverrideSigningUISuspend(override bool) {
 	GITTICONFIGSETTINGS.OverrideSigningUISuspend = override
+	cfgPath, err := getConfigPath()
+	if err == nil {
+		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
+	}
+}
+
+// ----------------------------------
+//
+//	Update and persist the merge setting (fast forward or non fast forward, system default is non fast forward)
+//
+// ----------------------------------
+func UpdateFfMerge(ffMerge bool) {
+	GITTICONFIGSETTINGS.FfMerge = ffMerge
 	cfgPath, err := getConfigPath()
 	if err == nil {
 		saveConfig(cfgPath, *GITTICONFIGSETTINGS)
