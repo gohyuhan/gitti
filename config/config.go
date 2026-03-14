@@ -123,6 +123,26 @@ func SetOverrideSigningUISuspend(override string) {
 
 // ----------------------------------
 //
+//	Set the ffMerge behaviour (ff or non ff for merge ops) and persist to config
+//
+// ----------------------------------
+func SetFfMerge(ffMerge string) {
+	if strings.ToLower(ffMerge) == "true" {
+		settings.UpdateFfMerge(true)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.FfMergeEnabled)
+		os.Exit(0)
+	} else if strings.ToLower(ffMerge) == "false" {
+		settings.UpdateFfMerge(false)
+		lipgloss.Println(i18n.LANGUAGEMAPPING.FfMergeDisabled)
+		os.Exit(0)
+	} else {
+		lipgloss.Println(i18n.LANGUAGEMAPPING.FfMergeSetError)
+		os.Exit(1)
+	}
+}
+
+// ----------------------------------
+//
 //	Enable or disable commit graph write and persist to config
 //
 // ----------------------------------

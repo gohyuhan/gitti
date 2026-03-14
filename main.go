@@ -63,6 +63,7 @@ func main() {
 	setMaxLogCount := flag.Int("max-log-count", 0, i18n.LANGUAGEMAPPING.FlagMaxLogCount)
 	setShowXLog := flag.Int("show-x-log", 0, i18n.LANGUAGEMAPPING.FlagShowXLog)
 	overrideSigningUISuspend := flag.String("override-signing-ui-suspend", "", i18n.LANGUAGEMAPPING.FlagOverrideSigningUISuspend)
+	ffMerge := flag.String("ff-merge", "", i18n.LANGUAGEMAPPING.FlagFfMerge)
 
 	flag.Parse()
 
@@ -96,6 +97,8 @@ func main() {
 		config.SetShowXLog(*setShowXLog)
 	case *overrideSigningUISuspend != "":
 		config.SetOverrideSigningUISuspend(*overrideSigningUISuspend)
+	case *ffMerge != "":
+		config.SetFfMerge(*ffMerge)
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string, 32)
