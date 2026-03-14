@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -366,4 +367,45 @@ func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 	}
 
 	gb.remoteBranches = remoteBranches
+}
+
+// ----------------------------------
+//
+//	Related to get merge branch
+//
+// ----------------------------------
+func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]string, bool) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
+	gitArgs := []string{"merge"}
+	gitArgs = append(gitArgs, branchesName...)
+
+	mergeExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	gb.logging.RegisterNewLog(logging.MERGE_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	mergeOutput, mergeErr := mergeExecutor.CombinedOutput()
+
+	gitMergeOpsOutput := processGeneralGitOpsOutputIntoStringArray(mergeOutput)
+
+	if mergeErr != nil {
+		gb.logging.RegisterNewLog(logging.MERGE_BRANCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.MERGE_BRANCH_OPS, mergeErr.Error()), true)
+		return gitMergeOpsOutput, false
+	}
+	return gitMergeOpsOutput, true
+}
+
+// ----------------------------------
+//
+//	GitMergeWithSigning constructs a git merge command for terminal execution when signing is required.
+//	When commit signing is enabled, gitti UI is suspended and the commit is executed directly in the terminal,
+//	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
+//
+// ----------------------------------
+func (gb *GitBranch) GitMergeWithSigning(branchesName []string) []string {
+	gitArgs := []string{"merge"}
+	gitArgs = append(gitArgs, branchesName...)
+
+	return gitArgs
 }

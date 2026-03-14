@@ -57,6 +57,8 @@ const (
 	GitRebaseBranchInputPopUp                     = "GitRebaseBranchInputPopUp"                     // IsTyping will be true
 	GitRebaseOutputPopUp                          = "GitRebaseOutputPopUp"                          // IsTyping will be false
 	ChooseRemoteBranchOptionPopUp                 = "ChooseRemoteBranchOptionPopUp"                 // IsTyping will be false
+	ChooseBranchOptionForMergePopUp               = "ChooseBranchOptionForMergePopUp"               // IsTyping will be false
+	BranchMergeOutputPopUp                        = "BranchMergeOutputPopUp"                        // IsTyping will be false
 )
 
 const (
@@ -128,40 +130,45 @@ const (
 	MaxGitRebaseBranchInputPopUpWidth                     = 150
 	MaxGitRebaseOutputPopUpWidth                          = 150
 	MaxChooseRemoteBranchOptionPopUpWidth                 = 150
+	MaxChooseBranchOptionForMergePopUpWidth               = 150
+	MaxBranchMergeOutputPopUpWidth                        = 150
 
-	PopUpGlobalKeyBindingViewPortHeight                = 18
-	PopUpGitCommitOutputViewPortHeight                 = 10
-	PopUpGitAmendCommitOutputViewPortHeight            = 10
-	PopUpAddRemoteOutputViewPortHeight                 = 2
-	PopUpGitRemotePushOutputViewportHeight             = 10
-	PopUpChooseRemoteHeight                            = 10
-	PopUpChoosePushTypeHeight                          = 6
-	PopUpChooseNewBranchTypeHeight                     = 8
-	PopUpChooseSwitchBranchTypeHeight                  = 6
-	PopUpSwitchBranchOutputViewPortHeight              = 10
-	PopUpChooseGitPullTypeHeight                       = 6
-	PopUpGitPullOutputViewportHeight                   = 16
-	PopUpGitDiscardTypeOptionHeight                    = 6
-	PopUpGitStashOperationOutputViewPortHeight         = 10
-	PopUpGitResolveConflictOptionPopUpHeight           = 6
-	PopUpGitDeleteBranchOutputViewportHeight           = 4
-	PopUpCreateBranchBasedOnRemoteOutputViewportHeight = 4
-	PopUpGitResetLatestCommitTypeOptionHeight          = 6
-	PopUpGitResetToSelectedCommitTypeOptionHeight      = 6
-	PopUpGitCherryPickOptionSelectionHeight            = 6
-	PopUpGitCherryPickPopUpHeight                      = 10
-	PopUpGitEditCherryPickPopUpHeight                  = 10
-	PopUpGitDiscardFileLineChangeViewportHeight        = 1
-	PopUpChooseDeleteTagOptionHeight                   = 4
-	PopUpChooseRemoteForDeleteRemoteTagHeight          = 10
-	PopUpDeleteTagOutputViewportHeight                 = 10
-	PopUpChoosePushTagOptionHeight                     = 10
-	PopUpPushTagOutputViewportHeight                   = 10
-	PopUpChooseFetchTagOptionHeight                    = 10
-	PopUpFetchTagOutputViewportHeight                  = 10
-	PopUpGitRevertParentOptionSelectionHeight          = 10
-	PopUpGitRebaseOutputViewportHeight                 = 10
-	PopUpChooseRemoteBranchOptionHeight                = 10
+	PopUpGlobalKeyBindingViewPortHeight                       = 18
+	PopUpGitCommitOutputViewPortHeight                        = 10
+	PopUpGitAmendCommitOutputViewPortHeight                   = 10
+	PopUpAddRemoteOutputViewPortHeight                        = 2
+	PopUpGitRemotePushOutputViewportHeight                    = 10
+	PopUpChooseRemoteHeight                                   = 10
+	PopUpChoosePushTypeHeight                                 = 6
+	PopUpChooseNewBranchTypeHeight                            = 8
+	PopUpChooseSwitchBranchTypeHeight                         = 6
+	PopUpSwitchBranchOutputViewPortHeight                     = 10
+	PopUpChooseGitPullTypeHeight                              = 6
+	PopUpGitPullOutputViewportHeight                          = 16
+	PopUpGitDiscardTypeOptionHeight                           = 6
+	PopUpGitStashOperationOutputViewPortHeight                = 10
+	PopUpGitResolveConflictOptionPopUpHeight                  = 6
+	PopUpGitDeleteBranchOutputViewportHeight                  = 4
+	PopUpCreateBranchBasedOnRemoteOutputViewportHeight        = 4
+	PopUpGitResetLatestCommitTypeOptionHeight                 = 6
+	PopUpGitResetToSelectedCommitTypeOptionHeight             = 6
+	PopUpGitCherryPickOptionSelectionHeight                   = 6
+	PopUpGitCherryPickPopUpHeight                             = 10
+	PopUpGitEditCherryPickPopUpHeight                         = 10
+	PopUpGitDiscardFileLineChangeViewportHeight               = 1
+	PopUpChooseDeleteTagOptionHeight                          = 4
+	PopUpChooseRemoteForDeleteRemoteTagHeight                 = 10
+	PopUpDeleteTagOutputViewportHeight                        = 10
+	PopUpChoosePushTagOptionHeight                            = 10
+	PopUpPushTagOutputViewportHeight                          = 10
+	PopUpChooseFetchTagOptionHeight                           = 10
+	PopUpFetchTagOutputViewportHeight                         = 10
+	PopUpGitRevertParentOptionSelectionHeight                 = 10
+	PopUpGitRebaseOutputViewportHeight                        = 10
+	PopUpChooseRemoteBranchOptionHeight                       = 10
+	PopUpChooseBranchOptionForMergeBranchOptionHeight         = 5
+	PopUpChooseBranchOptionForMergeSelectedBranchOptionHeight = 5
+	PopUpBranchMergeOutputViewportHeight                      = 16
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

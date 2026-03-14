@@ -1,6 +1,7 @@
 package branch
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -267,4 +268,77 @@ func (d RemoteBranchItemDelegate) Render(w io.Writer, m list.Model, index int, l
 	str = utils.TruncateString(str, componentWidth)
 
 	fmt.Fprint(w, fn(str))
+}
+
+// ---------------------------------
+//
+// choose branch(es) for git merge
+//
+// ---------------------------------
+type ChooseBranchOptionForMergePopUpModel struct {
+	BranchOptionList              list.Model
+	BranchOptionSectionSelected   atomic.Bool
+	SelectedBranchList            list.Model
+	SelectedBranchSectionSelected atomic.Bool
+}
+
+// ---------------------------------
+//
+// for list component of remote branches
+//
+// ---------------------------------
+type (
+	GitMergeBranchOptionItemDelegate struct{}
+	GitMergeBranchOptionItem         struct {
+		BranchName string
+	}
+)
+
+func (i GitMergeBranchOptionItem) FilterValue() string {
+	return i.BranchName
+}
+
+// for list component of Git branch
+func (d GitMergeBranchOptionItemDelegate) Height() int                             { return 1 }
+func (d GitMergeBranchOptionItemDelegate) Spacing() int                            { return 0 }
+func (d GitMergeBranchOptionItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d GitMergeBranchOptionItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(GitMergeBranchOptionItem)
+	if !ok {
+		return
+	}
+
+	str := fmt.Sprintf("  %s", i.BranchName)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+	str = utils.TruncateString(str, componentWidth)
+
+	fmt.Fprint(w, fn(str))
+}
+
+// ---------------------------------
+//
+// # A pop up to show git merge result
+//
+// ---------------------------------
+type BranchMergeOutputPopUpModel struct {
+	BranchMergeOutputViewport viewport.Model // to log out the output from git operation
+	Spinner                   spinner.Model  // spinner for showing processing state
+	IsProcessing              atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError                  atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess            atomic.Bool    // has the process sucessfuly executed
+	IsCancelled               atomic.Bool    // flag to indicate if the operation was cancelled by user
+	// CancelFunc is used to cancel the git merge operation
+	CancelFunc context.CancelFunc
 }

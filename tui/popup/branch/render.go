@@ -309,3 +309,84 @@ func RenderChooseRemoteBranchOptionPopUp(m *types.GittiModel) string {
 	}
 	return ""
 }
+
+func RenderChooseBranchOptionForMergePopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChooseBranchOptionForMergePopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxChooseBranchOptionForMergePopUpWidth, int(float64(m.Width)*0.8))
+		branchOptionTitle := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.ChooseBranchOptionForGitMergeTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(m.CheckOutBranch)))
+		selectedBranchOptionTitle := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.SelectedBranchOptionForGitMergeTitle)
+		popUp.BranchOptionList.SetWidth(popUpWidth - 4)
+		popUp.SelectedBranchList.SetWidth(popUpWidth - 4)
+
+		branchOptionListView := popUp.BranchOptionList.View()
+		selectedBranchList := popUp.SelectedBranchList.View()
+
+		borderWidth := popUpWidth - 2
+
+		if popUp.BranchOptionSectionSelected.Load() {
+			branchOptionListView = style.SelectedBorderStyle.Width(borderWidth).Render(popUp.BranchOptionList.View())
+			selectedBranchList = style.PanelBorderStyle.Width(borderWidth).Render(popUp.SelectedBranchList.View())
+		} else if popUp.SelectedBranchSectionSelected.Load() {
+			branchOptionListView = style.PanelBorderStyle.Width(borderWidth).Render(popUp.BranchOptionList.View())
+			selectedBranchList = style.SelectedBorderStyle.Width(borderWidth).Render(popUp.SelectedBranchList.View())
+		}
+
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			branchOptionTitle,
+			branchOptionListView,
+			selectedBranchOptionTitle,
+			selectedBranchList,
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ----------------------------------
+//
+//	for git merge output
+//
+// ----------------------------------
+func RenderBranchMergeOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*BranchMergeOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxBranchMergeOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitMergeOutputTitle)
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpBranchMergeOutputViewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.BranchMergeOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.BranchMergeOutputViewport.SetYOffset(popUp.BranchMergeOutputViewport.YOffset())
+		logViewPort := logViewPortStyle.Render(popUp.BranchMergeOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.BranchMerging)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
