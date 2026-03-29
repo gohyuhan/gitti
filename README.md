@@ -19,8 +19,6 @@ A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 
 ![Demo](assets/demo.gif)
 
-> ⚠️ **Development Status**: Gitti is actively under development. Features, APIs, and behaviors may change significantly. Development is driven by personal needs first, with additional features planned afterward. Not all majority used Git operations are currently supported.
-
 ## Requirements
 
 - **Git 2.32+**
