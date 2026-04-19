@@ -215,6 +215,9 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.6.1]
+-  fix: fix rebase incorrect git command flag and arguments for local branch rebase
+
 ### [v0.6.0]
 
 - feature: reflog UI component with related functionality
