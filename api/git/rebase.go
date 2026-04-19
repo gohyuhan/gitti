@@ -69,7 +69,7 @@ func (gr *GitRebase) GitRebase(ctx context.Context, remote string, branchName st
 
 	var gitArgs []string
 	if remote == "" {
-		gitArgs = []string{"rebase", branchName, "--progress", "--autostash", "--no-edit"}
+		gitArgs = []string{"rebase", branchName, "--autostash"}
 	} else {
 		gitArgs = []string{"pull", remote, branchName, "--progress", "--rebase", "--autostash", "--no-edit"}
 	}
@@ -148,7 +148,7 @@ func (gr *GitRebase) GitRebase(ctx context.Context, remote string, branchName st
 func (gr *GitRebase) GitRebaseWithSigning(remote string, branchName string) []string {
 	var gitArgs []string
 	if remote == "" {
-		gitArgs = []string{"rebase", branchName, "--progress", "--autostash", "--no-edit"}
+		gitArgs = []string{"rebase", branchName, "--autostash"}
 	} else {
 		gitArgs = []string{"pull", remote, branchName, "--progress", "--rebase", "--autostash", "--no-edit"}
 	}
