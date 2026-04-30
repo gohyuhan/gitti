@@ -12,6 +12,8 @@ import (
 	"github.com/gohyuhan/gitti/logging"
 )
 
+const SEPARATOR = "\x00"
+
 // represent the info of commit that got cherry picked
 type CherryPickedCommitLog struct {
 	Hash                 string
@@ -85,7 +87,7 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 		"--topo-order",
 		"--no-decorate",
 		"--no-notes",
-		"--pretty=format:%H|%P|%s|%an",
+		"--pretty=format:%H%x00%P%x00%s%x00%an",
 		"-n", gCL.maxCommitLogCount,
 		"--",
 	}
@@ -109,7 +111,7 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 	// 2. Process Commits
 	for scanner.Scan() {
 		line := scanner.Text()
-		parts := strings.SplitN(line, "|", 4)
+		parts := strings.SplitN(line, SEPARATOR, 4)
 		if len(parts) < 4 {
 			continue
 		}
