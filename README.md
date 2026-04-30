@@ -216,6 +216,10 @@ gitti --init-dbranch main --global
 ## Changelog
 
 ### [v0.6.1]
+-  fix: update commit log parsing seperator to prevent weird parse behaviour
+-  fix: fix UI freeze when git ops that require signing returns error
+
+### [v0.6.1]
 -  fix: fix rebase incorrect git command flag and arguments for local branch rebase
 
 ### [v0.6.0]
