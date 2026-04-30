@@ -257,17 +257,13 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case types.GitOperationRequiredSigningFinishedMsg:
 		if msg.Err != nil {
 			m.GittiLogger.RegisterNewLog(msg.GitOperationOpsTypeForLogging, "", logging.ERROR, fmt.Sprintf("[%s ERROR] %s", msg.GitOperationOpsTypeForLogging, msg.Err.Error()), false)
-		} else {
-			// After a signed Git operation (executed directly in the terminal) completes successfully,
-			// we perform a global state reset. This safely clears any active popups and resets temporary data
-			// (like cherry-pick selections) for all supported operations, eliminating the need for operation-specific cleanup logic.
-
-			m.ShowPopUp.Store(false)
-			m.IsTyping.Store(false)
-			m.PopUpModel = nil
-			m.PopUpType = constant.NoPopUp
-			utils.ReinitCherryPickedCommitInfo(m)
 		}
+		m.ShowPopUp.Store(false)
+		m.IsTyping.Store(false)
+		m.PopUpModel = nil
+		m.PopUpType = constant.NoPopUp
+		utils.ReinitCherryPickedCommitInfo(m)
+
 		return gAM, nil
 	case tea.MouseMsg:
 		model, cmd := interaction.GittiMouseInteraction(msg, m)

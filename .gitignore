@@ -1,5 +1,6 @@
 main
 *.DS_Store
+/graphify-out
 
 # for profiling
 lag.prof
