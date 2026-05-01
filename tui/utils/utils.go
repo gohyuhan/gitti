@@ -183,3 +183,10 @@ func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand
 		}
 	})
 }
+
+func ResetPopUpModelStateForGitSigningOps(m *types.GittiModel) {
+	m.ShowPopUp.Store(false)
+	m.IsTyping.Store(false)
+	m.PopUpModel = nil
+	m.PopUpType = constant.NoPopUp
+}

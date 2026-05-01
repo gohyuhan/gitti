@@ -90,9 +90,10 @@ const (
 	STASH_DETAIL   = "STASH DETAIL"
 
 	// UNIVERSAL STATE OPS
-	SKIP     = "SKIP"
-	ABORT    = "ABORT"
-	CONTINUE = "CONTINUE"
+	SKIP                             = "SKIP"
+	ABORT                            = "ABORT"
+	CONTINUE                         = "CONTINUE"
+	CONTINUE_COMMIT_WITH_SIGNING_OPS = "CONTINUE COMMIT WITH SIGNING"
 
 	// ACUQUIRE GIT LOCK
 	ACQUIRE_GIT_LOCK = "ACQUIRE_GIT_LOCK"

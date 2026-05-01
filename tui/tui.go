@@ -257,12 +257,14 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case types.GitOperationRequiredSigningFinishedMsg:
 		if msg.Err != nil {
 			m.GittiLogger.RegisterNewLog(msg.GitOperationOpsTypeForLogging, "", logging.ERROR, fmt.Sprintf("[%s ERROR] %s", msg.GitOperationOpsTypeForLogging, msg.Err.Error()), false)
+			if msg.GitOperationOpsTypeForLogging != logging.COMMIT_WITH_SIGNING_OPS && msg.GitOperationOpsTypeForLogging != logging.AMEND_COMMIT_WITH_SIGNING_OPS {
+				utils.ResetPopUpModelStateForGitSigningOps(m)
+				utils.ReinitCherryPickedCommitInfo(m)
+			}
+		} else {
+			utils.ResetPopUpModelStateForGitSigningOps(m)
+			utils.ReinitCherryPickedCommitInfo(m)
 		}
-		m.ShowPopUp.Store(false)
-		m.IsTyping.Store(false)
-		m.PopUpModel = nil
-		m.PopUpType = constant.NoPopUp
-		utils.ReinitCherryPickedCommitInfo(m)
 
 		return gAM, nil
 	case tea.MouseMsg:

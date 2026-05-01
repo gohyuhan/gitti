@@ -39,6 +39,7 @@ func InitGitCommitPopUpModel(m *types.GittiModel) {
 	CommitDescriptionTextAreaInput.DynamicHeight = true
 	CommitDescriptionTextAreaInput.MinHeight = constant.TextAreaInputMinHeight
 	CommitDescriptionTextAreaInput.MaxHeight = constant.TextAreaInputMaxHeight
+	CommitDescriptionTextAreaInput.MaxContentHeight = 9999
 	CommitDescriptionTextAreaInput.Blur()
 
 	vp := viewport.New()
@@ -94,6 +95,7 @@ func InitGitAmendCommitPopUpModel(m *types.GittiModel) {
 	CommitDescriptionTextAreaInput.DynamicHeight = true
 	CommitDescriptionTextAreaInput.MinHeight = constant.TextAreaInputMinHeight
 	CommitDescriptionTextAreaInput.MaxHeight = constant.TextAreaInputMaxHeight
+	CommitDescriptionTextAreaInput.MaxContentHeight = 9999
 	CommitDescriptionTextAreaInput.MoveToEnd()
 	CommitDescriptionTextAreaInput.Blur()
 
