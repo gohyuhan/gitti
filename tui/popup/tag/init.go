@@ -40,6 +40,7 @@ func InitCreateTagPopUpModel(m *types.GittiModel, commitHash string, commitMessa
 	TagMessageTextAreaInput.DynamicHeight = true
 	TagMessageTextAreaInput.MinHeight = constant.TextAreaInputMinHeight
 	TagMessageTextAreaInput.MaxHeight = constant.TextAreaInputMaxHeight
+	TagMessageTextAreaInput.MaxContentHeight = 9999
 	TagMessageTextAreaInput.Blur()
 
 	popUpModel := &CreateTagPopUpModel{

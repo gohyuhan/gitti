@@ -222,7 +222,7 @@ func handleNonTypingCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			if len(gitArgs) < 1 {
 				return m, nil
 			}
-			return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.COMMIT_WITH_SIGNING_OPS)
+			return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CONTINUE_COMMIT_WITH_SIGNING_OPS)
 		} else {
 			services.GitStateUniversalUtilsContinueService(m)
 			return m, nil
@@ -1251,10 +1251,6 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CHERRY_PICK_WITH_SIGNING_OPS)
 			} else {
 				services.GitCherryPickService(m, m.CherryPickedCommitInfo.CherryPickedCommitMap)
-				m.ShowPopUp.Store(false)
-				m.IsTyping.Store(false)
-				m.PopUpModel = nil
-				m.PopUpType = constant.NoPopUp
 				return m, nil
 			}
 		case constant.GitDiscardFileLineChangeConfirmPopUp:
@@ -1452,10 +1448,6 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.GitRevertConfirmationPopUp:
 			popUp, ok := m.PopUpModel.(*commitLogPopUp.GitRevertConfirmationPopUpModel)
 			if ok {
-				m.ShowPopUp.Store(false)
-				m.IsTyping.Store(false)
-				m.PopUpType = constant.NoPopUp
-				m.PopUpModel = nil
 				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
 					gitArgs := m.GitOperations.GitCommitLog.GitRevertCommitWithSigning(popUp.CommitHash, popUp.ParentOrder)
 					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.REVERT_COMMIT_WITH_SIGNING_OPS)
@@ -1467,10 +1459,6 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.GitCherryPickFromRefLogApplyConfirmationPopUp:
 			popUp, ok := m.PopUpModel.(*reflogPopUp.GitCherryPickFromRefLogApplyConfirmationPopUpModel)
 			if ok {
-				m.ShowPopUp.Store(false)
-				m.IsTyping.Store(false)
-				m.PopUpType = constant.NoPopUp
-				m.PopUpModel = nil
 				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
 					gitArgs := m.GitOperations.GitCommitLog.GitCherryPickWithSigning([]string{popUp.Hash})
 					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CHERRY_PICK_WITH_SIGNING_OPS)
