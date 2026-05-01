@@ -215,7 +215,7 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
-### [v0.6.1]
+### [v0.6.2]
 -  fix: update commit log parsing seperator to prevent weird parse behaviour
 -  fix: fix UI freeze when git ops that require signing returns error
 
