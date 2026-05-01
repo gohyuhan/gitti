@@ -70,7 +70,8 @@ const (
 	MinWidth  = 80
 	MinHeight = 24
 
-	TextAreaInputHeight = 4
+	TextAreaInputMinHeight = 3
+	TextAreaInputMaxHeight = 7
 
 	Padding                             = 1
 	MainPageKeyBindingLayoutPanelHeight = 1
