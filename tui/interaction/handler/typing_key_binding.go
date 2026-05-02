@@ -700,9 +700,7 @@ func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 		case constant.BlamePopUp:
 			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
 			if ok {
-				if !popUp.ShowingBlameInfo {
-					popUp.FilterInput, cmd = popUp.FilterInput.Update(msg)
-				} else {
+				if popUp.ShowingBlameInfo {
 					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
 				}
 			}
@@ -724,9 +722,7 @@ func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiM
 		case constant.BlamePopUp:
 			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
 			if ok {
-				if !popUp.ShowingBlameInfo {
-					popUp.FilterInput, cmd = popUp.FilterInput.Update(msg)
-				} else {
+				if popUp.ShowingBlameInfo {
 					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
 				}
 			}
