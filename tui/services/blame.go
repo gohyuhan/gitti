@@ -22,7 +22,7 @@ func GetFileGitBlameInfoService(m *types.GittiModel, filePath string) {
 	rowSeparator := strings.Repeat("-", largestLineLength+ansi.StringWidth(InfoLineSeparator))
 	var viewportContent strings.Builder
 	var previousCommitHash string
-	popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+	popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 	if !ok {
 		return
 	}

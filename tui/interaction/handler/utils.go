@@ -520,7 +520,7 @@ func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types
 			return m, cmd
 		}
 	case constant.BlamePopUp:
-		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 		if ok && popUp.ShowingBlameInfo {
 			popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
 			return m, cmd

@@ -112,6 +112,8 @@ type LanguageMapping struct {
 	CurrentTerminalWidth        string
 	MinimumTerminalWidth        string
 	Loading                     string
+	TimeAgoParseError           string
+	TimeAgoJustNow              string
 	TimeAgoSeconds              string
 	TimeAgoMinutes              string
 	TimeAgoHours                string

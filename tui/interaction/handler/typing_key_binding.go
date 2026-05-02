@@ -38,7 +38,7 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 	case constant.AddRemotePromptPopUp:
 		services.GitAddRemoteCancelService(m)
 	case constant.BlamePopUp:
-		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 		if ok {
 			if popUp.ShowingBlameInfo {
 				popUp.ResetSelectedBlameFile()
@@ -440,9 +440,12 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 		}
 
 	case constant.BlamePopUp:
-		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 		if ok {
 			selectedFilepath := popUp.CurrentGitTrackedFilesPathList.SelectedItem()
+			if selectedFilepath == nil {
+				return m, nil
+			}
 			parsedFilePath := selectedFilepath.(blamePopUp.CurrentGitTrackedFilesPathItem).FilePath
 			popUp.ShowBlameInfoView(parsedFilePath)
 			services.GetFileGitBlameInfoService(m, parsedFilePath)
@@ -650,7 +653,7 @@ func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMode
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
-			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 			if ok {
 				if !popUp.ShowingBlameInfo {
 					popUp.CurrentGitTrackedFilesPathList.CursorUp()
@@ -674,7 +677,7 @@ func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
-			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 			if ok {
 				if !popUp.ShowingBlameInfo {
 					popUp.CurrentGitTrackedFilesPathList.CursorDown()
@@ -698,7 +701,7 @@ func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
-			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 			if ok {
 				if popUp.ShowingBlameInfo {
 					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
@@ -720,7 +723,7 @@ func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiM
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
-			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 			if ok {
 				if popUp.ShowingBlameInfo {
 					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)

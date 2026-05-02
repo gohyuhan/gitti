@@ -50,7 +50,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 					popUp.GlobalKeyBindingViewport.ScrollLeft(scrollSpeed)
 				}
 			case constant.BlamePopUp:
-				popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+				popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 				if ok && popUp.ShowingBlameInfo {
 					popUp.BlameViewport.ScrollLeft(1)
 				}
@@ -82,7 +82,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 					popUp.GlobalKeyBindingViewport.ScrollRight(scrollSpeed)
 				}
 			case constant.BlamePopUp:
-				popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+				popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 				if ok && popUp.ShowingBlameInfo {
 					popUp.BlameViewport.ScrollRight(1)
 				}

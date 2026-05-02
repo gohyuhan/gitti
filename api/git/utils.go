@@ -246,19 +246,16 @@ func checkIfFileExistWithinDotGitFolder(absolutePath string, fileName string) bo
 //	Time ago
 //
 // ------------------------------------
-func timeAgo(unixTsString string, tz string) string {
+func timeAgo(unixTsString string) string {
 	ts, err := strconv.ParseInt(unixTsString, 10, 64)
 	if err != nil {
-		return "TIME PARSE ERROR"
+		return i18n.LANGUAGEMAPPING.TimeAgoParseError
 	}
 
-	loc, err := time.Parse("-0700", tz)
-	if err != nil {
-		return "TIME PARSE ERROR"
+	duration := time.Since(time.Unix(ts, 0))
+	if duration < 0 {
+		return i18n.LANGUAGEMAPPING.TimeAgoJustNow
 	}
-
-	t := time.Unix(ts, 0).In(loc.Location())
-	duration := time.Since(t)
 
 	switch {
 	case duration < time.Minute:

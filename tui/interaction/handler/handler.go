@@ -157,7 +157,7 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 			return m, cmd
 		}
 	case constant.BlamePopUp:
-		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 		if ok && !popUp.ShowingBlameInfo && msg.String() != "up" && msg.String() != "down" {
 			popUp.FilterInput, cmd = popUp.FilterInput.Update(msg)
 			popUp.FilterValue = popUp.FilterInput.Value()

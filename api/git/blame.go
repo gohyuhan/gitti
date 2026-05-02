@@ -3,6 +3,7 @@ package git
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/charmbracelet/x/ansi"
 	"github.com/gohyuhan/gitti/executor"
@@ -10,7 +11,7 @@ import (
 )
 
 const (
-	MAX_COMMITTER_CHAR_LENGTH = 16
+	MAX_AUTHOR_CHAR_LENGTH = 16
 )
 
 type GitBlame struct {
@@ -33,7 +34,7 @@ type LineBlameInfo struct {
 	CommitSummary         string
 	FileName              string
 	CommittedLine         string
-	ConsolidatedBlameInfo string // this is the blame info for display (not inclluding the code line)
+	ConsolidatedBlameInfo string // this is the blame info for display (not including the code line)
 }
 
 // ------------------------------------
@@ -77,24 +78,26 @@ func (gb *GitBlame) GetCurrentGitTrackedFiles() []string {
 // ------------------------------------
 func (gb *GitBlame) GetFileGitBlameInfo(filePath string) (int, int, []LineBlameInfo) {
 	var lineBlameInfo []LineBlameInfo
-	largestConsolidatedBlameInfoLineLength := 0 // this is the length for the consolidated blame info (commit hash [first 7 chars] + time ago + committer)
-	largestLineLength := 0                      // this is the lenght for the consolidated blame info + code line, which determines the viewport largest width
+	largestConsolidatedBlameInfoLineLength := 0 // this is the length for the consolidated blame info (commit hash [first 7 chars] + time ago + author)
+	largestLineLength := 0                      // this is the length for the consolidated blame info + code line, which determines the viewport largest width
 
 	gitArgs := []string{"blame", "--line-porcelain", filePath}
-	GetFileGitBlameInfoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	getFileGitBlameInfoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gb.logging.RegisterNewLog(logging.GET_FILE_BLAME_INFO, strings.Join(gitArgs, " "), logging.INFO, "", true)
-	GetFileGitBlameInfoCmdExecutorOutput, GetFileGitBlameInfoCmdExecutorErr := GetFileGitBlameInfoCmdExecutor.Output()
+	getFileGitBlameInfoCmdExecutorOutput, getFileGitBlameInfoCmdExecutorErr := getFileGitBlameInfoCmdExecutor.Output()
 
-	if GetFileGitBlameInfoCmdExecutorErr != nil {
-		gb.logging.RegisterNewLog(logging.GET_FILE_BLAME_INFO, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GET_FILE_BLAME_INFO, GetFileGitBlameInfoCmdExecutorErr.Error()), true)
+	if getFileGitBlameInfoCmdExecutorErr != nil {
+		gb.logging.RegisterNewLog(logging.GET_FILE_BLAME_INFO, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.GET_FILE_BLAME_INFO, getFileGitBlameInfoCmdExecutorErr.Error()), true)
 		return largestConsolidatedBlameInfoLineLength, largestLineLength, lineBlameInfo
 	}
 
-	parsedOutput := processGeneralGitOpsOutputIntoStringArray(GetFileGitBlameInfoCmdExecutorOutput)
+	parsedOutput := processGeneralGitOpsOutputIntoStringArray(getFileGitBlameInfoCmdExecutorOutput)
 
 	var currentBlameInfo LineBlameInfo
 	for _, parsedLine := range parsedOutput {
 		switch {
+		case strings.HasPrefix(parsedLine, "boundary"):
+			continue
 		case strings.HasPrefix(parsedLine, "author "):
 			currentBlameInfo.Author = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "author-mail "):
@@ -118,10 +121,14 @@ func (gb *GitBlame) GetFileGitBlameInfo(filePath string) (int, int, []LineBlameI
 		case strings.HasPrefix(parsedLine, "filename "):
 			currentBlameInfo.FileName = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "\t"):
+			shortHash := "!@#$%^&"
+			if utf8.RuneCountInString(currentBlameInfo.CommitHash) >= 7 {
+				shortHash = currentBlameInfo.CommitHash[:7]
+			}
 			currentBlameInfo.CommittedLine = normalizeBlameCodeLine(parsedLine[1:]) // strip the \t
-			consolidateBlameInfo := sanitizeBlameLine(currentBlameInfo.CommitHash[:7] + " " +
-				timeAgo(currentBlameInfo.CommitterTime, currentBlameInfo.CommitterTimeZone) + " " +
-				ansi.Truncate(currentBlameInfo.Committer, MAX_COMMITTER_CHAR_LENGTH, "...")) // build the consolidate blame
+			consolidateBlameInfo := sanitizeBlameLine(shortHash + " " +
+				timeAgo(currentBlameInfo.AuthorTime) + " " +
+				ansi.Truncate(currentBlameInfo.Author, MAX_AUTHOR_CHAR_LENGTH, "...")) // build the consolidate blame
 
 			currentConsolidateBlameInfoLen := ansi.StringWidth(consolidateBlameInfo)
 			currentLineLength := ansi.StringWidth(currentBlameInfo.CommittedLine) + currentConsolidateBlameInfoLen
@@ -158,5 +165,5 @@ func sanitizeBlameLine(s string) string {
 //
 // ------------------------------------
 func normalizeBlameCodeLine(s string) string {
-	return strings.ReplaceAll(sanitizeBlameLine(s), "\t", "")
+	return strings.ReplaceAll(sanitizeBlameLine(s), "\t", "    ")
 }

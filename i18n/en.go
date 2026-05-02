@@ -85,6 +85,8 @@ var eN = LanguageMapping{
 	CurrentTerminalWidth:                "Current width",
 	MinimumTerminalWidth:                "Minimum required width",
 	Loading:                             "Loading...",
+	TimeAgoParseError:                   "TIME PARSE ERROR",
+	TimeAgoJustNow:                      "just now",
 	TimeAgoSeconds:                      "%d seconds ago",
 	TimeAgoMinutes:                      "%d minutes ago",
 	TimeAgoHours:                        "%d hours ago",

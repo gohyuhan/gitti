@@ -14,7 +14,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-type BlamePoUpModel struct {
+type BlamePopUpModel struct {
 	CurrentGitTrackedFilesPathList list.Model
 	BlameViewport                  viewport.Model
 	FilterInput                    textinput.Model
@@ -29,7 +29,7 @@ type BlamePoUpModel struct {
 //	Reset the popup back to file-selection state, clearing any chosen file and blame view
 //
 // ------------------------------------
-func (bPM *BlamePoUpModel) ResetSelectedBlameFile() {
+func (bPM *BlamePopUpModel) ResetSelectedBlameFile() {
 	bPM.ShowingBlameInfo = false
 	bPM.HasFilePathChosen = false
 	bPM.SelectedFilePath = ""
@@ -41,7 +41,7 @@ func (bPM *BlamePoUpModel) ResetSelectedBlameFile() {
 //	Display blame information view for selected file path
 //
 // ------------------------------------
-func (bPM *BlamePoUpModel) ShowBlameInfoView(filePath string) {
+func (bPM *BlamePopUpModel) ShowBlameInfoView(filePath string) {
 	bPM.ShowingBlameInfo = true
 	bPM.HasFilePathChosen = true
 	bPM.SelectedFilePath = filePath

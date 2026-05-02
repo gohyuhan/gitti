@@ -50,7 +50,7 @@ func InitBlamePopUpModel(m *types.GittiModel) {
 	vp.SetHeight(height)
 	vp.SetWidth(width)
 
-	popUpModel := &BlamePoUpModel{
+	popUpModel := &BlamePopUpModel{
 		CurrentGitTrackedFilesPathList: cGTFPL,
 		FilterInput:                    filterInput,
 		BlameViewport:                  vp,

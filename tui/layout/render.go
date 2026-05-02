@@ -446,7 +446,7 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.BranchMergeOutputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForBranchMergeOutputPopUp
 		case constant.BlamePopUp:
-			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 			if ok {
 				if !popUp.ShowingBlameInfo {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingForBlamePopUpFilePathSelection

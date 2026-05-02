@@ -85,6 +85,8 @@ var jA = LanguageMapping{
 	CurrentTerminalWidth:                "現在の幅",
 	MinimumTerminalWidth:                "必要な最小の幅",
 	Loading:                             "読み込み中...",
+	TimeAgoParseError:                   "時刻解析エラー",
+	TimeAgoJustNow:                      "たった今",
 	TimeAgoSeconds:                      "%d 秒前",
 	TimeAgoMinutes:                      "%d 分前",
 	TimeAgoHours:                        "%d 時間前",

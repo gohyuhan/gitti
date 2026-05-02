@@ -15,7 +15,7 @@ import (
 //
 // ------------------------------------
 func RenderBlamePopUp(m *types.GittiModel) string {
-	popUp, ok := m.PopUpModel.(*BlamePoUpModel)
+	popUp, ok := m.PopUpModel.(*BlamePopUpModel)
 	if ok {
 		width := int(float64(m.Width) * 0.9)
 		height := int(float64(m.Height) * 0.9)

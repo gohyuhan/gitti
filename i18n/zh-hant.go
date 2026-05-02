@@ -85,6 +85,8 @@ var zH_HANT = LanguageMapping{
 	CurrentTerminalWidth:                "目前寬度",
 	MinimumTerminalWidth:                "最小需求寬度",
 	Loading:                             "載入中...",
+	TimeAgoParseError:                   "時間解析錯誤",
+	TimeAgoJustNow:                      "剛剛",
 	TimeAgoSeconds:                      "%d 秒前",
 	TimeAgoMinutes:                      "%d 分鐘前",
 	TimeAgoHours:                        "%d 小時前",
