@@ -26,13 +26,13 @@ type LineBlameInfo struct {
 	AuthorMail            string
 	AuthorTime            string
 	AuthorTimeZone        string
-	Comitter              string
-	ComitterMail          string
-	ComitterTime          string
-	ComitterTimeZone      string
+	Committer             string
+	CommitterMail         string
+	CommitterTime         string
+	CommitterTimeZone     string
 	CommitSummary         string
 	FileName              string
-	ComittedLine          string
+	CommittedLine         string
 	ConsolidatedBlameInfo string // this is the blame info for display (not inclluding the code line)
 }
 
@@ -104,13 +104,13 @@ func (gb *GitBlame) GetFileGitBlameInfo(filePath string) (int, int, []LineBlameI
 		case strings.HasPrefix(parsedLine, "author-tz "):
 			currentBlameInfo.AuthorTimeZone = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "committer "):
-			currentBlameInfo.Comitter = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
+			currentBlameInfo.Committer = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "committer-mail "):
-			currentBlameInfo.ComitterMail = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
+			currentBlameInfo.CommitterMail = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "committer-time "):
-			currentBlameInfo.ComitterTime = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
+			currentBlameInfo.CommitterTime = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "committer-tz "):
-			currentBlameInfo.ComitterTimeZone = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
+			currentBlameInfo.CommitterTimeZone = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "summary "):
 			currentBlameInfo.CommitSummary = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "previous "):
@@ -118,13 +118,13 @@ func (gb *GitBlame) GetFileGitBlameInfo(filePath string) (int, int, []LineBlameI
 		case strings.HasPrefix(parsedLine, "filename "):
 			currentBlameInfo.FileName = sanitizeBlameLine(strings.SplitN(parsedLine, " ", 2)[1])
 		case strings.HasPrefix(parsedLine, "\t"):
-			currentBlameInfo.ComittedLine = normalizeBlameCodeLine(parsedLine[1:]) // strip the \t
+			currentBlameInfo.CommittedLine = normalizeBlameCodeLine(parsedLine[1:]) // strip the \t
 			consolidateBlameInfo := sanitizeBlameLine(currentBlameInfo.CommitHash[:7] + " " +
-				timeAgo(currentBlameInfo.ComitterTime, currentBlameInfo.ComitterTimeZone) + " " +
-				ansi.Truncate(currentBlameInfo.Comitter, MAX_COMMITTER_CHAR_LENGTH, "...")) // build the consolidate blame
+				timeAgo(currentBlameInfo.CommitterTime, currentBlameInfo.CommitterTimeZone) + " " +
+				ansi.Truncate(currentBlameInfo.Committer, MAX_COMMITTER_CHAR_LENGTH, "...")) // build the consolidate blame
 
 			currentConsolidateBlameInfoLen := ansi.StringWidth(consolidateBlameInfo)
-			currentLineLength := ansi.StringWidth(currentBlameInfo.ComittedLine) + currentConsolidateBlameInfoLen
+			currentLineLength := ansi.StringWidth(currentBlameInfo.CommittedLine) + currentConsolidateBlameInfoLen
 			if currentConsolidateBlameInfoLen > largestConsolidatedBlameInfoLineLength {
 				largestConsolidatedBlameInfoLineLength = currentConsolidateBlameInfoLen
 			}

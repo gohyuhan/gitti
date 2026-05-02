@@ -19,7 +19,7 @@ const InfoLineSeparator = "  |  "
 func GetFileGitBlameInfoService(m *types.GittiModel, filePath string) {
 	largestBlameInfoLineLength, largestLineLength, lineBlameInfoArray := m.GitOperations.GitBlame.GetFileGitBlameInfo(filePath)
 
-	rowSeperator := strings.Repeat("-", largestLineLength+ansi.StringWidth(InfoLineSeparator))
+	rowSeparator := strings.Repeat("-", largestLineLength+ansi.StringWidth(InfoLineSeparator))
 	var viewportContent strings.Builder
 	var previousCommitHash string
 	popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
@@ -31,11 +31,11 @@ func GetFileGitBlameInfoService(m *types.GittiModel, filePath string) {
 		var blameInfo string
 		if previousCommitHash != lineBlameInfo.CommitHash {
 			previousCommitHash = lineBlameInfo.CommitHash
-			isUncommitedChange := strings.ReplaceAll(lineBlameInfo.CommitHash, "0", "") == ""
-			if isUncommitedChange {
+			isUncommittedChange := strings.ReplaceAll(lineBlameInfo.CommitHash, "0", "") == ""
+			if isUncommittedChange {
 				blameInfoColor = style.ColorYellowSoft
 			}
-			viewportContent.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Faint(true).Render(rowSeperator))
+			viewportContent.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Faint(true).Render(rowSeparator))
 			viewportContent.WriteRune('\n')
 			blameInfo = lineBlameInfo.ConsolidatedBlameInfo
 		} else {
@@ -47,7 +47,7 @@ func GetFileGitBlameInfoService(m *types.GittiModel, filePath string) {
 		}
 		viewportContent.WriteString(style.NewStyle.Foreground(blameInfoColor).Render(blameInfo))
 		viewportContent.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Faint(true).Render(InfoLineSeparator))
-		viewportContent.WriteString(lineBlameInfo.ComittedLine)
+		viewportContent.WriteString(lineBlameInfo.CommittedLine)
 		viewportContent.WriteRune('\n')
 	}
 

@@ -27,7 +27,7 @@ func InitBlamePopUpModel(m *types.GittiModel) {
 	cGTFPL := list.New(items, CurrentGitTrackedFilesPathDelegate{}, width, listHeight)
 	cGTFPL.SetShowPagination(false)
 	cGTFPL.SetShowStatusBar(false)
-	cGTFPL.SetFilteringEnabled(false)
+	cGTFPL.SetFilteringEnabled(true)
 	cGTFPL.SetShowTitle(false)
 
 	filterInput := textinput.New()
