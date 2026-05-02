@@ -112,6 +112,14 @@ type LanguageMapping struct {
 	CurrentTerminalWidth        string
 	MinimumTerminalWidth        string
 	Loading                     string
+	TimeAgoParseError           string
+	TimeAgoJustNow              string
+	TimeAgoSeconds              string
+	TimeAgoMinutes              string
+	TimeAgoHours                string
+	TimeAgoDays                 string
+	TimeAgoMonths               string
+	TimeAgoYears                string
 	StagedTitle                 string
 	UnstagedTitle               string
 	LineEditingModeTitle        string
@@ -194,6 +202,9 @@ type LanguageMapping struct {
 	KeyBindingForChooseRemoteBranchOptionPopUp                 []string
 	KeyBindingForChooseBranchOptionForMergePopUp               []string
 	KeyBindingForBranchMergeOutputPopUp                        []string
+	KeyBindingForBlamePopUpFilePathSelection                   []string
+	KeyBindingForBlamePopUpBlameView                           []string
+
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -420,4 +431,8 @@ type LanguageMapping struct {
 	SelectedBranchOptionForGitMergeTitle string
 	GitMergeOutputTitle                  string
 	BranchMerging                        string
+	// for blame
+	BlameFilePathFilterPlaceholder string
+	GitTrackedFileTitle            string
+	BlameViewportTitle             string
 }

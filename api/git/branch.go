@@ -24,11 +24,11 @@ type GitBranch struct {
 	FfMerge         bool // determine when merge it was fast forward or not, fast forward will not have the merge commit and non fast forward will have one
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git branch handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitBranch(gitProcessLock *GitProcessLock, ffMerge bool, logging *logging.GittiLogging) *GitBranch {
 	gitBranch := GitBranch{
 		isRepoUnborn:   false,
@@ -39,52 +39,52 @@ func InitGitBranch(gitProcessLock *GitProcessLock, ffMerge bool, logging *loggin
 	return &gitBranch
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return current branch
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) CurrentCheckOut() BranchInfo {
 	return gb.currentCheckOut
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return  allbranch
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) AllBranches() []BranchInfo {
 	copied := make([]BranchInfo, len(gb.allBranches))
 	copy(copied, gb.allBranches)
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return  remoteBranches
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) RemoteBranches() []BranchInfo {
 	copied := make([]BranchInfo, len(gb.remoteBranches))
 	copy(copied, gb.remoteBranches)
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return is repo unborn
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) IsRepoUnborn() bool {
 	return gb.isRepoUnborn
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //		Retrieve Branches Info
 //	 * Passive, this should only be trigger by system
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GetLatestBranchesInfo() {
 	gitArgs := []string{"branch"}
 	allBranches := []BranchInfo{}
@@ -101,7 +101,7 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 	gitBranches := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 
 	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
-	// meaning this was a newly init repo with a uncommited branch
+	// meaning this was a newly init repo with a uncommitted branch
 	if len(gitBranches) < 1 {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
 		branchCmdExecutor = executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -138,11 +138,11 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 	gb.allBranches = allBranches
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Set The Global Default Branch Name when git init
 //
-// ----------------------------------
+// ------------------------------------
 func SetGitInitDefaultBranch(branchName string, cwd string) {
 	gitArgs := []string{"config", "--global", "init.defaultBranch", branchName}
 
@@ -150,11 +150,11 @@ func SetGitInitDefaultBranch(branchName string, cwd string) {
 	_ = cmdExecutor.Run()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Create New Branch ( only create, remain at current branch )
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -176,11 +176,11 @@ func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Create New Branch and Move All Changes to new Branch ( create, then switch to new branch )
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -197,11 +197,11 @@ func (gb *GitBranch) GitCreateNewBranchAndSwitch(branchName string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Create New Branch based on a remote branch
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitCreateNewBranchBasedOnRemote(remoteName string, branchName string) ([]string, bool) {
 	success := false
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
@@ -229,11 +229,11 @@ func (gb *GitBranch) GitCreateNewBranchBasedOnRemote(remoteName string, branchNa
 	return parsedCreateBranchBasedOnRemoteOutput, success
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Switch Branch ( Does not bring the changes over )
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
@@ -264,12 +264,12 @@ func (gb *GitBranch) GitSwitchBranch(branchName string) ([]string, bool) {
 	return gitOpsOutput, true
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //		Related to Create New Branch based on commit hash ( only create, remain at current branch )
 //	 * used to create branch based on commit hash on reflog
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitCreateNewBranchBasedOnCommitHash(branchName string, commitHash string) {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -287,11 +287,11 @@ func (gb *GitBranch) GitCreateNewBranchBasedOnCommitHash(branchName string, comm
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Switch Branch with the changes ( bring the changes over )
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bool) {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
@@ -313,11 +313,11 @@ func (gb *GitBranch) GitSwitchBranchWithChanges(branchName string) ([]string, bo
 	return gitOpsOutput, true
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to delete branch in local
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) DeleteLocalBranch(branchName string) ([]string, bool) {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
@@ -337,12 +337,12 @@ func (gb *GitBranch) DeleteLocalBranch(branchName string) ([]string, bool) {
 	return gitOpsOutput, true
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //		Related to get remote branch
 //	 * this run passively and will not be triggered by user manually, this will be trigger after passive and manual git fetch
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 	gitArgs := []string{"branch", "-r"}
 	remoteBranchExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -371,11 +371,11 @@ func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 	gb.remoteBranches = remoteBranches
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to get merge branch
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]string, bool) {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
@@ -402,13 +402,13 @@ func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]str
 	return gitMergeOpsOutput, true
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	GitMergeWithSigning constructs a git merge command for terminal execution when signing is required.
 //	When commit signing is enabled, gitti UI is suspended and the commit is executed directly in the terminal,
 //	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBranch) GitMergeWithSigning(branchesName []string) []string {
 	var gitArgs []string
 	if gb.FfMerge {

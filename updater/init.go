@@ -1,10 +1,10 @@
 package updater
 
-// ----------------------------------
+// ------------------------------------
 //
-//	InitUpdater initializes the updater and checks for updates if needed
+//	Auto-check for updates and prompt user to install if a newer version is available
 //
-// ----------------------------------
+// ------------------------------------
 func AutoUpdater() {
 	if ShouldCheckForUpdate() {
 		latestVersion, isNewer, err := CheckForUpdates()

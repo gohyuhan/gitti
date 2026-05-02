@@ -2,6 +2,7 @@ package popup
 
 import (
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/popup/blame"
 	"github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	"github.com/gohyuhan/gitti/tui/popup/commitlog"
@@ -19,13 +20,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-//	Functions that relate to the rendering of pop up
+//   Functions that relate to the rendering of pop up
 
-// ----------------------------------
+// ------------------------------------
 //
 //	render the PopUp and the content within it will be a determine dynamically
 //
-// ----------------------------------
+// ------------------------------------
 func RenderPopUpComponent(m *types.GittiModel) string {
 	var popUp string
 
@@ -134,6 +135,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = branch.RenderChooseBranchOptionForMergePopUp(m)
 	case constant.BranchMergeOutputPopUp:
 		popUp = branch.RenderBranchMergeOutputPopUp(m)
+	case constant.BlamePopUp:
+		popUp = blame.RenderBlamePopUp(m)
 	}
 	return popUp
 }

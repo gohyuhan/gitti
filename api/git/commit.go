@@ -29,11 +29,11 @@ type LatestCommitMsgAndDesc struct {
 	Description string
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git commit handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitCommit {
 	gitCommit := GitCommit{
 		gitCommitOutput:     []string{},
@@ -46,11 +46,11 @@ func InitGitCommit(updateChannel chan string, gitProcessLock *GitProcessLock, lo
 	return &gitCommit
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return git commit output
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitCommitOutput() []string {
 	gc.gitCommitOutputMu.RLock()
 	defer gc.gitCommitOutputMu.RUnlock()
@@ -60,11 +60,11 @@ func (gc *GitCommit) GitCommitOutput() []string {
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return git remote push output
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitRemotePushOutput() []string {
 	gc.gitRemotePushOutputMu.RLock()
 	defer gc.gitRemotePushOutputMu.RUnlock()
@@ -74,11 +74,11 @@ func (gc *GitCommit) GitRemotePushOutput() []string {
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Commit
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitCommit(ctx context.Context, message, description string, isAmendCommit bool) int {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
@@ -179,24 +179,24 @@ func (gc *GitCommit) GitCommit(ctx context.Context, message, description string,
 	return 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Clear the stored commit output buffer
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) ClearGitCommitOutput() {
 	gc.gitCommitOutputMu.Lock()
 	defer gc.gitCommitOutputMu.Unlock()
 	gc.gitCommitOutput = []string{}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	GitCommitWithSigning constructs a git commit command for terminal execution when signing is required.
 //	When commit signing is enabled, gitti UI is suspended and the commit is executed directly in the terminal,
 //	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitCommitWithSigning(message, description string, isAmendCommit bool) []string {
 	gitArgs := []string{"commit", "-m", message}
 	if isAmendCommit {
@@ -209,11 +209,11 @@ func (gc *GitCommit) GitCommitWithSigning(message, description string, isAmendCo
 	return gitArgs
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Commit (Amend)
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 	gitArgs := []string{"log", "-1", "--pretty=format:%s%n%b", "HEAD"}
 	latestCommitCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -237,11 +237,11 @@ func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Push
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType string, currentCheckOutBranch string) int {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return -1
@@ -345,13 +345,13 @@ func (gc *GitCommit) GitPush(ctx context.Context, originName string, pushType st
 	return 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	GitPushWithSigning constructs a git push command for terminal execution when signing is required.
 //	When push signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
 //	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitPushWithSigning(originName string, pushType string, currentCheckOutBranch string) []string {
 	var gitArgs []string
 
@@ -379,22 +379,22 @@ func (gc *GitCommit) GitPushWithSigning(originName string, pushType string, curr
 	return gitArgs
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Clear the stored remote push output buffer
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) ClearGitRemotePushOutput() {
 	gc.gitRemotePushOutputMu.Lock()
 	defer gc.gitRemotePushOutputMu.Unlock()
 	gc.gitRemotePushOutput = []string{}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Commit RESET (apply to the latest commit only)
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitResetLatestCommit(resetType string) {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -426,11 +426,11 @@ func (gc *GitCommit) GitResetLatestCommit(resetType string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Commit RESET (apply to selected commit [using commit hash])
 //
-// ----------------------------------
+// ------------------------------------
 func (gc *GitCommit) GitResetToSelectedCommit(resetType string, commitHash string) {
 	if !gc.gitProcessLock.CanProceedWithGitOps() {
 		return

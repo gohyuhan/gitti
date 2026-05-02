@@ -7,12 +7,13 @@ import (
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/interaction/handler"
+	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle mouse interactions.
 //	Responsibility: Translates mouse wheel events (up, down, left, right) into
@@ -20,7 +21,7 @@ import (
 //	- Active Popup: Scrolls within popups like instructions or discard confirmation.
 //	- Detail Panels: Horizontally or vertically scrolls the main viewports.
 //
-// ----------------------------------
+// ------------------------------------
 func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg.String() {
@@ -48,6 +49,11 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 					}
 					popUp.GlobalKeyBindingViewport.ScrollLeft(scrollSpeed)
 				}
+			case constant.BlamePopUp:
+				popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
+				if ok && popUp.ShowingBlameInfo {
+					popUp.BlameViewport.ScrollLeft(1)
+				}
 			}
 		}
 
@@ -74,6 +80,11 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 						scrollSpeed = 2
 					}
 					popUp.GlobalKeyBindingViewport.ScrollRight(scrollSpeed)
+				}
+			case constant.BlamePopUp:
+				popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
+				if ok && popUp.ShowingBlameInfo {
+					popUp.BlameViewport.ScrollRight(1)
 				}
 			}
 		}

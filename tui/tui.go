@@ -34,11 +34,11 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize and return a new GittiAppModel with necessary dependencies and viewport setup
 //
-// ----------------------------------
+// ------------------------------------
 func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
@@ -143,20 +143,20 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 // Bubble Tea standard functions
 // -----------------------------------------------------------------------------
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Bubble tea Init function, called once when the program starts
 //
-// ----------------------------------
+// ------------------------------------
 func (gAM *GittiAppModel) Init() tea.Cmd {
 	return nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Bubble tea Update function, handles all incoming messages and state changes
 //
-// ----------------------------------
+// ------------------------------------
 func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds []tea.Cmd
 	m := gAM.model
@@ -360,11 +360,11 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return gAM, tea.Batch(cmds...)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Bubble tea View function, renders the UI based on the current model state
 //
-// ----------------------------------
+// ------------------------------------
 func (gAM *GittiAppModel) View() tea.View {
 	var v tea.View
 	v.SetContent(layout.GittiMainPageView(gAM.model))
@@ -373,11 +373,11 @@ func (gAM *GittiAppModel) View() tea.View {
 	return v
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Update the Git remote status, upstream branch, and sync line string in the model
 //
-// ----------------------------------
+// ------------------------------------
 func (gAM *GittiAppModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
 	m := gAM.model
 	// set branch upstream
@@ -390,11 +390,11 @@ func (gAM *GittiAppModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
 	m.RemoteSyncRemoteState = remoteSynsStatusInfo.Remote
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Update the current repository state (e.g., REBASE, MERGE, etc.) in the model
 //
-// ----------------------------------
+// ------------------------------------
 func (gAM *GittiAppModel) updateGitRepoState() {
 	m := gAM.model
 	m.CurrentGitRepoStatus = m.GitOperations.GitStateUniversalUtils.GetCurrentGitState()

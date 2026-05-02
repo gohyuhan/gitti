@@ -17,11 +17,11 @@ import (
 	"github.com/gohyuhan/gitti/settings"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
-//	check if git was installed
+//	Check if git is installed in the system
 //
-// ----------------------------------
+// ------------------------------------
 func IsGitInstalled(repoPath string) {
 	gitArgs := []string{"--version"}
 
@@ -37,11 +37,11 @@ func IsGitInstalled(repoPath string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	IsRepoGitInitialized checks if the given path is a Git repository
+//	Check if the given path is a Git repository
 //
-// ----------------------------------
+// ------------------------------------
 func IsRepoGitInitialized(repoPath string) GitRepoPath {
 	gitPathInfo, err := getGitPathInfo()
 	if err != nil {
@@ -55,11 +55,11 @@ func IsRepoGitInitialized(repoPath string) GitRepoPath {
 	return gitPathInfo
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	to prompt user if they want to git init current dir if .git is not detected
+//	Prompt the user if they want to git init the current directory if .git is not detected
 //
-// ----------------------------------
+// ------------------------------------
 func PromptUserForGitInitConfirmation(repoPath string) {
 	reader := bufio.NewReader(os.Stdin)
 
@@ -79,11 +79,11 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize all git operation handlers with the given path and shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogging *logging.GittiLogging) *GitOperations {
 	gitProcessLock := git.InitGitProcessLock(gittiLogging)
 	return &GitOperations{
@@ -98,14 +98,15 @@ func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogg
 		GitRefLog:              git.InitGitRefLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxRefLogCount, gittiLogging),
 		GitTag:                 git.InitGitTag(updateChannel, gitProcessLock, gittiLogging),
 		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock, gittiLogging),
+		GitBlame:               git.InitGitBlame(updateChannel, gitProcessLock, gittiLogging),
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	to check and validate if the input branch name is valid and also to generate the valid branch name
+//	Check and validate if the input branch name is valid and generate the valid branch name
 //
-// ----------------------------------
+// ------------------------------------
 func IsBranchNameValid(branchName string) (string, bool) {
 	// Git-invalid characters anywhere (except space which we replace with "-")
 	// These characters must be removed entirely.
@@ -179,13 +180,11 @@ func IsBranchNameValid(branchName string) (string, bool) {
 	return modified, isValid
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	get the top-level and absolute git path
-//	top-level eg: /Users/<username>/Projects/<example-project>
-//	absolute-path eg: /Users/<username>/Projects/<example-project>/.git
+//	Get the top-level and absolute git path
 //
-// ----------------------------------
+// ------------------------------------
 func getGitPathInfo() (GitRepoPath, error) {
 	// get the most absolute git folder path
 	absGitPathArgs := []string{"rev-parse", "--absolute-git-dir"}
@@ -215,11 +214,11 @@ func getGitPathInfo() (GitRepoPath, error) {
 	return gitRepoPath, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	check git operation if require signing
+//	Check if git operations require signing
 //
-// ----------------------------------
+// ------------------------------------
 func CheckSigningRequiredOperation() (bool, bool, bool) {
 	var commitRequireSigning bool
 	var tagRequireSigning bool

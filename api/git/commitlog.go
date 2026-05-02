@@ -47,11 +47,11 @@ type CommitHashParentInfo struct {
 	ParentOrder         int
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Init Git Commit Log
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitCommitLog(updateChannel chan string, gitProcessLock *GitProcessLock, maxCommitLogCountInt int, logging *logging.GittiLogging) *GitCommitLog {
 	maxCommitLogCount := strconv.Itoa(maxCommitLogCountInt)
 	gitCommitLog := GitCommitLog{
@@ -64,22 +64,22 @@ func InitGitCommitLog(updateChannel chan string, gitProcessLock *GitProcessLock,
 	return &gitCommitLog
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return commit log output
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) GitCommitLogOutput() []CommitLog {
 	copied := make([]CommitLog, len(gCL.gitCommitLogOutput))
 	copy(copied, gCL.gitCommitLogOutput)
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Get the Commit log
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) GetCommitLogs() {
 	// 1. Prepare git command
 	gitArgs := []string{
@@ -169,22 +169,22 @@ type GraphRenderer struct {
 	currentLanes []Lane
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Create a new GraphRenderer for rendering commit lane visualization
 //
-// ----------------------------------
+// ------------------------------------
 func NewGraphRenderer() *GraphRenderer {
 	return &GraphRenderer{
 		currentLanes: make([]Lane, 0),
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the Commit Lane graph line
 //
-// ----------------------------------
+// ------------------------------------
 func (g *GraphRenderer) RenderCommit(cL CommitLog) ([]Cell, int) {
 	// -- Step 1: Identify the Commit's Lane --
 	// Find which existing lane this commit belongs to.
@@ -442,11 +442,11 @@ func (g *GraphRenderer) RenderCommit(cL CommitLog) ([]Cell, int) {
 	return cells, commitLaneIdx
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Retrieve the detailed diff or stat for a specific commit by its hash
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash string) []string {
 	gitArgs := []string{"show", commitHash, "--stat", "-p"}
 
@@ -467,11 +467,11 @@ func (gCL *GitCommitLog) GitCommitLogDetail(ctx context.Context, commitHash stri
 	return commitChangesLine
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Commit cherry pick
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) GitCherryPick(cherryPickedCommitHashes []string) {
 	topoOrderedCherryPickedCommitHashes := gCL.topoOrderCherryPickedCommit(cherryPickedCommitHashes)
 	gitArgs := []string{"cherry-pick"}
@@ -485,12 +485,12 @@ func (gCL *GitCommitLog) GitCherryPick(cherryPickedCommitHashes []string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	GitCherryPickWithSigning constructs the git cherry-pick command arguments for execution in the terminal.
 //	This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) GitCherryPickWithSigning(cherryPickedCommitHashes []string) []string {
 	topoOrderedCherryPickedCommitHashes := gCL.topoOrderCherryPickedCommit(cherryPickedCommitHashes)
 	gitArgs := []string{"cherry-pick"}
@@ -498,12 +498,12 @@ func (gCL *GitCommitLog) GitCherryPickWithSigning(cherryPickedCommitHashes []str
 	return gitArgs
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // Helper to topo order cherry picked commit to prevent cherry pick conflict
 // (this only to commits that are from the same branch or related, else it will be in the sequence of how user cherry oicked it)
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) topoOrderCherryPickedCommit(cherryPickedCommitHashes []string) []string {
 	// if the cherry picked commit hash is less than 1, we don't have to even order it
 	if len(cherryPickedCommitHashes) <= 1 {
@@ -526,22 +526,22 @@ func (gCL *GitCommitLog) topoOrderCherryPickedCommit(cherryPickedCommitHashes []
 	return topoOrderedCherryPickedCommitHashes
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Helper to write commit graph that improve performance of git log retrieval
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) WriteCommitGraph() {
 	gitArgs := []string{"commit-graph", "write", "--reachable", "--split"}
 	writeCommitGraphCmdExec := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	writeCommitGraphCmdExec.Run()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Git Revert for commit
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) GitRevertCommit(commitHash string, parentOrder int) {
 	// parentOrder is only need when reverting a merge commit, other commit reverting only require the hash commit
 	var gitArgs []string
@@ -561,11 +561,11 @@ func (gCL *GitCommitLog) GitRevertCommit(commitHash string, parentOrder int) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # To get the parent(s) info for the commit hash
 //
-// ----------------------------------
+// ------------------------------------
 func (gCL *GitCommitLog) GetCommitHashParentInfo(commitHash string) []CommitHashParentInfo {
 	parentTarget := commitHash + "^@"
 

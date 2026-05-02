@@ -22,11 +22,11 @@ type GitStash struct {
 	logging        *logging.GittiLogging
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git stash handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitStash(gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitStash {
 	gitStash := &GitStash{
 		allStash:       []StashInfo{},
@@ -37,22 +37,22 @@ func InitGitStash(gitProcessLock *GitProcessLock, logging *logging.GittiLogging)
 	return gitStash
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return all stash entries
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) AllStash() []StashInfo {
 	copied := make([]StashInfo, len(gs.allStash))
 	copy(copied, gs.allStash)
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Get Latest Info For Stash
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) GetLatestStashInfo() {
 	gitArgs := []string{"stash", "list", "--format=%gd %s"}
 	stashInfoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -82,11 +82,11 @@ func (gs *GitStash) GetLatestStashInfo() {
 	gs.allStash = stashInfoArray
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Stash All including untracked ( both index and worktree except ignored )
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) GitStashAll(message string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
@@ -114,11 +114,11 @@ func (gs *GitStash) GitStashAll(message string) ([]string, int) {
 	return stashAllOutputStringArray, 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Stash File changes
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) GitStashFile(filePathName string, message string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
@@ -160,11 +160,11 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) ([]string,
 	return stashOutputStringArray, 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Git stash apply
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) GitStashApply(stashId string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
@@ -191,11 +191,11 @@ func (gs *GitStash) GitStashApply(stashId string) ([]string, int) {
 	return stashApplyOutputStringArray, 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Git stash pop
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) GitStashPop(stashId string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
@@ -222,11 +222,11 @@ func (gs *GitStash) GitStashPop(stashId string) ([]string, int) {
 	return stashPopOutputStringArray, 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Git stash drop
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) GitStashDrop(stashId string) ([]string, int) {
 	if !gs.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gs.gitProcessLock.OtherProcessRunningWarning()}, -1
@@ -253,11 +253,11 @@ func (gs *GitStash) GitStashDrop(stashId string) ([]string, int) {
 	return stashDropOutputStringArray, 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Git stash detail
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) GitStashDetail(ctx context.Context, stashId string) []string {
 	var parsedDetail []string
 
@@ -288,11 +288,11 @@ func (gs *GitStash) GitStashDetail(ctx context.Context, stashId string) []string
 	return parsedDetail
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 // # Helper to determine if stash is small
 //
-// ----------------------------------
+// ------------------------------------
 func (gs *GitStash) isStashSmall(ctx context.Context, stashId string) (bool, error) {
 	// Fast early-exit: use numstat which shows all files (tracked + untracked)
 	// Stop reading after threshold to avoid processing millions of files

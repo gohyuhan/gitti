@@ -11,11 +11,11 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	the function to handle bubbletea key interactions
 //
-// ----------------------------------
+// ------------------------------------
 func GittiKeyInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	// global key binding
 	switch msg.String() {

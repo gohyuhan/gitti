@@ -12,11 +12,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for resolve conflict option list popup
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitResolveConflictOptionPopUpModel(m *types.GittiModel, filePathName string) {
 	resolveConflictOption := []GitResolveConflictOptionItem{
 		{

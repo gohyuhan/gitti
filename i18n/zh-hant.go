@@ -85,6 +85,14 @@ var zH_HANT = LanguageMapping{
 	CurrentTerminalWidth:                "目前寬度",
 	MinimumTerminalWidth:                "最小需求寬度",
 	Loading:                             "載入中...",
+	TimeAgoParseError:                   "時間解析錯誤",
+	TimeAgoJustNow:                      "剛剛",
+	TimeAgoSeconds:                      "%d 秒前",
+	TimeAgoMinutes:                      "%d 分鐘前",
+	TimeAgoHours:                        "%d 小時前",
+	TimeAgoDays:                         "%d 天前",
+	TimeAgoMonths:                       "%d 個月前",
+	TimeAgoYears:                        "%d 年前",
 	StagedTitle:                         "已暫存的變更",
 	UnstagedTitle:                       "未暫存的變更",
 	LineEditingModeTitle:                "行編輯模式",
@@ -459,6 +467,17 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForBranchMergeOutputPopUp: []string{
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForBlamePopUpFilePathSelection: []string{
+		"[↑/↓] 上下移動",
+		"[enter] 檢視 blame",
+		"[type <char>] 過濾檔案路徑",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForBlamePopUpBlameView: []string{
+		"[↑/↓] 上下移動",
+		"[←/→] 左右移動",
+		"[esc] 返回檔案選擇",
+	},
 	GlobalKeyBinding:                                         zhHantGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHantTagComponentKeyBinding,
@@ -642,6 +661,9 @@ var zH_HANT = LanguageMapping{
 	SelectedBranchOptionForGitMergeTitle:                     "已選分支",
 	GitMergeOutputTitle:                                      "合併",
 	BranchMerging:                                            "合併中...",
+	BlameFilePathFilterPlaceholder:                           "過濾檔案路徑 ...",
+	GitTrackedFileTitle:                                      "已追蹤檔案",
+	BlameViewportTitle:                                       "Blame: %s",
 }
 
 // for about gitti
@@ -805,6 +827,11 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "聚焦到日誌面板",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "b",
+		TitleOrInfoLine: "開啟 blame 彈出視窗",
 		LineType:        INFO,
 	},
 }
@@ -1698,6 +1725,19 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"5. 使用 `tab` / `shift+tab` 在可用分支列表和已選分支列表之間切換",
 			"6. 按 `enter` 執行合併",
 			"7. 按 `esc` 取消",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "blame",
+		InstructionLines: []string{
+			"1. 按 `b` 開啟 blame 彈出視窗",
+			"2. 使用 `↑/↓` 在已追蹤檔案間導覽",
+			"   - 可選：輸入字元即時過濾檔案路徑",
+			"3. 按 `enter` 檢視所選檔案的 blame 資訊",
+			"4. 使用 `↑/↓` 捲動 blame 輸出，`←/→` 左右捲動",
+			"5. 按 `esc` 返回檔案選擇畫面",
+			"6. 在檔案選擇畫面再次按 `esc` 關閉彈出視窗",
 		},
 		LineType: INFO,
 	},

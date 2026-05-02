@@ -142,11 +142,11 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 	}(ctx)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for tag detail panel view
 //
-// ----------------------------------
+// ------------------------------------
 func generateTagDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
 	var tagItem tag.GitTagItem
@@ -172,6 +172,11 @@ func generateTagDetailPanelContent(ctx context.Context, m *types.GittiModel) str
 	return vpLine.String()
 }
 
+// ------------------------------------
+//
+//	Generate remote detail panel content
+//
+// ------------------------------------
 func generateRemoteDetailPanelContent(m *types.GittiModel) string {
 	currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
 	var remoteItem remote.GitRemoteItem
@@ -240,11 +245,11 @@ func generateRemoteDetailPanelContent(m *types.GittiModel) string {
 	return vpLine.String()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for modified file detail panel view
 //
-// ----------------------------------
+// ------------------------------------
 func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiModel) (string, string, bool) {
 	shouldRenderDetailComponentPanelTwo := false
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
@@ -304,11 +309,11 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 	return vpLine1.String(), vpLine2.String(), shouldRenderDetailComponentPanelTwo
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for commit log detail panel view
 //
-// ----------------------------------
+// ------------------------------------
 func generateCommitLogOrRefLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	var hash string
 
@@ -344,11 +349,11 @@ func generateCommitLogOrRefLogDetailPanelContent(ctx context.Context, m *types.G
 	return vpLine.String()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for stash detail panel view
 //
-// ----------------------------------
+// ------------------------------------
 func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	currentSelectedStash := m.CurrentRepoStashInfoList.SelectedItem()
 	var stashItem stash.GitStashItem
@@ -379,16 +384,21 @@ func generateStashDetailPanelContent(ctx context.Context, m *types.GittiModel) s
 	return vpLine.String()
 }
 
+// ------------------------------------
+//
+//	Generate log detail panel content
+//
+// ------------------------------------
 func generateLogDetailPanelContent(ctx context.Context, m *types.GittiModel) string {
 	vpLine := log.InitGittiLogViewport(m, false, ctx)
 	return vpLine
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for about gitti content
 //
-// ----------------------------------
+// ------------------------------------
 func generateAboutGittiContent() string {
 	var vpLine strings.Builder
 
@@ -645,6 +655,11 @@ func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewpor
 	m.LineEditingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
 }
 
+// ------------------------------------
+//
+//	Trigger async git fetch operation via daemon update channel
+//
+// ------------------------------------
 func GitFetchService(m *types.GittiModel) {
 	go func() {
 		m.DaemonUpdateChannel <- git.GIT_FETCH

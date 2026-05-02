@@ -13,6 +13,11 @@ var SUPPORTED_LANGUAGE_CODE = []string{"EN", "JA", "ZH-HANT", "ZH-HANS"}
 
 var LANGUAGEMAPPING *LanguageMapping
 
+// ------------------------------------
+//
+//	Initialize language mapping based on the provided language code
+//
+// ------------------------------------
 func InitGittiLanguageMapping(languageCode string) {
 	languageCode = strings.ToUpper(languageCode)
 	switch languageCode {
@@ -29,6 +34,11 @@ func InitGittiLanguageMapping(languageCode string) {
 	}
 }
 
+// ------------------------------------
+//
+//	Check if the language code is supported
+//
+// ------------------------------------
 func IsLanguageCodeSupported(languageCode string) bool {
 	if utils.Contains(SUPPORTED_LANGUAGE_CODE, strings.ToUpper(languageCode)) {
 		return true
