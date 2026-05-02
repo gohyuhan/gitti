@@ -5,6 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/layout"
+	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
@@ -48,6 +49,18 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 	// to copy content from current input field to clipboard
 	case "ctrl+y":
 		return handleTypingCtrlyKeyBindingInteraction(m)
+
+	case "up":
+		return handleTypingUpKeyBindingInteraction(msg, m)
+
+	case "down":
+		return handleTypingDownKeyBindingInteraction(msg, m)
+
+	case "left":
+		return handleTypingLeftKeyBindingInteraction(msg, m)
+
+	case "right":
+		return handleTypingRightKeyBindingInteraction(msg, m)
 	}
 
 	// for input typing update
@@ -155,6 +168,15 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 			popUp.BranchNameInput, cmd = popUp.BranchNameInput.Update(msg)
 			return m, cmd
 		}
+	case constant.BlamePopUp:
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		if ok && !popUp.ShowingBlameInfo {
+			var cmd tea.Cmd
+			popUp.FilterInput, cmd = popUp.FilterInput.Update(msg)
+			popUp.FilterValue = popUp.FilterInput.Value()
+			popUp.CurrentGitTrackedFilesPathList.SetFilterText(popUp.FilterValue)
+			return m, cmd
+		}
 	}
 	return m, nil
 }
@@ -186,6 +208,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 
 	case "A":
 		return handleNonTypingAKeyBindingInteraction(m)
+
+	case "b":
+		return handleNonTypingbKeyBindingInteraction(m)
 
 	case "c":
 		return handleNonTypingcKeyBindingInteraction(m)

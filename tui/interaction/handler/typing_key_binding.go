@@ -10,6 +10,7 @@ import (
 	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
+	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
@@ -36,6 +37,18 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		services.GitAmendCommitCancelService(m)
 	case constant.AddRemotePromptPopUp:
 		services.GitAddRemoteCancelService(m)
+	case constant.BlamePopUp:
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		if ok {
+			if popUp.ShowingBlameInfo {
+				popUp.ResetSelectedBlameFile()
+			} else {
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
+		}
 	case constant.CreateNewBranchPopUp,
 		constant.GitStashMessagePopUp,
 		constant.CreateBranchBasedOnRemotePopUp,
@@ -425,6 +438,16 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 				return m, cmd
 			}
 		}
+
+	case constant.BlamePopUp:
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		if ok {
+			selectedFilepath := popUp.CurrentGitTrackedFilesPathList.SelectedItem()
+			parsedFilePath := selectedFilepath.(blamePopUp.CurrentGitTrackedFilesPathItem).FilePath
+			popUp.ShowBlameInfoView(parsedFilePath)
+			services.GetFileGitBlameInfoService(m, parsedFilePath)
+			return m, nil
+		}
 	}
 	return m, nil
 }
@@ -615,4 +638,80 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 	}
 
 	return m, nil
+}
+
+func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.BlamePopUp:
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			if ok {
+				if !popUp.ShowingBlameInfo {
+					popUp.CurrentGitTrackedFilesPathList.CursorUp()
+				} else {
+					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+				}
+			}
+		}
+	}
+
+	return m, cmd
+}
+
+func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.BlamePopUp:
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			if ok {
+				if !popUp.ShowingBlameInfo {
+					popUp.CurrentGitTrackedFilesPathList.CursorDown()
+				} else {
+					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+				}
+			}
+		}
+	}
+
+	return m, cmd
+}
+
+func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.BlamePopUp:
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			if ok {
+				if !popUp.ShowingBlameInfo {
+					popUp.FilterInput, cmd = popUp.FilterInput.Update(msg)
+				} else {
+					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+				}
+			}
+		}
+	}
+
+	return m, cmd
+}
+
+func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+	if m.ShowPopUp.Load() {
+		switch m.PopUpType {
+		case constant.BlamePopUp:
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			if ok {
+				if !popUp.ShowingBlameInfo {
+					popUp.FilterInput, cmd = popUp.FilterInput.Update(msg)
+				} else {
+					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+				}
+			}
+		}
+	}
+
+	return m, cmd
 }

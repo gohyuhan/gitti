@@ -59,6 +59,7 @@ const (
 	ChooseRemoteBranchOptionPopUp                 = "ChooseRemoteBranchOptionPopUp"                 // IsTyping will be false
 	ChooseBranchOptionForMergePopUp               = "ChooseBranchOptionForMergePopUp"               // IsTyping will be false
 	BranchMergeOutputPopUp                        = "BranchMergeOutputPopUp"                        // IsTyping will be false
+	BlamePopUp                                    = "BlamePopUp"                                    // IsTyping will be true
 )
 
 const (
@@ -133,6 +134,7 @@ const (
 	MaxChooseRemoteBranchOptionPopUpWidth                 = 150
 	MaxChooseBranchOptionForMergePopUpWidth               = 150
 	MaxBranchMergeOutputPopUpWidth                        = 150
+	// BlamePopUpWidth will not be set as it will always take up 90% of width
 
 	PopUpGlobalKeyBindingViewPortHeight                       = 18
 	PopUpGitCommitOutputViewPortHeight                        = 10
@@ -170,6 +172,7 @@ const (
 	PopUpChooseBranchOptionForMergeBranchOptionHeight         = 5
 	PopUpChooseBranchOptionForMergeSelectedBranchOptionHeight = 5
 	PopUpBranchMergeOutputViewportHeight                      = 16
+	// BlamePopUpWidth will not be set as it will always take up 90% of height
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

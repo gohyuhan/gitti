@@ -73,7 +73,7 @@ func GetDownloadsDir() (string, error) {
 		dir = filepath.Join(home, "Downloads")
 	}
 
-	// Optional: ensure it exists (create if needed, or just let os.Create fail later)
+	// ensure the directory exists before returning
 	makeDirErr := os.MkdirAll(dir, 0o755)
 	if makeDirErr != nil {
 		return "", makeDirErr

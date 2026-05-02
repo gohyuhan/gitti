@@ -2,6 +2,7 @@ package popup
 
 import (
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/popup/blame"
 	"github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	"github.com/gohyuhan/gitti/tui/popup/commitlog"
@@ -134,6 +135,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = branch.RenderChooseBranchOptionForMergePopUp(m)
 	case constant.BranchMergeOutputPopUp:
 		popUp = branch.RenderBranchMergeOutputPopUp(m)
+	case constant.BlamePopUp:
+		popUp = blame.RenderBlamePopUp(m)
 	}
 	return popUp
 }

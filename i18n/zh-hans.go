@@ -85,6 +85,12 @@ var zH_HANS = LanguageMapping{
 	CurrentTerminalWidth:                "当前宽度",
 	MinimumTerminalWidth:                "最小要求宽度",
 	Loading:                             "加载中...",
+	TimeAgoSeconds:                      "%d 秒前",
+	TimeAgoMinutes:                      "%d 分钟前",
+	TimeAgoHours:                        "%d 小时前",
+	TimeAgoDays:                         "%d 天前",
+	TimeAgoMonths:                       "%d 个月前",
+	TimeAgoYears:                        "%d 年前",
 	StagedTitle:                         "已暂存的更改",
 	UnstagedTitle:                       "未暂存的更改",
 	LineEditingModeTitle:                "行编辑模式",
@@ -459,6 +465,17 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForBranchMergeOutputPopUp: []string{
 		"[esc] 取消 / 关闭",
 	},
+	KeyBindingForBlamePopUpFilePathSelection: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 查看 blame",
+		"[type <char>] 过滤文件路径",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForBlamePopUpBlameView: []string{
+		"[↑/↓] 上下移动",
+		"[←/→] 左右移动",
+		"[esc] 返回文件选择",
+	},
 	GlobalKeyBinding:                                         zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   zhHansTagComponentKeyBinding,
@@ -642,6 +659,9 @@ var zH_HANS = LanguageMapping{
 	SelectedBranchOptionForGitMergeTitle:                     "已选分支",
 	GitMergeOutputTitle:                                      "合并",
 	BranchMerging:                                            "合并中...",
+	BlameFilePathFilterPlaceholder:                           "过滤文件路径 ...",
+	GitTrackedFileTitle:                                      "已追踪文件",
+	BlameViewportTitle:                                       "Blame: %s",
 }
 
 // for about gitti
@@ -805,6 +825,11 @@ var zhHansGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "聚焦到日志面板",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "b",
+		TitleOrInfoLine: "打开 blame 弹窗",
 		LineType:        INFO,
 	},
 }
@@ -1698,6 +1723,19 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"5. 使用 `tab` / `shift+tab` 在可用分支列表和已选分支列表之间切换",
 			"6. 按 `enter` 执行合并",
 			"7. 按 `esc` 取消",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "blame",
+		InstructionLines: []string{
+			"1. 按 `b` 打开 blame 弹窗",
+			"2. 使用 `↑/↓` 在已追踪文件间导航",
+			"   - 可选：输入字符实时过滤文件路径",
+			"3. 按 `enter` 查看所选文件的 blame 信息",
+			"4. 使用 `↑/↓` 滚动 blame 输出，`←/→` 左右滚动",
+			"5. 按 `esc` 返回文件选择界面",
+			"6. 在文件选择界面再次按 `esc` 关闭弹窗",
 		},
 		LineType: INFO,
 	},

@@ -8,9 +8,12 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/logging"
 )
 
@@ -236,4 +239,34 @@ func checkIfFileExistWithinDotGitFolder(absolutePath string, fileName string) bo
 		return true // Path exists
 	}
 	return false
+}
+
+func timeAgo(unixTsString string, tz string) string {
+	ts, err := strconv.ParseInt(unixTsString, 10, 64)
+	if err != nil {
+		return "TIME PARSE ERROR"
+	}
+
+	loc, err := time.Parse("-0700", tz)
+	if err != nil {
+		return "TIME PARSE ERROR"
+	}
+
+	t := time.Unix(ts, 0).In(loc.Location())
+	duration := time.Since(t)
+
+	switch {
+	case duration < time.Minute:
+		return fmt.Sprintf(i18n.LANGUAGEMAPPING.TimeAgoSeconds, int(duration.Seconds()))
+	case duration < time.Hour:
+		return fmt.Sprintf(i18n.LANGUAGEMAPPING.TimeAgoMinutes, int(duration.Minutes()))
+	case duration < 24*time.Hour:
+		return fmt.Sprintf(i18n.LANGUAGEMAPPING.TimeAgoHours, int(duration.Hours()))
+	case duration < 30*24*time.Hour:
+		return fmt.Sprintf(i18n.LANGUAGEMAPPING.TimeAgoDays, int(duration.Hours()/24))
+	case duration < 365*24*time.Hour:
+		return fmt.Sprintf(i18n.LANGUAGEMAPPING.TimeAgoMonths, int(duration.Hours()/(24*30)))
+	default:
+		return fmt.Sprintf(i18n.LANGUAGEMAPPING.TimeAgoYears, int(duration.Hours()/(24*365)))
+	}
 }

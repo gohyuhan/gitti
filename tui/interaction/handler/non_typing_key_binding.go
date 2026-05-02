@@ -19,6 +19,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/layout"
+	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
@@ -176,6 +177,18 @@ func handleNonTypingAKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		m.GitOperations.GitCommit.ClearGitCommitOutput()
 
 		commitPopUp.InitGitAmendCommitPopUpModel(m)
+
+		m.IsTyping.Store(true)
+	}
+	return m, nil
+}
+
+func handleNonTypingbKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		m.ShowPopUp.Store(true)
+		m.PopUpType = constant.BlamePopUp
+
+		blamePopUp.InitBlamePopUpModel(m)
 
 		m.IsTyping.Store(true)
 	}

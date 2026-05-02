@@ -85,6 +85,12 @@ var eN = LanguageMapping{
 	CurrentTerminalWidth:                "Current width",
 	MinimumTerminalWidth:                "Minimum required width",
 	Loading:                             "Loading...",
+	TimeAgoSeconds:                      "%d seconds ago",
+	TimeAgoMinutes:                      "%d minutes ago",
+	TimeAgoHours:                        "%d hours ago",
+	TimeAgoDays:                         "%d days ago",
+	TimeAgoMonths:                       "%d months ago",
+	TimeAgoYears:                        "%d years ago",
 	StagedTitle:                         "Staged Changes",
 	UnstagedTitle:                       "Unstaged Changes",
 	LineEditingModeTitle:                "In Line Editing Mode",
@@ -459,6 +465,17 @@ var eN = LanguageMapping{
 	KeyBindingForBranchMergeOutputPopUp: []string{
 		"[esc] cancel / close",
 	},
+	KeyBindingForBlamePopUpFilePathSelection: []string{
+		"[↑/↓] move up and down",
+		"[enter] view blame",
+		"[type <char>] file path filter",
+		"[esc] cancel / close",
+	},
+	KeyBindingForBlamePopUpBlameView: []string{
+		"[↑/↓] move up and down",
+		"[←/→] move left and right",
+		"[esc] back to file selection",
+	},
 	GlobalKeyBinding:                                         enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   enTagComponentKeyBinding,
@@ -642,6 +659,9 @@ var eN = LanguageMapping{
 	SelectedBranchOptionForGitMergeTitle:                     "Selected branch(es)",
 	GitMergeOutputTitle:                                      "Merge",
 	BranchMerging:                                            "Merging...",
+	BlameFilePathFilterPlaceholder:                           "filter file path ...",
+	GitTrackedFileTitle:                                      "Git Tracked Files",
+	BlameViewportTitle:                                       "Blame: %s",
 }
 
 // for about gitti
@@ -804,6 +824,11 @@ var enGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "focus on the log panel",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "b",
+		TitleOrInfoLine: "open blame popup",
 		LineType:        INFO,
 	},
 }
@@ -1697,6 +1722,19 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"5. Use `tab` / `shift+tab` to switch between the available and selected branch lists",
 			"6. Press `enter` to execute the merge",
 			"7. Press `esc` to cancel",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "blame",
+		InstructionLines: []string{
+			"1. Press `b` to open the blame popup",
+			"2. Use `↑/↓` to navigate tracked files",
+			"   - Optionally, type to live-filter file paths",
+			"3. Press `enter` to view blame for the selected file",
+			"4. Use `↑/↓` to scroll blame output, `←/→` to scroll left and right",
+			"5. Press `esc` to return to file selection",
+			"6. Press `esc` again on file selection to close the popup",
 		},
 		LineType: INFO,
 	},

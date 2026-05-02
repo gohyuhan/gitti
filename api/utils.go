@@ -98,6 +98,7 @@ func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogg
 		GitRefLog:              git.InitGitRefLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxRefLogCount, gittiLogging),
 		GitTag:                 git.InitGitTag(updateChannel, gitProcessLock, gittiLogging),
 		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock, gittiLogging),
+		GitBlame:               git.InitGitBlame(updateChannel, gitProcessLock, gittiLogging),
 	}
 }
 

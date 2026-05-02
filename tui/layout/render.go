@@ -10,6 +10,7 @@ import (
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/constant"
+	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	"github.com/gohyuhan/gitti/tui/style"
@@ -444,6 +445,15 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseBranchOptionForMergePopUp
 		case constant.BranchMergeOutputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForBranchMergeOutputPopUp
+		case constant.BlamePopUp:
+			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+			if ok {
+				if !popUp.ShowingBlameInfo {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingForBlamePopUpFilePathSelection
+				} else {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingForBlamePopUpBlameView
+				}
+			}
 		}
 	} else {
 		//-----------------------------

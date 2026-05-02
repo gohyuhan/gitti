@@ -85,6 +85,12 @@ var jA = LanguageMapping{
 	CurrentTerminalWidth:                "現在の幅",
 	MinimumTerminalWidth:                "必要な最小の幅",
 	Loading:                             "読み込み中...",
+	TimeAgoSeconds:                      "%d 秒前",
+	TimeAgoMinutes:                      "%d 分前",
+	TimeAgoHours:                        "%d 時間前",
+	TimeAgoDays:                         "%d 日前",
+	TimeAgoMonths:                       "%d か月前",
+	TimeAgoYears:                        "%d 年前",
 	StagedTitle:                         "ステージされた変更",
 	UnstagedTitle:                       "ステージされていない変更",
 	LineEditingModeTitle:                "行編集モード",
@@ -459,6 +465,17 @@ var jA = LanguageMapping{
 	KeyBindingForBranchMergeOutputPopUp: []string{
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForBlamePopUpFilePathSelection: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] blame を表示",
+		"[type <char>] ファイルパスを絞り込み",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForBlamePopUpBlameView: []string{
+		"[↑/↓] 上下に移動",
+		"[←/→] 左右に移動",
+		"[esc] ファイル選択に戻る",
+	},
 	GlobalKeyBinding:                                         jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                           jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                   jaTagComponentKeyBinding,
@@ -642,6 +659,9 @@ var jA = LanguageMapping{
 	SelectedBranchOptionForGitMergeTitle:                     "選択されたブランチ",
 	GitMergeOutputTitle:                                      "マージ",
 	BranchMerging:                                            "マージ中...",
+	BlameFilePathFilterPlaceholder:                           "ファイルパスをフィルタ ...",
+	GitTrackedFileTitle:                                      "追跡ファイル一覧",
+	BlameViewportTitle:                                       "Blame: %s",
 }
 
 // for about gitti
@@ -806,6 +826,11 @@ var jaGlobalKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "/",
 		TitleOrInfoLine: "ログパネルにフォーカス",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "b",
+		TitleOrInfoLine: "blame ポップアップを開く",
 		LineType:        INFO,
 	},
 }
@@ -1699,6 +1724,19 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"5. `tab` / `shift+tab` を使用して利用可能なブランチリストと選択済みブランチリストを切り替える",
 			"6. `enter` を押してマージを実行",
 			"7. `esc` を押してキャンセル",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "blame",
+		InstructionLines: []string{
+			"1. `b` を押して blame ポップアップを開く",
+			"2. `↑/↓` を使用して追跡ファイルを移動",
+			"   - 任意: 文字を入力してファイルパスをリアルタイムフィルタ",
+			"3. `enter` を押して選択したファイルの blame を表示",
+			"4. `↑/↓` で blame 出力をスクロール、`←/→` で左右にスクロール",
+			"5. `esc` を押してファイル選択画面に戻る",
+			"6. ファイル選択画面で再度 `esc` を押してポップアップを閉じる",
 		},
 		LineType: INFO,
 	},

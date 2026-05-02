@@ -3,6 +3,7 @@ package handler
 import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/tui/constant"
+	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
@@ -516,6 +517,12 @@ func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types
 		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
 		if ok {
 			popUp.BranchMergeOutputViewport, cmd = popUp.BranchMergeOutputViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.BlamePopUp:
+		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
+		if ok && popUp.ShowingBlameInfo {
+			popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
 			return m, cmd
 		}
 	}
