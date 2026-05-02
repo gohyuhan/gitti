@@ -20,13 +20,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle up/down key messages for pop-up navigation and scrolling.
 //	Responsibility: Routes vertical navigation events (Up/k, Down/j) to the currently
 //	active popup's internal lists or text viewports, ensuring the correct popup state is updated.
 //
-// ----------------------------------
+// ------------------------------------
 func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// for within pop up component
@@ -453,13 +453,13 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle mouse wheel up/down messages for pop-up scrolling.
 //	Responsibility: Routes vertical mouse scroll events to the appropriate internal list
 //	or viewport of the currently active popup, matching keyboard navigation behavior.
 //
-// ----------------------------------
+// ------------------------------------
 func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// for pop up that have viewport

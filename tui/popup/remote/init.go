@@ -11,11 +11,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the popup model for prompting user to add remote origin
 //
-// ----------------------------------
+// ------------------------------------
 func InitAddRemotePromptPopUpModel(m *types.GittiModel, noInitialRemote bool) {
 	RemoteNameTextInput := textinput.New()
 	if noInitialRemote {
@@ -53,11 +53,11 @@ func InitAddRemotePromptPopUpModel(m *types.GittiModel, noInitialRemote bool) {
 	m.PopUpModel = popUpModel
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the popup model to choose remote
 //
-// ----------------------------------
+// ------------------------------------
 func InitChooseRemotePopUpModel(m *types.GittiModel, remoteList []git.GitRemoteInfo, action string) {
 	items := make([]list.Item, 0, len(remoteList))
 	for _, remote := range remoteList {
@@ -93,11 +93,11 @@ func InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m *types.GittiModel, nam
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the popup model for prompting user to edit remote name or url
 //
-// ----------------------------------
+// ------------------------------------
 func InitEditRemotePromptPopUpModel(m *types.GittiModel, oldRemoteName string, oldRemoteUrl string) {
 	RemoteNameTextInput := textinput.New()
 	RemoteNameTextInput.Placeholder = i18n.LANGUAGEMAPPING.EditRemotePopUpRemoteNamePlaceHolder

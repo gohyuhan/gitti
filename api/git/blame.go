@@ -36,11 +36,11 @@ type LineBlameInfo struct {
 	ConsolidatedBlameInfo string // this is the blame info for display (not inclluding the code line)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git blame handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitBlame(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitBlame {
 	gitBlame := GitBlame{
 		gitProcessLock: gitProcessLock,
@@ -50,11 +50,11 @@ func InitGitBlame(updateChannel chan string, gitProcessLock *GitProcessLock, log
 	return &gitBlame
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return all files currently tracked by git in the repo via `git ls-files`
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBlame) GetCurrentGitTrackedFiles() []string {
 	gitArgs := []string{"ls-files", "--cached", "--others", "--exclude-standard"}
 	getCurrentGitTrackedFilesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -70,11 +70,11 @@ func (gb *GitBlame) GetCurrentGitTrackedFiles() []string {
 	return parsedOutput
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Parse `git blame --line-porcelain` output for the given file and return per-line blame info
 //
-// ----------------------------------
+// ------------------------------------
 func (gb *GitBlame) GetFileGitBlameInfo(filePath string) (int, int, []LineBlameInfo) {
 	var lineBlameInfo []LineBlameInfo
 	largestConsolidatedBlameInfoLineLength := 0 // this is the length for the consolidated blame info (commit hash [first 7 chars] + time ago + committer)
@@ -143,10 +143,20 @@ func (gb *GitBlame) GetFileGitBlameInfo(filePath string) (int, int, []LineBlameI
 	return largestConsolidatedBlameInfoLineLength, largestLineLength, lineBlameInfo
 }
 
+// ------------------------------------
+//
+//	Sanitize blame line
+//
+// ------------------------------------
 func sanitizeBlameLine(s string) string {
 	return ansi.Strip(s)
 }
 
+// ------------------------------------
+//
+//	Normalize blame code line
+//
+// ------------------------------------
 func normalizeBlameCodeLine(s string) string {
 	return strings.ReplaceAll(sanitizeBlameLine(s), "\t", "")
 }

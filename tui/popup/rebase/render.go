@@ -42,11 +42,11 @@ func RenderGitRebaseBranchInputPopUp(m *types.GittiModel) string {
 	return ""
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for git rebase output
 //
-// ----------------------------------
+// ------------------------------------
 func RenderGitRebaseOutputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRebaseOutputPopUpModel)
 	if ok {

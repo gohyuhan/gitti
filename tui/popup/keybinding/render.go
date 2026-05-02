@@ -41,6 +41,11 @@ func RenderKeyBindingAndFeatureInstructionsPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render global key binding part
+//
+// ------------------------------------
 func renderGlobalKeyBindingPart(m *types.GittiModel, contentLine *strings.Builder) {
 	// this will usually only be run once for the entire gitti session
 	// to determine the largest keybinding line so that everything is render nicely
@@ -90,6 +95,11 @@ func renderGlobalKeyBindingPart(m *types.GittiModel, contentLine *strings.Builde
 	contentLine.WriteRune('\n')
 }
 
+// ------------------------------------
+//
+//	Render selected component key binding part
+//
+// ------------------------------------
 func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *strings.Builder) {
 	// this will usually only be run once for the entire gitti session
 	// to determine the largest keybinding line so that everything is render nicely
@@ -180,6 +190,11 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 	contentLine.WriteRune('\n')
 }
 
+// ------------------------------------
+//
+//	Render features instuctions and steps part
+//
+// ------------------------------------
 func renderFeaturesInstuctionsAndStepsPart(contentLine *strings.Builder) {
 	for index := range i18n.LANGUAGEMAPPING.FeatureInstructions {
 		featureInstruction := i18n.LANGUAGEMAPPING.FeatureInstructions[index]

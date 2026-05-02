@@ -14,11 +14,11 @@ import (
 //	For Git Pull
 //
 // ------------------------------------
-// ----------------------------------
+// ------------------------------------
 //
 //	choose git pull option
 //
-// ----------------------------------
+// ------------------------------------
 func RenderChooseGitPullTypePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseGitPullTypePopUpModel)
 	if ok {
@@ -35,11 +35,11 @@ func RenderChooseGitPullTypePopUp(m *types.GittiModel) string {
 	return ""
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for git pull output
 //
-// ----------------------------------
+// ------------------------------------
 func RenderGitPullOutputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
 	if ok {

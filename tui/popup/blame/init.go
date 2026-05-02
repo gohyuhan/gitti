@@ -10,11 +10,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the blame popup model with file list, filter input, and viewport
 //
-// ----------------------------------
+// ------------------------------------
 func InitBlamePopUpModel(m *types.GittiModel) {
 	width := int(float64(m.Width)*0.9) - 4
 	height := int(float64(m.Height) * 0.9)

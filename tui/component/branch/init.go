@@ -9,11 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the list component for Branch Component
 //
-// ----------------------------------
+// ------------------------------------
 func InitBranchList(m *types.GittiModel) {
 	currentCheckOut := m.GitOperations.GitBranch.CurrentCheckOut()
 	latestBranchArray := []list.Item{

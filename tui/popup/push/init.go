@@ -12,11 +12,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the popup model for push output log
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitRemotePushPopUpModel(m *types.GittiModel) {
 	// for git push output viewport,
 	vp := viewport.New()
@@ -41,11 +41,11 @@ func InitGitRemotePushPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the popup model for choosing push type
 //
-// ----------------------------------
+// ------------------------------------
 func InitChoosePushTypePopUpModel(m *types.GittiModel, remoteName string) {
 	pushTypeOption := []GitPushOptionItem{
 		{

@@ -9,12 +9,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the list component for Modified Files Component
 //	return bool was to tell if we need to reinit the detail component panel or not
 //
-// ----------------------------------
+// ------------------------------------
 func InitModifiedFilesList(m *types.GittiModel) bool {
 	latestModifiedFilesArray := m.GitOperations.GitFiles.FilesStatus()
 	items := make([]list.Item, 0, len(latestModifiedFilesArray))

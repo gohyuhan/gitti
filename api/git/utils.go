@@ -17,11 +17,11 @@ import (
 	"github.com/gohyuhan/gitti/logging"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Parse raw git command output bytes into a clean string array, filtering out empty results
 //
-// ----------------------------------
+// ------------------------------------
 func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {
 	var cleanedStringArray []string
 	cleanedStringArray = strings.Split(strings.TrimSpace(string(dirtyGitOutput)), "\n")
@@ -33,12 +33,12 @@ func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {
 	return cleanedStringArray
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Custom bufio split function that splits on both carriage return and newline,
 //	preserving \r in the token while stripping \n for proper git progress stream handling
 //
-// ----------------------------------
+// ------------------------------------
 func splitOnCarriageReturnOrNewline(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF && len(data) == 0 {
 		return 0, nil, nil
@@ -61,11 +61,11 @@ func splitOnCarriageReturnOrNewline(data []byte, atEOF bool) (advance int, token
 	return 0, nil, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Process streaming git output, handling CR-based line replacements for progress displays
 //
-// ----------------------------------
+// ------------------------------------
 func handleProgressOutputStream(cursorIndex int, scanner *bufio.Scanner, outputArray []string) (int, []string) {
 	// line counter was to determine when a line end with \r,
 	// we should replace the latest line in the array or append because this is a new line
@@ -90,11 +90,11 @@ func handleProgressOutputStream(cursorIndex int, scanner *bufio.Scanner, outputA
 	return cursorIndex, outputArray
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	check if the format for git remote is correct and valid
 //
-// ----------------------------------
+// ------------------------------------
 func isValidGitRemoteURL(remote string) bool {
 	// Check HTTPS style
 	if strings.HasPrefix(remote, "https://") || strings.HasPrefix(remote, "http://") {
@@ -108,11 +108,11 @@ func isValidGitRemoteURL(remote string) bool {
 	return matched
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Init
 //
-// ----------------------------------
+// ------------------------------------
 func GitInit(repoPath string, initBranchName string) {
 	initGitArgs := []string{"init"}
 
@@ -134,11 +134,11 @@ func GitInit(repoPath string, initBranchName string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git check upstream existence
 //
-// ----------------------------------
+// ------------------------------------
 func hasUpStream() (string, bool) {
 	gitArgs := []string{"rev-parse", "--abbrev-ref", "@{u}"}
 
@@ -151,11 +151,11 @@ func hasUpStream() (string, bool) {
 	return strings.TrimSpace(string(checkUpStreamOutput)), true
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to return upstream with relevant icon
 //
-// ----------------------------------
+// ------------------------------------
 func hasUpstreamWithIcon() (string, string, bool) {
 	remoteIcon := "\ue702"
 	upStream, upStreamExist := hasUpStream()
@@ -188,11 +188,11 @@ func hasUpstreamWithIcon() (string, string, bool) {
 	return remoteIcon, upStream, upStreamExist
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	check if a file is in a conflict state
 //
-// ----------------------------------
+// ------------------------------------
 func isFilesInConflictState(indexState string, workTree string) bool {
 	combinedState := indexState + workTree
 	if combinedState == "UU" ||
@@ -207,11 +207,11 @@ func isFilesInConflictState(indexState string, workTree string) bool {
 	return false
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Fetch
 //
-// ----------------------------------
+// ------------------------------------
 func gitFetch(gittiLogger *logging.GittiLogging, userTriggered bool) {
 	gitArgs := []string{"fetch", "--prune"}
 	if userTriggered {
@@ -225,12 +225,12 @@ func gitFetch(gittiLogger *logging.GittiLogging, userTriggered bool) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	checkIfFileExistWithinDotGitFolder verifies if a specific file (e.g., MERGE_HEAD) exists in the .git directory.
 //	This is useful for determining the current state of the repository (e.g., merging, rebasing).
 //
-// ----------------------------------
+// ------------------------------------
 func checkIfFileExistWithinDotGitFolder(absolutePath string, fileName string) bool {
 	// Join the provided absolute path with the path returned by git to check existence.
 	filePath := filepath.Join(absolutePath, fileName)
@@ -241,6 +241,11 @@ func checkIfFileExistWithinDotGitFolder(absolutePath string, fileName string) bo
 	return false
 }
 
+// ------------------------------------
+//
+//	Time ago
+//
+// ------------------------------------
 func timeAgo(unixTsString string, tz string) string {
 	ts, err := strconv.ParseInt(unixTsString, 10, 64)
 	if err != nil {

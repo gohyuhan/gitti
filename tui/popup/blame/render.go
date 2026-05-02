@@ -9,11 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the blame popup: file-selection list with filter input, or blame viewport for chosen file
 //
-// ----------------------------------
+// ------------------------------------
 func RenderBlamePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*BlamePoUpModel)
 	if ok {

@@ -12,17 +12,22 @@ type CmdExecutor struct {
 
 var GittiCmdExecutor *CmdExecutor
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the global command executor with the given repo path
 //
-// ----------------------------------
+// ------------------------------------
 func InitCmdExecutor(repoPath string) {
 	GittiCmdExecutor = &CmdExecutor{
 		repoPath: repoPath,
 	}
 }
 
+// ------------------------------------
+//
+//	Execute a git command with the given arguments
+//
+// ------------------------------------
 func (c *CmdExecutor) RunGitCmd(gitArgs []string, colorized bool) *exec.Cmd {
 	if colorized {
 		gitArgs = append([]string{"-c", "color.ui=always"}, gitArgs...)
@@ -41,12 +46,11 @@ func (c *CmdExecutor) RunGitCmd(gitArgs []string, colorized bool) *exec.Cmd {
 	return cmd
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	RunGitCmdWithContext creates a git command that respects context cancellation.
-//	When the context is cancelled, the command will be terminated automatically.
+//	Create a git command that respects context cancellation and terminates automatically
 //
-// ----------------------------------
+// ------------------------------------
 func (c *CmdExecutor) RunGitCmdWithContext(ctx context.Context, gitArgs []string, colorized bool) *exec.Cmd {
 	if colorized {
 		gitArgs = append([]string{"-c", "color.ui=always"}, gitArgs...)
@@ -66,11 +70,11 @@ func (c *CmdExecutor) RunGitCmdWithContext(ctx context.Context, gitArgs []string
 	return cmd
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Update the working directory for all subsequent command executions
 //
-// ----------------------------------
+// ------------------------------------
 func (c *CmdExecutor) UpdateRepoPath(updatedRepoPath string) {
 	c.repoPath = updatedRepoPath
 }

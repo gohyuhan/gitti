@@ -22,13 +22,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle ESC key interaction during typing state.
 //	Responsibility: Acts as a primary cancellation mechanism when the user is in an input field.
 //	It clears input models, resets state flags, and dismisses active popups without saving.
 //
-// ----------------------------------
+// ------------------------------------
 func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
@@ -63,13 +63,13 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle Tab key interaction during typing state.
 //	Responsibility: Facilitates forward navigation between multiple input fields
 //	within complex popups (like commit creation or cherry-pick editing).
 //
-// ----------------------------------
+// ------------------------------------
 func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
@@ -141,13 +141,13 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle Shift+Tab key interaction during typing state.
 //	Responsibility: Facilitates backward navigation between multiple input fields
 //	within complex popups (like commit creation or cherry-pick editing).
 //
-// ----------------------------------
+// ------------------------------------
 func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
@@ -220,13 +220,13 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle Ctrl+e key interaction during typing state.
 //	Responsibility: Acts as an explicit submission/confirmation trigger for multi-line
 //	or complex inputs (e.g., executing a commit from the commit popup).
 //
-// ----------------------------------
+// ------------------------------------
 func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.CommitPopUp:
@@ -284,14 +284,14 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle Enter key interaction during typing state.
 //	Responsibility: Context-dependent behavior for text input.
 //	- Single-line inputs (e.g., prompts): Submits the input and triggers the associated action.
 //	- Multi-line inputs (e.g., commit message body): Inserts a newline character into the text area.
 //
-// ----------------------------------
+// ------------------------------------
 func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPressMsg) (*types.GittiModel, tea.Cmd) {
 	switch m.PopUpType {
 	case constant.AddRemotePromptPopUp:
@@ -452,13 +452,13 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle Ctrl+p key interaction during typing state.
 //	Responsibility: Reads text from the system clipboard and inserts it at the cursor
 //	position within the currently focused input field or text area.
 //
-// ----------------------------------
+// ------------------------------------
 func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	content, err := clipboard.ReadAll()
 	if err != nil {
@@ -560,13 +560,13 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle Ctrl+y key interaction during typing state.
 //	Responsibility: Copies the entire content of the currently focused input field
 //	or text area into the system clipboard.
 //
-// ----------------------------------
+// ------------------------------------
 func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var content string
 	switch m.PopUpType {
@@ -640,6 +640,11 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 	return m, nil
 }
 
+// ------------------------------------
+//
+//	Handle typing up key binding interaction
+//
+// ------------------------------------
 func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {
@@ -659,6 +664,11 @@ func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMode
 	return m, cmd
 }
 
+// ------------------------------------
+//
+//	Handle typing down key binding interaction
+//
+// ------------------------------------
 func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {
@@ -678,6 +688,11 @@ func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 	return m, cmd
 }
 
+// ------------------------------------
+//
+//	Handle typing left key binding interaction
+//
+// ------------------------------------
 func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {
@@ -697,6 +712,11 @@ func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 	return m, cmd
 }
 
+// ------------------------------------
+//
+//	Handle typing right key binding interaction
+//
+// ------------------------------------
 func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {

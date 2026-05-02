@@ -15,11 +15,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
 //
-// ----------------------------------
+// ------------------------------------
 func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
@@ -181,11 +181,11 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 	return m, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle non-typing key binding interactions, dispatching to specific key handlers
 //
-// ----------------------------------
+// ------------------------------------
 func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "?":

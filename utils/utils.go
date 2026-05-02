@@ -9,7 +9,11 @@ import (
 
 // universal utils that can be used by any package
 
-// Contains is a generic helper function to check for the existence of an item in a slice.
+// ------------------------------------
+//
+//	Check for the existence of an item in a slice
+//
+// ------------------------------------
 func Contains[T comparable](slice []T, item T) bool {
 	for _, v := range slice {
 		if v == item {
@@ -19,11 +23,11 @@ func Contains[T comparable](slice []T, item T) bool {
 	return false
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Open a URL in the system's default browser in a non-blocking goroutine
 //
-// ----------------------------------
+// ------------------------------------
 func OpenBrowser(url string) {
 	go func() {
 		var cmdExecutor *exec.Cmd
@@ -44,11 +48,11 @@ func OpenBrowser(url string) {
 	}()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return the platform-specific Downloads directory path, creating it if needed
 //
-// ----------------------------------
+// ------------------------------------
 func GetDownloadsDir() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {

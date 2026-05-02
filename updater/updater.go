@@ -25,11 +25,11 @@ import (
 
 const GittiRepoURL = "https://api.github.com/repos/gohyuhan/gitti/releases/latest"
 
-// ----------------------------------
+// ------------------------------------
 //
-//	CheckForUpdates checks if a new version is available
+//	Check if a new version is available on GitHub
 //
-// ----------------------------------
+// ------------------------------------
 func CheckForUpdates() (string, bool, error) {
 	// Use GitHub API to fetch the latest release information
 	client := &http.Client{Timeout: 10 * time.Second}
@@ -69,11 +69,11 @@ func CheckForUpdates() (string, bool, error) {
 	return latestVersion, isNewer, nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	compareVersions compares two version strings to determine if the latest is newer
+//	Compare two version strings to determine if latest is newer
 //
-// ----------------------------------
+// ------------------------------------
 func compareVersions(current, latest string) bool {
 	// Add 'v' prefix if missing (common for GitHub tags)
 	if !strings.HasPrefix(current, "v") {
@@ -91,11 +91,11 @@ func compareVersions(current, latest string) bool {
 	return semver.Compare(latest, current) > 0 // true if latest > current
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	ShouldCheckForUpdate determines if an update check is due based on last fetch time
+//	Determine if an update check is due based on last fetch time
 //
-// ----------------------------------
+// ------------------------------------
 func ShouldCheckForUpdate() bool {
 	lastFetchTime := LoadLastFetchTime()
 
@@ -103,29 +103,29 @@ func ShouldCheckForUpdate() bool {
 	return lastFetchTime.Before(sevenDaysAgo) || lastFetchTime.IsZero()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	LoadUpdateInfo reads the last fetch time from the settings file
+//	Read the last fetch time from the settings file
 //
-// ----------------------------------
+// ------------------------------------
 func LoadLastFetchTime() time.Time {
 	return settings.GITTICONFIGSETTINGS.LastUpdateCheckTime
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	SaveUpdateInfo saves the current time as the last fetch time
+//	Save the current time as the last fetch time
 //
-// ----------------------------------
+// ------------------------------------
 func SaveUpdateInfo() {
 	settings.UpdateLastFetchTime()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	PromptUserForUpdate prompts the user to download the latest version
+//	Prompt the user to download the latest version
 //
-// ----------------------------------
+// ------------------------------------
 func PromptUserForUpdate(latestVersion string) bool {
 	fmt.Printf(i18n.LANGUAGEMAPPING.UpdaterDownloadPrompt, latestVersion)
 	var response string
@@ -133,11 +133,11 @@ func PromptUserForUpdate(latestVersion string) bool {
 	return response == "y" || response == "Y"
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	Update handles the download and replacement of the current TUI application with the latest version
+//	Download and install the latest version of gitti
 //
-// ----------------------------------
+// ------------------------------------
 func Update() {
 	// Fetch the latest version information
 	latestVersion, isNewer, err := CheckForUpdates()
@@ -189,11 +189,11 @@ func Update() {
 	os.Exit(0)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	getBinaryURL constructs the URL for the binary based on OS, architecture, and version
+//	Construct the URL for the binary based on OS, architecture, and version
 //
-// ----------------------------------
+// ------------------------------------
 func getBinaryURL(osName, arch, version string) string {
 	// Map of OS and architecture to binary suffix
 	binarySuffixes := map[string]map[string]string{
@@ -220,11 +220,11 @@ func getBinaryURL(osName, arch, version string) string {
 	return ""
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	downloadBinary downloads the binary from the specified URL to a temporary file
+//	Download the binary from the specified URL to a temporary file
 //
-// ----------------------------------
+// ------------------------------------
 func downloadBinary(url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -250,11 +250,11 @@ func downloadBinary(url string) (string, error) {
 	return tempFile.Name(), nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	replaceBinary replaces the current executable with the downloaded binary
+//	Replace the current executable with the downloaded binary
 //
-// ----------------------------------
+// ------------------------------------
 func replaceBinary(tempFile string) error {
 	// Get the path of the current executable
 	execPath, err := os.Executable()
@@ -271,11 +271,11 @@ func replaceBinary(tempFile string) error {
 	return replaceBinaryUnix(tempFile, execPath)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
-//	replaceBinaryWindows handles binary replacement on Windows
+//	Handle binary replacement on Windows
 //
-// ----------------------------------
+// ------------------------------------
 func replaceBinaryWindows(tempFile, execPath string) error {
 	// On Windows, we can't replace a running executable, so rename the old one and move the new one
 	backupPath := execPath + ".old"
@@ -293,11 +293,11 @@ func replaceBinaryWindows(tempFile, execPath string) error {
 	return nil
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	replaceBinaryUnix handles binary replacement on Unix-like systems with automatic sudo fallback
 //
-// ----------------------------------
+// ------------------------------------
 func replaceBinaryUnix(tempFile, execPath string) error {
 	// First, try to replace the binary directly (works for user-owned binaries)
 	err := os.Rename(tempFile, execPath)
@@ -315,11 +315,11 @@ func replaceBinaryUnix(tempFile, execPath string) error {
 	return err
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	replaceBinaryWithSudo uses sudo to replace the binary when permission is denied
 //
-// ----------------------------------
+// ------------------------------------
 func replaceBinaryWithSudo(tempFile, execPath string) error {
 	// Import needed for running commands
 	// Note: We're using os/exec which needs to be imported at the top
@@ -359,11 +359,11 @@ func replaceBinaryWithSudo(tempFile, execPath string) error {
 	return runCommand("sh", "-c", cmd)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	runCommand executes a command and waits for it to complete
 //
-// ----------------------------------
+// ------------------------------------
 func runCommand(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	cmd.Stdin = os.Stdin
@@ -372,11 +372,11 @@ func runCommand(name string, args ...string) error {
 	return cmd.Run()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	extractBinary extracts the binary from the archive based on the URL extension
 //
-// ----------------------------------
+// ------------------------------------
 func extractBinary(archivePath, url string) (string, error) {
 	if strings.HasSuffix(url, ".zip") {
 		return extractZip(archivePath)
@@ -386,11 +386,11 @@ func extractBinary(archivePath, url string) (string, error) {
 	return "", fmt.Errorf("unsupported archive format")
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	extractZip extracts the binary from a zip archive
 //
-// ----------------------------------
+// ------------------------------------
 func extractZip(archivePath string) (string, error) {
 	r, err := zip.OpenReader(archivePath)
 	if err != nil {
@@ -411,11 +411,11 @@ func extractZip(archivePath string) (string, error) {
 	return "", fmt.Errorf("binary not found in archive")
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	extractTarGz extracts the binary from a tar.gz archive
 //
-// ----------------------------------
+// ------------------------------------
 func extractTarGz(archivePath string) (string, error) {
 	f, err := os.Open(archivePath)
 	if err != nil {
@@ -447,21 +447,21 @@ func extractTarGz(archivePath string) (string, error) {
 	return "", fmt.Errorf("binary not found in archive")
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	isBinaryFile checks if the file name matches the expected binary name
 //
-// ----------------------------------
+// ------------------------------------
 func isBinaryFile(name string) bool {
 	base := filepath.Base(name)
 	return base == "gitti" || base == "gitti.exe"
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	saveTempBinary saves the content from the reader to a temporary file
 //
-// ----------------------------------
+// ------------------------------------
 func saveTempBinary(r io.Reader) (string, error) {
 	tempFile, err := os.CreateTemp("", "gitti-binary-*.tmp")
 	if err != nil {

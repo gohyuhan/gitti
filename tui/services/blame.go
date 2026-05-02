@@ -11,6 +11,11 @@ import (
 
 const InfoLineSeparator = "  |  "
 
+// ------------------------------------
+//
+//	Populate blame info for a file and display in blame popup viewport
+//
+// ------------------------------------
 func GetFileGitBlameInfoService(m *types.GittiModel, filePath string) {
 	largestBlameInfoLineLength, largestLineLength, lineBlameInfoArray := m.GitOperations.GitBlame.GetFileGitBlameInfo(filePath)
 

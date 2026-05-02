@@ -36,11 +36,11 @@ type RemoteSyncStatus struct {
 	Remote string
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git remote handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitRemote {
 	gitRemote := GitRemote{
 		updateChannel:                 updateChannel,
@@ -56,65 +56,65 @@ func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock, lo
 	return &gitRemote
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return remote
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) Remote() []GitRemoteInfo {
 	return gr.remote
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return fetch related remote only
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) FetchRemote() []GitRemoteInfo {
 	return gr.fetchRemote
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return push related remote only
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) PushRemote() []GitRemoteInfo {
 	return gr.pushRemote
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return remote sync status
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) RemoteSyncStatus() RemoteSyncStatus {
 	return gr.remoteSyncStatus
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return current upstream icon
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) UpStreamRemoteIcon() string {
 	return gr.upStreamRemoteIcon
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return current branch upstream
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) CurrentBranchUpStream() string {
 	return gr.currentBranchUpStream
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to add Remote
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url string) ([]string, int) {
 	if !gr.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gr.gitProcessLock.OtherProcessRunningWarning()}, -1
@@ -152,11 +152,11 @@ func (gr *GitRemote) GitAddRemote(ctx context.Context, originName string, url st
 	return gitAddRemoteOutput, 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to delete Remote
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) GitRemoveRemote(remoteName string) {
 	if !gr.gitProcessLock.CanProceedWithGitOps() {
 		gr.logging.RegisterNewLog(logging.REMOVE_REMOTE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
@@ -176,13 +176,13 @@ func (gr *GitRemote) GitRemoveRemote(remoteName string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //		Related to set remote as tracking upStream for current branch
 //	   * currently we always assume the local branch and remote branch will be the same identical name
 //	     so it will be something like git branch --set-upstream-to=origin/<main> <main>
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) GitSetRemoteAsTrackingUpstream(remoteName string, branchName string) {
 	if !gr.gitProcessLock.CanProceedWithGitOps() {
 		gr.logging.RegisterNewLog(logging.SET_REMOTE_AS_TRACKING_UPSTREAM_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
@@ -203,11 +203,11 @@ func (gr *GitRemote) GitSetRemoteAsTrackingUpstream(remoteName string, branchNam
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to change remote name
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) GitChangeRemoteName(oldRemoteName string, newRemoteName string) {
 	if !gr.gitProcessLock.CanProceedWithGitOps() {
 		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_NAME_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
@@ -227,11 +227,11 @@ func (gr *GitRemote) GitChangeRemoteName(oldRemoteName string, newRemoteName str
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to change remote url
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) GitChangeRemoteUrl(remoteName string, newRemoteUrl string) {
 	if !gr.gitProcessLock.CanProceedWithGitOps() {
 		gr.logging.RegisterNewLog(logging.CHANGE_REMOTE_URL_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gr.gitProcessLock.OtherProcessRunningWarning()), false)
@@ -260,14 +260,14 @@ func (gr *GitRemote) GitChangeRemoteUrl(remoteName string, newRemoteUrl string) 
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	CheckRemoteExist checks for existing remotes by running 'git remote -v'.
 //	It parses the output to identify unique remote name-URL combinations and
 //	determines if they are intended for fetching, pushing, or both.
 //	It populates the gr.remote, gr.fetchRemote, and gr.pushRemote slices accordingly.
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 	gitArgs := []string{"remote", "-v"}
 	cmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -334,11 +334,11 @@ func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 	return len(gr.remote) > 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Related to Git Remote sync status and upstream, will be call by system
 //
-// ----------------------------------
+// ------------------------------------
 func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool, userTriggered bool) {
 	upstreamIcon, upstream, _ := hasUpstreamWithIcon()
 	gr.upStreamRemoteIcon = upstreamIcon
