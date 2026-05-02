@@ -24,11 +24,11 @@ type BlamePoUpModel struct {
 	SelectedFilePath               string
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Reset the popup back to file-selection state, clearing any chosen file and blame view
 //
-// ----------------------------------
+// ------------------------------------
 func (bPM *BlamePoUpModel) ResetSelectedBlameFile() {
 	bPM.ShowingBlameInfo = false
 	bPM.HasFilePathChosen = false
@@ -36,6 +36,11 @@ func (bPM *BlamePoUpModel) ResetSelectedBlameFile() {
 	bPM.BlameViewport.SetContent("")
 }
 
+// ------------------------------------
+//
+//	Display blame information view for selected file path
+//
+// ------------------------------------
 func (bPM *BlamePoUpModel) ShowBlameInfoView(filePath string) {
 	bPM.ShowingBlameInfo = true
 	bPM.HasFilePathChosen = true
@@ -58,7 +63,7 @@ func (i CurrentGitTrackedFilesPathItem) FilterValue() string {
 	return i.FilePath
 }
 
-// list delegate for git-tracked file paths in blame popup
+// list delegate interface implementation for CurrentGitTrackedFilesPathDelegate
 func (d CurrentGitTrackedFilesPathDelegate) Height() int                             { return 1 }
 func (d CurrentGitTrackedFilesPathDelegate) Spacing() int                            { return 0 }
 func (d CurrentGitTrackedFilesPathDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

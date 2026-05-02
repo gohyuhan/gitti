@@ -9,11 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the list component for commit log Component
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitCommitLogList(m *types.GittiModel) bool {
 	latestGitCommitLog := m.GitOperations.GitCommitLog.GitCommitLogOutput()
 	latestGitCommitLogItemArray := make([]list.Item, 0, len(latestGitCommitLog))

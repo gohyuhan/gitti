@@ -13,7 +13,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle mouse interactions.
 //	Responsibility: Translates mouse wheel events (up, down, left, right) into
@@ -21,7 +21,7 @@ import (
 //	- Active Popup: Scrolls within popups like instructions or discard confirmation.
 //	- Detail Panels: Horizontally or vertically scrolls the main viewports.
 //
-// ----------------------------------
+// ------------------------------------
 func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg.String() {

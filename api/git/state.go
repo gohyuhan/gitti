@@ -84,14 +84,14 @@ func (gSUU *GitStateUniversalUtils) GitUniversalContinue() {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	GitUniversalContinueWithSigning constructs a git continue command for terminal execution when signing is required.
 //	When signing is enabled, gitti UI is suspended and the continue operation is executed directly in the terminal,
 //	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
 //	This function detects the current git operation in progress and builds the appropriate continue command.
 //
-// ----------------------------------
+// ------------------------------------
 func (gSUU *GitStateUniversalUtils) GitUniversalContinueWithSigning() []string {
 	var gitArgs []string
 

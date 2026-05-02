@@ -28,11 +28,11 @@ type GitFiles struct {
 	logging        *logging.GittiLogging
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git file status handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitFiles {
 	gitFiles := GitFiles{
 		filesStatus:    make([]FileStatus, 0),
@@ -43,22 +43,22 @@ func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock, logg
 	return &gitFiles
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return filesStatus
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) FilesStatus() []FileStatus {
 	copied := make([]FileStatus, len(gf.filesStatus))
 	copy(copied, gf.filesStatus)
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Retrieve File Status
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) GetGitFilesStatus() {
 	gitArgs := []string{"status", "--porcelain", "--untracked-files=all"}
 
@@ -97,11 +97,11 @@ func (gf *GitFiles) GetGitFilesStatus() {
 	gf.filesStatus = modifiedFilesStatus
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	get the file diff content
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus, DiffType string) []string {
 	filePathName := fileStatus.FilePathname
 	if fileStatus.IndexState == "R" || fileStatus.IndexState == "C" {
@@ -159,11 +159,11 @@ func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus,
 	return fileDiffLines
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Toggle a file's stage/unstage state based on its current status
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -207,11 +207,11 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Stage all modified and untracked files
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) StageAllChanges() {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -227,11 +227,11 @@ func (gf *GitFiles) StageAllChanges() {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Unstage all currently staged files
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) UnstageAllChanges() {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -247,11 +247,11 @@ func (gf *GitFiles) UnstageAllChanges() {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Stage line
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []string, startFromIndex int, stageLineIndex int) {
 	// Acquire Git process lock to ensure no other Git operations are running concurrently.
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
@@ -329,13 +329,13 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	generateStageLinePatchString creates a patch string for a single line from a larger diff.
 //	It keeps the target line as a change, converts other changes in the same context to "context lines",
 //	and preserves existing context lines. This effectively isolates the chosen line for staging/unstaging.
 //
-// ----------------------------------
+// ------------------------------------
 func generateStageLinePatchString(diffContentStringArray []string, actualStageLineIndex int, filePathName string) string {
 	var stageLinePatchString strings.Builder
 	// We need to track if the previous line was skipped to handle "\ No newline" markers correctly.
@@ -405,11 +405,11 @@ func generateStageLinePatchString(diffContentStringArray []string, actualStageLi
 	return stageLinePatchString.String()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Unstage line
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []string, startFromIndex int, unStageLineIndex int) {
 	// Acquire Git process lock.
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
@@ -492,6 +492,11 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 	}
 }
 
+// ------------------------------------
+//
+//	Generate unstage line patch string
+//
+// ------------------------------------
 func generateUnstageLinePatchString(diffContentStringArray []string, actualUnStageLineIndex int, filePathName string) string {
 	var unStageLinePatchString strings.Builder
 	lastLineWasSkipped := false
@@ -562,11 +567,11 @@ func generateUnstageLinePatchString(diffContentStringArray []string, actualUnSta
 	return unStageLinePatchString.String()
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Discard File changes
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -676,11 +681,11 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Resolve a conflicted file using the specified resolution strategy
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) {
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -713,13 +718,13 @@ func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) 
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //		       Discard Line Change
 //	  * GitDiscardFileLineChange discards a specific line change from either the Index (unstage) or the Worktree (discard).
 //	    It works by generating a "reverse patch" for that specific line and applying it via 'git apply'.
 //
-// ----------------------------------
+// ------------------------------------
 func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStringArray []string, startFromIndex int, discardLineIndex int, stageStatus string) {
 	// Acquire Git process lock to ensure no other Git operations are running concurrently.
 	if !gf.gitProcessLock.CanProceedWithGitOps() {
@@ -793,7 +798,7 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	generateDiscardLinePatchString constructs a unified diff patch that inverses the change of a single line.
 //	To make the patch apply cleanly even if there are other changes in the same chunk:
@@ -802,7 +807,7 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 //	3. OTHER deleted lines (-) are skipped because they do not exist in the target state.
 //	4. Special /dev/null paths are transformed to actual file paths for newly added/deleted files.
 //
-// ----------------------------------
+// ------------------------------------
 func generateDiscardLinePatchString(diffContentStringArray []string, actualDiscardLineIndex int, filePathName string) string {
 	var discardLinePatchString strings.Builder
 

@@ -14,11 +14,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	To update the width and height of all components
 //
-// ----------------------------------
+// ------------------------------------
 func TuiWindowSizing(m *types.GittiModel) {
 	// Compute panel widths
 	m.WindowLeftPanelWidth = int(float64(m.Width) * m.WindowLeftPanelRatio)
@@ -67,11 +67,11 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.CurrentLogComponentViewport.SetHeight(m.LogComponentPanelHeight)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Dynamically resize the left panel components to fill the available height
 //
-// ----------------------------------
+// ------------------------------------
 func LeftPanelDynamicResize(m *types.GittiModel) {
 	var unSelectedComponentPanelHeightPerComponent int
 	var selectedComponentPanelHeight int

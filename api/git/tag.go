@@ -28,11 +28,11 @@ type GitTag struct {
 	tagFetchOutputMu sync.RWMutex
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git tag handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitTag(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitTag {
 	gitTag := GitTag{
 		updateChannel:  updateChannel,
@@ -42,20 +42,20 @@ func InitGitTag(updateChannel chan string, gitProcessLock *GitProcessLock, loggi
 	return &gitTag
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return all tag
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) AllTag() []TagInfo {
 	return gt.allTag
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return git tag push output
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) PushTagOutput() []string {
 	gt.tagPushOutputMu.RLock()
 	defer gt.tagPushOutputMu.RUnlock()
@@ -65,11 +65,11 @@ func (gt *GitTag) PushTagOutput() []string {
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return git tag fetch output
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) FetchTagOutput() []string {
 	gt.tagFetchOutputMu.RLock()
 	defer gt.tagFetchOutputMu.RUnlock()
@@ -79,11 +79,11 @@ func (gt *GitTag) FetchTagOutput() []string {
 	return copied
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Fetch the latest tag available
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) GetLatestGitTag() {
 	var latestTags []TagInfo
 	gitArgs := []string{"tag"}
@@ -112,11 +112,11 @@ func (gt *GitTag) GetLatestGitTag() {
 	gt.allTag = latestTags
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Create a new git tag, return the output and is success boolean
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) CreateNewTag(commitHash string, newTagName string, tagMessage string) {
 	if !gt.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -134,24 +134,24 @@ func (gt *GitTag) CreateNewTag(commitHash string, newTagName string, tagMessage 
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	CreateNewTagWithSigning constructs a git tag command for terminal execution when signing is required.
 //	When tag signing is enabled, gitti UI is suspended and the tag is created directly in the terminal,
 //	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) CreateNewTagWithSigning(commitHash string, newTagName string, tagMessage string) []string {
 	gitArgs := []string{"tag", "-a", newTagName, commitHash, "-m", tagMessage}
 
 	return gitArgs
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Fetch the detail associate with the provided tag
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) ShowGitTagDetail(ctx context.Context, tagName string) []string {
 	gitArgs := []string{"show", tagName}
 
@@ -174,11 +174,11 @@ func (gt *GitTag) ShowGitTagDetail(ctx context.Context, tagName string) []string
 	return tagDetail
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Push new tag to remote
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) GitPushTag(ctx context.Context, originName string, tagName string, pushType string) int {
 	if !gt.gitProcessLock.CanProceedWithGitOps() {
 		return -1
@@ -276,24 +276,24 @@ func (gt *GitTag) GitPushTag(ctx context.Context, originName string, tagName str
 	return 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Clear the stored tag push output buffer
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) ClearGitPushTagOutput() {
 	gt.tagPushOutputMu.Lock()
 	defer gt.tagPushOutputMu.Unlock()
 	gt.tagPushOutput = []string{}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	GitPushTagWithSigning constructs a git push tag command for terminal execution when signing is required.
 //	When tag signing is enabled, gitti UI is suspended and the push is executed directly in the terminal,
 //	allowing the user to interact with the signing prompt (e.g., GPG passphrase).
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) GitPushTagWithSigning(originName string, tagName string, pushType string) []string {
 	var gitArgs []string
 
@@ -314,11 +314,11 @@ func (gt *GitTag) GitPushTagWithSigning(originName string, tagName string, pushT
 	return gitArgs
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Fetch tags from remote
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) GitFetchTag(ctx context.Context, originName string, fetchType string) int {
 	if !gt.gitProcessLock.CanProceedWithGitOps() {
 		return -1
@@ -413,22 +413,22 @@ func (gt *GitTag) GitFetchTag(ctx context.Context, originName string, fetchType 
 	return 0
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Clear the stored tag fetch output buffer
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) ClearGitFetchTagOutput() {
 	gt.tagFetchOutputMu.Lock()
 	defer gt.tagFetchOutputMu.Unlock()
 	gt.tagFetchOutput = []string{}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Delete tags from local/remote
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) GitDeleteTag(ctx context.Context, originName string, tagName string, deleteType string) ([]string, bool) {
 	if !gt.gitProcessLock.CanProceedWithGitOps() {
 		return []string{gt.gitProcessLock.OtherProcessRunningWarning()}, false
@@ -467,11 +467,11 @@ func (gt *GitTag) GitDeleteTag(ctx context.Context, originName string, tagName s
 	return parsedDeleteTagOutput, true
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Construct args for signing-required remote tag deletion in the terminal
 //
-// ----------------------------------
+// ------------------------------------
 func (gt *GitTag) GitDeleteRemoteTagWithSigning(originName string, tagName string) []string {
 	return []string{"push", originName, "--delete", tagName}
 }

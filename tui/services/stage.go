@@ -43,7 +43,7 @@ func GitUnstageAllChangesService(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Strip ANSI escape codes from a string array for clean text processing
+//	Strip ANSI escape codes from string array for clean text processing
 //
 // ------------------------------------
 func stripAnsi(strArray []string) []string {

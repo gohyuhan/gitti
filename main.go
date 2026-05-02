@@ -41,6 +41,11 @@ import (
 	"github.com/gohyuhan/gitti/updater"
 )
 
+// ------------------------------------
+//
+//	Entry point for gitti TUI application
+//
+// ------------------------------------
 func main() {
 	repoPath, err := os.Getwd()
 	if err != nil {

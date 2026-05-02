@@ -15,12 +15,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
 //
-// ----------------------------------
+// ------------------------------------
 func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	var cmd tea.Cmd
+
 	switch msg.String() {
 	case "esc":
 		return handleTypingESCKeyBindingInteraction(m)
@@ -51,16 +53,16 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		return handleTypingCtrlyKeyBindingInteraction(m)
 
 	case "up":
-		return handleTypingUpKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingUpKeyBindingInteraction(msg, m)
 
 	case "down":
-		return handleTypingDownKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingDownKeyBindingInteraction(msg, m)
 
 	case "left":
-		return handleTypingLeftKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingLeftKeyBindingInteraction(msg, m)
 
 	case "right":
-		return handleTypingRightKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingRightKeyBindingInteraction(msg, m)
 	}
 
 	// for input typing update
@@ -70,12 +72,10 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:
-				var cmd tea.Cmd
 				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
 				return m, cmd
 
 			case 2:
-				var cmd tea.Cmd
 				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
 				return m, cmd
 			}
@@ -85,12 +85,10 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:
-				var cmd tea.Cmd
 				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
 				return m, cmd
 
 			case 2:
-				var cmd tea.Cmd
 				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
 				return m, cmd
 			}
@@ -100,12 +98,10 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:
-				var cmd tea.Cmd
 				popUp.RemoteNameTextInput, cmd = popUp.RemoteNameTextInput.Update(msg)
 				return m, cmd
 
 			case 2:
-				var cmd tea.Cmd
 				popUp.RemoteUrlTextInput, cmd = popUp.RemoteUrlTextInput.Update(msg)
 				return m, cmd
 			}
@@ -115,12 +111,10 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:
-				var cmd tea.Cmd
 				popUp.NewRemoteNameTextInput, cmd = popUp.NewRemoteNameTextInput.Update(msg)
 				return m, cmd
 
 			case 2:
-				var cmd tea.Cmd
 				popUp.NewRemoteUrlTextInput, cmd = popUp.NewRemoteUrlTextInput.Update(msg)
 				return m, cmd
 			}
@@ -128,21 +122,18 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 	case constant.CreateNewBranchPopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.CreateNewBranchPopUpModel)
 		if ok {
-			var cmd tea.Cmd
 			popUp.NewBranchNameInput, cmd = popUp.NewBranchNameInput.Update(msg)
 			return m, cmd
 		}
 	case constant.GitStashMessagePopUp:
 		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashMessagePopUpModel)
 		if ok {
-			var cmd tea.Cmd
 			popUp.StashMessageInput, cmd = popUp.StashMessageInput.Update(msg)
 			return m, cmd
 		}
 	case constant.CreateBranchBasedOnRemotePopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemotePopUpModel)
 		if ok {
-			var cmd tea.Cmd
 			popUp.RemoteBranchNameInput, cmd = popUp.RemoteBranchNameInput.Update(msg)
 			return m, cmd
 		}
@@ -151,12 +142,10 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:
-				var cmd tea.Cmd
 				popUp.TagNameInput, cmd = popUp.TagNameInput.Update(msg)
 				return m, cmd
 
 			case 2:
-				var cmd tea.Cmd
 				popUp.TagMessageTextAreaInput, cmd = popUp.TagMessageTextAreaInput.Update(msg)
 				return m, cmd
 			}
@@ -164,28 +153,26 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 	case constant.GitRebaseBranchInputPopUp:
 		popUp, ok := m.PopUpModel.(*rebasePopUp.GitRebaseBranchInputPopUpModel)
 		if ok {
-			var cmd tea.Cmd
 			popUp.BranchNameInput, cmd = popUp.BranchNameInput.Update(msg)
 			return m, cmd
 		}
 	case constant.BlamePopUp:
 		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePoUpModel)
-		if ok && !popUp.ShowingBlameInfo {
-			var cmd tea.Cmd
+		if ok && !popUp.ShowingBlameInfo && msg.String() != "up" && msg.String() != "down" {
 			popUp.FilterInput, cmd = popUp.FilterInput.Update(msg)
 			popUp.FilterValue = popUp.FilterInput.Value()
 			popUp.CurrentGitTrackedFilesPathList.SetFilterText(popUp.FilterValue)
 			return m, cmd
 		}
 	}
-	return m, nil
+	return m, cmd
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Handle non-typing key binding interactions, dispatching to specific key handlers
 //
-// ----------------------------------
+// ------------------------------------
 func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	switch msg.String() {
 	case "?":

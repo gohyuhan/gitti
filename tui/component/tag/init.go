@@ -9,11 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	init the list component for Branch Component
 //
-// ----------------------------------
+// ------------------------------------
 func InitTagList(m *types.GittiModel) bool {
 	latestTagArray := []list.Item{}
 

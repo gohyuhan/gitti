@@ -21,11 +21,11 @@ type GitRebase struct {
 	logging           *logging.GittiLogging
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git rebase handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitRebase(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitRebase {
 	gitRebase := &GitRebase{
 		gitRebaseOutput: []string{},

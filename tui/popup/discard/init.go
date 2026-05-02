@@ -12,11 +12,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for discard option list popup
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
 	discardTypeOption := []GitDiscardTypeOptionItem{
 		{
@@ -87,11 +87,11 @@ func InitGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, new
 	m.PopUpModel = popUpModel
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	for discard confirm prompt
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitDiscardConfirmPromptPopupModel(m *types.GittiModel, filePathName string, discardType string) {
 	popUpModel := &GitDiscardConfirmPromptPopUpModel{
 		FilePathName: filePathName,

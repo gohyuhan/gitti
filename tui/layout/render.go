@@ -23,11 +23,11 @@ import (
 //	Functions that help construct the view
 //
 // -----------------------------------------------------------------------------
-// ----------------------------------
+// ------------------------------------
 //
 //	render the Gitti Status Panel
 //
-// ----------------------------------
+// ------------------------------------
 func renderGitStatusComponentPanel(m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.GitStatusComponentPanel {
@@ -74,11 +74,11 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 	}
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the Local Branches or Tag or Remote panel
 //
-// ----------------------------------
+// ------------------------------------
 func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel {
@@ -99,11 +99,11 @@ func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *ty
 		Render(content)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the Changed Files panel
 //
-// ----------------------------------
+// ------------------------------------
 func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.ModifiedFilesComponentPanel {
@@ -115,11 +115,11 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 		Render(m.CurrentRepoModifiedFilesInfoList.View())
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the commit log or reflog panel
 //
-// ----------------------------------
+// ------------------------------------
 func renderCommitLogOrRefLogComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel {
@@ -274,11 +274,11 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 		Render(content)
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the Stash Panel
 //
-// ----------------------------------
+// ------------------------------------
 func renderStashComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.StashComponentPanel {
@@ -290,11 +290,11 @@ func renderStashComponentPanel(width int, height int, m *types.GittiModel) strin
 		Render(m.CurrentRepoStashInfoList.View())
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the Log Panel
 //
-// ----------------------------------
+// ------------------------------------
 func renderLogComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
 	if m.CurrentSelectedComponent == constant.LogComponentPanel {
@@ -306,11 +306,11 @@ func renderLogComponentPanel(width int, height int, m *types.GittiModel) string 
 		Render(m.CurrentLogComponentViewport.View())
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Render the key binding help bar at the bottom of the screen
 //
-// ----------------------------------
+// ------------------------------------
 func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 	keys := []string{""} // to prevent a misconfiguration on key binding will not crash the program
 

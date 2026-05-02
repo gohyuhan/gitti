@@ -20,13 +20,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-//	Functions that relate to the rendering of pop up
+//   Functions that relate to the rendering of pop up
 
-// ----------------------------------
+// ------------------------------------
 //
 //	render the PopUp and the content within it will be a determine dynamically
 //
-// ----------------------------------
+// ------------------------------------
 func RenderPopUpComponent(m *types.GittiModel) string {
 	var popUp string
 

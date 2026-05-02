@@ -25,11 +25,11 @@ type GitRefLogInfo struct {
 	Hash       string // Hash is the hash associate with the reflog entry
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Initialize the git reflog handler with shared dependencies
 //
-// ----------------------------------
+// ------------------------------------
 func InitGitRefLog(updateChannel chan string, gitProcessLock *GitProcessLock, maxRefLogCount int, logging *logging.GittiLogging) *GitRefLog {
 	gitRefLog := GitRefLog{
 		updateChannel:  updateChannel,
@@ -42,21 +42,21 @@ func InitGitRefLog(updateChannel chan string, gitProcessLock *GitProcessLock, ma
 	return &gitRefLog
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //	Return reflog
 //
-// ----------------------------------
+// ------------------------------------
 func (grl *GitRefLog) RefLog() []GitRefLogInfo {
 	return grl.reflog
 }
 
-// ----------------------------------
+// ------------------------------------
 //
 //		Get latest RefLog entry
 //	 * passive, called by daemon only
 //
-// ----------------------------------
+// ------------------------------------
 func (grl *GitRefLog) GetLatestRefLog() {
 	var latestRefLog []GitRefLogInfo
 
