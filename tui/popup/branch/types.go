@@ -126,7 +126,7 @@ func (i GitNewBranchTypeOptionItem) FilterValue() string {
 }
 
 // for new branch creation type selection
-func (d GitNewBranchTypeOptionDelegate) Height() int                             { return 1 }
+func (d GitNewBranchTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitNewBranchTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitNewBranchTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitNewBranchTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -180,7 +180,7 @@ func (i GitSwitchBranchTypeOptionItem) FilterValue() string {
 }
 
 // for switch branch type selection
-func (d GitSwitchBranchTypeOptionDelegate) Height() int                             { return 1 }
+func (d GitSwitchBranchTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitSwitchBranchTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitSwitchBranchTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitSwitchBranchTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {

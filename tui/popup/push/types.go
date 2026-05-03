@@ -45,7 +45,7 @@ func (i GitPushOptionItem) FilterValue() string {
 }
 
 // for push selection option
-func (d GitPushOptionDelegate) Height() int                             { return 1 }
+func (d GitPushOptionDelegate) Height() int                             { return 2 }
 func (d GitPushOptionDelegate) Spacing() int                            { return 0 }
 func (d GitPushOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitPushOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {

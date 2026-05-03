@@ -41,7 +41,7 @@ func (i GitResolveConflictOptionItem) FilterValue() string {
 }
 
 // for resolve conflict option selection
-func (d GitResolveConflictOptionDelegate) Height() int                             { return 1 }
+func (d GitResolveConflictOptionDelegate) Height() int                             { return 2 }
 func (d GitResolveConflictOptionDelegate) Spacing() int                            { return 0 }
 func (d GitResolveConflictOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitResolveConflictOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
