@@ -7,12 +7,11 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/logging"
 )
-
-const SEPARATOR = "\x00"
 
 // represent the info of commit that got cherry picked
 type CherryPickedCommitLog struct {
@@ -122,8 +121,8 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 			Message: parts[2],
 			Author:  parts[3],
 		}
-		if len(parts[1]) > 0 {
-			cL.Parents = strings.Split(parts[1], " ")
+		if utf8.RuneCountInString(parts[1]) > 0 {
+			cL.Parents = strings.Fields(parts[1])
 		}
 
 		// 3. Render

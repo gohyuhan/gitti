@@ -435,4 +435,8 @@ type LanguageMapping struct {
 	BlameFilePathFilterPlaceholder string
 	GitTrackedFileTitle            string
 	BlameViewportTitle             string
+	// for interactive rebase
+	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError        string
+	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError string
+	InteractiveRebaseFixupWarning                                string
 }

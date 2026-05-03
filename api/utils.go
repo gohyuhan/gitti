@@ -99,6 +99,7 @@ func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogg
 		GitTag:                 git.InitGitTag(updateChannel, gitProcessLock, gittiLogging),
 		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock, gittiLogging),
 		GitBlame:               git.InitGitBlame(updateChannel, gitProcessLock, gittiLogging),
+		GitInteractiveRebase:   git.InitGitInteractiveRebase(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount, gittiLogging),
 	}
 }
 

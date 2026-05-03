@@ -1,5 +1,7 @@
 package git
 
+const SEPARATOR = "\x00"
+
 // Git Push operation types
 const (
 	PUSH               = "PUSH"               // Standard git push
