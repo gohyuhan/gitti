@@ -70,8 +70,7 @@ func InitGitCherryPickPopUp(m *types.GittiModel, branchName string) {
 	}
 
 	width := (min(constant.MaxGitCherryPickPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-	// we are dividing by 2 because the list is a single string that have 1 \n that break into 2 line
-	height := max(constant.PopUpGitCherryPickPopUpHeight, int((float64(m.Height)*0.8)/2)-3)
+	height := (max(constant.PopUpGitCherryPickPopUpHeight, int(float64(m.Height)*0.8)) - 2)
 	gCPL := list.New(items, GitCherryPickDelegate{&m.CherryPickedCommitInfo.CherryPickedCommitMap}, width, height)
 	gCPL.SetShowPagination(false)
 	gCPL.SetShowStatusBar(false)
@@ -113,8 +112,7 @@ func InitGitEditCherryPickPopUp(m *types.GittiModel, selectionIndex int) {
 	}
 
 	width := (min(constant.MaxGitEditCherryPickPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-	// we are dividing by 3 because the list is a single string that have 2 \n that break into 3 line
-	height := max(constant.PopUpGitEditCherryPickPopUpHeight, int((float64(m.Height)*0.8)/3)-3)
+	height := (max(constant.PopUpGitEditCherryPickPopUpHeight, int(float64(m.Height)*0.8)) - 2)
 	gECPL := list.New(items, GitEditCherryPickDelegate{}, width, height)
 	gECPL.SetShowPagination(false)
 	gECPL.SetShowStatusBar(false)
@@ -160,8 +158,7 @@ func InitGitRevertParentOptionSelectionPopUp(m *types.GittiModel, commitHash str
 	}
 
 	width := (min(constant.MaxGitRevertParentOptionSelectionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-	// we are dividing by 3 because the list is a single string that have 2 \n that break into 3 line
-	height := max(constant.PopUpGitRevertParentOptionSelectionHeight, int((float64(m.Height)*0.8)/3)-3)
+	height := (max(constant.PopUpGitRevertParentOptionSelectionHeight, int(float64(m.Height)*0.8)) - 2)
 	gRPOL := list.New(items, GitRevertParentOptionDelegate{}, width, height)
 	gRPOL.SetShowPagination(false)
 	gRPOL.SetShowStatusBar(false)

@@ -68,7 +68,7 @@ func (i GitRemoteItem) FilterValue() string {
 }
 
 // for list component of git remote
-func (d GitRemoteItemDelegate) Height() int                             { return 1 }
+func (d GitRemoteItemDelegate) Height() int                             { return 2 }
 func (d GitRemoteItemDelegate) Spacing() int                            { return 0 }
 func (d GitRemoteItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {

@@ -53,7 +53,7 @@ func (i GitDiscardTypeOptionItem) FilterValue() string {
 }
 
 // for discard type selection
-func (d GitDiscardTypeOptionDelegate) Height() int                             { return 1 }
+func (d GitDiscardTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitDiscardTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitDiscardTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitDiscardTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {

@@ -64,7 +64,7 @@ func (i GitCherryPickItem) FilterValue() string {
 }
 
 // for list component of Git branch
-func (d GitCherryPickDelegate) Height() int                             { return 1 }
+func (d GitCherryPickDelegate) Height() int                             { return 2 }
 func (d GitCherryPickDelegate) Spacing() int                            { return 0 }
 func (d GitCherryPickDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitCherryPickDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -131,7 +131,7 @@ func (i GitEditCherryPickItem) FilterValue() string {
 }
 
 // for list component of Git branch
-func (d GitEditCherryPickDelegate) Height() int                             { return 1 }
+func (d GitEditCherryPickDelegate) Height() int                             { return 3 }
 func (d GitEditCherryPickDelegate) Spacing() int                            { return 0 }
 func (d GitEditCherryPickDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitEditCherryPickDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -190,7 +190,7 @@ func (i CherryPickOpsOptionItem) FilterValue() string {
 }
 
 // for list component of Git branch
-func (d CherryPickOpsOptionDelegate) Height() int                             { return 1 }
+func (d CherryPickOpsOptionDelegate) Height() int                             { return 2 }
 func (d CherryPickOpsOptionDelegate) Spacing() int                            { return 0 }
 func (d CherryPickOpsOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d CherryPickOpsOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -254,7 +254,7 @@ func (i GitRevertParentOptionItem) FilterValue() string {
 }
 
 // for list component of Git branch
-func (d GitRevertParentOptionDelegate) Height() int                             { return 1 }
+func (d GitRevertParentOptionDelegate) Height() int                             { return 2 }
 func (d GitRevertParentOptionDelegate) Spacing() int                            { return 0 }
 func (d GitRevertParentOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitRevertParentOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {

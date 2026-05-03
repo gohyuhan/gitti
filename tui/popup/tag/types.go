@@ -101,7 +101,7 @@ func (i DeleteTagOptionItem) FilterValue() string {
 }
 
 // for tag deletion option selection
-func (d DeleteTagOptionDelegate) Height() int                             { return 1 }
+func (d DeleteTagOptionDelegate) Height() int                             { return 2 }
 func (d DeleteTagOptionDelegate) Spacing() int                            { return 0 }
 func (d DeleteTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d DeleteTagOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -156,7 +156,7 @@ func (i GitRemoteForDeleteRemoteTagItem) FilterValue() string {
 }
 
 // for list component of git remote for deleting remote tag
-func (d GitRemoteForDeleteRemoteTagItemDelegate) Height() int                             { return 1 }
+func (d GitRemoteForDeleteRemoteTagItemDelegate) Height() int                             { return 2 }
 func (d GitRemoteForDeleteRemoteTagItemDelegate) Spacing() int                            { return 0 }
 func (d GitRemoteForDeleteRemoteTagItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitRemoteForDeleteRemoteTagItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -221,7 +221,7 @@ func (i PushTagOptionItem) FilterValue() string {
 }
 
 // for tag deletion option selection
-func (d PushTagOptionDelegate) Height() int                             { return 1 }
+func (d PushTagOptionDelegate) Height() int                             { return 2 }
 func (d PushTagOptionDelegate) Spacing() int                            { return 0 }
 func (d PushTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d PushTagOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -301,7 +301,7 @@ func (i FetchTagOptionItem) FilterValue() string {
 }
 
 // for tag deletion option selection
-func (d FetchTagOptionDelegate) Height() int                             { return 1 }
+func (d FetchTagOptionDelegate) Height() int                             { return 2 }
 func (d FetchTagOptionDelegate) Spacing() int                            { return 0 }
 func (d FetchTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d FetchTagOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {

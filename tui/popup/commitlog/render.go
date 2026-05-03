@@ -31,10 +31,10 @@ func RenderGitCherryPickPopUp(m *types.GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxGitCherryPickPopUpWidth, int(float64(m.Width)*0.8))
 		// we are dividing by 2 because the list is a single string that have 1 \n that break into 2 line
-		popUpHeight := max(constant.PopUpGitCherryPickPopUpHeight, int((float64(m.Height)*0.8)/2))
+		popUpHeight := max(constant.PopUpGitCherryPickPopUpHeight, int(float64(m.Height)*0.8))
 		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.CherryPickTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(popUp.CurrentBranchName)))
 		popUp.CurrentBranchCherryPickCommitLog.SetWidth(popUpWidth - 4)
-		popUp.CurrentBranchCherryPickCommitLog.SetHeight(popUpHeight - 3)
+		popUp.CurrentBranchCherryPickCommitLog.SetHeight(popUpHeight - 2)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -50,10 +50,10 @@ func RenderGitEditCherryPickPopUp(m *types.GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxGitEditCherryPickPopUpWidth, int(float64(m.Width)*0.8))
 		// we are dividing by 3 because the list is a single string that have 2 \n that break into 3 line
-		popUpHeight := max(constant.PopUpGitEditCherryPickPopUpHeight, int((float64(m.Height)*0.8)/3))
+		popUpHeight := max(constant.PopUpGitEditCherryPickPopUpHeight, int(float64(m.Height)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.EditCherryPickTitle)
 		popUp.CherryPickedCommitLog.SetWidth(popUpWidth - 4)
-		popUp.CherryPickedCommitLog.SetHeight(popUpHeight - 3)
+		popUp.CherryPickedCommitLog.SetHeight(popUpHeight - 2)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
@@ -79,10 +79,10 @@ func RenderGitRevertParentOptionSelectionPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRevertParentOptionSelectionPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxGitRevertParentOptionSelectionPopUpWidth, int(float64(m.Width)*0.8))
-		popUpHeight := max(constant.PopUpGitRevertParentOptionSelectionHeight, int((float64(m.Height)*0.8)/2))
+		popUpHeight := max(constant.PopUpGitRevertParentOptionSelectionHeight, int(float64(m.Height)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.GitRevertParentOptionSelectionTitle)
 		popUp.GitRevertParentOption.SetWidth(popUpWidth - 4)
-		popUp.GitRevertParentOption.SetHeight(popUpHeight - 3)
+		popUp.GitRevertParentOption.SetHeight(popUpHeight - 2)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,

@@ -98,7 +98,7 @@ func (i GitResetLatestCommitTypeOptionItem) FilterValue() string {
 }
 
 // for reset laytes commit type selection
-func (d GitResetLatestCommitTypeOptionDelegate) Height() int                             { return 1 }
+func (d GitResetLatestCommitTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitResetLatestCommitTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitResetLatestCommitTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitResetLatestCommitTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
@@ -176,7 +176,7 @@ func (i GitResetToSelectedCommitTypeOptionItem) FilterValue() string {
 }
 
 // for reset laytes commit type selection
-func (d GitResetToSelectedCommitTypeOptionDelegate) Height() int  { return 1 }
+func (d GitResetToSelectedCommitTypeOptionDelegate) Height() int  { return 2 }
 func (d GitResetToSelectedCommitTypeOptionDelegate) Spacing() int { return 0 }
 func (d GitResetToSelectedCommitTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
 	return nil

@@ -60,7 +60,7 @@ func (i GitPullTypeOptionItem) FilterValue() string {
 }
 
 // for pull type selection
-func (d GitPullTypeOptionDelegate) Height() int                             { return 1 }
+func (d GitPullTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitPullTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitPullTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
 func (d GitPullTypeOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
