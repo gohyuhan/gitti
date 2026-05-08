@@ -666,6 +666,7 @@ var zH_HANS = LanguageMapping{
 	BlameViewportTitle:                                           "Blame: %s",
 	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError:        "交互式变基至少需要选择 2 个提交",
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError: "fixup/squash 目标不能是合并提交",
+	InteractiveRebaseFixupPositionMismatchError:                  "交互式变基 fixup 的所选提交位置不匹配",
 	InteractiveRebaseFixupWarning:                                "警告：比压缩目标更新的合并提交将被跳过并从变基中丢弃，即使已选中也不例外。",
 }
 

@@ -438,5 +438,6 @@ type LanguageMapping struct {
 	// for interactive rebase
 	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError        string
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError string
+	InteractiveRebaseFixupPositionMismatchError                  string
 	InteractiveRebaseFixupWarning                                string
 }

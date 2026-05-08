@@ -666,6 +666,7 @@ var jA = LanguageMapping{
 	BlameViewportTitle:                                           "Blame: %s",
 	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError:        "インタラクティブリベースには少なくとも2つのコミットを選択する必要があります",
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError: "fixup/squash ターゲットはマージコミットであってはなりません",
+	InteractiveRebaseFixupPositionMismatchError:                  "インタラクティブリベースfixupの選択コミット位置が一致しません",
 	InteractiveRebaseFixupWarning:                                "警告：スカッシュターゲットより新しいマージコミットは、選択されていてもリベースからスキップ・除外されます。",
 }
 

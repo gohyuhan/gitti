@@ -666,6 +666,7 @@ var eN = LanguageMapping{
 	BlameViewportTitle:                                           "Blame: %s",
 	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError:        "Interactive rebase requires at least 2 commits to be selected",
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError: "The fixup/squash target must not be a merge commit",
+	InteractiveRebaseFixupPositionMismatchError:                  "Selected commit position mismatch for interactive rebase fixup",
 	InteractiveRebaseFixupWarning:                                "Warning: Any merge commits newer than the squash target will be skipped and dropped from the rebase, even if selected.",
 }
 
