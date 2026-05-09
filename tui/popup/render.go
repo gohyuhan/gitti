@@ -140,6 +140,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = blame.RenderBlamePopUp(m)
 	case constant.InteractiveRebaseOptionPopUp:
 		popUp = interactiverebase.RenderInteractiveRebaseOptionPopUp(m)
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseFixupSquashSelectionPopUp(m)
 	}
 	return popUp
 }

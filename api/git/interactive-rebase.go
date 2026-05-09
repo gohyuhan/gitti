@@ -27,7 +27,6 @@ type CommitInfo struct {
 }
 
 type GitInteractiveRebase struct {
-	gitCommitInfo     []CommitInfo // this is on demand, everytime a ops need it, we reassign a new one to prevent race conditions
 	updateChannel     chan string
 	maxCommitLogCount string
 	gitProcessLock    *GitProcessLock
@@ -42,7 +41,6 @@ type GitInteractiveRebase struct {
 func InitGitInteractiveRebase(updateChannel chan string, gitProcessLock *GitProcessLock, maxCommitLogCountInt int, logging *logging.GittiLogging) *GitInteractiveRebase {
 	maxCommitLogCount := strconv.Itoa(maxCommitLogCountInt)
 	gitInteractiveRebase := GitInteractiveRebase{
-		gitCommitInfo:     make([]CommitInfo, 0),
 		gitProcessLock:    gitProcessLock,
 		updateChannel:     updateChannel,
 		maxCommitLogCount: maxCommitLogCount,
@@ -53,22 +51,10 @@ func InitGitInteractiveRebase(updateChannel chan string, gitProcessLock *GitProc
 
 // ------------------------------------
 //
-//	Return commit log output
-//
-// ------------------------------------
-func (gIR *GitInteractiveRebase) GitCommitInfo() []CommitInfo {
-	copied := make([]CommitInfo, len(gIR.gitCommitInfo))
-	copy(copied, gIR.gitCommitInfo)
-	return copied
-}
-
-// ------------------------------------
-//
 //	Get the Commit Info for Interactive Rebase
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GetCommitInfos() {
-	gIR.clearGitCommitInfos()
+func (gIR *GitInteractiveRebase) GetCommitInfos() []CommitInfo {
 	// 1. Prepare git command
 	gitArgs := []string{
 		"log",
@@ -85,8 +71,7 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() {
 	commitInfoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	commitInfoOutput, commitInfoErr := commitInfoCmdExecutor.Output()
 	if commitInfoErr != nil {
-		gIR.gitCommitInfo = commitInfos
-		return
+		return commitInfos
 	}
 
 	parsedCommitInfoArray := strings.Split(string(commitInfoOutput), "\x01")
@@ -109,7 +94,7 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() {
 		})
 	}
 
-	gIR.gitCommitInfo = commitInfos
+	return commitInfos
 }
 
 // ------------------------------------
@@ -129,7 +114,7 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() {
 //	* message applied via `git commit --amend -F <tempfile>` — no editor flag
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) ([]string, error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -137,14 +122,14 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, 
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixup(ctx, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, false)
+	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixup(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, false)
 	if fixupErr != nil {
 		return []string{}, fixupErr
 	}
 	if fixupCleanup != nil {
 		defer fixupCleanup()
 	}
-
+	gIR.logging.RegisterNewLog(logging.INTERACTIVE_REBASE_FIXUP_SQUASH, strings.Join(fixupCmd.Args, " "), logging.INFO, "", true)
 	fixupOutput, runErr := fixupCmd.CombinedOutput()
 	parsedFixupOutput := processGeneralGitOpsOutputIntoStringArray(fixupOutput)
 
@@ -169,7 +154,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, 
 //	* git's own repo lock (.git/rebase-merge/) prevents concurrent ops during execution
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupWithSigning(ctx context.Context, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) (*exec.Cmd, func(), error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return nil, nil, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -177,10 +162,10 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupWithSigning(ctx contex
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	return gIR.interactiveRebaseFixup(ctx, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, true)
+	return gIR.interactiveRebaseFixup(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, true)
 }
 
-func (gIR *GitInteractiveRebase) interactiveRebaseFixup(ctx context.Context, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string, signing bool) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) interactiveRebaseFixup(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string, signing bool) (*exec.Cmd, func(), error) {
 	if len(sortedSelectedCommitInfos) < 2 {
 		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError)
 	}
@@ -193,13 +178,13 @@ func (gIR *GitInteractiveRebase) interactiveRebaseFixup(ctx context.Context, sor
 	// oldest selected commit's CommitOrder equals its index in gitCommitInfo (which is latest-first)
 	// so gitCommitInfo[:targetCommitPosition+1] gives us HEAD..oldest-selected
 	targetCommitPosition := sortedSelectedCommitInfos[0].CommitOrder
-	if targetCommitPosition < 0 || targetCommitPosition >= len(gIR.gitCommitInfo) {
+	if targetCommitPosition < 0 || targetCommitPosition >= len(gitCommitInfo) {
 		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupPositionMismatchError)
 	}
 
 	// copy so we don't mutate gitCommitInfo, then sort oldest → latest for todo construction
 	sortedAffectedCommitInfos := make([]CommitInfo, targetCommitPosition+1)
-	copy(sortedAffectedCommitInfos, gIR.gitCommitInfo[:targetCommitPosition+1])
+	copy(sortedAffectedCommitInfos, gitCommitInfo[:targetCommitPosition+1])
 	slices.SortFunc(sortedAffectedCommitInfos, func(a, b CommitInfo) int {
 		return cmp.Compare(b.CommitOrder, a.CommitOrder) // largest CommitOrder first = oldest to latest
 	})
@@ -440,13 +425,4 @@ func (gIR *GitInteractiveRebase) createSequenceEditorScript(todoFilePath string)
 	}
 
 	return scriptPath, nil
-}
-
-// ------------------------------------
-//
-//	gIR internal clear git commit info func
-//
-// ------------------------------------
-func (gIR *GitInteractiveRebase) clearGitCommitInfos() {
-	gIR.gitCommitInfo = []CommitInfo{}
 }

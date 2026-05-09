@@ -12,7 +12,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-func InitChooseGitPullTypePopUp(m *types.GittiModel) {
+// ------------------------------------
+//
+//	Init the popup model for selecting the git pull strategy (pull, pull-rebase, pull-merge)
+//
+// ------------------------------------
+func InitChooseGitPullTypePopUpModel(m *types.GittiModel) {
 	pullTypeOption := []GitPullTypeOptionItem{
 		{
 			Name:     i18n.LANGUAGEMAPPING.GitPullOption,
@@ -56,6 +61,11 @@ func InitChooseGitPullTypePopUp(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Init the popup model for displaying git pull command output with a spinner
+//
+// ------------------------------------
 func InitGitPullOutputPopUpModel(m *types.GittiModel) {
 	// for git pull output viewport
 	vp := viewport.New()

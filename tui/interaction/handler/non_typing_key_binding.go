@@ -25,7 +25,7 @@ import (
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
-	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
+	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
@@ -186,7 +186,9 @@ func handleNonTypingAKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 
 // ------------------------------------
 //
-//	Handle non typingb key binding interaction
+//	Handle 'b' key interaction.
+//	Responsibility: Opens the git blame popup for the currently focused file;
+//	sets IsTyping to true so subsequent key events are routed to the popup.
 //
 // ------------------------------------
 func handleNonTypingbKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -321,31 +323,31 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				if (currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree != " ") || (currentSelectedFile.IndexState == "C" && currentSelectedFile.WorkTree != " ") {
 					// indicating the files is a newly added tracked / copied file with unstage modification (modified or delete )
 					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					discardPopUp.InitGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, true, false)
+					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, true, false)
 				} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree != " " {
 					// a staged rename with unstaged modification
 					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					discardPopUp.InitGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false, true)
+					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, false, true)
 				} else if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
 					// newly added untracked file
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
 				} else if currentSelectedFile.IndexState != "A" && currentSelectedFile.IndexState != "C" && currentSelectedFile.IndexState != "R" && currentSelectedFile.IndexState != "?" && currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
 					// tracked file with both staged and unstaged modification (beside A, C and  )
 					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					discardPopUp.InitGitDiscardTypeOptionPopUp(m, currentSelectedFile.FilePathname, false, false)
+					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, false, false)
 				} else if (currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " ") || (currentSelectedFile.IndexState == "C" && currentSelectedFile.WorkTree == " ") {
 					// newly added tracked / copied file
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDEDORCOPIED)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDEDORCOPIED)
 				} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree == " " {
 					// a staged rename
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, currentSelectedFile.FilePathname, git.DISCARDANDREVERTRENAME)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDANDREVERTRENAME)
 				} else {
 					// tracked file with only unstaged modification
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
 				}
 			}
 		case constant.DetailComponentPanel, constant.DetailComponentPanelTwo:
@@ -375,7 +377,7 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 						m.ShowPopUp.Store(true)
 						m.IsTyping.Store(false)
 						m.PopUpType = constant.GitDiscardFileLineChangeConfirmPopUp
-						filesPopUp.InitGitDiscardFileLineChangeConfirmPopUp(m)
+						filesPopUp.InitGitDiscardFileLineChangeConfirmPopUpModel(m)
 					} else {
 						filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
 						services.GitDiscardLineFileChangeService(m, filePathName)
@@ -403,7 +405,7 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 						m.PopUpModel = nil
 					} else {
 						// reinit the list after a removal
-						commitLogPopUp.InitGitEditCherryPickPopUp(m, popUp.CherryPickedCommitLog.Index())
+						commitLogPopUp.InitGitEditCherryPickPopUpModel(m, popUp.CherryPickedCommitLog.Index())
 					}
 				}
 			}
@@ -427,12 +429,12 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		switch m.PopUpType {
 		case constant.GitCherryPickPopUp:
 			m.PopUpType = constant.GitEditCherryPickPopUp
-			commitLogPopUp.InitGitEditCherryPickPopUp(m, 0)
+			commitLogPopUp.InitGitEditCherryPickPopUpModel(m, 0)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		case constant.GitCherryPickApplyConfirmPopUp:
 			m.PopUpType = constant.GitEditCherryPickPopUp
-			commitLogPopUp.InitGitEditCherryPickPopUp(m, 0)
+			commitLogPopUp.InitGitEditCherryPickPopUpModel(m, 0)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		}
@@ -516,6 +518,13 @@ func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+// ------------------------------------
+//
+//	Handle 'i' key interaction.
+//	Responsibility: Opens the interactive rebase option popup when the commit log panel
+//	is focused and at least one commit exists in the list.
+//
+// ------------------------------------
 func handleNonTypingiKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel {
@@ -524,7 +533,7 @@ func handleNonTypingiKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.InteractiveRebaseOptionPopUp
-				interactiverebase.InitInteractiveRebaseOptionPopUp(m)
+				interactiverebasePopUp.InitInteractiveRebaseOptionPopUpModel(m)
 			}
 		}
 	}
@@ -689,7 +698,7 @@ func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 			m.PopUpType = constant.ChooseGitPullTypePopUp
-			pullPopUp.InitChooseGitPullTypePopUp(m)
+			pullPopUp.InitChooseGitPullTypePopUpModel(m)
 		}
 	}
 	return m, nil
@@ -937,6 +946,7 @@ func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.
 //	Handle Enter key interaction.
 //	Responsibility: Core confirmation and drill-down action. Depends heavily on context:
 //	- Active Popup (e.g., choosing remote, selecting branch type, confirming discard): Executes the chosen workflow or triggers git commands (push, pull, reset, discard, tag operations, etc.).
+//	- Interactive Rebase Option Popup: Confirms the selected operation type and navigates to the next popup (e.g., fixup/squash commit selection).
 //	- Component Panels (when no popup active): Typically drills down into a "detail view" for the selected item (e.g., viewing diffs for a file, showing commit details), or triggers context menus like switching branches.
 //
 // ------------------------------------
@@ -1014,7 +1024,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.ShowPopUp.Store(true)
 						m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
 						// only one remote found so, we will default to that remote
-						branchPopUp.InitCreateBranchBasedOnRemotePopUp(m, remoteName)
+						branchPopUp.InitCreateBranchBasedOnRemotePopUpModel(m, remoteName)
 					case constant.TAGPUSHACTION:
 						selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
 						if selectedTag != nil {
@@ -1086,7 +1096,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 							m.IsTyping.Store(true)
 							m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
 							// only one remote found so, we will default to that remote
-							branchPopUp.InitCreateBranchBasedOnRemotePopUp(m, remotes[0].Name)
+							branchPopUp.InitCreateBranchBasedOnRemotePopUpModel(m, remotes[0].Name)
 						} else if len(remotes) > 1 {
 							m.IsTyping.Store(false)
 							// if remote is more than 1 let user choose which remote
@@ -1167,7 +1177,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
 				selectedOption := selectedDiscardItem.(discardPopUp.GitDiscardTypeOptionItem)
-				discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, popUp.FilePathName, selectedOption.DiscardType)
+				discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, popUp.FilePathName, selectedOption.DiscardType)
 			}
 		case constant.GitDiscardConfirmPromptPopUp:
 			popUp, ok := m.PopUpModel.(*discardPopUp.GitDiscardConfirmPromptPopUpModel)
@@ -1275,10 +1285,10 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					switch cherryPickType {
 					case constant.CHERRYPICK:
 						m.PopUpType = constant.GitCherryPickPopUp
-						commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+						commitLogPopUp.InitGitCherryPickPopUpModel(m, m.CheckOutBranch)
 					case constant.EDITCHERRYPICK:
 						m.PopUpType = constant.GitEditCherryPickPopUp
-						commitLogPopUp.InitGitEditCherryPickPopUp(m, 0)
+						commitLogPopUp.InitGitEditCherryPickPopUpModel(m, 0)
 					case constant.APPLYCHERRYPICK:
 						m.ShowPopUp.Store(true)
 						m.PopUpType = constant.GitCherryPickApplyConfirmPopUp
@@ -1497,9 +1507,9 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				selectedParent := popUp.GitRevertParentOption.SelectedItem()
 				if selectedParent != nil {
 					parsedSelectedParent := selectedParent.(commitLogPopUp.GitRevertParentOptionItem)
-					commitLogPopUp.InitGitRevertConfirmationPopUp(m, popUp.CommitHash, parsedSelectedParent.ParentOrder)
+					commitLogPopUp.InitGitRevertConfirmationPopUpModel(m, popUp.CommitHash, parsedSelectedParent.ParentOrder)
 				} else {
-					commitLogPopUp.InitGitRevertConfirmationPopUp(m, popUp.CommitHash, 1)
+					commitLogPopUp.InitGitRevertConfirmationPopUpModel(m, popUp.CommitHash, 1)
 				}
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
@@ -1535,7 +1545,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				if selectedRemoteBranch != nil {
 					branchName := selectedRemoteBranch.(branchPopUp.RemoteBranchItem).BranchName
 					if utf8.RuneCountInString(branchName) > 0 {
-						branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUp(m)
+						branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUpModel(m)
 						popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
 						if ok {
 							m.ShowPopUp.Store(true)
@@ -1574,6 +1584,26 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					}
 				}
 			}
+		case constant.InteractiveRebaseOptionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseOptionPopUpModel)
+			if ok {
+				selectedInteractiveRebaseOption := popUp.InteractiveRebaseOptionList.SelectedItem()
+				if selectedInteractiveRebaseOption != nil {
+					parsedSelected := selectedInteractiveRebaseOption.(interactiverebasePopUp.InteractiveRebaseOptionItem)
+					switch parsedSelected.InteractiveRebaseType {
+					case git.FIXUPSQUASH:
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.InteractiveRebaseFixupSquashSelectionPopUp
+						interactiverebasePopUp.InitInteractiveRebaseFixupSquashSelectionPopUpModel(m)
+					case git.REWORD:
+						// COMING IN NEXT VERSION
+					case git.DROP:
+						// COMING IN NEXT VERSION
+					}
+				}
+			}
+
 		}
 	}
 	return m, nil
@@ -1654,6 +1684,7 @@ func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.G
 //	- Stash Panel: Triggers applying a stash (without dropping it).
 //	- Cherry Pick Popup: Selects/toggles the currently highlighted commit to be added to the cherry-pick queue.
 //	- Merge Popup: Toggles the currently highlighted branch between the available and selected branch lists.
+//	- Interactive Rebase Fixup/Squash Popup: Toggles the highlighted commit's inclusion in the fixup/squash target set.
 //
 // ------------------------------------
 func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -1715,6 +1746,26 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			_, ok := m.PopUpModel.(*branchPopUp.ChooseBranchOptionForMergePopUpModel)
 			if ok {
 				branchPopUp.UpdateChooseBranchOptionForMergePopUpModel(m)
+			}
+
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+			if ok {
+				if popUp.IsCommitListSelected.Load() {
+					selectedItem := popUp.CommitList.SelectedItem()
+					if selectedItem != nil {
+						// check if the selected item is pick for selection or not
+						// if not, include it for selection, else unselect it
+						parsedSelectedItem := selectedItem.(interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionItem)
+						_, exist := popUp.SelectedCommitHashMap[parsedSelectedItem.Hash]
+						if exist {
+							delete(popUp.SelectedCommitHashMap, parsedSelectedItem.Hash)
+						} else {
+							popUp.SelectedCommitHashMap[parsedSelectedItem.Hash] = git.CommitInfo(parsedSelectedItem)
+						}
+						interactiverebasePopUp.UpdateInteractiveRebaseFixupSquashViewport(m)
+					}
+				}
 			}
 		}
 	}
@@ -1819,7 +1870,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.GitCherryPickFromRefLogApplyConfirmationPopUp,
 			constant.ChooseRemoteBranchOptionPopUp,
 			constant.ChooseBranchOptionForMergePopUp,
-			constant.InteractiveRebaseOptionPopUp:
+			constant.InteractiveRebaseOptionPopUp,
+			constant.InteractiveRebaseFixupSquashSelectionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -2104,6 +2156,11 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 
 				popUp.GlobalKeyBindingViewport.ScrollLeft(scrollSpeed)
 			}
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+			if ok && popUp.IsCommitFixupSquashViewportSelected.Load() {
+				popUp.CommitFixupSquashViewport.ScrollLeft(1)
+			}
 		}
 	}
 	return m, nil
@@ -2149,6 +2206,11 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 					scrollSpeed = 2
 				}
 				popUp.GlobalKeyBindingViewport.ScrollRight(scrollSpeed)
+			}
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+			if ok && popUp.IsCommitFixupSquashViewportSelected.Load() {
+				popUp.CommitFixupSquashViewport.ScrollRight(1)
 			}
 		}
 	}
@@ -2211,8 +2273,10 @@ func handleNonTypingSlashKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 //
 //	Handle '<' key interaction.
 //	Responsibility: Component sub-state cycling (Backward).
-//	In the unified 'Local Branch Or Tag Or Remote' panel, this specifically rotates the visible
-//	list to the left/previous entity (e.g., from Remotes -> Tags -> Branches).
+//	- No popup: In the 'Local Branch Or Tag Or Remote' panel, rotates the visible list to the
+//	  left/previous entity (e.g., from Remotes -> Tags -> Branches). In the Commit Log panel,
+//	  switches from Reflog back to Commit Log view.
+//	- Interactive Rebase Fixup/Squash Popup: Shifts focus to the commit list pane.
 //
 // ------------------------------------
 func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -2238,6 +2302,15 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		}
+	} else {
+		switch m.PopUpType {
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+			if ok {
+				popUp.IsCommitListSelected.Store(true)
+				popUp.IsCommitFixupSquashViewportSelected.Store(false)
+			}
+		}
 	}
 	return m, nil
 }
@@ -2246,8 +2319,10 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 //
 //	Handle '>' key interaction.
 //	Responsibility: Component sub-state cycling (Forward).
-//	In the unified 'Local Branch Or Tag Or Remote' panel, this specifically rotates the visible
-//	list to the right/next entity (e.g., from Branches -> Tags -> Remotes).
+//	- No popup: In the 'Local Branch Or Tag Or Remote' panel, rotates the visible list to the
+//	  right/next entity (e.g., from Branches -> Tags -> Remotes). In the Commit Log panel,
+//	  switches from Commit Log to Reflog view.
+//	- Interactive Rebase Fixup/Squash Popup: Shifts focus to the detail viewport pane.
 //
 // ------------------------------------
 func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -2271,6 +2346,15 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_REFLOG:
 				// do nothing, as reflog is currently the most right option in the commit log or reflog component panel
+			}
+		}
+	} else {
+		switch m.PopUpType {
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+			if ok {
+				popUp.IsCommitListSelected.Store(false)
+				popUp.IsCommitFixupSquashViewportSelected.Store(true)
 			}
 		}
 	}
@@ -2321,12 +2405,12 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		switch m.PopUpType {
 		case constant.GitEditCherryPickPopUp:
 			m.PopUpType = constant.GitCherryPickPopUp
-			commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+			commitLogPopUp.InitGitCherryPickPopUpModel(m, m.CheckOutBranch)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		case constant.GitCherryPickApplyConfirmPopUp:
 			m.PopUpType = constant.GitCherryPickPopUp
-			commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+			commitLogPopUp.InitGitCherryPickPopUpModel(m, m.CheckOutBranch)
 			m.ShowPopUp.Store(true)
 			m.IsTyping.Store(false)
 		}
@@ -2337,12 +2421,12 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.GitCherryPickPopUp
 				m.IsTyping.Store(false)
-				commitLogPopUp.InitGitCherryPickPopUp(m, m.CheckOutBranch)
+				commitLogPopUp.InitGitCherryPickPopUpModel(m, m.CheckOutBranch)
 			} else {
 				m.ShowPopUp.Store(true)
 				m.PopUpType = constant.GitCherryPickOptionSelectionPopUp
 				m.IsTyping.Store(false)
-				commitLogPopUp.InitGitCherryPickOptionSelectionPopUp(m)
+				commitLogPopUp.InitGitCherryPickOptionSelectionPopUpModel(m)
 			}
 		} else if (m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel || m.DetailPanelParentComponent == constant.CommitLogOrRefLogComponentPanel) &&
 			len(m.CurrentRepoRefLogInfoList.Items()) > 0 && m.CurrentCommitLogOrRefLogComponentShowing == constant.SHOW_REFLOG {
@@ -2410,18 +2494,18 @@ func handleNonTypingCtrlrKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					commitHashParentInfos := services.GetCommitHashParentInfoService(m, parsedCommitLog.Hash)
 					if commitHashParentInfos != nil {
 						if len(commitHashParentInfos) > 1 {
-							commitLogPopUp.InitGitRevertParentOptionSelectionPopUp(m, parsedCommitLog.Hash, commitHashParentInfos)
+							commitLogPopUp.InitGitRevertParentOptionSelectionPopUpModel(m, parsedCommitLog.Hash, commitHashParentInfos)
 							m.ShowPopUp.Store(true)
 							m.IsTyping.Store(false)
 							m.PopUpType = constant.GitRevertParentOptionSelectionPopUp
 						} else {
-							commitLogPopUp.InitGitRevertConfirmationPopUp(m, parsedCommitLog.Hash, 0)
+							commitLogPopUp.InitGitRevertConfirmationPopUpModel(m, parsedCommitLog.Hash, 0)
 							m.ShowPopUp.Store(true)
 							m.IsTyping.Store(false)
 							m.PopUpType = constant.GitRevertConfirmationPopUp
 						}
 					} else {
-						commitLogPopUp.InitGitRevertConfirmationPopUp(m, parsedCommitLog.Hash, 0)
+						commitLogPopUp.InitGitRevertConfirmationPopUpModel(m, parsedCommitLog.Hash, 0)
 						m.ShowPopUp.Store(true)
 						m.IsTyping.Store(false)
 						m.PopUpType = constant.GitRevertConfirmationPopUp

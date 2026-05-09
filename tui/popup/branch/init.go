@@ -126,6 +126,11 @@ func InitChooseSwitchBranchTypePopUpModel(m *types.GittiModel, branchName string
 	}
 }
 
+// ------------------------------------
+//
+//	Init the popup model for displaying branch switch command output with a spinner
+//
+// ------------------------------------
 func InitSwitchBranchOutputPopUpModel(m *types.GittiModel, branchName string, switchType string) {
 	// for git push output viewport,
 	vp := viewport.New()
@@ -151,6 +156,11 @@ func InitSwitchBranchOutputPopUpModel(m *types.GittiModel, branchName string, sw
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Init the popup model for the branch deletion confirmation prompt
+//
+// ------------------------------------
 func InitGitDeleteBranchConfirmPromptPopUpModel(m *types.GittiModel, branchName string) {
 	popUpModel := &GitDeleteBranchConfirmPromptPopUpModel{
 		BranchName: branchName,
@@ -158,6 +168,11 @@ func InitGitDeleteBranchConfirmPromptPopUpModel(m *types.GittiModel, branchName 
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Init the popup model for displaying branch deletion command output with a spinner
+//
+// ------------------------------------
 func InitGitDeleteBranchOutputPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true
@@ -181,7 +196,12 @@ func InitGitDeleteBranchOutputPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func InitCreateBranchBasedOnRemotePopUp(m *types.GittiModel, remoteOrigin string) {
+// ------------------------------------
+//
+//	Init the popup model for entering a new remote branch name to track from a given remote origin
+//
+// ------------------------------------
+func InitCreateBranchBasedOnRemotePopUpModel(m *types.GittiModel, remoteOrigin string) {
 	remoteBranchNameInput := textinput.New()
 	remoteBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.EnterRemoteBranchPrompt
 	remoteBranchNameInput.Focus()
@@ -197,7 +217,12 @@ func InitCreateBranchBasedOnRemotePopUp(m *types.GittiModel, remoteOrigin string
 	m.PopUpModel = popUpModel
 }
 
-func InitCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) {
+// ------------------------------------
+//
+//	Init the popup model for displaying remote branch creation command output with a spinner
+//
+// ------------------------------------
+func InitCreateBranchBasedOnRemoteOutputPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
@@ -220,6 +245,11 @@ func InitCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Init the popup model for selecting a remote branch to track locally
+//
+// ------------------------------------
 func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
 	remoteBranches := m.GitOperations.GitBranch.RemoteBranches()
 	items := make([]list.Item, 0, len(remoteBranches))
@@ -244,6 +274,11 @@ func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
 	}
 }
 
+// ------------------------------------
+//
+//	Init the split-list popup model for selecting branches to merge into the current branch
+//
+// ------------------------------------
 func InitChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 	branches := m.GitOperations.GitBranch.AllBranches()
 	items := make([]list.Item, 0, len(branches))

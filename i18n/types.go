@@ -205,6 +205,7 @@ type LanguageMapping struct {
 	KeyBindingForBlamePopUpFilePathSelection                   []string
 	KeyBindingForBlamePopUpBlameView                           []string
 	KeyBindingForInteractiveRebaseOptionPopUp                  []string
+	KeyBindingForInteractiveRebaseFixupSquashSelectionPopUp    []string
 
 	// -----------------
 	//  For Pop Up
@@ -419,7 +420,7 @@ type LanguageMapping struct {
 	GitRevertConfirmationTitle          string
 	// for reflog
 	GitCherryPickFromRefLogApplyConfirmationTitle string
-	//for rebase
+	// for rebase
 	GitRebaseUseLocalBranch                       string
 	GitRebaseUseLocalBranchDesc                   string
 	RebaseBranchNameInputPlaceholder              string

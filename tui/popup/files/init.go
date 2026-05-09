@@ -8,7 +8,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-func InitGitDiscardFileLineChangeConfirmPopUp(m *types.GittiModel) {
+// ------------------------------------
+//
+//	Init the popup model for confirming discard of a single changed line in the detail panel
+//
+// ------------------------------------
+func InitGitDiscardFileLineChangeConfirmPopUpModel(m *types.GittiModel) {
 	// for git discard file line change confirmation
 	vp := viewport.New()
 	vp.SoftWrap = false

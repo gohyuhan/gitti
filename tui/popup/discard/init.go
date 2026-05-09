@@ -17,7 +17,7 @@ import (
 //	for discard option list popup
 //
 // ------------------------------------
-func InitGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
+func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
 	discardTypeOption := []GitDiscardTypeOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
@@ -92,7 +92,7 @@ func InitGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, new
 //	for discard confirm prompt
 //
 // ------------------------------------
-func InitGitDiscardConfirmPromptPopupModel(m *types.GittiModel, filePathName string, discardType string) {
+func InitGitDiscardConfirmPromptPopUpModel(m *types.GittiModel, filePathName string, discardType string) {
 	popUpModel := &GitDiscardConfirmPromptPopUpModel{
 		FilePathName: filePathName,
 		DiscardType:  discardType,

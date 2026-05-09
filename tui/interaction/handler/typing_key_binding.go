@@ -362,7 +362,7 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 			validBranchName, _ := api.IsBranchNameValid(popUp.RemoteBranchNameInput.Value())
 			remoteOrigin := popUp.RemoteOrigin
 			if utf8.RuneCountInString(validBranchName) > 0 {
-				branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUp(m)
+				branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUpModel(m)
 				popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
 				if ok {
 					m.ShowPopUp.Store(true)

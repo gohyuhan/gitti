@@ -9,7 +9,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
-	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
+	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
@@ -396,7 +396,7 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 		}
 
 	case constant.InteractiveRebaseOptionPopUp:
-		popUp, ok := m.PopUpModel.(*interactiverebase.InteractiveRebaseOptionPopUp)
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseOptionPopUpModel)
 		if ok {
 			switch msg.String() {
 			case "up", "k":
@@ -469,6 +469,32 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			popUp.BranchMergeOutputViewport, cmd = popUp.BranchMergeOutputViewport.Update(msg)
 			return m, cmd
 		}
+
+	// popup that have both viewport and list
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+		if ok {
+			if popUp.IsCommitListSelected.Load() {
+				switch msg.String() {
+				case "up", "k":
+					if popUp.CommitList.Index() > 0 {
+						latestIndex := popUp.CommitList.Index() - 1
+						popUp.CommitList.Select(latestIndex)
+					}
+				case "down", "j":
+					if popUp.CommitList.Index() < len(popUp.CommitList.Items())-1 {
+						latestIndex := popUp.CommitList.Index() + 1
+						popUp.CommitList.Select(latestIndex)
+					}
+				}
+				popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, popUp.CommitList.Width())
+				return m, nil
+			} else if popUp.IsCommitFixupSquashViewportSelected.Load() {
+				popUp.CommitFixupSquashViewport, cmd = popUp.CommitFixupSquashViewport.Update(msg)
+				return m, cmd
+			}
+		}
+
 	}
 	return m, nil
 }
@@ -480,7 +506,7 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 //	or viewport of the currently active popup, matching keyboard navigation behavior.
 //
 // ------------------------------------
-func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func UpDownMouseMsgUpdateForPopUp(msg tea.MouseWheelMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// for pop up that have viewport
 	switch m.PopUpType {

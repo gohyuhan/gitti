@@ -140,14 +140,12 @@ func renderCommitLogOrRefLogComponentPanel(width int, height int, m *types.Gitti
 		Render(content)
 }
 
-// Render the detail component part at the right of the window,
-// however the content within it will be dynamic based on the current selected component
 // ------------------------------------
 //
-//			For Render Detail Component Panel
-//		  * this will render the detail component panel
-//	   * it will handle the layout for both line editing mode and normal mode
-//	   * it will also handle the split view for line editing mode (one for staged, one for unstaged)
+//	Render the detail component panel (right side of the window).
+//	Content is dynamic based on the current selected component.
+//	Handles both normal mode and line-editing mode layout, including
+//	the split staged/unstaged view in line-editing mode.
 //
 // ------------------------------------
 func renderDetailComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -456,6 +454,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			}
 		case constant.InteractiveRebaseOptionPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseOptionPopUp
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseFixupSquashSelectionPopUp
 		}
 	} else {
 		//-----------------------------

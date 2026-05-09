@@ -267,7 +267,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		return gAM, nil
-	case tea.MouseMsg:
+	case tea.MouseWheelMsg:
 		model, cmd := interaction.GittiMouseInteraction(msg, m)
 		gAM.model = model
 		return gAM, cmd

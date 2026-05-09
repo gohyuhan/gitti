@@ -184,6 +184,25 @@ func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand
 	})
 }
 
+func SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m *types.GittiModel, executor *exec.Cmd, cleanUpFunc func(), GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
+	var stderr bytes.Buffer
+	executor.Stderr = io.MultiWriter(os.Stderr, &stderr)
+
+	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(executor.Args, " "), logging.INFO, "", true)
+	return m, tea.ExecProcess(executor, func(err error) tea.Msg {
+		cleanUpFunc()
+		if err != nil {
+			if stderrStr := strings.TrimSpace(stderr.String()); stderrStr != "" {
+				err = fmt.Errorf("%w\n\n%s", err, stderrStr)
+			}
+		}
+		return types.GitOperationRequiredSigningFinishedMsg{
+			GitOperationOpsTypeForLogging: GitOperationOpsTypeForLogging,
+			Err:                           err,
+		}
+	})
+}
+
 func ResetPopUpModelStateForGitSigningOps(m *types.GittiModel) {
 	m.ShowPopUp.Store(false)
 	m.IsTyping.Store(false)
