@@ -15,11 +15,11 @@ type GitStateUniversalUtils struct {
 	logging         *logging.GittiLogging
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// init the Git GitStateUniversalUtils
+//	Initialize git state utility with repo path, process lock, and logger dependencies
 //
-// --------------------------------
+// ------------------------------------
 func InitGitStateUniversalUtils(gitAbsolutePath string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitStateUniversalUtils {
 	gitStateUniversalUtils := &GitStateUniversalUtils{
 		currentGitState: "",
@@ -31,21 +31,20 @@ func InitGitStateUniversalUtils(gitAbsolutePath string, gitProcessLock *GitProce
 	return gitStateUniversalUtils
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// GetCurrentGitState returns the current Git state as a string.
+//	Return cached current git state string
 //
-// --------------------------------
+// ------------------------------------
 func (gSUU *GitStateUniversalUtils) GetCurrentGitState() string {
 	return gSUU.currentGitState
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// GitUniversalContinue attempts to continue the current Git operation (rebase, merge, am, etc.)
-// by detecting the state files within the .git folder.
+//	Detect active git state and execute corresponding continue command
 //
-// --------------------------------
+// ------------------------------------
 func (gSUU *GitStateUniversalUtils) GitUniversalContinue() {
 	if !gSUU.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -114,12 +113,11 @@ func (gSUU *GitStateUniversalUtils) GitUniversalContinueWithSigning() []string {
 	return gitArgs
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// GitUniversalAbort aborts the current Git operation (rebase, merge, am, etc.)
-// by detecting the state files within the .git folder.
+//	Detect active git state and execute corresponding abort command
 //
-// --------------------------------
+// ------------------------------------
 func (gSUU *GitStateUniversalUtils) GitUniversalAbort() {
 	if !gSUU.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -158,12 +156,11 @@ func (gSUU *GitStateUniversalUtils) GitUniversalAbort() {
 	}
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// GitUniversalSkip skip the current Git operation (rebase, cherry-pick, am, etc.)
-// by detecting the state files within the .git folder.
+//	Detect active git state and execute corresponding skip command
 //
-// --------------------------------
+// ------------------------------------
 func (gSUU *GitStateUniversalUtils) GitUniversalSkip() {
 	if !gSUU.gitProcessLock.CanProceedWithGitOps() {
 		return
@@ -198,12 +195,11 @@ func (gSUU *GitStateUniversalUtils) GitUniversalSkip() {
 	}
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// CheckCurrentGitState updates the currentGitState field by checking the existence of
-// specific state files inside the .git directory.
+//	Refresh cached git state by checking operation marker files under .git
 //
-// --------------------------------
+// ------------------------------------
 func (gSUU *GitStateUniversalUtils) CheckCurrentGitState() {
 	gSUU.currentGitState = ""
 	if checkIfFileExistWithinDotGitFolder(gSUU.GitAbsolutePath, "rebase-apply/applying") {

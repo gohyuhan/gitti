@@ -37,11 +37,11 @@ func InitGitRebase(updateChannel chan string, gitProcessLock *GitProcessLock, lo
 	return gitRebase
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// return the git rebase output
+//	Return a copy of the latest git rebase output lines
 //
-// --------------------------------
+// ------------------------------------
 func (gr *GitRebase) GetGitRebaseOutput() []string {
 	gr.gitRebaseOutputMu.RLock()
 	defer gr.gitRebaseOutputMu.RUnlock()
@@ -51,12 +51,12 @@ func (gr *GitRebase) GetGitRebaseOutput() []string {
 	return copied
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// # Git Rebase (this rebase is different from the above rebase which default to its track upstream branch)
-// * this rebase will be a more precise control on what remote (or local) and branch it will rebase on
+//	Execute explicit rebase target flow:
+//	rebase local branch directly when remote empty, otherwise pull --rebase from selected remote/branch
 //
-// --------------------------------
+// ------------------------------------
 func (gr *GitRebase) GitRebase(ctx context.Context, remote string, branchName string) int {
 	if !gr.gitProcessLock.CanProceedWithGitOps() {
 		return -1
@@ -143,8 +143,11 @@ func (gr *GitRebase) GitRebase(ctx context.Context, remote string, branchName st
 	return 0
 }
 
-// GitRebaseWithSigning constructs the git rebase command arguments for execution in the terminal.
-// This allows for interactive signing (e.g., grG passphrase) by suspending the UI.
+// ------------------------------------
+//
+//	Build git rebase args for signing-required terminal execution path
+//
+// ------------------------------------
 func (gr *GitRebase) GitRebaseWithSigning(remote string, branchName string) []string {
 	var gitArgs []string
 	if remote == "" {
@@ -155,11 +158,11 @@ func (gr *GitRebase) GitRebaseWithSigning(remote string, branchName string) []st
 	return gitArgs
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// # Clear the Git Process Output
+//	Clear cached git rebase output lines
 //
-// --------------------------------
+// ------------------------------------
 func (gr *GitRebase) ClearGitRebaseOutput() {
 	gr.gitRebaseOutputMu.Lock()
 	defer gr.gitRebaseOutputMu.Unlock()

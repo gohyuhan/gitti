@@ -23,9 +23,9 @@ import (
 //	- Detail Panels: Horizontally or vertically scrolls the main viewports.
 //
 // ------------------------------------
-func GittiMouseInteraction(msg tea.MouseWheelMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
-	switch msg.Button {
+	switch msg.Mouse().Button {
 	case tea.MouseWheelLeft:
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
@@ -57,7 +57,7 @@ func GittiMouseInteraction(msg tea.MouseWheelMsg, m *types.GittiModel) (*types.G
 				}
 			case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
-				if ok && popUp.IsCommitFixupSquashViewportSelected.Load() {
+				if ok && popUp.IsCommitFixupSquashViewportSelected {
 					popUp.CommitFixupSquashViewport.ScrollLeft(1)
 				}
 			}
@@ -94,7 +94,7 @@ func GittiMouseInteraction(msg tea.MouseWheelMsg, m *types.GittiModel) (*types.G
 				}
 			case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
-				if ok && popUp.IsCommitFixupSquashViewportSelected.Load() {
+				if ok && popUp.IsCommitFixupSquashViewportSelected {
 					popUp.CommitFixupSquashViewport.ScrollRight(1)
 				}
 			}

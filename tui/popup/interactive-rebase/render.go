@@ -10,7 +10,7 @@ import (
 
 // ------------------------------------
 //
-//	choose interactive rebase option
+//	Render the interactive rebase option selection popup (fixup/squash, reword, drop)
 //
 // ------------------------------------
 func RenderInteractiveRebaseOptionPopUp(m *types.GittiModel) string {
@@ -54,10 +54,10 @@ func RenderInteractiveRebaseFixupSquashSelectionPopUp(m *types.GittiModel) strin
 		var commitSelectionView string
 		var commitViewportView string
 
-		if popUp.IsCommitListSelected.Load() && !popUp.IsCommitFixupSquashViewportSelected.Load() {
+		if popUp.IsCommitListSelected && !popUp.IsCommitFixupSquashViewportSelected {
 			commitSelectionView = style.SelectedBorderStyle.Width(listWidth).Render(popUp.CommitList.View())
 			commitViewportView = style.PanelBorderStyle.Width(vpWidth).Render(popUp.CommitFixupSquashViewport.View())
-		} else if !popUp.IsCommitListSelected.Load() && popUp.IsCommitFixupSquashViewportSelected.Load() {
+		} else if !popUp.IsCommitListSelected && popUp.IsCommitFixupSquashViewportSelected {
 			commitSelectionView = style.PanelBorderStyle.Width(listWidth).Render(popUp.CommitList.View())
 			commitViewportView = style.SelectedBorderStyle.Width(vpWidth).Render(popUp.CommitFixupSquashViewport.View())
 		}
@@ -72,8 +72,80 @@ func RenderInteractiveRebaseFixupSquashSelectionPopUp(m *types.GittiModel) strin
 			lipgloss.Left,
 			title,
 			innerContent,
+			style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseFixupWarning),
 		)
 
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	Render the commit message and description input popup for the fixup/squash rebase operation
+//
+// ------------------------------------
+func RenderInteractiveRebaseFixupSquashCommitPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashCommitPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxInteractiveRebaseFixupSquashCommitPopUpWidth, int(float64(m.Width)*0.8))
+		popUp.MessageTextInput.SetWidth(popUpWidth - 6)
+		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 6)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseFixupSquashCommitMessageTitle),
+			popUp.MessageTextInput.View(),
+			style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseFixupSquashCommitDescriptionTitle),
+			popUp.DescriptionTextAreaInput.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	Render the fixup/squash rebase output popup; shows a spinner while processing,
+//	and changes the viewport border color to reflect error or success state
+//
+// ------------------------------------
+func RenderInteractiveRebaseFixupSquashOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxInteractiveRebaseFixupSquashOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseFixupSquashOutputPopUpTitle)
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpInteractiveRebaseFixupSquashOutputviewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.FixupSquashOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.FixupSquashOutputViewport.SetYOffset(popUp.FixupSquashOutputViewport.YOffset())
+		logViewPort := logViewPortStyle.Render(popUp.FixupSquashOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.InteractiveRebaseFixupSquashing)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""

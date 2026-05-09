@@ -211,7 +211,7 @@ func (gc *GitCommit) GitCommitWithSigning(message, description string, isAmendCo
 
 // ------------------------------------
 //
-//	Related to Git Commit (Amend)
+//	Retrieve the subject and body of the latest commit (HEAD) for pre-filling the amend commit input
 //
 // ------------------------------------
 func (gc *GitCommit) GetLatestCommitMsgAndDesc() LatestCommitMsgAndDesc {

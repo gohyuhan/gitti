@@ -45,7 +45,7 @@ func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock, logg
 
 // ------------------------------------
 //
-//	Return filesStatus
+//	Return a copy of all tracked/modified file statuses
 //
 // ------------------------------------
 func (gf *GitFiles) FilesStatus() []FileStatus {
@@ -249,7 +249,7 @@ func (gf *GitFiles) UnstageAllChanges() {
 
 // ------------------------------------
 //
-//	Stage line
+//	Stage a single diff line from the given file by generating and applying a minimal patch
 //
 // ------------------------------------
 func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []string, startFromIndex int, stageLineIndex int) {
@@ -407,7 +407,7 @@ func generateStageLinePatchString(diffContentStringArray []string, actualStageLi
 
 // ------------------------------------
 //
-//	Unstage line
+//	Unstage a single diff line from the given file by generating and applying a reverse patch
 //
 // ------------------------------------
 func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []string, startFromIndex int, unStageLineIndex int) {

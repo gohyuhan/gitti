@@ -137,7 +137,11 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 	gCL.gitCommitLogOutput = gitCommitLogOutput
 }
 
-// RenderCommit generates the visual graph line for a single commit.
+// ------------------------------------
+//
+//	Render one commit graph line using stable-color dense-packing lane logic
+//
+// ------------------------------------
 //
 // Algorithm Overview: "Stable-Color Dense-Packing"
 // ------------------------------------------------
@@ -499,8 +503,8 @@ func (gCL *GitCommitLog) GitCherryPickWithSigning(cherryPickedCommitHashes []str
 
 // ------------------------------------
 //
-// Helper to topo order cherry picked commit to prevent cherry pick conflict
-// (this only to commits that are from the same branch or related, else it will be in the sequence of how user cherry oicked it)
+//	Topologically order selected cherry-pick commits to reduce conflict risk for related commits;
+//	unrelated commits remain in user-selected sequence
 //
 // ------------------------------------
 func (gCL *GitCommitLog) topoOrderCherryPickedCommit(cherryPickedCommitHashes []string) []string {
@@ -592,8 +596,11 @@ func (gCL *GitCommitLog) GetCommitHashParentInfo(commitHash string) []CommitHash
 	return parentCommitInfoArray
 }
 
-// GitRevertCommitWithSigning constructs the git revert command arguments for execution in the terminal.
-// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+// ------------------------------------
+//
+//	Build git revert args for signing-required terminal execution path
+//
+// ------------------------------------
 func (gCL *GitCommitLog) GitRevertCommitWithSigning(commitHash string, parentOrder int) []string {
 	var gitArgs []string
 	if parentOrder > 0 {

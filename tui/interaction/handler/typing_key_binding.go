@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"unicode/utf8"
 
 	tea "charm.land/bubbletea/v2"
@@ -13,6 +14,7 @@ import (
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
@@ -54,7 +56,8 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		constant.CreateBranchBasedOnRemotePopUp,
 		constant.CreateTagPopUp,
 		constant.EditRemotePromptPopUp,
-		constant.GitRebaseBranchInputPopUp:
+		constant.GitRebaseBranchInputPopUp,
+		constant.InteractiveRebaseFixupSquashCommitPopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -67,7 +70,7 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 //
 //	Handle Tab key interaction during typing state.
 //	Responsibility: Facilitates forward navigation between multiple input fields
-//	within complex popups (like commit creation or cherry-pick editing).
+//	within complex popups (like commit creation, cherry-pick editing, or fixup/squash commit editing).
 //
 // ------------------------------------
 func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -137,6 +140,19 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 				popUp.TagMessageTextAreaInput.Focus()
 			}
 		}
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+			case 2:
+				popUp.MessageTextInput.Blur()
+				popUp.DescriptionTextAreaInput.Focus()
+			}
+		}
 	}
 	return m, nil
 }
@@ -145,7 +161,7 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 //
 //	Handle Shift+Tab key interaction during typing state.
 //	Responsibility: Facilitates backward navigation between multiple input fields
-//	within complex popups (like commit creation or cherry-pick editing).
+//	within complex popups (like commit creation, cherry-pick editing, or fixup/squash commit editing).
 //
 // ------------------------------------
 func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -215,7 +231,19 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				popUp.TagMessageTextAreaInput.Focus()
 			}
 		}
-
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+			case 2:
+				popUp.MessageTextInput.Blur()
+				popUp.DescriptionTextAreaInput.Focus()
+			}
+		}
 	}
 	return m, nil
 }
@@ -224,7 +252,7 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 //
 //	Handle Ctrl+e key interaction during typing state.
 //	Responsibility: Acts as an explicit submission/confirmation trigger for multi-line
-//	or complex inputs (e.g., executing a commit from the commit popup).
+//	or complex inputs (e.g., executing a commit from the commit popup or fixup/squash from the fixup/squash commit popup).
 //
 // ------------------------------------
 func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -279,6 +307,42 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			m.IsTyping.Store(false)
 			tagPopUp.InitCreateTagConfirmationPopUpModel(m, popUp.TagNameInput.Value(), popUp.TagMessageTextAreaInput.Value(), popUp.CommitHash, popUp.CommitMessage)
 			m.PopUpType = constant.CreateTagConfirmationPopUp
+		}
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			ogRetrievedCommitsList := popUp.OriginalRetrievedCommitList
+			sortedSelectedCommits := popUp.SortedSelectedCommits
+			fixupSquashCommitMessage := popUp.MessageTextInput.Value()
+			fixupSquashCommitDescription := popUp.DescriptionTextAreaInput.Value()
+
+			if utf8.RuneCountInString(fixupSquashCommitMessage) > 0 && len(ogRetrievedCommitsList) > 1 && len(sortedSelectedCommits) > 1 {
+				// Switch to output popup before starting execution so errors/progress are visible immediately.
+				interactiverebasePopUp.InitInteractiveRebaseFixupSquashOutputPopUpModel(m)
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+				m.PopUpType = constant.InteractiveRebaseFixupSquashOutputPopUp
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					// Signing path returns prepared exec command; tea.ExecProcess handles terminal suspension.
+					executor, cleanupCallbackFunc, fixupSquashErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseFixupSquashWithSigning(context.TODO(), ogRetrievedCommitsList, sortedSelectedCommits, fixupSquashCommitMessage, fixupSquashCommitDescription)
+					if fixupSquashErr != nil {
+						popUp.HasError.Store(true)
+						popUp.FixupSquashOutputViewport.SetContent(fixupSquashErr.Error())
+						return m, nil
+					}
+					return utils.SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m, executor, cleanupCallbackFunc, logging.INTERACTIVE_REBASE_FIXUP_SQUASH)
+				} else {
+					if ok {
+						popUp.IsProcessing.Store(true)
+						// Non-signing path runs async service with cancellable context.
+						services.InteractiveRebaseFixupSquashService(m, ogRetrievedCommitsList, sortedSelectedCommits, fixupSquashCommitMessage, fixupSquashCommitDescription)
+
+						// Start spinner ticking
+						return m, popUp.Spinner.Tick
+					}
+				}
+			}
 		}
 	}
 	return m, nil
@@ -559,6 +623,21 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			popUp.BranchNameInput, cmd = popUp.BranchNameInput.Update(msg)
 			return m, cmd
 		}
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -632,6 +711,16 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 		popUp, ok := m.PopUpModel.(*rebasePopUp.GitRebaseBranchInputPopUpModel)
 		if ok {
 			content = popUp.BranchNameInput.Value()
+		}
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.MessageTextInput.Value()
+			case 2:
+				content = popUp.DescriptionTextAreaInput.Value()
+			}
 		}
 	}
 

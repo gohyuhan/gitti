@@ -20,6 +20,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
@@ -267,7 +268,7 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		return gAM, nil
-	case tea.MouseWheelMsg:
+	case tea.MouseMsg:
 		model, cmd := interaction.GittiMouseInteraction(msg, m)
 		gAM.model = model
 		return gAM, cmd
@@ -353,6 +354,12 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if branchPopup, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
 				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.InteractiveRebaseFixupSquashOutputPopUp:
+			if interactiveRebaseFixupSquash, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel); ok && interactiveRebaseFixupSquash.IsProcessing.Load() {
+				var cmd tea.Cmd
+				interactiveRebaseFixupSquash.Spinner, cmd = interactiveRebaseFixupSquash.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		}

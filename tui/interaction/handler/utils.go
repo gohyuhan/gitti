@@ -25,7 +25,8 @@ import (
 //
 //	Handle up/down key messages for pop-up navigation and scrolling.
 //	Responsibility: Routes vertical navigation events (Up/k, Down/j) to the currently
-//	active popup's internal lists or text viewports, ensuring the correct popup state is updated.
+//	active popup's internal lists or text viewports, including interactive rebase
+//	fixup/squash selection and output popups.
 //
 // ------------------------------------
 func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -470,11 +471,19 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			return m, cmd
 		}
 
+	case constant.InteractiveRebaseFixupSquashOutputPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+		if ok && !popUp.IsProcessing.Load() {
+			// Block viewport scroll while command is actively running.
+			popUp.FixupSquashOutputViewport, cmd = popUp.FixupSquashOutputViewport.Update(msg)
+			return m, cmd
+		}
+
 	// popup that have both viewport and list
 	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
 		if ok {
-			if popUp.IsCommitListSelected.Load() {
+			if popUp.IsCommitListSelected {
 				switch msg.String() {
 				case "up", "k":
 					if popUp.CommitList.Index() > 0 {
@@ -489,7 +498,7 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 				}
 				popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, popUp.CommitList.Width())
 				return m, nil
-			} else if popUp.IsCommitFixupSquashViewportSelected.Load() {
+			} else if popUp.IsCommitFixupSquashViewportSelected {
 				popUp.CommitFixupSquashViewport, cmd = popUp.CommitFixupSquashViewport.Update(msg)
 				return m, cmd
 			}
@@ -503,10 +512,11 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 //
 //	Handle mouse wheel up/down messages for pop-up scrolling.
 //	Responsibility: Routes vertical mouse scroll events to the appropriate internal list
-//	or viewport of the currently active popup, matching keyboard navigation behavior.
+//	or viewport of the currently active popup, including interactive rebase
+//	fixup/squash selection and output popups.
 //
 // ------------------------------------
-func UpDownMouseMsgUpdateForPopUp(msg tea.MouseWheelMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
 	// for pop up that have viewport
 	switch m.PopUpType {
@@ -569,6 +579,19 @@ func UpDownMouseMsgUpdateForPopUp(msg tea.MouseWheelMsg, m *types.GittiModel) (*
 		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 		if ok && popUp.ShowingBlameInfo {
 			popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+		if ok && popUp.IsCommitFixupSquashViewportSelected {
+			popUp.CommitFixupSquashViewport, cmd = popUp.CommitFixupSquashViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.InteractiveRebaseFixupSquashOutputPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+		if ok && !popUp.IsProcessing.Load() {
+			// Block viewport scroll while command is actively running.
+			popUp.FixupSquashOutputViewport, cmd = popUp.FixupSquashOutputViewport.Update(msg)
 			return m, cmd
 		}
 	}

@@ -1,0 +1,44 @@
+package interactiverebase
+
+import (
+	"cmp"
+	"fmt"
+	"slices"
+
+	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/tui/types"
+)
+
+// ------------------------------------
+//
+//	Validates that at least two commits are selected and the base commit is not a merge commit,
+//	then sorts selected commits oldest-first by CommitOrder; sets SelectionError on failure
+//
+// ------------------------------------
+func InteractiveRebaseFixupSquashSelectionValidationAndSort(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
+	if ok {
+		popUp.SelectionError = nil
+		var sortedSelectedCommitArray []git.CommitInfo
+
+		for _, commit := range popUp.SelectedCommitHashMap {
+			sortedSelectedCommitArray = append(sortedSelectedCommitArray, commit)
+		}
+
+		slices.SortFunc(sortedSelectedCommitArray, func(a, b git.CommitInfo) int {
+			return cmp.Compare(b.CommitOrder, a.CommitOrder) // largest CommitOrder first = oldest to latest
+		})
+
+		popUp.SortedSelectedCommits = sortedSelectedCommitArray
+
+		if len(sortedSelectedCommitArray) < 2 {
+			popUp.SelectionError = fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError)
+			return
+		}
+
+		if len(sortedSelectedCommitArray[0].Parent) > 1 {
+			popUp.SelectionError = fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit)
+		}
+	}
+}

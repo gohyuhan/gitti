@@ -16,7 +16,11 @@ import (
 	"github.com/gohyuhan/gitti/logging"
 )
 
-// represent the info of commit that got cherry picked
+// ------------------------------------
+//
+//	Represents one commit entry used by the interactive rebase fixup/squash flow
+//
+// ------------------------------------
 type CommitInfo struct {
 	Hash        string
 	Message     string
@@ -114,7 +118,7 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() []CommitInfo {
 //	* message applied via `git commit --amend -F <tempfile>` — no editor flag
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) ([]string, error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -122,7 +126,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, 
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixup(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, false)
+	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, false)
 	if fixupErr != nil {
 		return []string{}, fixupErr
 	}
@@ -143,7 +147,6 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, 
 	return parsedFixupOutput, nil
 }
 
-// GitInteractiveRebaseFixupWithSigning is the signing variant of GitInteractiveRebaseFixup.
 // ------------------------------------
 //
 //	Interactive Rebase - Fixup (Signing variant)
@@ -154,7 +157,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixup(ctx context.Context, 
 //	* git's own repo lock (.git/rebase-merge/) prevents concurrent ops during execution
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) (*exec.Cmd, func(), error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return nil, nil, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -162,10 +165,16 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupWithSigning(ctx contex
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	return gIR.interactiveRebaseFixup(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, true)
+	return gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, true)
 }
 
-func (gIR *GitInteractiveRebase) interactiveRebaseFixup(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string, signing bool) (*exec.Cmd, func(), error) {
+// ------------------------------------
+//
+//	Builds the rebase command and cleanup callback for fixup/squash; validates selected commits,
+//	generates todo and message temp files, and configures a non-interactive sequence editor
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) interactiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string, signing bool) (*exec.Cmd, func(), error) {
 	if len(sortedSelectedCommitInfos) < 2 {
 		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError)
 	}

@@ -1603,6 +1603,16 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					}
 				}
 			}
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+			if ok {
+				if popUp.SelectionError == nil {
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+					m.PopUpType = constant.InteractiveRebaseFixupSquashCommitPopUp
+					interactiverebasePopUp.InitInteractiveRebaseFixupSquashCommitPopUp(m, popUp.OriginalRetrievedCommitList, popUp.SortedSelectedCommits)
+				}
+			}
 
 		}
 	}
@@ -1751,7 +1761,7 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
 			if ok {
-				if popUp.IsCommitListSelected.Load() {
+				if popUp.IsCommitListSelected {
 					selectedItem := popUp.CommitList.SelectedItem()
 					if selectedItem != nil {
 						// check if the selected item is pick for selection or not
@@ -1763,6 +1773,7 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						} else {
 							popUp.SelectedCommitHashMap[parsedSelectedItem.Hash] = git.CommitInfo(parsedSelectedItem)
 						}
+						interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionValidationAndSort(m)
 						interactiverebasePopUp.UpdateInteractiveRebaseFixupSquashViewport(m)
 					}
 				}
@@ -1787,18 +1798,28 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 		switch m.PopUpType {
 		case constant.GitRemotePushPopUp:
 			services.GitRemotePushCancelService(m)
+			m.PopUpModel = nil
 		case constant.GitPullOutputPopUp:
 			services.GitPullCancelService(m)
+			m.PopUpModel = nil
 		case constant.PushTagOutputPopUp:
 			services.GitPushTagCancelService(m)
+			m.PopUpModel = nil
 		case constant.FetchTagOutputPopUp:
 			services.GitFetchTagCancelService(m)
+			m.PopUpModel = nil
 		case constant.DeleteTagOutputPopUp:
 			services.DeleteTagCancelService(m)
+			m.PopUpModel = nil
 		case constant.GitRebaseOutputPopUp:
 			services.GitRebaseCancelService(m)
+			m.PopUpModel = nil
 		case constant.BranchMergeOutputPopUp:
 			services.GitMergeCancelService(m)
+			m.PopUpModel = nil
+		case constant.InteractiveRebaseFixupSquashOutputPopUp:
+			services.InteractiveRebaseFixupSquashCancelService(m)
+			m.PopUpModel = nil
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -2122,7 +2143,6 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 //
 // ------------------------------------
 func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponentPanel:
@@ -2137,8 +2157,7 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 		case constant.CommitPopUp:
 			popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
 			if ok {
-				popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
-				return m, cmd
+				popUp.GitCommitOutputViewport.ScrollLeft(1)
 			}
 		case constant.GitDiscardFileLineChangeConfirmPopUp:
 			popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
@@ -2158,8 +2177,14 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 			}
 		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
-			if ok && popUp.IsCommitFixupSquashViewportSelected.Load() {
+			if ok && popUp.IsCommitFixupSquashViewportSelected {
 				popUp.CommitFixupSquashViewport.ScrollLeft(1)
+			}
+
+		case constant.InteractiveRebaseFixupSquashOutputPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+			if ok && !popUp.IsProcessing.Load() {
+				popUp.FixupSquashOutputViewport.ScrollLeft(1)
 			}
 		}
 	}
@@ -2174,7 +2199,6 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 //
 // ------------------------------------
 func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponentPanel:
@@ -2189,8 +2213,7 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 		case constant.CommitPopUp:
 			popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
 			if ok {
-				popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
-				return m, cmd
+				popUp.GitCommitOutputViewport.ScrollRight(1)
 			}
 		case constant.GitDiscardFileLineChangeConfirmPopUp:
 			popUp, ok := m.PopUpModel.(*filesPopUp.GitDiscardFileLineChangeConfirmPopUpModel)
@@ -2209,8 +2232,13 @@ func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 			}
 		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
-			if ok && popUp.IsCommitFixupSquashViewportSelected.Load() {
+			if ok && popUp.IsCommitFixupSquashViewportSelected {
 				popUp.CommitFixupSquashViewport.ScrollRight(1)
+			}
+		case constant.InteractiveRebaseFixupSquashOutputPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+			if ok && !popUp.IsProcessing.Load() {
+				popUp.FixupSquashOutputViewport.ScrollRight(1)
 			}
 		}
 	}
@@ -2307,8 +2335,8 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
 			if ok {
-				popUp.IsCommitListSelected.Store(true)
-				popUp.IsCommitFixupSquashViewportSelected.Store(false)
+				popUp.IsCommitListSelected = true
+				popUp.IsCommitFixupSquashViewportSelected = false
 			}
 		}
 	}
@@ -2353,8 +2381,8 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
 			if ok {
-				popUp.IsCommitListSelected.Store(false)
-				popUp.IsCommitFixupSquashViewportSelected.Store(true)
+				popUp.IsCommitListSelected = false
+				popUp.IsCommitFixupSquashViewportSelected = true
 			}
 		}
 	}
