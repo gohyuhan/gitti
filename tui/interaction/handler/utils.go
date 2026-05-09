@@ -9,6 +9,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
+	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
@@ -391,6 +392,25 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			}
 			popUp.BranchOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.BranchOptionList, constant.MaxChooseBranchOptionForMergePopUpWidth)
 			popUp.SelectedBranchList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.SelectedBranchList, constant.MaxChooseBranchOptionForMergePopUpWidth)
+			return m, nil
+		}
+
+	case constant.InteractiveRebaseOptionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebase.InteractiveRebaseOptionPopUp)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.InteractiveRebaseOptionList.Index() > 0 {
+					latestIndex := popUp.InteractiveRebaseOptionList.Index() - 1
+					popUp.InteractiveRebaseOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.InteractiveRebaseOptionList.Index() < len(popUp.InteractiveRebaseOptionList.Items())-1 {
+					latestIndex := popUp.InteractiveRebaseOptionList.Index() + 1
+					popUp.InteractiveRebaseOptionList.Select(latestIndex)
+				}
+			}
+			popUp.InteractiveRebaseOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.InteractiveRebaseOptionList, constant.MaxInteractiveRebaseOptionPopUpWidth)
 			return m, nil
 		}
 

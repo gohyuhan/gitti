@@ -454,6 +454,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingForBlamePopUpBlameView
 				}
 			}
+		case constant.InteractiveRebaseOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseOptionPopUp
 		}
 	} else {
 		//-----------------------------

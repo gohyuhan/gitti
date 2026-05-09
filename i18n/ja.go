@@ -186,6 +186,7 @@ var jA = LanguageMapping{
 		"[enter] コミットログの内容を表示",
 		"[t] タグを作成",
 		"[ctrl+r] このコミットをリバート",
+		"[i] インタラクティブリベース",
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
@@ -199,6 +200,7 @@ var jA = LanguageMapping{
 		"[</>] コンポーネントを切り替え",
 		"[↑/↓] 上下に移動",
 		"[enter] 参照ログの内容を表示",
+		"[i] インタラクティブリベース",
 		"[n] コミットハッシュに基づいて新しいブランチを作成",
 		"[r] このコミットにリセット",
 		"[ctrl+p] チェリーピックして適用する",
@@ -478,6 +480,11 @@ var jA = LanguageMapping{
 		"[←/→] 左右に移動",
 		"[esc] ファイル選択に戻る",
 	},
+	KeyBindingForInteractiveRebaseOptionPopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] リベースオプションを選択",
+		"[esc] キャンセル / 閉じる",
+	},
 	GlobalKeyBinding:                                             jaGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                               jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                       jaTagComponentKeyBinding,
@@ -668,6 +675,12 @@ var jA = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError: "fixup/squash ターゲットはマージコミットであってはなりません",
 	InteractiveRebaseFixupPositionMismatchError:                  "インタラクティブリベースfixupの選択コミット位置が一致しません",
 	InteractiveRebaseFixupWarning:                                "警告：スカッシュターゲットより新しいマージコミットは、選択されていてもリベースからスキップ・除外されます。",
+	InteractiveRebaseFixupSquash:                                 "Fixup / Squash",
+	InteractiveRebaseFixupSquashDescription:                      "選択したコミットを1つにまとめます（コミットメッセージの編集も可能）",
+	InteractiveRebaseReword:                                      "Reword",
+	InteractiveRebaseDrop:                                        "Drop",
+	InteractiveRebaseFeatureComingSoon:                           "近日公開",
+	ChooseInteractiveRebaseOption:                                "インタラクティブリベースの操作を選択",
 }
 
 // for about gitti
@@ -1075,6 +1088,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "i",
+		TitleOrInfoLine: "インタラクティブリベース",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下に移動",
 		LineType:        INFO,
@@ -1116,6 +1134,11 @@ var jaRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "参照ログからチェリーピックして現在のブランチに適用する",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "i",
+		TitleOrInfoLine: "インタラクティブリベース",
 		LineType:        INFO,
 	},
 	{

@@ -102,3 +102,10 @@ const (
 	STAGE   = "STAGE"   // Stage changes (git add)
 	UNSTAGE = "UNSTAGE" // Unstage changes (git reset)
 )
+
+// interactive rebase
+const (
+	FIXUPSQUASH = "FIXUPSQUASH" // interactive rebase fixup/squash, as we control the flow layer, so this will be categorize as the same in gitti
+	REWORD      = "REWORD"      // interactive rebase reword
+	DROP        = "DROP"        // interactive rebase drop
+)

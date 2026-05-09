@@ -8,6 +8,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/commitlog"
 	"github.com/gohyuhan/gitti/tui/popup/discard"
 	"github.com/gohyuhan/gitti/tui/popup/files"
+	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	"github.com/gohyuhan/gitti/tui/popup/keybinding"
 	"github.com/gohyuhan/gitti/tui/popup/pull"
 	"github.com/gohyuhan/gitti/tui/popup/push"
@@ -137,6 +138,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = branch.RenderBranchMergeOutputPopUp(m)
 	case constant.BlamePopUp:
 		popUp = blame.RenderBlamePopUp(m)
+	case constant.InteractiveRebaseOptionPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseOptionPopUp(m)
 	}
 	return popUp
 }

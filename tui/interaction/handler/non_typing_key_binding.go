@@ -25,6 +25,7 @@ import (
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
+	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
@@ -515,6 +516,22 @@ func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingiKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel {
+			// interactive rebase only possible when there is commit
+			if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.InteractiveRebaseOptionPopUp
+				interactiverebase.InitInteractiveRebaseOptionPopUp(m)
+			}
+		}
+	}
+
+	return m, nil
+}
+
 // ------------------------------------
 //
 //	Handle 'L' key interaction.
@@ -952,14 +969,17 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.LocalBranchOrTagOrRemoteComponentPanel:
 			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-				currentSelectedLocalBranch := m.CurrentRepoBranchesInfoList.SelectedItem().(branch.GitBranchItem)
-				// only proceed if the local branch selected is not current checkedout branch
-				// we can't switch from current checkout branch to current checkout branch, do we
-				if !currentSelectedLocalBranch.IsCheckedOut {
-					m.PopUpType = constant.ChooseSwitchBranchTypePopUp
-					m.IsTyping.Store(false)
-					m.ShowPopUp.Store(true)
-					branchPopUp.InitChooseSwitchBranchTypePopUpModel(m, currentSelectedLocalBranch.BranchName)
+				selectedLocalBranchItem := m.CurrentRepoBranchesInfoList.SelectedItem()
+				if selectedLocalBranchItem != nil {
+					currentSelectedLocalBranch := selectedLocalBranchItem.(branch.GitBranchItem)
+					// only proceed if the local branch selected is not current checkedout branch
+					// we can't switch from current checkout branch to current checkout branch, do we
+					if !currentSelectedLocalBranch.IsCheckedOut {
+						m.PopUpType = constant.ChooseSwitchBranchTypePopUp
+						m.IsTyping.Store(false)
+						m.ShowPopUp.Store(true)
+						branchPopUp.InitChooseSwitchBranchTypePopUpModel(m, currentSelectedLocalBranch.BranchName)
+					}
 				}
 			case constant.SHOW_REMOTE:
 				currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
@@ -981,42 +1001,44 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			popUp, ok := m.PopUpModel.(*remotePopUp.ChooseRemotePopUpModel)
 			if ok {
 				remote := popUp.RemoteList.SelectedItem()
-				remoteName := remote.(remotePopUp.GitRemoteItem).Name
-				switch popUp.Action {
-				case constant.PUSHACTION:
-					m.PopUpType = constant.ChoosePushTypePopUp
-					m.IsTyping.Store(false)
-					m.ShowPopUp.Store(true)
-					pushPopUp.InitChoosePushTypePopUpModel(m, remoteName)
-				case constant.CREATEBRANCHBASEDONREMOTE:
-					m.IsTyping.Store(true)
-					m.ShowPopUp.Store(true)
-					m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
-					// only one remote found so, we will default to that remote
-					branchPopUp.InitCreateBranchBasedOnRemotePopUp(m, remoteName)
-				case constant.TAGPUSHACTION:
-					selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
-					if selectedTag != nil {
+				if remote != nil {
+					remoteName := remote.(remotePopUp.GitRemoteItem).Name
+					switch popUp.Action {
+					case constant.PUSHACTION:
+						m.PopUpType = constant.ChoosePushTypePopUp
 						m.IsTyping.Store(false)
 						m.ShowPopUp.Store(true)
-						m.PopUpType = constant.ChoosePushTagOptionPopUp
-						tagPopUp.InitChoosePushTagOptionPopUpModel(m, remoteName, selectedTag.(tag.GitTagItem).TagName)
-					} else {
+						pushPopUp.InitChoosePushTypePopUpModel(m, remoteName)
+					case constant.CREATEBRANCHBASEDONREMOTE:
+						m.IsTyping.Store(true)
+						m.ShowPopUp.Store(true)
+						m.PopUpType = constant.CreateBranchBasedOnRemotePopUp
+						// only one remote found so, we will default to that remote
+						branchPopUp.InitCreateBranchBasedOnRemotePopUp(m, remoteName)
+					case constant.TAGPUSHACTION:
+						selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+						if selectedTag != nil {
+							m.IsTyping.Store(false)
+							m.ShowPopUp.Store(true)
+							m.PopUpType = constant.ChoosePushTagOptionPopUp
+							tagPopUp.InitChoosePushTagOptionPopUpModel(m, remoteName, selectedTag.(tag.GitTagItem).TagName)
+						} else {
+							m.IsTyping.Store(false)
+							m.ShowPopUp.Store(false)
+							m.PopUpType = constant.NoPopUp
+							m.PopUpModel = nil
+						}
+					case constant.TAGFETCHACTION:
 						m.IsTyping.Store(false)
-						m.ShowPopUp.Store(false)
-						m.PopUpType = constant.NoPopUp
-						m.PopUpModel = nil
+						m.ShowPopUp.Store(true)
+						m.PopUpType = constant.ChooseFetchTagOptionPopUp
+						tagPopUp.InitChooseFetchTagOptionPopUpModel(m, remoteName)
+					case constant.REBASEACTION:
+						m.IsTyping.Store(true)
+						m.ShowPopUp.Store(true)
+						m.PopUpType = constant.GitRebaseBranchInputPopUp
+						rebasePopUp.InitGitRebaseBranchInputPopUpModel(m, remoteName)
 					}
-				case constant.TAGFETCHACTION:
-					m.IsTyping.Store(false)
-					m.ShowPopUp.Store(true)
-					m.PopUpType = constant.ChooseFetchTagOptionPopUp
-					tagPopUp.InitChooseFetchTagOptionPopUpModel(m, remoteName)
-				case constant.REBASEACTION:
-					m.IsTyping.Store(true)
-					m.ShowPopUp.Store(true)
-					m.PopUpType = constant.GitRebaseBranchInputPopUp
-					rebasePopUp.InitGitRebaseBranchInputPopUpModel(m, remoteName)
 				}
 			}
 
@@ -1024,14 +1046,16 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			popUp, ok := m.PopUpModel.(*pushPopUp.ChoosePushTypePopUpModel)
 			if ok {
 				selectedOption := popUp.PushOptionList.SelectedItem()
-				if m.GitPushRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
-					gitArgs := m.GitOperations.GitCommit.GitPushWithSigning(popUp.RemoteName, selectedOption.(pushPopUp.GitPushOptionItem).PushType, m.CheckOutBranch)
-					return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.GIT_PUSH_WITH_SIGNING_OPS)
-				} else {
-					m.PopUpType = constant.GitRemotePushPopUp
-					m.ShowPopUp.Store(true)
-					m.IsTyping.Store(false)
-					return services.InitGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(pushPopUp.GitPushOptionItem).PushType)
+				if selectedOption != nil {
+					if m.GitPushRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+						gitArgs := m.GitOperations.GitCommit.GitPushWithSigning(popUp.RemoteName, selectedOption.(pushPopUp.GitPushOptionItem).PushType, m.CheckOutBranch)
+						return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.GIT_PUSH_WITH_SIGNING_OPS)
+					} else {
+						m.PopUpType = constant.GitRemotePushPopUp
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						return services.InitGitRemotePushPopUpModelAndStartGitRemotePushService(m, popUp.RemoteName, selectedOption.(pushPopUp.GitPushOptionItem).PushType)
+					}
 				}
 			}
 
@@ -1039,6 +1063,9 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseNewBranchTypeOptionPopUpModel)
 			if ok {
 				selectedOption := popUp.NewBranchTypeOptionList.SelectedItem()
+				if selectedOption == nil {
+					return m, nil
+				}
 				newBranchType := selectedOption.(branchPopUp.GitNewBranchTypeOptionItem).NewBranchType
 				switch newBranchType {
 				case git.NEWBRANCHBASEDONREMOTEUSERINPUT:
@@ -1085,10 +1112,14 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.ChooseSwitchBranchTypePopUp:
 			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseSwitchBranchTypePopUpModel)
 			if ok {
+				selectedSwitchItem := popUp.SwitchTypeOptionList.SelectedItem()
+				if selectedSwitchItem == nil {
+					return m, nil
+				}
 				m.PopUpType = constant.SwitchBranchOutputPopUp
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				selectedOption := popUp.SwitchTypeOptionList.SelectedItem().(branchPopUp.GitSwitchBranchTypeOptionItem)
+				selectedOption := selectedSwitchItem.(branchPopUp.GitSwitchBranchTypeOptionItem)
 				branchName := popUp.BranchName
 				branchPopUp.InitSwitchBranchOutputPopUpModel(m, branchName, selectedOption.SwitchBranchType)
 				popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -1102,7 +1133,11 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.ChooseGitPullTypePopUp:
 			popUp, ok := m.PopUpModel.(*pullPopUp.ChooseGitPullTypePopUpModel)
 			if ok {
-				selectedOption := popUp.PullTypeOptionList.SelectedItem().(pullPopUp.GitPullTypeOptionItem)
+				selectedPullItem := popUp.PullTypeOptionList.SelectedItem()
+				if selectedPullItem == nil {
+					return m, nil
+				}
+				selectedOption := selectedPullItem.(pullPopUp.GitPullTypeOptionItem)
 
 				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
 					gitArgs := m.GitOperations.GitPull.GitPullWithSigning(selectedOption.PullType)
@@ -1124,10 +1159,14 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.GitDiscardTypeOptionPopUp:
 			popUp, ok := m.PopUpModel.(*discardPopUp.GitDiscardTypeOptionPopUpModel)
 			if ok {
+				selectedDiscardItem := popUp.DiscardTypeOptionList.SelectedItem()
+				if selectedDiscardItem == nil {
+					return m, nil
+				}
 				m.PopUpType = constant.GitDiscardConfirmPromptPopUp
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
-				selectedOption := popUp.DiscardTypeOptionList.SelectedItem().(discardPopUp.GitDiscardTypeOptionItem)
+				selectedOption := selectedDiscardItem.(discardPopUp.GitDiscardTypeOptionItem)
 				discardPopUp.InitGitDiscardConfirmPromptPopupModel(m, popUp.FilePathName, selectedOption.DiscardType)
 			}
 		case constant.GitDiscardConfirmPromptPopUp:
@@ -1155,7 +1194,11 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.GitResolveConflictOptionPopUp:
 			popUp, ok := m.PopUpModel.(*resolvePopUp.GitResolveConflictOptionPopUpModel)
 			if ok {
-				selectedResolveType := popUp.ResolveConflictOptionList.SelectedItem().(resolvePopUp.GitResolveConflictOptionItem)
+				selectedResolveItem := popUp.ResolveConflictOptionList.SelectedItem()
+				if selectedResolveItem == nil {
+					return m, nil
+				}
+				selectedResolveType := selectedResolveItem.(resolvePopUp.GitResolveConflictOptionItem)
 				services.GitResolveConflictService(m, popUp.FilePathName, selectedResolveType.ResolveType)
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
@@ -1775,7 +1818,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.GitRevertConfirmationPopUp,
 			constant.GitCherryPickFromRefLogApplyConfirmationPopUp,
 			constant.ChooseRemoteBranchOptionPopUp,
-			constant.ChooseBranchOptionForMergePopUp:
+			constant.ChooseBranchOptionForMergePopUp,
+			constant.InteractiveRebaseOptionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

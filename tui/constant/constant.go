@@ -60,6 +60,10 @@ const (
 	ChooseBranchOptionForMergePopUp               = "ChooseBranchOptionForMergePopUp"               // IsTyping will be false
 	BranchMergeOutputPopUp                        = "BranchMergeOutputPopUp"                        // IsTyping will be false
 	BlamePopUp                                    = "BlamePopUp"                                    // IsTyping will be true
+	InteractiveRebaseOptionPopUp                  = "InteractiveRebaseOptionPopUp"                  // IsTyping will be false
+	InteractiveRebaseFixupSquashSelectionPopUp    = "InteractiveRebaseFixupSquashSelectionPopUp"    // IsTyping will be false
+	InteractiveRebaseFixupSquashCommitPopUp       = "InteractiveRebaseFixupSquashCommitPopUp"       // IsTyping will be true
+	InteractiveRebaseFixupSquashOutputPopUp       = "InteractiveRebaseFixupSquashOutputPopUp"       // Istyping will be false
 )
 
 const (
@@ -135,6 +139,10 @@ const (
 	MaxChooseBranchOptionForMergePopUpWidth               = 150
 	MaxBranchMergeOutputPopUpWidth                        = 150
 	// BlamePopUpWidth will not be set as it will always take up 90% of width
+	MaxInteractiveRebaseOptionPopUpWidth = 150
+	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebese display
+	MaxInteractiveRebaseFixupSquashCommitPopUpWidth = 150
+	MaxInteractiveRebaseFixupSquashOutputPopUpWidth = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                       = 18
 	PopUpGitCommitOutputViewPortHeight                        = 10
@@ -173,6 +181,9 @@ const (
 	PopUpChooseBranchOptionForMergeSelectedBranchOptionHeight = 5
 	PopUpBranchMergeOutputViewportHeight                      = 16
 	// BlamePopUpWidth will not be set as it will always take up 90% of height
+	PopUpInteractiveRebaseOptionHeight = 8
+	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebese display
+	PopUpInteractiveRebaseFixupSquashOutputviewportHeight = 8
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it

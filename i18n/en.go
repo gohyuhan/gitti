@@ -186,6 +186,7 @@ var eN = LanguageMapping{
 		"[enter] view commit log content",
 		"[t] create tag",
 		"[ctrl+r] revert this commit",
+		"[i] interactive rebase",
 		"[r] reset to this commit",
 		"[R] reset latest commit",
 		"[ctrl+p] cherry pick ops",
@@ -199,6 +200,7 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[↑/↓] move up and down",
 		"[enter] view reflog content",
+		"[i] interactive rebase",
 		"[n] new branch based on commit hash",
 		"[r] reset to this commit",
 		"[ctrl+p] cherry pick and apply",
@@ -478,6 +480,11 @@ var eN = LanguageMapping{
 		"[←/→] move left and right",
 		"[esc] back to file selection",
 	},
+	KeyBindingForInteractiveRebaseOptionPopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] select rebase option",
+		"[esc] cancel / close",
+	},
 	GlobalKeyBinding:                                             enGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                               enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                       enTagComponentKeyBinding,
@@ -668,6 +675,12 @@ var eN = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError: "The fixup/squash target must not be a merge commit",
 	InteractiveRebaseFixupPositionMismatchError:                  "Selected commit position mismatch for interactive rebase fixup",
 	InteractiveRebaseFixupWarning:                                "Warning: Any merge commits newer than the squash target will be skipped and dropped from the rebase, even if selected.",
+	InteractiveRebaseFixupSquash:                                 "Fixup / Squash",
+	InteractiveRebaseFixupSquashDescription:                      "Combine selected commits into one, optionally editing the commit message",
+	InteractiveRebaseReword:                                      "Reword",
+	InteractiveRebaseDrop:                                        "Drop",
+	InteractiveRebaseFeatureComingSoon:                           "Coming Soon",
+	ChooseInteractiveRebaseOption:                                "Choose Interactive Rebase Option",
 }
 
 // for about gitti
@@ -1073,6 +1086,11 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "i",
+		TitleOrInfoLine: "interactive rebase",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "move up and down",
 		LineType:        INFO,
@@ -1114,6 +1132,11 @@ var enRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "cherry pick from reflog and apply on current branch",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "i",
+		TitleOrInfoLine: "interactive rebase",
 		LineType:        INFO,
 	},
 	{

@@ -186,6 +186,7 @@ var zH_HANS = LanguageMapping{
 		"[enter] 查看提交日志内容",
 		"[t] 创建标签",
 		"[ctrl+r] 还原此提交",
+		"[i] 交互式变基",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 遴选操作",
@@ -199,6 +200,7 @@ var zH_HANS = LanguageMapping{
 		"[</>] 切换组件",
 		"[↑/↓] 上下移动",
 		"[enter] 查看引用日志内容",
+		"[i] 交互式变基",
 		"[n] 基于此提交哈希创建新分支",
 		"[r] 重置到此提交",
 		"[ctrl+p] 遴选并应用",
@@ -478,6 +480,11 @@ var zH_HANS = LanguageMapping{
 		"[←/→] 左右移动",
 		"[esc] 返回文件选择",
 	},
+	KeyBindingForInteractiveRebaseOptionPopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 选择变基选项",
+		"[esc] 取消 / 关闭",
+	},
 	GlobalKeyBinding:                                             zhHansGlobalKeyBinding,
 	LocalBranchComponentKeyBinding:                               zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                       zhHansTagComponentKeyBinding,
@@ -668,6 +675,12 @@ var zH_HANS = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError: "fixup/squash 目标不能是合并提交",
 	InteractiveRebaseFixupPositionMismatchError:                  "交互式变基 fixup 的所选提交位置不匹配",
 	InteractiveRebaseFixupWarning:                                "警告：比压缩目标更新的合并提交将被跳过并从变基中丢弃，即使已选中也不例外。",
+	InteractiveRebaseFixupSquash:                                 "Fixup / Squash",
+	InteractiveRebaseFixupSquashDescription:                      "将所选提交合并为一个，可选择编辑提交信息",
+	InteractiveRebaseReword:                                      "Reword",
+	InteractiveRebaseDrop:                                        "Drop",
+	InteractiveRebaseFeatureComingSoon:                           "即将推出",
+	ChooseInteractiveRebaseOption:                                "选择交互式变基操作",
 }
 
 // for about gitti
@@ -1074,6 +1087,11 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "i",
+		TitleOrInfoLine: "交互式变基",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移动",
 		LineType:        INFO,
@@ -1115,6 +1133,11 @@ var zhHansRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "ctrl+p",
 		TitleOrInfoLine: "从引用日志遴选并应用到当前分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "i",
+		TitleOrInfoLine: "交互式变基",
 		LineType:        INFO,
 	},
 	{

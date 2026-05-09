@@ -204,6 +204,7 @@ type LanguageMapping struct {
 	KeyBindingForBranchMergeOutputPopUp                        []string
 	KeyBindingForBlamePopUpFilePathSelection                   []string
 	KeyBindingForBlamePopUpBlameView                           []string
+	KeyBindingForInteractiveRebaseOptionPopUp                  []string
 
 	// -----------------
 	//  For Pop Up
@@ -440,4 +441,10 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError string
 	InteractiveRebaseFixupPositionMismatchError                  string
 	InteractiveRebaseFixupWarning                                string
+	InteractiveRebaseFixupSquash                                 string
+	InteractiveRebaseFixupSquashDescription                      string
+	InteractiveRebaseReword                                      string
+	InteractiveRebaseDrop                                        string
+	InteractiveRebaseFeatureComingSoon                           string
+	ChooseInteractiveRebaseOption                                string
 }
