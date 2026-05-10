@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/interaction/handler"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
+	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -18,14 +19,14 @@ import (
 //	Handle mouse interactions.
 //	Responsibility: Translates mouse wheel events (up, down, left, right) into
 //	scrolling actions. Depending on the current view state:
-//	- Active Popup: Scrolls within popups like instructions or discard confirmation.
+//	- Active Popup: Scrolls within popups (instructions, discard confirmation, interactive rebase fixup/squash detail viewport, etc.).
 //	- Detail Panels: Horizontally or vertically scrolls the main viewports.
 //
 // ------------------------------------
 func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	var cmd tea.Cmd
-	switch msg.String() {
-	case "wheelleft":
+	switch msg.Mouse().Button {
+	case tea.MouseWheelLeft:
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 				m.DetailPanelTwoViewport.ScrollLeft(1)
@@ -54,10 +55,15 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				if ok && popUp.ShowingBlameInfo {
 					popUp.BlameViewport.ScrollLeft(1)
 				}
+			case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+				if ok && popUp.IsCommitFixupSquashViewportSelected {
+					popUp.CommitFixupSquashViewport.ScrollLeft(1)
+				}
 			}
 		}
 
-	case "wheelright":
+	case tea.MouseWheelRight:
 		if !m.ShowPopUp.Load() {
 			if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 				m.DetailPanelTwoViewport.ScrollRight(1)
@@ -86,25 +92,15 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				if ok && popUp.ShowingBlameInfo {
 					popUp.BlameViewport.ScrollRight(1)
 				}
-			}
-		}
-
-	case "wheelup":
-		if !m.ShowPopUp.Load() {
-			if !m.IsLineEditingState.Load() {
-				if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
-					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
-				} else {
-					m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+			case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+				if ok && popUp.IsCommitFixupSquashViewportSelected {
+					popUp.CommitFixupSquashViewport.ScrollRight(1)
 				}
-				return m, cmd
 			}
-			return m, nil
-		} else {
-			return handler.UpDownMouseMsgUpdateForPopUp(msg, m)
 		}
 
-	case "wheeldown":
+	case tea.MouseWheelUp, tea.MouseWheelDown:
 		if !m.ShowPopUp.Load() {
 			if !m.IsLineEditingState.Load() {
 				if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {

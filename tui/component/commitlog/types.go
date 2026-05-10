@@ -13,11 +13,15 @@ import (
 	"github.com/gohyuhan/gitti/tui/style"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git branch
+//	Cell holds a single commit-graph character and its associated color ID for
+//	lane rendering. GitCommitLogItem holds the hash, parents, message, author,
+//	graph lane data, and color ID for one commit entry. GitCommitLogItemDelegate
+//	renders each row as a 7-char yellow hash, author monogram, colored graph lane,
+//	and truncated commit message.
 //
-// ---------------------------------
+// ------------------------------------
 type Cell struct {
 	Char    rune
 	ColorID int
@@ -39,7 +43,6 @@ func (i GitCommitLogItem) FilterValue() string {
 	return i.Hash
 }
 
-// for list component of Git branch
 func (d GitCommitLogItemDelegate) Height() int                             { return 1 }
 func (d GitCommitLogItemDelegate) Spacing() int                            { return 0 }
 func (d GitCommitLogItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

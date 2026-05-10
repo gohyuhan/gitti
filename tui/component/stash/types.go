@@ -12,11 +12,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git stashed files
+//	GitStashItem holds the stash ID and message for one stash entry.
+//	GitStashItemDelegate renders each row as the truncated stash message.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitStashItemDelegate struct{}
 	GitStashItem         struct {
@@ -29,7 +30,6 @@ func (i GitStashItem) FilterValue() string {
 	return i.Message
 }
 
-// for list component of stash
 func (d GitStashItemDelegate) Height() int                             { return 1 }
 func (d GitStashItemDelegate) Spacing() int                            { return 0 }
 func (d GitStashItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

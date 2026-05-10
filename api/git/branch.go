@@ -50,7 +50,7 @@ func (gb *GitBranch) CurrentCheckOut() BranchInfo {
 
 // ------------------------------------
 //
-//	Return  allbranch
+//	Return a copy of all local branches
 //
 // ------------------------------------
 func (gb *GitBranch) AllBranches() []BranchInfo {
@@ -61,7 +61,7 @@ func (gb *GitBranch) AllBranches() []BranchInfo {
 
 // ------------------------------------
 //
-//	Return  remoteBranches
+//	Return a copy of all remote branches
 //
 // ------------------------------------
 func (gb *GitBranch) RemoteBranches() []BranchInfo {
@@ -72,7 +72,7 @@ func (gb *GitBranch) RemoteBranches() []BranchInfo {
 
 // ------------------------------------
 //
-//	Return is repo unborn
+//	Return true if the repo has no commits yet (newly initialised, unborn branch)
 //
 // ------------------------------------
 func (gb *GitBranch) IsRepoUnborn() bool {
@@ -373,7 +373,7 @@ func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 
 // ------------------------------------
 //
-//	Related to get merge branch
+//	Merge the given branches into the current branch; respects the FfMerge flag to choose fast-forward or no-ff strategy
 //
 // ------------------------------------
 func (gb *GitBranch) GitMerge(ctx context.Context, branchesName []string) ([]string, bool) {

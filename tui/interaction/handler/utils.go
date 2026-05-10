@@ -9,6 +9,7 @@ import (
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
+	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
@@ -24,7 +25,8 @@ import (
 //
 //	Handle up/down key messages for pop-up navigation and scrolling.
 //	Responsibility: Routes vertical navigation events (Up/k, Down/j) to the currently
-//	active popup's internal lists or text viewports, ensuring the correct popup state is updated.
+//	active popup's internal lists or text viewports, including interactive rebase
+//	fixup/squash selection and output popups.
 //
 // ------------------------------------
 func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -394,6 +396,25 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			return m, nil
 		}
 
+	case constant.InteractiveRebaseOptionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseOptionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.InteractiveRebaseOptionList.Index() > 0 {
+					latestIndex := popUp.InteractiveRebaseOptionList.Index() - 1
+					popUp.InteractiveRebaseOptionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.InteractiveRebaseOptionList.Index() < len(popUp.InteractiveRebaseOptionList.Items())-1 {
+					latestIndex := popUp.InteractiveRebaseOptionList.Index() + 1
+					popUp.InteractiveRebaseOptionList.Select(latestIndex)
+				}
+			}
+			popUp.InteractiveRebaseOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.InteractiveRebaseOptionList, constant.MaxInteractiveRebaseOptionPopUpWidth)
+			return m, nil
+		}
+
 	// following is for viewport
 	case constant.KeybindingAndFeatureInstructionsPopUp:
 		popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
@@ -449,6 +470,40 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			popUp.BranchMergeOutputViewport, cmd = popUp.BranchMergeOutputViewport.Update(msg)
 			return m, cmd
 		}
+
+	case constant.InteractiveRebaseFixupSquashOutputPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+		if ok && !popUp.IsProcessing.Load() {
+			// Block viewport scroll while command is actively running.
+			popUp.FixupSquashOutputViewport, cmd = popUp.FixupSquashOutputViewport.Update(msg)
+			return m, cmd
+		}
+
+	// popup that have both viewport and list
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+		if ok {
+			if popUp.IsCommitListSelected {
+				switch msg.String() {
+				case "up", "k":
+					if popUp.CommitList.Index() > 0 {
+						latestIndex := popUp.CommitList.Index() - 1
+						popUp.CommitList.Select(latestIndex)
+					}
+				case "down", "j":
+					if popUp.CommitList.Index() < len(popUp.CommitList.Items())-1 {
+						latestIndex := popUp.CommitList.Index() + 1
+						popUp.CommitList.Select(latestIndex)
+					}
+				}
+				popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, popUp.CommitList.Width())
+				return m, nil
+			} else if popUp.IsCommitFixupSquashViewportSelected {
+				popUp.CommitFixupSquashViewport, cmd = popUp.CommitFixupSquashViewport.Update(msg)
+				return m, cmd
+			}
+		}
+
 	}
 	return m, nil
 }
@@ -457,7 +512,8 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 //
 //	Handle mouse wheel up/down messages for pop-up scrolling.
 //	Responsibility: Routes vertical mouse scroll events to the appropriate internal list
-//	or viewport of the currently active popup, matching keyboard navigation behavior.
+//	or viewport of the currently active popup, including interactive rebase
+//	fixup/squash selection and output popups.
 //
 // ------------------------------------
 func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -523,6 +579,19 @@ func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types
 		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 		if ok && popUp.ShowingBlameInfo {
 			popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
+		if ok && popUp.IsCommitFixupSquashViewportSelected {
+			popUp.CommitFixupSquashViewport, cmd = popUp.CommitFixupSquashViewport.Update(msg)
+			return m, cmd
+		}
+	case constant.InteractiveRebaseFixupSquashOutputPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+		if ok && !popUp.IsProcessing.Load() {
+			// Block viewport scroll while command is actively running.
+			popUp.FixupSquashOutputViewport, cmd = popUp.FixupSquashOutputViewport.Update(msg)
 			return m, cmd
 		}
 	}

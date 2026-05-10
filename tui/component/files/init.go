@@ -11,8 +11,9 @@ import (
 
 // ------------------------------------
 //
-//	init the list component for Modified Files Component
-//	return bool was to tell if we need to reinit the detail component panel or not
+//	Rebuild the modified files list widget from the latest git status data, preserve the
+//	previously selected file by path, and return true if the selection changed (signals that
+//	the diff/detail panel needs to be reinitialized).
 //
 // ------------------------------------
 func InitModifiedFilesList(m *types.GittiModel) bool {

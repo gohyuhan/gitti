@@ -14,7 +14,9 @@ import (
 
 // ------------------------------------
 //
-//	For Git Stash to prompt for stash message
+//	Render the stash message prompt popup. Shows a titled border box containing
+//	the text input where the user enters an optional stash message before the
+//	stash operation executes.
 //
 // ------------------------------------
 func RenderGitStashMessagePopUp(m *types.GittiModel) string {
@@ -35,7 +37,10 @@ func RenderGitStashMessagePopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For stash operation output
+//	Render the stash operation output popup. Colors the viewport border red on
+//	error or green on success. When IsProcessing is true, shows a spinner line
+//	above the viewport. The localized title and processing text are selected by
+//	StashOperationType (stash-all, stash-file, apply, drop, or pop).
 //
 // ------------------------------------
 func RenderGitStashOperationOutputPopUp(m *types.GittiModel) string {
@@ -101,7 +106,9 @@ func RenderGitStashOperationOutputPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For stash operation confirmation prompt
+//	Render the stash confirmation prompt popup. Selects the localized confirmation
+//	message by StashOperationType (stash-all, stash-file, apply, drop, or pop),
+//	interpolating the styled file path, stash message, or stash ID as needed.
 //
 // ------------------------------------
 func RenderGitStashConfirmPromptPopUp(m *types.GittiModel) string {

@@ -18,11 +18,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For add Remote prompt pop up
+//	AddRemotePromptPopUpModel holds the two text inputs (remote name and URL),
+//	an output viewport for the add-remote result, atomic state flags, a cancel
+//	function for aborting the operation, and a flag indicating whether this repo
+//	has no remote configured yet.
 //
-// ---------------------------------
+// ------------------------------------
 type AddRemotePromptPopUpModel struct {
 	RemoteNameTextInput     textinput.Model // input index 1
 	RemoteUrlTextInput      textinput.Model // input index 2
@@ -38,21 +41,25 @@ type AddRemotePromptPopUpModel struct {
 	CancelFunc context.CancelFunc
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// choose a remote to push to
+//	ChooseRemotePopUpModel holds a list of configured remotes and the action
+//	string (e.g. "push") so the user can select which remote to target.
 //
-// ---------------------------------
+// ------------------------------------
 type ChooseRemotePopUpModel struct {
 	RemoteList list.Model
 	Action     string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git remote
+//	GitRemoteItem holds the name, URL, and fetch/push flags for one configured
+//	git remote. GitRemoteItemDelegate renders each row as a two-line entry with
+//	the remote name on the first line and the URL (faint) on the second line.
+//	Rows with empty name/URL render the "use local branch" rebase option instead.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitRemoteItemDelegate struct{}
 	GitRemoteItem         struct {
@@ -67,7 +74,6 @@ func (i GitRemoteItem) FilterValue() string {
 	return i.Name
 }
 
-// for list component of git remote
 func (d GitRemoteItemDelegate) Height() int                             { return 2 }
 func (d GitRemoteItemDelegate) Spacing() int                            { return 0 }
 func (d GitRemoteItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -110,11 +116,12 @@ func (d GitRemoteItemDelegate) Render(w io.Writer, m list.Model, index int, list
 	fmt.Fprint(w, fn(fullStr))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// remove remote confirmation
+//	RemoveRemoteConfirmationPopUpModel holds the name, URL, and fetch/push flags
+//	of the remote selected for deletion, displayed in the confirmation popup.
 //
-// ---------------------------------
+// ------------------------------------
 type RemoveRemoteConfirmationPopUpModel struct {
 	RemoteName string
 	RemoteUrl  string
@@ -122,21 +129,24 @@ type RemoveRemoteConfirmationPopUpModel struct {
 	Push       bool
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// remote as tracking upstream confirmation
+//	RemoteAsTrackingUpstreamConfirmationPopUpModel holds the remote name and URL
+//	that will be set as the tracking upstream for the currently checked-out branch.
 //
-// ---------------------------------
+// ------------------------------------
 type RemoteAsTrackingUpstreamConfirmationPopUpModel struct {
 	RemoteName string
 	RemoteUrl  string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// remote as tracking upstream confirmation
+//	EditRemotePromptPopUpModel holds the original remote name and URL alongside
+//	two text inputs pre-filled with those values, allowing the user to rename
+//	the remote or update its URL before submitting the edit.
 //
-// ---------------------------------
+// ------------------------------------
 type EditRemotePromptPopUpModel struct {
 	OldRemoteName           string          // the old remote name
 	OldRemoteUrl            string          // the old remote url

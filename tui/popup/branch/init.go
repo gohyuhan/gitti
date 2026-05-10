@@ -15,7 +15,9 @@ import (
 
 // ------------------------------------
 //
-//	init the popup model for creating a new branch
+//	Initialize the create-new-branch popup model with a focused text input sized
+//	to fit the terminal width, and the given createType and commitHash stored for
+//	use during branch creation.
 //
 // ------------------------------------
 func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string, commitHash string) {
@@ -34,7 +36,9 @@ func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string, commi
 
 // ------------------------------------
 //
-//	init the popup model for choosing new branch creation option
+//	Initialize the new-branch type selection popup, populating a list with four
+//	creation options (create, create-and-switch, remote-input, remote-selection)
+//	and attaching an item-count help key.
 //
 // ------------------------------------
 func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
@@ -85,7 +89,9 @@ func InitChooseNewBranchTypePopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	init the popup model for switching branch
+//	Initialize the switch-branch type selection popup, populating a list with
+//	two options (switch clean, switch-with-changes) and attaching an item-count
+//	help key. The target branch name is stored in the model.
 //
 // ------------------------------------
 func InitChooseSwitchBranchTypePopUpModel(m *types.GittiModel, branchName string) {
@@ -126,8 +132,14 @@ func InitChooseSwitchBranchTypePopUpModel(m *types.GittiModel, branchName string
 	}
 }
 
+// ------------------------------------
+//
+//	Initialize the switch-branch output popup model with a soft-wrap viewport,
+//	a dot spinner, and all atomic state flags reset to false. The target branch
+//	name and switch type are stored for use in the render function.
+//
+// ------------------------------------
 func InitSwitchBranchOutputPopUpModel(m *types.GittiModel, branchName string, switchType string) {
-	// for git push output viewport,
 	vp := viewport.New()
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
@@ -151,6 +163,12 @@ func InitSwitchBranchOutputPopUpModel(m *types.GittiModel, branchName string, sw
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Initialize the branch-deletion confirmation popup model, storing the target
+//	branch name so the render function can display the localized confirmation.
+//
+// ------------------------------------
 func InitGitDeleteBranchConfirmPromptPopUpModel(m *types.GittiModel, branchName string) {
 	popUpModel := &GitDeleteBranchConfirmPromptPopUpModel{
 		BranchName: branchName,
@@ -158,6 +176,13 @@ func InitGitDeleteBranchConfirmPromptPopUpModel(m *types.GittiModel, branchName 
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Initialize the branch-deletion output popup model with a soft-wrap viewport,
+//	a dot spinner, and all atomic state flags (IsProcessing, HasError,
+//	ProcessSuccess) reset to false.
+//
+// ------------------------------------
 func InitGitDeleteBranchOutputPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true
@@ -181,7 +206,14 @@ func InitGitDeleteBranchOutputPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func InitCreateBranchBasedOnRemotePopUp(m *types.GittiModel, remoteOrigin string) {
+// ------------------------------------
+//
+//	Initialize the create-branch-from-remote input popup model with a focused
+//	text input and the given remote origin stored for display in the render
+//	function.
+//
+// ------------------------------------
+func InitCreateBranchBasedOnRemotePopUpModel(m *types.GittiModel, remoteOrigin string) {
 	remoteBranchNameInput := textinput.New()
 	remoteBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.EnterRemoteBranchPrompt
 	remoteBranchNameInput.Focus()
@@ -197,7 +229,14 @@ func InitCreateBranchBasedOnRemotePopUp(m *types.GittiModel, remoteOrigin string
 	m.PopUpModel = popUpModel
 }
 
-func InitCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) {
+// ------------------------------------
+//
+//	Initialize the create-branch-from-remote output popup model with a
+//	soft-wrap viewport, a dot spinner, and all atomic state flags (IsProcessing,
+//	HasError, ProcessSuccess) reset to false.
+//
+// ------------------------------------
+func InitCreateBranchBasedOnRemoteOutputPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true
 	vp.MouseWheelEnabled = true
@@ -220,6 +259,13 @@ func InitCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Initialize the remote-branch selection popup model, populating a list with
+//	all known remote branches so the user can pick one to track locally. Attaches
+//	an item-count help key; filtering and pagination are hidden.
+//
+// ------------------------------------
 func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
 	remoteBranches := m.GitOperations.GitBranch.RemoteBranches()
 	items := make([]list.Item, 0, len(remoteBranches))
@@ -244,6 +290,15 @@ func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
 	}
 }
 
+// ------------------------------------
+//
+//	Initialize the split-list popup model for selecting branches to merge into
+//	the current branch. Builds two lists: one for all non-checked-out branches
+//	(available), one empty (selected). The available-branch panel starts focused.
+//	Filtering and pagination are hidden; an item-count help key is attached to
+//	both lists.
+//
+// ------------------------------------
 func InitChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 	branches := m.GitOperations.GitBranch.AllBranches()
 	items := make([]list.Item, 0, len(branches))
@@ -290,6 +345,13 @@ func InitChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Initialize the branch merge output popup model with a scrollable viewport
+//	and a spinner. All atomic state flags (IsProcessing, IsCancelled, HasError,
+//	ProcessSuccess) are reset to false.
+//
+// ------------------------------------
 func InitBranchMergeOutputPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true

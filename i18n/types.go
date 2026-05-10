@@ -204,6 +204,9 @@ type LanguageMapping struct {
 	KeyBindingForBranchMergeOutputPopUp                        []string
 	KeyBindingForBlamePopUpFilePathSelection                   []string
 	KeyBindingForBlamePopUpBlameView                           []string
+	KeyBindingForInteractiveRebaseOptionPopUp                  []string
+	KeyBindingForInteractiveRebaseFixupSquashSelectionPopUp    []string
+	KeyBindingForInteractiveRebaseFixupSquashCommitPopUp       []string
 
 	// -----------------
 	//  For Pop Up
@@ -418,7 +421,7 @@ type LanguageMapping struct {
 	GitRevertConfirmationTitle          string
 	// for reflog
 	GitCherryPickFromRefLogApplyConfirmationTitle string
-	//for rebase
+	// for rebase
 	GitRebaseUseLocalBranch                       string
 	GitRebaseUseLocalBranchDesc                   string
 	RebaseBranchNameInputPlaceholder              string
@@ -435,4 +438,22 @@ type LanguageMapping struct {
 	BlameFilePathFilterPlaceholder string
 	GitTrackedFileTitle            string
 	BlameViewportTitle             string
+	// for interactive rebase
+	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError                    string
+	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError             string
+	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit                     string
+	InteractiveRebaseFixupPositionMismatchError                              string
+	InteractiveRebaseFixupWarning                                            string
+	InteractiveRebaseFixupSquash                                             string
+	InteractiveRebaseFixupSquashDescription                                  string
+	InteractiveRebaseFixupSquashCommitPopUpMessageInputPlaceHolder           string
+	InteractiveRebaseFixupSquashCommitPopUpCommitDescriptionInputPlaceHolder string
+	InteractiveRebaseFixupSquashCommitMessageTitle                           string
+	InteractiveRebaseFixupSquashCommitDescriptionTitle                       string
+	InteractiveRebaseFixupSquashOutputPopUpTitle                             string
+	InteractiveRebaseFixupSquashing                                          string
+	InteractiveRebaseReword                                                  string
+	InteractiveRebaseDrop                                                    string
+	InteractiveRebaseFeatureComingSoon                                       string
+	ChooseInteractiveRebaseOption                                            string
 }

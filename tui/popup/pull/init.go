@@ -12,7 +12,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-func InitChooseGitPullTypePopUp(m *types.GittiModel) {
+// ------------------------------------
+//
+//	Initialize the choose pull type popup. Builds a 3-option list (git pull,
+//	git pull --rebase --autostash, git pull --no-rebase), disables
+//	filtering/pagination/status bar, and attaches a counter help key.
+//
+// ------------------------------------
+func InitChooseGitPullTypePopUpModel(m *types.GittiModel) {
 	pullTypeOption := []GitPullTypeOptionItem{
 		{
 			Name:     i18n.LANGUAGEMAPPING.GitPullOption,
@@ -56,6 +63,14 @@ func InitChooseGitPullTypePopUp(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Initialize the git pull output popup. Creates a soft-wrap viewport sized to
+//	a fixed height and 80% of terminal width (minus padding), and a dot spinner.
+//	All atomic state flags (IsProcessing, HasError, ProcessSuccess, IsCancelled)
+//	are reset to false.
+//
+// ------------------------------------
 func InitGitPullOutputPopUpModel(m *types.GittiModel) {
 	// for git pull output viewport
 	vp := viewport.New()

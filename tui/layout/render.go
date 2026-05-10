@@ -18,14 +18,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// -----------------------------------------------------------------------------
-//
-//	Functions that help construct the view
-//
-// -----------------------------------------------------------------------------
 // ------------------------------------
 //
-//	render the Gitti Status Panel
+//	Render the git status panel (top of the left column). Shows the repo name,
+//	tracked branch with upstream icon, and remote sync counters (↑/↓). When a
+//	git operation is in progress (e.g. rebase, merge), shows a warning line
+//	instead.
 //
 // ------------------------------------
 func renderGitStatusComponentPanel(m *types.GittiModel) string {
@@ -76,7 +74,8 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	Render the Local Branches or Tag or Remote panel
+//	Render the left-column panel that switches between local branches, tags, and
+//	remotes based on m.CurrentLocalBranchOrTagOrRemoteComponentShowing.
 //
 // ------------------------------------
 func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -101,7 +100,8 @@ func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *ty
 
 // ------------------------------------
 //
-//	Render the Changed Files panel
+//	Render the modified files panel showing the list of staged/unstaged/untracked
+//	and conflicted files in the working tree.
 //
 // ------------------------------------
 func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -117,7 +117,8 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 
 // ------------------------------------
 //
-//	Render the commit log or reflog panel
+//	Render the commit log / reflog panel, switching between commit history and
+//	reflog views based on m.CurrentCommitLogOrRefLogComponentShowing.
 //
 // ------------------------------------
 func renderCommitLogOrRefLogComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -140,14 +141,12 @@ func renderCommitLogOrRefLogComponentPanel(width int, height int, m *types.Gitti
 		Render(content)
 }
 
-// Render the detail component part at the right of the window,
-// however the content within it will be dynamic based on the current selected component
 // ------------------------------------
 //
-//			For Render Detail Component Panel
-//		  * this will render the detail component panel
-//	   * it will handle the layout for both line editing mode and normal mode
-//	   * it will also handle the split view for line editing mode (one for staged, one for unstaged)
+//	Render the detail component panel (right side of the window).
+//	Content is dynamic based on the current selected component.
+//	Handles both normal mode and line-editing mode layout, including
+//	the split staged/unstaged view in line-editing mode.
 //
 // ------------------------------------
 func renderDetailComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -276,7 +275,7 @@ func renderDetailComponentPanel(width int, height int, m *types.GittiModel) stri
 
 // ------------------------------------
 //
-//	Render the Stash Panel
+//	Render the stash panel showing the list of git stash entries.
 //
 // ------------------------------------
 func renderStashComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -292,7 +291,8 @@ func renderStashComponentPanel(width int, height int, m *types.GittiModel) strin
 
 // ------------------------------------
 //
-//	Render the Log Panel
+//	Render the log panel showing the gitti application log viewport at the
+//	bottom of the right column.
 //
 // ------------------------------------
 func renderLogComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -308,7 +308,9 @@ func renderLogComponentPanel(width int, height int, m *types.GittiModel) string 
 
 // ------------------------------------
 //
-//	Render the key binding help bar at the bottom of the screen
+//	Render the keybinding help bar at the bottom of the screen. Shows
+//	context-sensitive key hints for the currently focused panel, with the
+//	app version right-aligned.
 //
 // ------------------------------------
 func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
@@ -454,6 +456,12 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingForBlamePopUpBlameView
 				}
 			}
+		case constant.InteractiveRebaseOptionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseOptionPopUp
+		case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseFixupSquashSelectionPopUp
+		case constant.InteractiveRebaseFixupSquashCommitPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseFixupSquashCommitPopUp
 		}
 	} else {
 		//-----------------------------

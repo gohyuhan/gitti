@@ -13,7 +13,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-func InitGitCherryPickOptionSelectionPopUp(m *types.GittiModel) {
+// ------------------------------------
+//
+//	Initialize the cherry-pick operation type selection popup, populating a list
+//	with three options (pick, edit-and-pick, apply). Filtering and pagination are
+//	hidden; an item-count help key is attached.
+//
+// ------------------------------------
+func InitGitCherryPickOptionSelectionPopUpModel(m *types.GittiModel) {
 	newCherryPickOpsOption := []CherryPickOpsOptionItem{
 		{
 			Name:              i18n.LANGUAGEMAPPING.CherryPickOpsTitle,
@@ -56,7 +63,15 @@ func InitGitCherryPickOptionSelectionPopUp(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func InitGitCherryPickPopUp(m *types.GittiModel, branchName string) {
+// ------------------------------------
+//
+//	Initialize the cherry-pick commit selection popup for the given branch.
+//	Builds a list from the current repo commit log, wrapping each entry as a
+//	GitCherryPickItem. The existing CherryPickedCommitMap is passed to the
+//	delegate so already-selected commits are rendered with a checked box.
+//
+// ------------------------------------
+func InitGitCherryPickPopUpModel(m *types.GittiModel, branchName string) {
 	items := make([]list.Item, 0, len(m.CurrentRepoCommitLogInfoList.Items()))
 	for _, item := range m.CurrentRepoCommitLogInfoList.Items() {
 		if commitItem, ok := item.(commitlog.GitCommitLogItem); ok {
@@ -91,7 +106,14 @@ func InitGitCherryPickPopUp(m *types.GittiModel, branchName string) {
 	m.PopUpModel = popUpModel
 }
 
-func InitGitEditCherryPickPopUp(m *types.GittiModel, selectionIndex int) {
+// ------------------------------------
+//
+//	Initialize the edit-cherry-pick popup from the current CherryPickedCommitMap,
+//	sorting commits by their user-selected sequence. selectionIndex restores the
+//	cursor position after a removal or reorder; pass 0 on first entry.
+//
+// ------------------------------------
+func InitGitEditCherryPickPopUpModel(m *types.GittiModel, selectionIndex int) {
 	// selectionIndex is need here to retain the user selection index cursor when we reinit the list due to removal or any modification to the list
 	// it will be 0 when user newly enter the cherry pick edit UI
 	items := make([]list.Item, 0, len(m.CherryPickedCommitInfo.CherryPickedCommitMap))
@@ -143,7 +165,15 @@ func InitGitEditCherryPickPopUp(m *types.GittiModel, selectionIndex int) {
 	m.PopUpModel = popUpModel
 }
 
-func InitGitRevertParentOptionSelectionPopUp(m *types.GittiModel, commitHash string, commitParentInfos []git.CommitHashParentInfo) {
+// ------------------------------------
+//
+//	Initialize the revert-parent selection popup for a merge commit. Builds a
+//	list from the provided parent infos (hash, message, order). Shown when the
+//	target commit has more than one parent and the user must choose which parent
+//	to revert to.
+//
+// ------------------------------------
+func InitGitRevertParentOptionSelectionPopUpModel(m *types.GittiModel, commitHash string, commitParentInfos []git.CommitHashParentInfo) {
 	items := make([]list.Item, 0, len(commitParentInfos))
 
 	for index := range commitParentInfos {
@@ -179,7 +209,13 @@ func InitGitRevertParentOptionSelectionPopUp(m *types.GittiModel, commitHash str
 	m.PopUpModel = popUpModel
 }
 
-func InitGitRevertConfirmationPopUp(m *types.GittiModel, commitHash string, parentOrder int) {
+// ------------------------------------
+//
+//	Initialize the git revert confirmation popup with the target commit hash
+//	and the chosen parent order, shown before the revert is executed.
+//
+// ------------------------------------
+func InitGitRevertConfirmationPopUpModel(m *types.GittiModel, commitHash string, parentOrder int) {
 	popUpModel := &GitRevertConfirmationPopUpModel{
 		CommitHash:  commitHash,
 		ParentOrder: parentOrder,

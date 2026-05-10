@@ -11,7 +11,9 @@ import (
 
 // ------------------------------------
 //
-//	init the list component for Branch Component
+//	Rebuild the tag list widget from the latest git tag data, preserve the previously
+//	selected tag by name, and return true if the selection changed (signals that the
+//	detail panel needs to be reinitialized).
 //
 // ------------------------------------
 func InitTagList(m *types.GittiModel) bool {

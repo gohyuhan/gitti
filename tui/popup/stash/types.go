@@ -8,22 +8,27 @@ import (
 	"charm.land/bubbles/v2/viewport"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up to prompt for git stash message
+//	GitStashMessagePopUpModel holds a focused text input for the user to type an
+//	optional stash message. FilePathName is set when stashing a single file;
+//	StashType distinguishes stash-file from stash-all operations.
 //
-// ---------------------------------
+// ------------------------------------
 type GitStashMessagePopUpModel struct {
 	StashMessageInput textinput.Model
 	FilePathName      string
 	StashType         string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for stash operation pop up with viewport (for showing the result of stash operation)
+//	GitStashOperationOutputPopUpModel holds the output viewport and spinner for a
+//	stash operation (stash-all, stash-file, apply, drop, or pop). Atomic flags
+//	IsProcessing, HasError, and ProcessSuccess drive the border color and spinner
+//	visibility in the render function.
 //
-// ---------------------------------
+// ------------------------------------
 type GitStashOperationOutputPopUpModel struct {
 	StashOperationType              string
 	GitStashOperationOutputViewport viewport.Model // to log out the output from git operation
@@ -33,12 +38,14 @@ type GitStashOperationOutputPopUpModel struct {
 	ProcessSuccess                  atomic.Bool    // has the process sucessfuly executed
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for stash operation confirm prompt pop up (for prompting user for confirmation)
-//   - for stash, stash all, drop, apply, discard
+//	GitStashConfirmPromptPopUpModel holds the details for the stash confirmation
+//	prompt shown before any stash operation executes. StashOperationType selects
+//	the localized confirmation message; FilePathName is used for single-file
+//	stash; StashMessage and StashId are used for apply/drop/pop confirmations.
 //
-// ---------------------------------
+// ------------------------------------
 type GitStashConfirmPromptPopUpModel struct {
 	StashOperationType string
 	FilePathName       string

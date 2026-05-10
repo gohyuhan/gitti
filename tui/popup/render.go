@@ -8,6 +8,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/commitlog"
 	"github.com/gohyuhan/gitti/tui/popup/discard"
 	"github.com/gohyuhan/gitti/tui/popup/files"
+	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	"github.com/gohyuhan/gitti/tui/popup/keybinding"
 	"github.com/gohyuhan/gitti/tui/popup/pull"
 	"github.com/gohyuhan/gitti/tui/popup/push"
@@ -20,11 +21,10 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-//   Functions that relate to the rendering of pop up
-
 // ------------------------------------
 //
-//	render the PopUp and the content within it will be a determine dynamically
+//	Dispatch popup rendering to the appropriate package function based on
+//	m.PopUpType. Returns an empty string when no popup type matches.
 //
 // ------------------------------------
 func RenderPopUpComponent(m *types.GittiModel) string {
@@ -137,6 +137,14 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = branch.RenderBranchMergeOutputPopUp(m)
 	case constant.BlamePopUp:
 		popUp = blame.RenderBlamePopUp(m)
+	case constant.InteractiveRebaseOptionPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseOptionPopUp(m)
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseFixupSquashSelectionPopUp(m)
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseFixupSquashCommitPopUp(m)
+	case constant.InteractiveRebaseFixupSquashOutputPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseFixupSquashOutputPopUp(m)
 	}
 	return popUp
 }

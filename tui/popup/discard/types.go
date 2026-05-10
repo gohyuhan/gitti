@@ -12,33 +12,37 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up to prompt for git discard type for file,
+//	GitDiscardTypeOptionPopUpModel holds the discard type option list and the
+//	target file path for the discard type selection popup. Only shown when a
+//	file has both staged and unstaged changes (index and worktree).
 //
-//	this will only be available when there are both changes in stage and unstage (index and worktree)
-//
-// ---------------------------------
+// ------------------------------------
 type GitDiscardTypeOptionPopUpModel struct {
 	DiscardTypeOptionList list.Model
 	FilePathName          string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # To prompt user for confirmation
+//	GitDiscardConfirmPromptPopUpModel holds the discard type and the target file
+//	path for the discard confirmation popup, shown before the discard executes.
 //
-// ---------------------------------
+// ------------------------------------
 type GitDiscardConfirmPromptPopUpModel struct {
 	DiscardType  string
 	FilePathName string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for discard option selection option
+//	GitDiscardTypeOptionDelegate renders each discard option row (name + info)
+//	in the discard type selection list.
+//	GitDiscardTypeOptionItem carries the display name, info string, and the
+//	discard type constant for a single discard action choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitDiscardTypeOptionDelegate struct{}
 	GitDiscardTypeOptionItem     struct {
@@ -52,7 +56,6 @@ func (i GitDiscardTypeOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for discard type selection
 func (d GitDiscardTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitDiscardTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitDiscardTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

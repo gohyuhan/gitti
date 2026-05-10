@@ -13,7 +13,10 @@ import (
 
 // ------------------------------------
 //
-//	init the popup model for prompting user to add remote origin
+//	Initialize the add-remote prompt popup model with two focused/blurred text
+//	inputs (name and URL), an output viewport, and all atomic state flags reset
+//	to false. When noInitialRemote is true the name input is pre-filled with
+//	"origin" to guide first-time remote setup.
 //
 // ------------------------------------
 func InitAddRemotePromptPopUpModel(m *types.GittiModel, noInitialRemote bool) {
@@ -55,7 +58,8 @@ func InitAddRemotePromptPopUpModel(m *types.GittiModel, noInitialRemote bool) {
 
 // ------------------------------------
 //
-//	init the popup model to choose remote
+//	Initialize the choose-remote popup model, populating a list with all
+//	configured remotes so the user can pick one for the given action (e.g. push).
 //
 // ------------------------------------
 func InitChooseRemotePopUpModel(m *types.GittiModel, remoteList []git.GitRemoteInfo, action string) {
@@ -77,6 +81,12 @@ func InitChooseRemotePopUpModel(m *types.GittiModel, remoteList []git.GitRemoteI
 	}
 }
 
+// ------------------------------------
+//
+//	Initialize the remove-remote confirmation popup model with the name, URL,
+//	and fetch/push flags of the remote the user selected for deletion.
+//
+// ------------------------------------
 func InitRemoveRemoteConfirmationPopUpModel(m *types.GittiModel, name string, url string, fetch bool, push bool) {
 	m.PopUpModel = &RemoveRemoteConfirmationPopUpModel{
 		RemoteName: name,
@@ -86,6 +96,13 @@ func InitRemoveRemoteConfirmationPopUpModel(m *types.GittiModel, name string, ur
 	}
 }
 
+// ------------------------------------
+//
+//	Initialize the set-tracking-upstream confirmation popup model with the
+//	remote name and URL that will be configured as the tracking upstream for
+//	the currently checked-out branch.
+//
+// ------------------------------------
 func InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m *types.GittiModel, name string, url string) {
 	m.PopUpModel = &RemoteAsTrackingUpstreamConfirmationPopUpModel{
 		RemoteName: name,

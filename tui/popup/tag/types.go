@@ -18,11 +18,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For Create Tag Pop Up Model
+//	CreateTagPopUpModel holds two inputs for the tag creation form: a single-line
+//	text input for the tag name and a dynamic-height textarea for the optional
+//	tag message. CommitHash and CommitMessage identify the target commit.
+//	CurrentActiveInputIndex tracks which input is focused (1 = name, 2 = message).
 //
-// ---------------------------------
+// ------------------------------------
 type CreateTagPopUpModel struct {
 	TagNameInput            textinput.Model
 	TagMessageTextAreaInput textarea.Model
@@ -32,11 +35,13 @@ type CreateTagPopUpModel struct {
 	TotalInputCount         int
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For Create Tag Confirmation Pop Up Model
+//	CreateTagConfirmationPopUpModel holds the collected tag creation parameters
+//	shown in the confirmation prompt before the tag is created: tag name, optional
+//	message, target commit hash, and commit message.
 //
-// ---------------------------------
+// ------------------------------------
 type CreateTagConfirmationPopUpModel struct {
 	TagName       string
 	TagMessage    string
@@ -44,21 +49,25 @@ type CreateTagConfirmationPopUpModel struct {
 	CommitMessage string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For Choose Delete Tag Option Pop Up Model
+//	ChooseDeleteTagOptionPopUpModel holds the tag name and the option list for
+//	the delete-tag scope selection popup, which offers local-only or remote
+//	deletion.
 //
-// ---------------------------------
+// ------------------------------------
 type ChooseDeleteTagOptionPopUpModel struct {
 	TagName          string
 	DeleteOptionList list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For Choose Remote For Delete Remote Tag Pop Up Model
+//	ChooseRemoteForDeleteRemoteTagPopUpModel holds the remote list and the
+//	selected tag name and deletion option type for the remote-selection popup
+//	shown when there is more than one configured remote.
 //
-// ---------------------------------
+// ------------------------------------
 type ChooseRemoteForDeleteRemoteTagPopUpModel struct {
 	RemoteList       list.Model
 	TagName          string
@@ -67,7 +76,10 @@ type ChooseRemoteForDeleteRemoteTagPopUpModel struct {
 
 // ------------------------------------
 //
-//	For git delete tag process pop up model
+//	DeleteTagOutputPopUpModel holds the output viewport and spinner for the tag
+//	deletion operation. Atomic flags IsProcessing, IsCancelled, HasError, and
+//	ProcessSuccess drive spinner visibility and border color. CancelFunc aborts
+//	the in-flight git operation.
 //
 // ------------------------------------
 type DeleteTagOutputPopUpModel struct {
@@ -84,7 +96,9 @@ type DeleteTagOutputPopUpModel struct {
 
 // ------------------------------------
 //
-//	For tag deletion option selection option
+//	DeleteTagOptionDelegate renders each tag deletion scope row (name + info).
+//	DeleteTagOptionItem carries the display name, info string, and the deletion
+//	type constant (local or remote) for a single tag deletion choice.
 //
 // ------------------------------------
 type (
@@ -100,7 +114,6 @@ func (i DeleteTagOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for tag deletion option selection
 func (d DeleteTagOptionDelegate) Height() int                             { return 2 }
 func (d DeleteTagOptionDelegate) Spacing() int                            { return 0 }
 func (d DeleteTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -138,7 +151,10 @@ func (d DeleteTagOptionDelegate) Render(w io.Writer, m list.Model, index int, li
 
 // ------------------------------------
 //
-//	For list component of git remote for deleting remote tag
+//	GitRemoteForDeleteRemoteTagItemDelegate renders each remote row (name + URL)
+//	in the remote selection list for remote tag deletion.
+//	GitRemoteForDeleteRemoteTagItem carries the remote name, URL, and fetch/push
+//	flags for a single remote entry.
 //
 // ------------------------------------
 type (
@@ -155,7 +171,6 @@ func (i GitRemoteForDeleteRemoteTagItem) FilterValue() string {
 	return i.Name
 }
 
-// for list component of git remote for deleting remote tag
 func (d GitRemoteForDeleteRemoteTagItemDelegate) Height() int                             { return 2 }
 func (d GitRemoteForDeleteRemoteTagItemDelegate) Spacing() int                            { return 0 }
 func (d GitRemoteForDeleteRemoteTagItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -191,11 +206,13 @@ func (d GitRemoteForDeleteRemoteTagItemDelegate) Render(w io.Writer, m list.Mode
 	fmt.Fprint(w, fn(fullStr))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For Choose Tag Push Option
+//	ChoosePushTagOptionPopUpModel holds the tag name, target remote name, and the
+//	option list for the push tag scope selection popup (push tag, push all,
+//	force-push tag, force-push all).
 //
-// ---------------------------------
+// ------------------------------------
 type ChoosePushTagOptionPopUpModel struct {
 	TagName        string
 	RemoteName     string
@@ -204,7 +221,10 @@ type ChoosePushTagOptionPopUpModel struct {
 
 // ------------------------------------
 //
-//	For tag push option selection option
+//	PushTagOptionDelegate renders each push option row (name + info) in the push
+//	tag option list.
+//	PushTagOptionItem carries the display name, info string, and the push type
+//	constant for a single push action choice.
 //
 // ------------------------------------
 type (
@@ -220,7 +240,6 @@ func (i PushTagOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for tag deletion option selection
 func (d PushTagOptionDelegate) Height() int                             { return 2 }
 func (d PushTagOptionDelegate) Spacing() int                            { return 0 }
 func (d PushTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -258,7 +277,10 @@ func (d PushTagOptionDelegate) Render(w io.Writer, m list.Model, index int, list
 
 // ------------------------------------
 //
-//	For git push tag process pop up model
+//	PushTagOutputPopUpModel holds the output viewport and spinner for the tag
+//	push operation. Atomic flags IsProcessing, IsCancelled, HasError, and
+//	ProcessSuccess drive spinner visibility and border color. CancelFunc aborts
+//	the in-flight git push.
 //
 // ------------------------------------
 type PushTagOutputPopUpModel struct {
@@ -272,11 +294,12 @@ type PushTagOutputPopUpModel struct {
 	CancelFunc context.CancelFunc
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For Choose Fetch Tag Option
+//	ChooseFetchTagOptionPopUpModel holds the target remote name and the option
+//	list for the fetch tag popup (fetch, fetch-overwrite, fetch-prune, mirror).
 //
-// ---------------------------------
+// ------------------------------------
 type ChooseFetchTagOptionPopUpModel struct {
 	RemoteName      string
 	FetchOptionList list.Model
@@ -284,7 +307,10 @@ type ChooseFetchTagOptionPopUpModel struct {
 
 // ------------------------------------
 //
-//	For tag fetch option selection option
+//	FetchTagOptionDelegate renders each fetch option row (name + info) in the
+//	fetch tag option list.
+//	FetchTagOptionItem carries the display name, info string, and the fetch type
+//	constant for a single fetch action choice.
 //
 // ------------------------------------
 type (
@@ -300,7 +326,6 @@ func (i FetchTagOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for tag deletion option selection
 func (d FetchTagOptionDelegate) Height() int                             { return 2 }
 func (d FetchTagOptionDelegate) Spacing() int                            { return 0 }
 func (d FetchTagOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -338,7 +363,10 @@ func (d FetchTagOptionDelegate) Render(w io.Writer, m list.Model, index int, lis
 
 // ------------------------------------
 //
-//	For git fetch tag process pop up model
+//	FetchTagOutputPopUpModel holds the output viewport and spinner for the tag
+//	fetch operation. Atomic flags IsProcessing, IsCancelled, HasError, and
+//	ProcessSuccess drive spinner visibility and border color. CancelFunc aborts
+//	the in-flight git fetch.
 //
 // ------------------------------------
 type FetchTagOutputPopUpModel struct {

@@ -7,12 +7,11 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/logging"
 )
-
-const SEPARATOR = "\x00"
 
 // represent the info of commit that got cherry picked
 type CherryPickedCommitLog struct {
@@ -122,8 +121,8 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 			Message: parts[2],
 			Author:  parts[3],
 		}
-		if len(parts[1]) > 0 {
-			cL.Parents = strings.Split(parts[1], " ")
+		if utf8.RuneCountInString(parts[1]) > 0 {
+			cL.Parents = strings.Fields(parts[1])
 		}
 
 		// 3. Render
@@ -138,7 +137,11 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 	gCL.gitCommitLogOutput = gitCommitLogOutput
 }
 
-// RenderCommit generates the visual graph line for a single commit.
+// ------------------------------------
+//
+//	Render one commit graph line using stable-color dense-packing lane logic
+//
+// ------------------------------------
 //
 // Algorithm Overview: "Stable-Color Dense-Packing"
 // ------------------------------------------------
@@ -500,8 +503,8 @@ func (gCL *GitCommitLog) GitCherryPickWithSigning(cherryPickedCommitHashes []str
 
 // ------------------------------------
 //
-// Helper to topo order cherry picked commit to prevent cherry pick conflict
-// (this only to commits that are from the same branch or related, else it will be in the sequence of how user cherry oicked it)
+//	Topologically order selected cherry-pick commits to reduce conflict risk for related commits;
+//	unrelated commits remain in user-selected sequence
 //
 // ------------------------------------
 func (gCL *GitCommitLog) topoOrderCherryPickedCommit(cherryPickedCommitHashes []string) []string {
@@ -593,8 +596,11 @@ func (gCL *GitCommitLog) GetCommitHashParentInfo(commitHash string) []CommitHash
 	return parentCommitInfoArray
 }
 
-// GitRevertCommitWithSigning constructs the git revert command arguments for execution in the terminal.
-// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+// ------------------------------------
+//
+//	Build git revert args for signing-required terminal execution path
+//
+// ------------------------------------
 func (gCL *GitCommitLog) GitRevertCommitWithSigning(commitHash string, parentOrder int) []string {
 	var gitArgs []string
 	if parentOrder > 0 {

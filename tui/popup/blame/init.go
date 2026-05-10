@@ -12,7 +12,10 @@ import (
 
 // ------------------------------------
 //
-//	Initialize the blame popup model with file list, filter input, and viewport
+//	Initialize the blame popup. Builds a file list from all git-tracked files,
+//	a focused filter text input (with localized placeholder), and a non-soft-wrap
+//	viewport with horizontal scrolling. Both the list and viewport are sized to
+//	90% of the terminal dimensions.
 //
 // ------------------------------------
 func InitBlamePopUpModel(m *types.GittiModel) {

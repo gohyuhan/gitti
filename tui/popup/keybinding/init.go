@@ -9,7 +9,10 @@ import (
 
 // ------------------------------------
 //
-//	init the viewport pop up for showing info of global key binding
+//	Initialize the keybinding and feature instructions popup. Creates a scrollable
+//	viewport sized to 80% of the terminal height (clamped to the minimum constant)
+//	and 80% of the terminal width (minus inner padding), with mouse-wheel scrolling
+//	enabled and soft-wrap disabled.
 //
 // ------------------------------------
 func InitKeybindingAndFeatureInstructionsPopUpModel(m *types.GittiModel) {

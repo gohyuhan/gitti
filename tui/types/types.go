@@ -16,7 +16,7 @@ type GittiModel struct {
 	DaemonUpdateChannel                              chan string // this is use to signal some trigger that will be handle by the daemon but we want it to be trigger manually also by user intention
 	IsRenderInit                                     atomic.Bool // to indicate if the render has been initialized, this will be check by function that run once only after the screen is rendered
 	UserSetEditor                                    string
-	TuiUpdateChannel                                 chan string
+	TuiUpdateChannel                                 chan interface{}
 	CurrentSelectedComponent                         string
 	CurrentSelectedComponentIndex                    int
 	CurrentLocalBranchOrTagOrRemoteComponentShowing  string

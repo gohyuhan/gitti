@@ -12,11 +12,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git remote
+//	GitRemoteItem holds the name, URL, and fetch/push flags for one configured
+//	git remote. GitRemoteItemDelegate renders each row as the truncated remote name.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitRemoteItemDelegate struct{}
 	GitRemoteItem         struct {
@@ -31,7 +32,6 @@ func (i GitRemoteItem) FilterValue() string {
 	return i.Name
 }
 
-// for list component of Git remote
 func (d GitRemoteItemDelegate) Height() int                             { return 1 }
 func (d GitRemoteItemDelegate) Spacing() int                            { return 0 }
 func (d GitRemoteItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

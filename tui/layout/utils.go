@@ -1,7 +1,10 @@
 package layout
 
 import (
+	"strings"
+
 	"github.com/charmbracelet/x/ansi"
+	"github.com/gohyuhan/gitti/i18n"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
@@ -10,13 +13,14 @@ import (
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	tagComponent "github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
-	"github.com/gohyuhan/gitti/tui/services"
+	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
 // ------------------------------------
 //
-//	To update the width and height of all components
+//	Recompute and apply all panel widths and heights from the current terminal
+//	dimensions and left-panel ratio. Called on every window-resize event.
 //
 // ------------------------------------
 func TuiWindowSizing(m *types.GittiModel) {
@@ -59,7 +63,7 @@ func TuiWindowSizing(m *types.GittiModel) {
 	// to recalculate the viewport of detail panel if it was in line editing mode so that
 	// it matches exactly the position of the selected line in the viewport
 	if m.IsLineEditingState.Load() {
-		services.EnterOrReinitLineEditingStateService(m)
+		EnterOrReinitLineEditingState(m)
 	}
 
 	// log panel (the height is fixed)
@@ -69,7 +73,9 @@ func TuiWindowSizing(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Dynamically resize the left panel components to fill the available height
+//	Resize all left-column panels so the focused panel is taller and the rest
+//	share the remaining height equally. Called when the selected component
+//	changes or on window resize.
 //
 // ------------------------------------
 func LeftPanelDynamicResize(m *types.GittiModel) {
@@ -182,10 +188,41 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//			For Update Detail Component Viewport Layout
-//		  * this was to update the layout for detail component viewport
-//	   * it will handle the layout for both line editing mode and normal mode
-//	   * it will also handle the split view for line editing mode (one for staged, one for unstaged)
+//	Apply new content and state from a detail-panel update event. Sets the
+//	primary viewport content, optional secondary viewport content, and
+//	re-enters line-editing state if it was active before the update.
+//
+// ------------------------------------
+func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, updateData types.DetailPanelStateAndLayoutUpdateEventDataStructure) {
+	needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponentPanel
+	m.DetailPanelViewport.SetContent(updateData.ContentLine)
+	m.DetailPanelViewportOGStringArray = updateData.OgLineDiff1
+	m.DetailPanelTwoViewportOGStringArray = updateData.OgLineDiff2
+
+	if needToScrollToBottom {
+		m.DetailPanelViewport.GotoBottom()
+	}
+
+	if updateData.SetForDetailComponentTwo {
+		m.DetailPanelTwoViewport.SetContent(updateData.ContentLine2)
+		m.ShowDetailPanelTwo.Store(true)
+	} else {
+		// if the detail component two is selected, switch to detail component as it is not set for detail component two
+		// as it will hide the detail component two viewport
+		if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
+			m.CurrentSelectedComponent = constant.DetailComponentPanel
+		}
+	}
+	if m.IsLineEditingState.Load() {
+		EnterOrReinitLineEditingState(m)
+	}
+}
+
+// ------------------------------------
+//
+//	Recalculate and apply the detail viewport layout. Handles both normal mode
+//	(single full-height viewport) and line-editing mode (split staged/unstaged
+//	view with a separate 3-column cursor viewport).
 //
 // ------------------------------------
 func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
@@ -251,4 +288,297 @@ func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 			m.DetailPanelViewport.SetWidth(m.DetailComponentPanelWidth - 2)
 		}
 	}
+}
+
+// ------------------------------------
+//
+//	EnterOrReinitLineEditingState
+//
+//	Called when entering line-editing mode for the first time, OR when
+//	reinitialising it after a window resize / layout change.
+//
+//	GUARD: exits immediately (and resets state) if the conditions for
+//	       line-editing are not met (wrong panel, no file selected, etc.).
+//
+//	BRANCH A — first entry (IsLineEditingState == false):
+//	  1. Inspect the selected file's git index/worktree state flags to decide
+//	     which StageType each detail-panel viewport represents:
+//	       ??  → untracked:           panel1=UNSTAGE, panel2=NOSTAGE, overflow=2
+//	       XY  → staged+unstaged:     panel1=STAGE,   panel2=UNSTAGE, overflow=3
+//	       X   → staged only:         panel1=STAGE,   panel2=NOSTAGE, overflow=2
+//	        Y  → unstaged only:       panel1=UNSTAGE, panel2=NOSTAGE, overflow=2
+//	       HasConflict → line-editing disabled entirely.
+//	  2. OverflowIndexCount = number of non-actionable header lines at the
+//	     top of the diff (file path, @@ hunk header, etc.). The cursor must
+//	     skip over these rows — they cannot be staged/unstaged individually.
+//	  3. Reset all index positions to 0 and store into LineEditingIndexPositionAndInfo.
+//	  4. Render the cursor viewport via SetLineEditingCursorViewportContent.
+//
+//	BRANCH B — reinit after resize or file status change (IsLineEditingState == true):
+//	  1. Re-derive StageType and OverflowIndexCount (file state may have changed).
+//	  2. Compensate actualIndex for header-row count changes caused by the resize:
+//	       new overflow < old overflow → actualIndex -= 1  (a header row disappeared)
+//	       new overflow > old overflow → actualIndex += 1  (a header row appeared)
+//	     Both panels must satisfy their condition simultaneously for the adjustment
+//	     to apply (prevents mis-compensation when only one panel changed).
+//	  3. Clamp actualIndex to [0, totalLines-1] so it never goes out of bounds.
+//	  4. Recompute visibleIndex = actualIndex - yOffset (cursor's row within the
+//	     visible portion of the viewport):
+//	       visibleIndex < 0              → cursor above view  → scroll up,   visibleIndex = 0
+//	       visibleIndex >= visibleCount  → cursor below view  → scroll down, visibleIndex = visibleCount-1
+//	       otherwise                     → cursor in view,    visibleIndex unchanged
+//	  5. Store updated state and re-render the cursor viewport.
+//
+// ------------------------------------
+func EnterOrReinitLineEditingState(m *types.GittiModel) {
+	if !((m.CurrentSelectedComponent == constant.DetailComponentPanel || m.CurrentSelectedComponent == constant.DetailComponentPanelTwo) && m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil) {
+		// we are eligible to be in line editing mode, so we need to reset the state
+		m.IsLineEditingState.Store(false)
+		// reinit the index position
+		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{}
+		return
+	}
+
+	detailPanelViewportVisibleIndex := m.DetailPanelViewport.VisibleLineCount()
+	detailPanelTwoViewportVisibleIndex := m.DetailPanelTwoViewport.VisibleLineCount()
+	detailPanelViewportTotalIndex := m.DetailPanelViewport.TotalLineCount()
+	detailPanelTwoViewportTotalIndex := m.DetailPanelTwoViewport.TotalLineCount()
+
+	if !m.IsLineEditingState.Load() {
+		// we first confirm that we are not in line editing mode yet, but we are supposed to be
+		// so we need to init the line editing state
+		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+		currentSelectedFile := currentSelectedFileItem.(filesComponent.GitModifiedFilesItem)
+
+		var detailPanelViewportStageType string
+		var detailPanelTwoViewportStageType string
+		detailPanelViewportOverflowIndexCount := 0
+		detailPanelTwoViewportOverflowIndexCount := 0
+
+		if currentSelectedFile.HasConflict {
+			// if the file is in conflict state, we cannot do line editing
+			m.IsLineEditingState.Store(false)
+			detailPanelViewportStageType = ""
+			detailPanelTwoViewportStageType = ""
+		} else {
+			m.IsLineEditingState.Store(true)
+			// determine the pop up state
+			if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
+				// newly added untracked file
+				detailPanelViewportStageType = constant.UNSTAGE
+				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
+				detailPanelViewportOverflowIndexCount = 2
+				detailPanelTwoViewportOverflowIndexCount = 2
+			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
+				// tracked file with both staged and unstaged modification
+				detailPanelViewportStageType = constant.STAGE
+				detailPanelTwoViewportStageType = constant.UNSTAGE
+				detailPanelViewportOverflowIndexCount = 3
+				detailPanelTwoViewportOverflowIndexCount = 3
+			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree == " " {
+				// tracked file with only staged modification
+				detailPanelViewportStageType = constant.STAGE
+				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
+				detailPanelViewportOverflowIndexCount = 2
+				detailPanelTwoViewportOverflowIndexCount = 2
+			} else {
+				// tracked file with only unstaged modification
+				detailPanelViewportStageType = constant.UNSTAGE
+				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
+				detailPanelViewportOverflowIndexCount = 2
+				detailPanelTwoViewportOverflowIndexCount = 2
+			}
+		}
+
+		// reinit the index position
+		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{
+			DetailPanelViewportIndexPosition:         0,
+			DetailPanelTwoViewportIndexPosition:      0,
+			DetailPanelViewportStageType:             detailPanelViewportStageType,
+			DetailPanelTwoViewportStageType:          detailPanelTwoViewportStageType,
+			DetailPanelViewportActualCurrentIndex:    0,
+			DetailPanelTwoViewportActualCurrentIndex: 0,
+			DetailPanelViewportOverflowIndexCount:    detailPanelViewportOverflowIndexCount,
+			DetailPanelTwoViewportOverflowIndexCount: detailPanelTwoViewportOverflowIndexCount,
+		}
+
+		// set the cursor viewport
+		SetLineEditingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
+	} else if m.IsLineEditingState.Load() {
+		// we are already in line editing mode, so we need to update the state
+		// this usually happens when we resize the window or similar event
+		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
+		currentSelectedFile := currentSelectedFileItem.(filesComponent.GitModifiedFilesItem)
+
+		var detailPanelViewportStageType string
+		var detailPanelTwoViewportStageType string
+
+		var detailPanelViewportIndexPosition int
+		var detailPanelTwoViewportIndexPosition int
+		var detailPanelViewportActualCurrentIndex int
+		var detailPanelTwoViewportActualCurrentIndex int
+		var detailPanelViewportOverflowIndexCount int
+		var detailPanelTwoViewportOverflowIndexCount int
+
+		if currentSelectedFile.HasConflict {
+			// if the file is in conflict state, we cannot do line editing
+			m.IsLineEditingState.Store(false)
+			detailPanelViewportStageType = ""
+			detailPanelTwoViewportStageType = ""
+		} else {
+			m.IsLineEditingState.Store(true)
+			// determine the pop up state
+			if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
+				// newly added untracked file
+				detailPanelViewportStageType = constant.UNSTAGE
+				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
+				detailPanelViewportOverflowIndexCount = 2
+				detailPanelTwoViewportOverflowIndexCount = 2
+			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
+				// tracked file with both staged and unstaged modification
+				detailPanelViewportStageType = constant.STAGE
+				detailPanelTwoViewportStageType = constant.UNSTAGE
+				detailPanelViewportOverflowIndexCount = 3
+				detailPanelTwoViewportOverflowIndexCount = 3
+			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree == " " {
+				// tracked file with only staged modification
+				detailPanelViewportStageType = constant.STAGE
+				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
+				detailPanelViewportOverflowIndexCount = 2
+				detailPanelTwoViewportOverflowIndexCount = 2
+			} else {
+				// tracked file with only unstaged modification
+				detailPanelViewportStageType = constant.UNSTAGE
+				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
+				detailPanelViewportOverflowIndexCount = 2
+				detailPanelTwoViewportOverflowIndexCount = 2
+			}
+		}
+
+		// recalculate the actual position
+		detailPanelViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
+		if detailPanelViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount {
+			detailPanelViewportActualCurrentIndex -= 1
+		} else if detailPanelViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount {
+			detailPanelViewportActualCurrentIndex += 1
+		}
+
+		detailPanelTwoViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
+		if detailPanelTwoViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
+			detailPanelTwoViewportActualCurrentIndex -= 1
+		} else if detailPanelTwoViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
+			detailPanelTwoViewportActualCurrentIndex += 1
+		}
+
+		// make sure the actual current index is not out of bound
+		detailPanelViewportActualCurrentIndex = max(0, min(detailPanelViewportActualCurrentIndex, detailPanelViewportTotalIndex-1))
+		detailPanelTwoViewportActualCurrentIndex = max(0, min(detailPanelTwoViewportActualCurrentIndex, detailPanelTwoViewportTotalIndex-1))
+
+		// recalculate the visible index position
+		// The relationship is: Actual Index = Viewport Offset + Visible Index
+		// So: Visible Index = Actual Index - Viewport Offset
+
+		// For Panel 1
+		currentOffset := m.DetailPanelViewport.YOffset()
+		calculatedVisibleIndex := detailPanelViewportActualCurrentIndex - currentOffset
+
+		if calculatedVisibleIndex < 0 {
+			// Cursor is above the current view, scroll up to make it the first line
+			m.DetailPanelViewport.SetYOffset(detailPanelViewportActualCurrentIndex)
+			detailPanelViewportIndexPosition = 0
+		} else if calculatedVisibleIndex >= detailPanelViewportVisibleIndex {
+			// Cursor is below the current view, scroll down to make it the last visible line
+			newOffset := detailPanelViewportActualCurrentIndex - (detailPanelViewportVisibleIndex - 1)
+			m.DetailPanelViewport.SetYOffset(newOffset)
+			detailPanelViewportIndexPosition = detailPanelViewportVisibleIndex - 1
+		} else {
+			// Cursor is within view
+			detailPanelViewportIndexPosition = calculatedVisibleIndex
+		}
+
+		// For Panel 2
+		currentOffsetTwo := m.DetailPanelTwoViewport.YOffset()
+		calculatedVisibleIndexTwo := detailPanelTwoViewportActualCurrentIndex - currentOffsetTwo
+
+		if calculatedVisibleIndexTwo < 0 {
+			// Cursor is above, scroll up
+			m.DetailPanelTwoViewport.SetYOffset(detailPanelTwoViewportActualCurrentIndex)
+			detailPanelTwoViewportIndexPosition = 0
+		} else if calculatedVisibleIndexTwo >= detailPanelTwoViewportVisibleIndex {
+			// Cursor is below, scroll down
+			newOffsetTwo := detailPanelTwoViewportActualCurrentIndex - (detailPanelTwoViewportVisibleIndex - 1)
+			m.DetailPanelTwoViewport.SetYOffset(newOffsetTwo)
+			detailPanelTwoViewportIndexPosition = detailPanelTwoViewportVisibleIndex - 1
+		} else {
+			// Cursor is within view
+			detailPanelTwoViewportIndexPosition = calculatedVisibleIndexTwo
+		}
+
+		// reinit the index position
+		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{
+			DetailPanelViewportIndexPosition:         detailPanelViewportIndexPosition,
+			DetailPanelTwoViewportIndexPosition:      detailPanelTwoViewportIndexPosition,
+			DetailPanelViewportStageType:             detailPanelViewportStageType,
+			DetailPanelTwoViewportStageType:          detailPanelTwoViewportStageType,
+			DetailPanelViewportActualCurrentIndex:    detailPanelViewportActualCurrentIndex,
+			DetailPanelTwoViewportActualCurrentIndex: detailPanelTwoViewportActualCurrentIndex,
+			DetailPanelViewportOverflowIndexCount:    detailPanelViewportOverflowIndexCount,
+			DetailPanelTwoViewportOverflowIndexCount: detailPanelTwoViewportOverflowIndexCount,
+		}
+
+		// set the cursor viewport
+		SetLineEditingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
+	}
+}
+
+// ------------------------------------
+//
+//	Populate the cursor-indicator viewports for line-editing mode. Renders a
+//	"❯" marker at the current cursor row in each of the two side-by-side cursor
+//	columns, which are displayed next to their corresponding content viewports.
+//
+// ------------------------------------
+func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewportVisibleIndex int, detailPanelTwoViewportVisibleIndex int) {
+	// set the cursor viewport
+	var cursorVpLine strings.Builder
+	var cursorVpTwoLine strings.Builder
+
+	for index := range detailPanelViewportVisibleIndex {
+		if index == m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition {
+			cursorVpLine.WriteString(style.SelectedItemStyle.Render("❯  "))
+			cursorVpLine.WriteRune('\n')
+		} else {
+			cursorVpLine.WriteString(style.NewStyle.Render("   "))
+			cursorVpLine.WriteRune('\n')
+		}
+	}
+
+	for index := range detailPanelTwoViewportVisibleIndex {
+		if index == m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
+			cursorVpTwoLine.WriteString(style.SelectedItemStyle.Render("❯  "))
+			cursorVpTwoLine.WriteRune('\n')
+		} else {
+			cursorVpTwoLine.WriteString(style.NewStyle.Render("   "))
+			cursorVpTwoLine.WriteRune('\n')
+		}
+	}
+	m.LineEditingIndexCursorViewport.SetContent(cursorVpLine.String())
+	m.LineEditingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
+}
+
+// ------------------------------------
+//
+//	Reset the detail panel viewports to a blank "loading" state. Clears both
+//	viewport contents, hides the secondary panel, and resets all scroll offsets.
+//
+// ------------------------------------
+func DetailComponentReinit(m *types.GittiModel) {
+	m.DetailPanelViewport.SetContent(style.NewStyle.Render(i18n.LANGUAGEMAPPING.Loading))
+	m.ShowDetailPanelTwo.Store(false)
+	m.DetailPanelViewportOffset = 0
+	m.DetailPanelViewport.SetXOffset(0)
+	m.DetailPanelViewport.SetYOffset(0)
+	m.DetailPanelTwoViewportOffset = 0
+	m.DetailPanelTwoViewport.SetXOffset(0)
+	m.DetailPanelTwoViewport.SetYOffset(0)
 }

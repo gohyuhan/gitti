@@ -16,14 +16,13 @@ import (
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	tagComponent "github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/helper"
 	"github.com/gohyuhan/gitti/tui/interaction"
 	"github.com/gohyuhan/gitti/tui/layout"
-	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
-	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -36,10 +35,13 @@ import (
 
 // ------------------------------------
 //
-//	Initialize and return a new GittiAppModel with necessary dependencies and viewport setup
+//	Construct and return a new GittiAppModel. Creates the three detail viewports
+//	(primary, secondary, log), two cursor viewports for line-editing mode,
+//	initialises all list components, and checks whether git signing is required
+//	for commit/tag/push operations.
 //
 // ------------------------------------
-func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
+func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
@@ -139,10 +141,6 @@ func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName st
 	return &GittiAppModel{model: gittiModel}
 }
 
-// -----------------------------------------------------------------------------
-// Bubble Tea standard functions
-// -----------------------------------------------------------------------------
-
 // ------------------------------------
 //
 //	Bubble tea Init function, called once when the program starts
@@ -185,8 +183,6 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case GitUpdateMsg:
 		updateEvent := string(msg)
 		switch updateEvent {
-		case constant.DETAIL_COMPONENT_PANEL_UPDATED:
-			layout.UpdateDetailComponentViewportLayout(m)
 		case git.GIT_BRANCH_UPDATE:
 			branchComponent.InitBranchList(m)
 			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_LOCAL_BRANCH {
@@ -271,92 +267,14 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		model, cmd := interaction.GittiMouseInteraction(msg, m)
 		gAM.model = model
 		return gAM, cmd
+
+	case types.GittiTuiUpdateMsg:
+		helper.GittiTuiUpdateEventHelper(m, msg)
 	}
 
 	// Update spinners in popups when they are processing
-	if m.ShowPopUp.Load() {
-		switch m.PopUpType {
-		case constant.CommitPopUp:
-			if commitPopup, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel); ok && commitPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				commitPopup.Spinner, cmd = commitPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.AmendCommitPopUp:
-			if amendCommitPopup, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel); ok && amendCommitPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				amendCommitPopup.Spinner, cmd = amendCommitPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.GitRemotePushPopUp:
-			if pushPopup, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel); ok && pushPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				pushPopup.Spinner, cmd = pushPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.GitPullOutputPopUp:
-			if pullPopup, ok := m.PopUpModel.(*pullPopUp.GitPullOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.SwitchBranchOutputPopUp:
-			if pullPopup, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.GitStashOperationOutputPopUp:
-			if stashPopup, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel); ok && stashPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				stashPopup.Spinner, cmd = stashPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.GitDeleteBranchOutputPopUp:
-			if branchPopup, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.CreateBranchBasedOnRemoteOutputPopUp:
-			if branchPopup, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.DeleteTagOutputPopUp:
-			if tagPopup, ok := m.PopUpModel.(*tagPopUp.DeleteTagOutputPopUpModel); ok && tagPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				tagPopup.Spinner, cmd = tagPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.PushTagOutputPopUp:
-			tagPopUp, ok := m.PopUpModel.(*tagPopUp.PushTagOutputPopUpModel)
-			if ok {
-				var cmd tea.Cmd
-				tagPopUp.Spinner, cmd = tagPopUp.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.FetchTagOutputPopUp:
-			if tagPopup, ok := m.PopUpModel.(*tagPopUp.FetchTagOutputPopUpModel); ok && tagPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				tagPopup.Spinner, cmd = tagPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.GitRebaseOutputPopUp:
-			if rebasePopup, ok := m.PopUpModel.(*rebasePopUp.GitRebaseOutputPopUpModel); ok && rebasePopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				rebasePopup.Spinner, cmd = rebasePopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		case constant.BranchMergeOutputPopUp:
-			if branchPopup, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
-				var cmd tea.Cmd
-				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
-				cmds = append(cmds, cmd)
-			}
-		}
-	}
+	cmds = helper.UpdateSpinner(m, msg, cmds)
+
 	return gAM, tea.Batch(cmds...)
 }
 

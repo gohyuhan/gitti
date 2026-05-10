@@ -16,41 +16,29 @@ import (
 //
 // ------------------------------------
 func GitRemotePushService(m *types.GittiModel, remoteName string, pushType string) {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	popUp, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel)
+	checkoutBranch := m.CheckOutBranch
 	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
 		popUp.CancelFunc = cancel
-	}
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
 
-	go func(ctx context.Context) {
-		defer cancel()
+		go func(ctx context.Context) {
+			defer cancel()
 
-		// set to is processing and remove the log content in UI and also in GITCOMMIT in memory
-		popUp, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel)
-		var exitStatusCode int
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-			popUp.IsCancelled.Store(false)
-		} else {
-			return
-		}
-		exitStatusCode = m.GitOperations.GitCommit.GitPush(ctx, remoteName, pushType, m.CheckOutBranch)
-		popUp, ok = m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel)
-		if ok && !popUp.IsCancelled.Load() {
-			popUp.IsProcessing.Store(false) // update the processing status
-			// if successful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(true)
-				popUp.IsProcessing.Store(false)
-				popUp.HasError.Store(false)
-			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
-				popUp.HasError.Store(true)
+			exitStatusCode := m.GitOperations.GitCommit.GitPush(ctx, remoteName, pushType, checkoutBranch)
+			data := types.GitPushResultEventDataStructure{
+				Success: exitStatusCode == 0,
 			}
-		}
-	}(ctx)
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.GIT_PUSH_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx)
+	}
 }
 
 // ------------------------------------

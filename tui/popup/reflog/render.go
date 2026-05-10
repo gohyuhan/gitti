@@ -9,6 +9,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Render the cherry-pick confirmation popup, displaying the commit hash and
+//	HEAD reference in color alongside the reflog action and action detail, so
+//	the user can confirm before applying the cherry-pick.
+//
+// ------------------------------------
 func RenderGitCherryPickFromRefLogApplyConfirmationPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCherryPickFromRefLogApplyConfirmationPopUpModel)
 	if ok {

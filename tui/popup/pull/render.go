@@ -11,12 +11,8 @@ import (
 
 // ------------------------------------
 //
-//	For Git Pull
-//
-// ------------------------------------
-// ------------------------------------
-//
-//	choose git pull option
+//	Render the pull-type selection popup, showing a list of pull strategy options
+//	(merge, rebase, fast-forward only) for the user to choose before pulling.
 //
 // ------------------------------------
 func RenderChooseGitPullTypePopUp(m *types.GittiModel) string {
@@ -37,7 +33,9 @@ func RenderChooseGitPullTypePopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	for git pull output
+//	Render the git pull output popup, showing a scrollable viewport of pull
+//	command output. Displays a spinner while the pull is in progress, and
+//	colors the viewport border red on error or green on success.
 //
 // ------------------------------------
 func RenderGitPullOutputPopUp(m *types.GittiModel) string {

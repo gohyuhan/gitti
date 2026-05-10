@@ -2,11 +2,12 @@ package keybinding
 
 import "charm.land/bubbles/v2/viewport"
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up helper for global keybinding
+//	KeybindingAndFeatureInstructionsPopUpModel holds a single scrollable viewport
+//	used to display the full keybinding reference and feature instructions popup.
 //
-// ---------------------------------
+// ------------------------------------
 type KeybindingAndFeatureInstructionsPopUpModel struct {
 	GlobalKeyBindingViewport viewport.Model
 }

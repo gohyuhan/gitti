@@ -12,11 +12,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git tag
+//	GitTagItem holds the name of a single git tag.
+//	GitTagItemDelegate renders each row as the truncated tag name.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitTagItemDelegate struct{}
 	GitTagItem         struct {
@@ -28,7 +29,6 @@ func (i GitTagItem) FilterValue() string {
 	return i.TagName
 }
 
-// for list component of Git tag
 func (d GitTagItemDelegate) Height() int                             { return 1 }
 func (d GitTagItemDelegate) Spacing() int                            { return 0 }
 func (d GitTagItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

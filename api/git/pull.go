@@ -37,11 +37,11 @@ func InitGitPull(updateChannel chan string, gitProcessLock *GitProcessLock, logg
 	return gitPull
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// return the git pull output
+//	Return a copy of the latest git pull output lines
 //
-// --------------------------------
+// ------------------------------------
 func (gp *GitPull) GetGitPullOutput() []string {
 	gp.gitPullOutputMu.RLock()
 	defer gp.gitPullOutputMu.RUnlock()
@@ -51,11 +51,11 @@ func (gp *GitPull) GetGitPullOutput() []string {
 	return copied
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// # Git Pull and will operate differently based on the user selection type
+//	Execute git pull using selected pull mode, stream combined output, and return exit status
 //
-// --------------------------------
+// ------------------------------------
 func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 	if !gp.gitProcessLock.CanProceedWithGitOps() {
 		return -1
@@ -145,8 +145,11 @@ func (gp *GitPull) GitPull(ctx context.Context, pullType string) int {
 	return 0
 }
 
-// GitPullWithSigning constructs the git pull command arguments for execution in the terminal.
-// This allows for interactive signing (e.g., GPG passphrase) by suspending the UI.
+// ------------------------------------
+//
+//	Build git pull args for signing-required terminal execution path
+//
+// ------------------------------------
 func (gp *GitPull) GitPullWithSigning(pullType string) []string {
 	var gitPullArgs []string
 	switch pullType {
@@ -160,11 +163,11 @@ func (gp *GitPull) GitPullWithSigning(pullType string) []string {
 	return gitPullArgs
 }
 
-// --------------------------------
+// ------------------------------------
 //
-// # Clear the Git Process Output
+//	Clear cached git pull output lines
 //
-// --------------------------------
+// ------------------------------------
 func (gp *GitPull) ClearGitPullOutput() {
 	gp.gitPullOutputMu.Lock()
 	defer gp.gitPullOutputMu.Unlock()

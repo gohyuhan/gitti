@@ -13,11 +13,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git branch
+//	GitBranchItem holds the name and checkout status of a branch for display
+//	in the branch list. GitBranchItemDelegate implements list.ItemDelegate,
+//	rendering each row with a "* " prefix for the checked-out branch and
+//	"❯" for the selected row.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitBranchItemDelegate struct{}
 	GitBranchItem         struct {
@@ -30,7 +33,6 @@ func (i GitBranchItem) FilterValue() string {
 	return i.BranchName
 }
 
-// for list component of Git branch
 func (d GitBranchItemDelegate) Height() int                             { return 1 }
 func (d GitBranchItemDelegate) Spacing() int                            { return 0 }
 func (d GitBranchItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

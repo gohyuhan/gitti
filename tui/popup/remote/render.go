@@ -14,7 +14,10 @@ import (
 
 // ------------------------------------
 //
-//	For Adding Git Remote
+//	Render the add-remote prompt popup with remote-name and URL text inputs. When
+//	the repo has no existing remote a prompt banner is shown above the inputs.
+//	If the output viewport has content (after a submit attempt), appends it below
+//	the inputs with the border colored red on error or green on success.
 //
 // ------------------------------------
 func RenderAddRemotePromptPopUp(m *types.GittiModel) string {
@@ -91,7 +94,9 @@ func RenderAddRemotePromptPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Choosing a Remote for git push if there is more than 1
+//	Render the choose-remote popup, showing a titled list of all configured
+//	remotes. Used when multiple remotes exist and the user must pick one for
+//	the pending action (e.g. push).
 //
 // ------------------------------------
 func RenderChooseRemotePopUp(m *types.GittiModel) string {
@@ -110,6 +115,13 @@ func RenderChooseRemotePopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the remove-remote confirmation popup, displaying the remote name,
+//	URL, and fetch/push flags so the user can confirm before the remote is
+//	permanently deleted from the repository config.
+//
+// ------------------------------------
 func RenderRemoveRemoteConfirmationPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*RemoveRemoteConfirmationPopUpModel)
 	if ok {
@@ -175,6 +187,13 @@ func RenderRemoveRemoteConfirmationPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the set-tracking-upstream confirmation popup, showing the current
+//	branch name alongside the remote name and URL that will be configured as
+//	its tracking upstream.
+//
+// ------------------------------------
 func RenderRemoteAsTrackingUpstreamConfirmationPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*RemoteAsTrackingUpstreamConfirmationPopUpModel)
 	if ok {
@@ -192,6 +211,13 @@ func RenderRemoteAsTrackingUpstreamConfirmationPopUp(m *types.GittiModel) string
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the edit-remote prompt popup, showing two text inputs pre-filled with
+//	the existing remote name and URL so the user can modify either or both before
+//	submitting the update.
+//
+// ------------------------------------
 func RenderEditRemotePromptPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*EditRemotePromptPopUpModel)
 	if ok {

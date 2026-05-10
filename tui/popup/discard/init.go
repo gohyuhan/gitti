@@ -14,10 +14,13 @@ import (
 
 // ------------------------------------
 //
-//	for discard option list popup
+//	Initialize the discard type selection popup for the given file. Builds a
+//	two-option list (discard whole, unstage) adapted for the file's change type:
+//	newly-added/copied files use a delete action instead of restore, and renamed
+//	files offer a revert-rename action instead.
 //
 // ------------------------------------
-func InitGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
+func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
 	discardTypeOption := []GitDiscardTypeOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
@@ -89,10 +92,11 @@ func InitGitDiscardTypeOptionPopUp(m *types.GittiModel, filePathName string, new
 
 // ------------------------------------
 //
-//	for discard confirm prompt
+//	Initialize the discard confirmation prompt popup with the target file path
+//	and the chosen discard type, shown before the discard is executed.
 //
 // ------------------------------------
-func InitGitDiscardConfirmPromptPopupModel(m *types.GittiModel, filePathName string, discardType string) {
+func InitGitDiscardConfirmPromptPopUpModel(m *types.GittiModel, filePathName string, discardType string) {
 	popUpModel := &GitDiscardConfirmPromptPopUpModel{
 		FilePathName: filePathName,
 		DiscardType:  discardType,

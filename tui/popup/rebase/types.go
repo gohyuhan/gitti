@@ -9,11 +9,13 @@ import (
 	"charm.land/bubbles/v2/viewport"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up to show git rebase result
+//	GitRebaseOutputPopUpModel holds the scrollable output viewport and dot spinner
+//	for the git rebase progress popup, plus atomic flags (IsProcessing, HasError,
+//	ProcessSuccess, IsCancelled) and a CancelFunc to abort the rebase operation.
 //
-// ---------------------------------
+// ------------------------------------
 type GitRebaseOutputPopUpModel struct {
 	GitRebaseOutputViewport viewport.Model // to log out the output from git operation
 	Spinner                 spinner.Model  // spinner for showing processing state
@@ -25,11 +27,12 @@ type GitRebaseOutputPopUpModel struct {
 	CancelFunc context.CancelFunc
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up for branch input
+//	GitRebaseBranchInputPopUpModel holds a focused text input for the branch name
+//	to rebase onto, and the optional remote name (empty for local branches).
 //
-// ---------------------------------
+// ------------------------------------
 type GitRebaseBranchInputPopUpModel struct {
 	BranchNameInput textinput.Model
 	Remote          string

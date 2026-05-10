@@ -15,6 +15,7 @@ type GitOperations struct {
 	GitTag                 *git.GitTag
 	GitStateUniversalUtils *git.GitStateUniversalUtils
 	GitBlame               *git.GitBlame
+	GitInteractiveRebase   *git.GitInteractiveRebase
 }
 
 type GitRepoPath struct {

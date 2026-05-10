@@ -8,8 +8,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-func InitGitDiscardFileLineChangeConfirmPopUp(m *types.GittiModel) {
-	// for git discard file line change confirmation
+// ------------------------------------
+//
+//	Initialize the discard-line-change confirmation popup. Creates a non-soft-wrap
+//	viewport pre-filled with the diff line at the cursor position from whichever
+//	detail panel is currently selected (DetailComponentPanel or DetailComponentPanelTwo).
+//
+// ------------------------------------
+func InitGitDiscardFileLineChangeConfirmPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true

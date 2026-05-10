@@ -8,6 +8,7 @@ import (
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
@@ -17,7 +18,10 @@ import (
 
 // ------------------------------------
 //
-//	typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
+//	Handle key presses in typing mode (always inside a popup). Routes esc, tab,
+//	shift+tab, ctrl+e, enter, ctrl+p, ctrl+y, and arrow keys to dedicated
+//	handlers, then forwards remaining input to the active popup's text
+//	input or textarea field.
 //
 // ------------------------------------
 func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -164,13 +168,27 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 			popUp.CurrentGitTrackedFilesPathList.SetFilterText(popUp.FilterValue)
 			return m, cmd
 		}
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, cmd
 }
 
 // ------------------------------------
 //
-//	Handle non-typing key binding interactions, dispatching to specific key handlers
+//	Handle key presses in non-typing mode. Dispatches each key (letters, arrows,
+//	special keys, and panel-resize +/-) to its dedicated handler function.
 //
 // ------------------------------------
 func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -213,6 +231,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 
 	case "f":
 		return handleNonTypingfKeyBindingInteraction(m)
+
+	case "i":
+		return handleNonTypingiKeyBindingInteraction(m)
 
 	case "L":
 		return handleNonTypingLKeyBindingInteraction(m)

@@ -11,8 +11,9 @@ import (
 
 // ------------------------------------
 //
-//	init the list component for Reflog Component
-//	return bool was to tell if we need to reinit the detail component panel or not
+//	Rebuild the reflog list widget from the latest git reflog data, preserve the previously
+//	selected entry by hash, and return true if the selection changed (signals that the detail
+//	panel needs to be reinitialized).
 //
 // ------------------------------------
 func InitGitRefLogList(m *types.GittiModel) bool {
