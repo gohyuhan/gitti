@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -35,6 +36,7 @@ type GitDaemon struct {
 	gitFilesActiveTimer                 *time.Timer
 	gitRemoteSyncStatusActiveTimer      *time.Timer
 	stopChannel                         chan struct{}
+	stopOnce                            sync.Once
 	errorLog                            []error
 	updateChannel                       chan string // to communicate back to main thread for an update event
 	daemonReceiverChannel               chan string // this is used to receive signal from main thread by the daemon
@@ -338,5 +340,7 @@ func (gd *GitDaemon) commitGraphWriteOnce() {
 //
 // ------------------------------------
 func (gd *GitDaemon) Stop() {
-	close(gd.stopChannel)
+	gd.stopOnce.Do(func() {
+		close(gd.stopChannel)
+	})
 }

@@ -121,9 +121,9 @@ func main() {
 		}
 
 		lastMouseSignal := time.Now()
-		mouseThrottleFrequency := 8 * time.Millisecond
+		mouseThrottleFrequency := 16 * time.Millisecond
 
-		// throttle the mouse signal to ~120 fps
+		// throttle mouse messages to ~60Hz cap (~62.5 events/sec at 16ms)
 		mouseThrottle := func(m tea.Model, msg tea.Msg) tea.Msg {
 			if _, ok := msg.(tea.MouseMsg); ok {
 				if time.Since(lastMouseSignal) < mouseThrottleFrequency {

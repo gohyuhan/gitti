@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/tui/constant"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
@@ -30,7 +31,6 @@ import (
 //
 // ------------------------------------
 func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	// for within pop up component
 	switch m.PopUpType {
 	// following is for list component
@@ -419,64 +419,64 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 	case constant.KeybindingAndFeatureInstructionsPopUp:
 		popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
 		if ok {
-			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.GlobalKeyBindingViewport)
+			return m, nil
 		}
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
 		if ok {
-			popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.GitCommitOutputViewport)
+			return m, nil
 		}
 	case constant.AmendCommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
 		if ok {
-			popUp.GitAmendCommitOutputViewport, cmd = popUp.GitAmendCommitOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.GitAmendCommitOutputViewport)
+			return m, nil
 		}
 	case constant.GitRemotePushPopUp:
 		popUp, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel)
 		if ok {
-			popUp.GitRemotePushOutputViewport, cmd = popUp.GitRemotePushOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.GitRemotePushOutputViewport)
+			return m, nil
 		}
 	case constant.GitPullOutputPopUp:
 		popUp, ok := m.PopUpModel.(*pullPopUp.GitPullOutputPopUpModel)
 		if ok {
-			popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.GitPullOutputViewport)
+			return m, nil
 		}
 	case constant.SwitchBranchOutputPopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
 		if ok {
-			popUp.SwitchBranchOutputViewport, cmd = popUp.SwitchBranchOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.SwitchBranchOutputViewport)
+			return m, nil
 		}
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
 		if ok {
-			popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.AddRemoteOutputViewport)
+			return m, nil
 		}
 	case constant.GitStashOperationOutputPopUp:
 		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
 		if ok {
-			popUp.GitStashOperationOutputViewport, cmd = popUp.GitStashOperationOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.GitStashOperationOutputViewport)
+			return m, nil
 		}
 	case constant.BranchMergeOutputPopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
 		if ok {
-			popUp.BranchMergeOutputViewport, cmd = popUp.BranchMergeOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.BranchMergeOutputViewport)
+			return m, nil
 		}
 
 	case constant.InteractiveRebaseFixupSquashOutputPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
 		if ok && !popUp.IsProcessing.Load() {
 			// Block viewport scroll while command is actively running.
-			popUp.FixupSquashOutputViewport, cmd = popUp.FixupSquashOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromKey(msg, &popUp.FixupSquashOutputViewport)
+			return m, nil
 		}
 
 	// popup that have both viewport and list
@@ -499,8 +499,8 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 				popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, popUp.CommitList.Width())
 				return m, nil
 			} else if popUp.IsCommitFixupSquashViewportSelected {
-				popUp.CommitFixupSquashViewport, cmd = popUp.CommitFixupSquashViewport.Update(msg)
-				return m, cmd
+				triggerViewportVerticalScrollFromKey(msg, &popUp.CommitFixupSquashViewport)
+				return m, nil
 			}
 		}
 
@@ -517,84 +517,101 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 //
 // ------------------------------------
 func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	// for pop up that have viewport
 	switch m.PopUpType {
 	case constant.KeybindingAndFeatureInstructionsPopUp:
 		popUp, ok := m.PopUpModel.(*keybindingPopUp.KeybindingAndFeatureInstructionsPopUpModel)
 		if ok {
-			popUp.GlobalKeyBindingViewport, cmd = popUp.GlobalKeyBindingViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.GlobalKeyBindingViewport)
+			return m, nil
 		}
 
 	case constant.CommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
 		if ok {
-			popUp.GitCommitOutputViewport, cmd = popUp.GitCommitOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.GitCommitOutputViewport)
+			return m, nil
 		}
 	case constant.AmendCommitPopUp:
 		popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
 		if ok {
-			popUp.GitAmendCommitOutputViewport, cmd = popUp.GitAmendCommitOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.GitAmendCommitOutputViewport)
+			return m, nil
 		}
 	case constant.GitRemotePushPopUp:
 		popUp, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel)
 		if ok {
-			popUp.GitRemotePushOutputViewport, cmd = popUp.GitRemotePushOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.GitRemotePushOutputViewport)
+			return m, nil
 		}
 	case constant.GitPullOutputPopUp:
 		popUp, ok := m.PopUpModel.(*pullPopUp.GitPullOutputPopUpModel)
 		if ok {
-			popUp.GitPullOutputViewport, cmd = popUp.GitPullOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.GitPullOutputViewport)
+			return m, nil
 		}
 	case constant.SwitchBranchOutputPopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
 		if ok {
-			popUp.SwitchBranchOutputViewport, cmd = popUp.SwitchBranchOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.SwitchBranchOutputViewport)
+			return m, nil
 		}
 	case constant.AddRemotePromptPopUp:
 		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
 		if ok {
-			popUp.AddRemoteOutputViewport, cmd = popUp.AddRemoteOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.AddRemoteOutputViewport)
+			return m, nil
 		}
 	case constant.GitStashOperationOutputPopUp:
 		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
 		if ok {
-			popUp.GitStashOperationOutputViewport, cmd = popUp.GitStashOperationOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.GitStashOperationOutputViewport)
+			return m, nil
 		}
 	case constant.BranchMergeOutputPopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
 		if ok {
-			popUp.BranchMergeOutputViewport, cmd = popUp.BranchMergeOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.BranchMergeOutputViewport)
+			return m, nil
 		}
 	case constant.BlamePopUp:
 		popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 		if ok && popUp.ShowingBlameInfo {
-			popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.BlameViewport)
+			return m, nil
 		}
 	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
 		if ok && popUp.IsCommitFixupSquashViewportSelected {
-			popUp.CommitFixupSquashViewport, cmd = popUp.CommitFixupSquashViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.CommitFixupSquashViewport)
+			return m, nil
 		}
 	case constant.InteractiveRebaseFixupSquashOutputPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
 		if ok && !popUp.IsProcessing.Load() {
 			// Block viewport scroll while command is actively running.
-			popUp.FixupSquashOutputViewport, cmd = popUp.FixupSquashOutputViewport.Update(msg)
-			return m, cmd
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.FixupSquashOutputViewport)
+			return m, nil
 		}
 	}
 
 	return m, nil
+}
+
+func triggerViewportVerticalScrollFromKey(msg tea.KeyPressMsg, vp *viewport.Model) {
+	switch msg.String() {
+	case "up", "k":
+		vp.ScrollUp(1)
+	case "down", "j":
+		vp.ScrollDown(1)
+	}
+}
+
+func triggerViewportVerticalScrollFromMouse(msg tea.MouseMsg, vp *viewport.Model) {
+	switch msg.Mouse().Button {
+	case tea.MouseWheelUp:
+		vp.ScrollUp(1)
+	case tea.MouseWheelDown:
+		vp.ScrollDown(1)
+	}
 }
