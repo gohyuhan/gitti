@@ -1323,7 +1323,15 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				gitArgs := m.GitOperations.GitCommitLog.GitCherryPickWithSigning(cherryPickedCommitHashes)
 				return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CHERRY_PICK_WITH_SIGNING_OPS)
 			} else {
-				services.GitCherryPickService(m, m.CherryPickedCommitInfo.CherryPickedCommitMap)
+				copiedCherryPickedHashmap := make(map[string]git.CherryPickedCommitLog)
+				for k, v := range m.CherryPickedCommitInfo.CherryPickedCommitMap {
+					copiedCherryPickedHashmap[k] = v
+				}
+				services.GitCherryPickService(m, copiedCherryPickedHashmap)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+				m.PopUpType = constant.NoPopUp
 				return m, nil
 			}
 		case constant.GitDiscardFileLineChangeConfirmPopUp:

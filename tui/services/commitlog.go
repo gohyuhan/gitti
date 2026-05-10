@@ -33,8 +33,8 @@ func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string
 		}
 
 		m.GitOperations.GitCommitLog.GitCherryPick(cherryPickedCommitHashes)
-		utils.ReinitCherryPickedCommitInfo(m)
 	}()
+	utils.ReinitCherryPickedCommitInfo(m)
 }
 
 // ------------------------------------
