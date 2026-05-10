@@ -18,10 +18,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
-// # For git commit process pop up model
+// ------------------------------------
 //
-// ---------------------------------
+//	GitCommitPopUpModel holds two text inputs (message + description textarea),
+//	a soft-wrap output viewport, a dot spinner, and atomic flags (IsProcessing,
+//	HasError, ProcessSuccess, IsCancelled, InitialCommitStarted) for the git
+//	commit popup. CancelFunc aborts an in-flight commit operation.
+//
+// ------------------------------------
 type GitCommitPopUpModel struct {
 	IsAmendCommit            bool            // to indicate is this is a normal commit or an amend commit operation
 	MessageTextInput         textinput.Model // input index 1
@@ -39,11 +43,14 @@ type GitCommitPopUpModel struct {
 	CancelFunc context.CancelFunc
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For git amend commit process pop up model
+//	GitAmendCommitPopUpModel holds two text inputs (message + description textarea)
+//	pre-filled from the latest commit, a soft-wrap output viewport, a dot spinner,
+//	and atomic flags (IsProcessing, HasError, ProcessSuccess, IsCancelled,
+//	InitialCommitStarted). CancelFunc aborts an in-flight amend operation.
 //
-// ---------------------------------
+// ------------------------------------
 type GitAmendCommitPopUpModel struct {
 	IsAmendCommit                bool            // to indicate is this is a normal commit or an amend commit operation
 	MessageTextInput             textinput.Model // input index 1
@@ -61,29 +68,35 @@ type GitAmendCommitPopUpModel struct {
 	CancelFunc context.CancelFunc
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up to prompt for git reset type that will apply for the latest commit
+//	GitResetLatestCommitTypeOptionPopUpModel holds the option list for the reset
+//	type selection popup targeting the latest commit, offering soft, hard, and
+//	mixed reset modes.
 //
-// ---------------------------------
+// ------------------------------------
 type GitResetLatestCommitTypeOptionPopUpModel struct {
 	ResetLatestCommitTypeOptionList list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # To prompt user for confirmation for reset type on the latest commit
+//	GitResetLatestCommitConfirmPromptPopUpModel holds the chosen reset type for
+//	the latest-commit reset confirmation prompt.
 //
-// ---------------------------------
+// ------------------------------------
 type GitResetLatestCommitConfirmPromptPopUpModel struct {
 	GitResetLatestCommitType string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for reset latest commit option selection option
+//	GitResetLatestCommitTypeOptionDelegate renders each reset type row (name +
+//	info) in the latest-commit reset type option list.
+//	GitResetLatestCommitTypeOptionItem carries the display name, info string, and
+//	the reset type constant for a single reset mode choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitResetLatestCommitTypeOptionDelegate struct{}
 	GitResetLatestCommitTypeOptionItem     struct {
@@ -97,7 +110,6 @@ func (i GitResetLatestCommitTypeOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for reset laytes commit type selection
 func (d GitResetLatestCommitTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitResetLatestCommitTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitResetLatestCommitTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -133,11 +145,13 @@ func (d GitResetLatestCommitTypeOptionDelegate) Render(w io.Writer, m list.Model
 	fmt.Fprint(w, fn(fullStr))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up to prompt for git reset type that will apply for selected commit
+//	GitResetToSelectedCommitTypeOptionPopUpModel holds the option list for the
+//	reset type selection popup targeting a selected commit, plus the commit hash,
+//	message, and author to display in the confirmation step.
 //
-// ---------------------------------
+// ------------------------------------
 type GitResetToSelectedCommitTypeOptionPopUpModel struct {
 	ResetToSelectedCommitTypeOptionList list.Model
 	SelectedCommitHash                  string
@@ -145,11 +159,13 @@ type GitResetToSelectedCommitTypeOptionPopUpModel struct {
 	CommitInfoAuthor                    string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # To prompt user for confirmation for reset type on the selected commit
+//	GitResetToSelectedCommitConfirmPromptPopUpModel holds the reset type, target
+//	commit hash, message, and author for the selected-commit reset confirmation
+//	prompt popup.
 //
-// ---------------------------------
+// ------------------------------------
 type GitResetToSelectedCommitConfirmPromptPopUpModel struct {
 	GitResetToSelectedCommitType string
 	SelectedCommitHash           string
@@ -157,11 +173,14 @@ type GitResetToSelectedCommitConfirmPromptPopUpModel struct {
 	CommitInfoAuthor             string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for reset selected commit option selection option
+//	GitResetToSelectedCommitTypeOptionDelegate renders each reset type row
+//	(name + info) in the selected-commit reset type option list.
+//	GitResetToSelectedCommitTypeOptionItem carries the display name, info string,
+//	and the reset type constant for a single reset mode choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitResetToSelectedCommitTypeOptionDelegate struct{}
 	GitResetToSelectedCommitTypeOptionItem     struct {
@@ -175,7 +194,6 @@ func (i GitResetToSelectedCommitTypeOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for reset laytes commit type selection
 func (d GitResetToSelectedCommitTypeOptionDelegate) Height() int  { return 2 }
 func (d GitResetToSelectedCommitTypeOptionDelegate) Spacing() int { return 0 }
 func (d GitResetToSelectedCommitTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {

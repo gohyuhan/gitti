@@ -15,6 +15,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Dispatch a GittiTuiUpdateMsg to the appropriate popup or layout update
+//	function based on the event type constant in msg.Event. Covers detail panel
+//	state/layout changes, branch/tag/stash/remote/rebase/commit/pull results,
+//	and interactive-rebase events.
+//
+// ------------------------------------
 func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg) {
 	updateMsg := types.GittiTuiUpdateMsg(msg)
 	updateEvent := updateMsg.Event

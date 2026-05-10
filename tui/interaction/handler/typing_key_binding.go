@@ -734,7 +734,9 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 
 // ------------------------------------
 //
-//	Handle typing up key binding interaction
+//	Handle up arrow in typing mode. In the blame popup, navigates the file list
+//	up when the file selector is active, or scrolls the blame viewport up when
+//	blame info is shown.
 //
 // ------------------------------------
 func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -758,7 +760,9 @@ func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMode
 
 // ------------------------------------
 //
-//	Handle typing down key binding interaction
+//	Handle down arrow in typing mode. In the blame popup, navigates the file
+//	list down when the file selector is active, or scrolls the blame viewport
+//	down when blame info is shown.
 //
 // ------------------------------------
 func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -782,7 +786,8 @@ func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 
 // ------------------------------------
 //
-//	Handle typing left key binding interaction
+//	Handle left arrow in typing mode. In the blame popup, scrolls the blame
+//	viewport left when blame info is shown.
 //
 // ------------------------------------
 func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -804,7 +809,8 @@ func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 
 // ------------------------------------
 //
-//	Handle typing right key binding interaction
+//	Handle right arrow in typing mode. In the blame popup, scrolls the blame
+//	viewport right when blame info is shown.
 //
 // ------------------------------------
 func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {

@@ -15,12 +15,9 @@ import (
 
 // ------------------------------------
 //
-//	For Creating New Git branch
-//
-// ------------------------------------
-// ------------------------------------
-//
-//	pop up that confirm the option for creating a new branch, just create or create and move everything to the new branch
+//	Render the new-branch type selection popup, showing a list of creation
+//	options: create only, create-and-switch, create-based-on-remote-input, and
+//	create-based-on-remote-selection.
 //
 // ------------------------------------
 func RenderChooseNewBranchTypePopUp(m *types.GittiModel) string {
@@ -41,7 +38,8 @@ func RenderChooseNewBranchTypePopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	to prompt user for new branch name and then proceed to trigger the creation of branch and optionally move changes
+//	Render the new-branch name input popup with a focused text input. Appends an
+//	inline warning if the current input value is not a valid branch name.
 //
 // ------------------------------------
 func RenderCreateNewBranchPopUp(m *types.GittiModel) string {
@@ -71,12 +69,8 @@ func RenderCreateNewBranchPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Switching Git branch
-//
-// ------------------------------------
-// ------------------------------------
-//
-//	pop up that confirm the option for switching a branch, just switch or switch to the branch while bringing all the changes
+//	Render the switch-branch type selection popup, showing a titled list of
+//	switch options (switch clean, switch-with-changes) for the target branch.
 //
 // ------------------------------------
 func RenderChooseSwitchBranchTypePopUp(m *types.GittiModel) string {
@@ -97,9 +91,10 @@ func RenderChooseSwitchBranchTypePopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	pop up to render the output of the switch branch operation
-//	because we allow switching with bring changes over, there is conflict possiblities there fore we need to show the output
-//	so that the user is aware of it
+//	Render the switch-branch output popup, showing a scrollable viewport of
+//	command output. When switching-with-changes, conflicts can occur, so output
+//	is always displayed. Shows a spinner while processing, and colors the viewport
+//	border red on error or green on success.
 //
 // ------------------------------------
 func RenderSwitchBranchOutputPopUp(m *types.GittiModel) string {
@@ -149,7 +144,8 @@ func RenderSwitchBranchOutputPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Git delete branch confirmation prompt
+//	Render the branch-deletion confirmation popup, showing the localized prompt
+//	with the target branch name highlighted in yellow.
 //
 // ------------------------------------
 func RenderGitDeleteBranchConfirmPromptPopUp(m *types.GittiModel) string {
@@ -166,7 +162,9 @@ func RenderGitDeleteBranchConfirmPromptPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Git delete branch output result
+//	Render the branch-deletion output popup, showing command output in a
+//	viewport with a spinner while processing. Colors the border red on error
+//	or green on success.
 //
 // ------------------------------------
 func RenderGitDeleteBranchOutputPopUp(m *types.GittiModel) string {
@@ -212,7 +210,9 @@ func RenderGitDeleteBranchOutputPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Create New Branch Based on remote
+//	Render the create-branch-from-remote input popup, showing the remote origin
+//	and a focused branch-name text input. Appends an inline warning if the
+//	current input value is not a valid branch name.
 //
 // ------------------------------------
 func RenderCreateBranchBasedOnRemotePopUp(m *types.GittiModel) string {
@@ -250,7 +250,9 @@ func RenderCreateBranchBasedOnRemotePopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Create New Branch Based on remote output result
+//	Render the create-branch-from-remote output popup, showing command output
+//	in a viewport with a spinner while processing. Colors the border red on
+//	error or green on success.
 //
 // ------------------------------------
 func RenderCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) string {
@@ -294,6 +296,12 @@ func RenderCreateBranchBasedOnRemoteOutputPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the remote-branch selection popup, showing a titled list of all
+//	remote branches the user can choose to track locally.
+//
+// ------------------------------------
 func RenderChooseRemoteBranchOptionPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseRemoteBranchOptionPopUpModel)
 	if ok {
@@ -310,6 +318,14 @@ func RenderChooseRemoteBranchOptionPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the branch-selection popup for git merge. Shows two bordered panels:
+//	the top panel lists available (unselected) branches, the bottom panel lists
+//	already-selected branches. The active panel is highlighted with a selected
+//	border; the inactive panel uses the default panel border.
+//
+// ------------------------------------
 func RenderChooseBranchOptionForMergePopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*ChooseBranchOptionForMergePopUpModel)
 	if ok {
@@ -346,7 +362,9 @@ func RenderChooseBranchOptionForMergePopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	for git merge output
+//	Render the git merge output popup, showing a scrollable viewport of merge
+//	command output. Displays a spinner while the merge is in progress, and colors
+//	the viewport border red on error or green on success.
 //
 // ------------------------------------
 func RenderBranchMergeOutputPopUp(m *types.GittiModel) string {

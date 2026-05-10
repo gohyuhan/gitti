@@ -8,6 +8,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Sync the remote push output viewport content and scroll position from the
+//	latest git push output lines. Called whenever the underlying output buffer
+//	changes during an in-progress or completed push operation.
+//
+// ------------------------------------
 func UpdatePopUpGitRemotePushOutputViewport(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if ok {
@@ -25,6 +32,13 @@ func UpdatePopUpGitRemotePushOutputViewport(m *types.GittiModel) {
 	}
 }
 
+// ------------------------------------
+//
+//	Handle the async git push result event. Clears the IsProcessing flag and
+//	sets ProcessSuccess on success, or sets HasError on failure. No-ops if
+//	the popup is not the active push output popup or the operation was cancelled.
+//
+// ------------------------------------
 func UpdateGitPushResultEvent(m *types.GittiModel, data types.GitPushResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if !ok || popUp.IsCancelled.Load() {

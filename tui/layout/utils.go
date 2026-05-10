@@ -20,7 +20,8 @@ import (
 
 // ------------------------------------
 //
-//	To update the width and height of all components
+//	Recompute and apply all panel widths and heights from the current terminal
+//	dimensions and left-panel ratio. Called on every window-resize event.
 //
 // ------------------------------------
 func TuiWindowSizing(m *types.GittiModel) {
@@ -73,7 +74,9 @@ func TuiWindowSizing(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Dynamically resize the left panel components to fill the available height
+//	Resize all left-column panels so the focused panel is taller and the rest
+//	share the remaining height equally. Called when the selected component
+//	changes or on window resize.
 //
 // ------------------------------------
 func LeftPanelDynamicResize(m *types.GittiModel) {
@@ -184,18 +187,25 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)
 }
 
-func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, UpdateData types.DetailPanelStateAndLayoutUpdateEventDataInterface) {
+// ------------------------------------
+//
+//	Apply new content and state from a detail-panel update event. Sets the
+//	primary viewport content, optional secondary viewport content, and
+//	re-enters line-editing state if it was active before the update.
+//
+// ------------------------------------
+func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, updateData types.DetailPanelStateAndLayoutUpdateEventDataInterface) {
 	needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponentPanel
-	m.DetailPanelViewport.SetContent(UpdateData.ContentLine)
-	m.DetailPanelViewportOGStringArray = UpdateData.OgLineDiff1
-	m.DetailPanelTwoViewportOGStringArray = UpdateData.OgLineDiff2
+	m.DetailPanelViewport.SetContent(updateData.ContentLine)
+	m.DetailPanelViewportOGStringArray = updateData.OgLineDiff1
+	m.DetailPanelTwoViewportOGStringArray = updateData.OgLineDiff2
 
 	if needToScrollToBottom {
 		m.DetailPanelViewport.GotoBottom()
 	}
 
-	if UpdateData.SetForDetailComponentTwo {
-		m.DetailPanelTwoViewport.SetContent(UpdateData.ContentLine2)
+	if updateData.SetForDetailComponentTwo {
+		m.DetailPanelTwoViewport.SetContent(updateData.ContentLine2)
 		m.ShowDetailPanelTwo.Store(true)
 	} else {
 		// if the detail component two is selected, switch to detail component as it is not set for detail component two
@@ -211,10 +221,9 @@ func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, UpdateDat
 
 // ------------------------------------
 //
-//			For Update Detail Component Viewport Layout
-//		  * this was to update the layout for detail component viewport
-//	   * it will handle the layout for both line editing mode and normal mode
-//	   * it will also handle the split view for line editing mode (one for staged, one for unstaged)
+//	Recalculate and apply the detail viewport layout. Handles both normal mode
+//	(single full-height viewport) and line-editing mode (split staged/unstaged
+//	view with a separate 3-column cursor viewport).
 //
 // ------------------------------------
 func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
@@ -284,11 +293,42 @@ func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//			For Enter Line Editing State
-//		  * this was to enter or reinit the line editing state
-//		  * it will calculate the index position for both visible and actual content
-//	   * it will also determine if the current file selected has staged/unstaged changes or both
-//	   * lastly it will set the cursor viewport content
+//	EnterOrReinitLineEditingState
+//
+//	Called when entering line-editing mode for the first time, OR when
+//	reinitialising it after a window resize / layout change.
+//
+//	GUARD: exits immediately (and resets state) if the conditions for
+//	       line-editing are not met (wrong panel, no file selected, etc.).
+//
+//	BRANCH A — first entry (IsLineEditingState == false):
+//	  1. Inspect the selected file's git index/worktree state flags to decide
+//	     which StageType each detail-panel viewport represents:
+//	       ??  → untracked:           panel1=UNSTAGE, panel2=NOSTAGE, overflow=2
+//	       XY  → staged+unstaged:     panel1=STAGE,   panel2=UNSTAGE, overflow=3
+//	       X   → staged only:         panel1=STAGE,   panel2=NOSTAGE, overflow=2
+//	        Y  → unstaged only:       panel1=UNSTAGE, panel2=NOSTAGE, overflow=2
+//	       HasConflict → line-editing disabled entirely.
+//	  2. OverflowIndexCount = number of non-actionable header lines at the
+//	     top of the diff (file path, @@ hunk header, etc.). The cursor must
+//	     skip over these rows — they cannot be staged/unstaged individually.
+//	  3. Reset all index positions to 0 and store into LineEditingIndexPositionAndInfo.
+//	  4. Render the cursor viewport via SetLineEditingCursorViewportContent.
+//
+//	BRANCH B — reinit after resize or file status change (IsLineEditingState == true):
+//	  1. Re-derive StageType and OverflowIndexCount (file state may have changed).
+//	  2. Compensate actualIndex for header-row count changes caused by the resize:
+//	       new overflow < old overflow → actualIndex -= 1  (a header row disappeared)
+//	       new overflow > old overflow → actualIndex += 1  (a header row appeared)
+//	     Both panels must satisfy their condition simultaneously for the adjustment
+//	     to apply (prevents mis-compensation when only one panel changed).
+//	  3. Clamp actualIndex to [0, totalLines-1] so it never goes out of bounds.
+//	  4. Recompute visibleIndex = actualIndex - yOffset (cursor's row within the
+//	     visible portion of the viewport):
+//	       visibleIndex < 0              → cursor above view  → scroll up,   visibleIndex = 0
+//	       visibleIndex >= visibleCount  → cursor below view  → scroll down, visibleIndex = visibleCount-1
+//	       otherwise                     → cursor in view,    visibleIndex unchanged
+//	  5. Store updated state and re-render the cursor viewport.
 //
 // ------------------------------------
 func EnterOrReinitLineEditingState(m *types.GittiModel) {
@@ -309,7 +349,7 @@ func EnterOrReinitLineEditingState(m *types.GittiModel) {
 		// we first confirm that we are not in line editing mode yet, but we are supposed to be
 		// so we need to init the line editing state
 		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-		currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
+		currentSelectedFile := currentSelectedFileItem.(filesComponent.GitModifiedFilesItem)
 
 		var detailPanelViewportStageType string
 		var detailPanelTwoViewportStageType string
@@ -420,11 +460,11 @@ func EnterOrReinitLineEditingState(m *types.GittiModel) {
 		detailPanelViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
 		detailPanelTwoViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
 		if detailPanelViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
+			detailPanelTwoViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
 			detailPanelViewportActualCurrentIndex -= 1
 			detailPanelTwoViewportActualCurrentIndex -= 1
 		} else if detailPanelViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
+			detailPanelTwoViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
 			detailPanelViewportActualCurrentIndex += 1
 			detailPanelTwoViewportActualCurrentIndex += 1
 		}
@@ -492,9 +532,9 @@ func EnterOrReinitLineEditingState(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//			For Set Line Editing Cursor Viewport Content
-//		  * this was to set the cursor viewport content
-//	   * needed because we are using a dual viewport setup for line editing mode (one for cursor, one for content)
+//	Populate the cursor-indicator viewports for line-editing mode. Renders a
+//	"❯" marker at the current cursor row in each of the two side-by-side cursor
+//	columns, which are displayed next to their corresponding content viewports.
 //
 // ------------------------------------
 func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewportVisibleIndex int, detailPanelTwoViewportVisibleIndex int) {
@@ -525,6 +565,12 @@ func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewpor
 	m.LineEditingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
 }
 
+// ------------------------------------
+//
+//	Reset the detail panel viewports to a blank "loading" state. Clears both
+//	viewport contents, hides the secondary panel, and resets all scroll offsets.
+//
+// ------------------------------------
 func DetailComponentReinit(m *types.GittiModel) {
 	m.DetailPanelViewport.SetContent(style.NewStyle.Render(i18n.LANGUAGEMAPPING.Loading))
 	m.ShowDetailPanelTwo.Store(false)

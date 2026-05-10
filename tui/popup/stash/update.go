@@ -2,6 +2,13 @@ package stash
 
 import "github.com/gohyuhan/gitti/tui/types"
 
+// ------------------------------------
+//
+//	Handle the async stash operation result event. Clears IsProcessing, then sets
+//	ProcessSuccess on success or HasError on failure, and loads the output lines
+//	into the viewport.
+//
+// ------------------------------------
 func UpdateGitStashOperationResultEvent(m *types.GittiModel, updateData types.GitStashOperationResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
 	if ok {

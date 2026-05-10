@@ -10,6 +10,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Initialize the rebase branch-name input popup model. If remoteName is non-empty
+//	the input is pre-labeled for a remote-branch rebase; otherwise it targets a local
+//	branch. The text input is focused and sized to fit the current terminal width.
+//
+// ------------------------------------
 func InitGitRebaseBranchInputPopUpModel(m *types.GittiModel, remoteName string) {
 	rebaseBranchNameInput := textinput.New()
 	rebaseBranchNameInput.Placeholder = i18n.LANGUAGEMAPPING.RebaseBranchNameInputPlaceholder
@@ -23,6 +30,13 @@ func InitGitRebaseBranchInputPopUpModel(m *types.GittiModel, remoteName string) 
 	}
 }
 
+// ------------------------------------
+//
+//	Initialize the rebase output popup model with a soft-wrap viewport, a dot
+//	spinner, and all atomic state flags (IsProcessing, IsCancelled, HasError,
+//	ProcessSuccess) set to false.
+//
+// ------------------------------------
 func InitGitRebaseOutputPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true

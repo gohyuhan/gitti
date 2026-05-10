@@ -10,6 +10,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Build and return the styled log viewport content string from the logger's entries.
+//	When ForLogComponent is true, only the visible (recent) log slice is used; otherwise
+//	the full log history is rendered. Each entry is colorized by severity (INFO/WARN/ERROR)
+//	and the context is checked between iterations to allow cancellation.
+//
+// ------------------------------------
 func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context.Context) string {
 	var logsArray []logging.LogItem
 

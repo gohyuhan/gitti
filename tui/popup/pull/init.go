@@ -14,7 +14,9 @@ import (
 
 // ------------------------------------
 //
-//	Init the popup model for selecting the git pull strategy (pull, pull-rebase, pull-merge)
+//	Initialize the choose pull type popup. Builds a 3-option list (git pull,
+//	git pull --rebase --autostash, git pull --no-rebase), disables
+//	filtering/pagination/status bar, and attaches a counter help key.
 //
 // ------------------------------------
 func InitChooseGitPullTypePopUpModel(m *types.GittiModel) {
@@ -63,7 +65,10 @@ func InitChooseGitPullTypePopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Init the popup model for displaying git pull command output with a spinner
+//	Initialize the git pull output popup. Creates a soft-wrap viewport sized to
+//	a fixed height and 80% of terminal width (minus padding), and a dot spinner.
+//	All atomic state flags (IsProcessing, HasError, ProcessSuccess, IsCancelled)
+//	are reset to false.
 //
 // ------------------------------------
 func InitGitPullOutputPopUpModel(m *types.GittiModel) {

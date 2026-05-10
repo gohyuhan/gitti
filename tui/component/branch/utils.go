@@ -9,9 +9,12 @@ import (
 )
 
 // those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
+
 // ------------------------------------
 //
-//	Construct the title string for the local branch component with responsive truncation
+//	Build the styled tab-bar title string for the branch panel, with the branch tab
+//	highlighted as active. Falls back to abbreviated icon/letter labels through up to
+//	four levels when the rendered width exceeds titleWidthLimit.
 //
 // ------------------------------------
 func ConstructLocalBranchComponentTitle(titleWidthLimit int) string {

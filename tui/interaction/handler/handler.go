@@ -18,7 +18,10 @@ import (
 
 // ------------------------------------
 //
-//	typing is currently only on pop up model, so we can safely process it without checking if they were on pop up or not
+//	Handle key presses in typing mode (always inside a popup). Routes esc, tab,
+//	shift+tab, ctrl+e, enter, ctrl+p, ctrl+y, and arrow keys to dedicated
+//	handlers, then forwards remaining input to the active popup's text
+//	input or textarea field.
 //
 // ------------------------------------
 func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -184,7 +187,8 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 
 // ------------------------------------
 //
-//	Handle non-typing key binding interactions, dispatching to specific key handlers
+//	Handle key presses in non-typing mode. Dispatches each key (letters, arrows,
+//	special keys, and panel-resize +/-) to its dedicated handler function.
 //
 // ------------------------------------
 func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {

@@ -19,20 +19,25 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// choose a rebase option, fixup/squash, reword, drop
+//	InteractiveRebaseOptionPopUpModel holds the option list for the interactive
+//	rebase type selection popup, where the user chooses between fixup/squash,
+//	reword, and drop.
 //
-// ---------------------------------
+// ------------------------------------
 type InteractiveRebaseOptionPopUpModel struct {
 	InteractiveRebaseOptionList list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for interactive rebase option selection option
+//	InteractiveRebaseOptionDelegate renders each interactive rebase option row
+//	(name + info) in the operation type selection list.
+//	InteractiveRebaseOptionItem carries the display name, info string, and the
+//	interactive rebase type constant for a single operation choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	InteractiveRebaseOptionDelegate struct{}
 	InteractiveRebaseOptionItem     struct {
@@ -109,11 +114,14 @@ func (d InteractiveRebaseOptionDelegate) Render(w io.Writer, m list.Model, index
 	fmt.Fprint(w, fn(fullStr))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for fixup/squash commit selection
+//	InteractiveRebaseFixupSquashSelectionPopUpModel holds the commit-selection
+//	list, the preview viewport, retrieved commit infos, the selected-commit map,
+//	pane focus flags, the sorted selection array, and any current validation
+//	error for the fixup/squash commit selection popup.
 //
-// ---------------------------------
+// ------------------------------------
 type InteractiveRebaseFixupSquashSelectionPopUpModel struct {
 	CommitList                          list.Model
 	CommitFixupSquashViewport           viewport.Model
@@ -125,11 +133,15 @@ type InteractiveRebaseFixupSquashSelectionPopUpModel struct {
 	SelectionError                      error
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// bubble tea list for selecting commit for fixup squash
+//	InteractiveRebaseFixupSquashSelectionDelegate renders each commit row
+//	(checkbox, short hash, author, message) in the fixup/squash selection list,
+//	marking already-selected commits with a checked box.
+//	InteractiveRebaseFixupSquashSelectionItem carries the hash, message, author,
+//	description, parent hashes, and commit order for a single candidate commit.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	InteractiveRebaseFixupSquashSelectionDelegate struct {
 		SelectedCommitHashMap *map[string]git.CommitInfo // key is commit hash
@@ -225,11 +237,14 @@ func (d InteractiveRebaseFixupSquashSelectionDelegate) Render(w io.Writer, m lis
 	fmt.Fprint(w, fn(str))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// Pop up model for editing the final commit message and description before executing the fixup/squash rebase
+//	InteractiveRebaseFixupSquashCommitPopUpModel holds the message text input,
+//	description textarea, input navigation state, the sorted selected commits,
+//	and the original retrieved commit list for the fixup/squash commit message
+//	editing popup shown before executing the rebase.
 //
-// ---------------------------------
+// ------------------------------------
 type InteractiveRebaseFixupSquashCommitPopUpModel struct {
 	MessageTextInput            textinput.Model // input index 1
 	DescriptionTextAreaInput    textarea.Model  // input index 2
@@ -239,11 +254,14 @@ type InteractiveRebaseFixupSquashCommitPopUpModel struct {
 	OriginalRetrievedCommitList []git.CommitInfo
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// Pop up model for displaying fixup/squash rebase output, with spinner and atomic state flags for processing/error/success/cancellation
+//	InteractiveRebaseFixupSquashOutputPopUpModel holds the output viewport,
+//	spinner, and atomic state flags (IsProcessing, HasError, ProcessSuccess,
+//	IsCancelled) for the fixup/squash rebase output popup. CancelFunc allows
+//	the in-progress git rebase operation to be cancelled by the user.
 //
-// ---------------------------------
+// ------------------------------------
 type InteractiveRebaseFixupSquashOutputPopUpModel struct {
 	FixupSquashOutputViewport viewport.Model // to log out the output from git operation
 	Spinner                   spinner.Model  // spinner for showing processing state

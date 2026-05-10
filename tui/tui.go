@@ -35,7 +35,10 @@ import (
 
 // ------------------------------------
 //
-//	Initialize and return a new GittiAppModel with necessary dependencies and viewport setup
+//	Construct and return a new GittiAppModel. Creates the three detail viewports
+//	(primary, secondary, log), two cursor viewports for line-editing mode,
+//	initialises all list components, and checks whether git signing is required
+//	for commit/tag/push operations.
 //
 // ------------------------------------
 func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
@@ -137,10 +140,6 @@ func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoNa
 
 	return &GittiAppModel{model: gittiModel}
 }
-
-// -----------------------------------------------------------------------------
-// Bubble Tea standard functions
-// -----------------------------------------------------------------------------
 
 // ------------------------------------
 //

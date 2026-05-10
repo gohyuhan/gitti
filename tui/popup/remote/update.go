@@ -4,6 +4,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Handle the async add-remote result event. Writes the result lines to the
+//	output viewport, clears IsProcessing, and either resets both inputs with
+//	ProcessSuccess on success, or sets HasError on failure. No-ops if the popup
+//	is not the active add-remote popup or the operation was cancelled.
+//
+// ------------------------------------
 func UpdateAddRemoteResultEvent(m *types.GittiModel, updateData types.GitAddRemoteResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if !ok || popUp.IsCancelled.Load() {

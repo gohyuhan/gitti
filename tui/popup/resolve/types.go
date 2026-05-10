@@ -12,21 +12,26 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for resolve conflict option pop up
+//	GitResolveConflictOptionPopUpModel holds the conflicted file path and the
+//	option list for the resolve conflict popup, which offers reset, accept-ours,
+//	and accept-theirs actions.
 //
-// ---------------------------------
+// ------------------------------------
 type GitResolveConflictOptionPopUpModel struct {
 	FilePathName              string
 	ResolveConflictOptionList list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for resolve conflict option selection option
+//	GitResolveConflictOptionDelegate renders each conflict resolution row
+//	(name + info) in the resolve conflict option list.
+//	GitResolveConflictOptionItem carries the display name, info string, and the
+//	resolve type constant for a single resolution choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitResolveConflictOptionDelegate struct{}
 	GitResolveConflictOptionItem     struct {
@@ -40,7 +45,6 @@ func (i GitResolveConflictOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for resolve conflict option selection
 func (d GitResolveConflictOptionDelegate) Height() int                             { return 2 }
 func (d GitResolveConflictOptionDelegate) Spacing() int                            { return 0 }
 func (d GitResolveConflictOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

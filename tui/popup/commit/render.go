@@ -14,7 +14,10 @@ import (
 
 // ------------------------------------
 //
-//	For Git Commit
+//	Render the git commit popup with message and description text inputs. Once a
+//	commit has started, appends a scrollable output viewport below the inputs;
+//	adds a spinner line while processing, and colors the viewport border red on
+//	error or green on success.
 //
 // ------------------------------------
 func RenderGitCommitPopUp(m *types.GittiModel) string {
@@ -83,7 +86,10 @@ func RenderGitCommitPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Git Commit (Amend)
+//	Render the git amend-commit popup with pre-filled message and description
+//	inputs. Once an amend has started, appends a scrollable output viewport;
+//	adds a spinner line while processing, and colors the viewport border red on
+//	error or green on success.
 //
 // ------------------------------------
 func RenderGitAmendCommitPopUp(m *types.GittiModel) string {
@@ -152,7 +158,8 @@ func RenderGitAmendCommitPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For reset latest commit reset type selection pop up
+//	Render the reset-latest-commit type selection popup, showing a titled list
+//	of soft/hard/mixed reset options for the user to choose from.
 //
 // ------------------------------------
 func RenderGitResetLatestCommitTypeOptionPopUp(m *types.GittiModel) string {
@@ -173,7 +180,8 @@ func RenderGitResetLatestCommitTypeOptionPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For reset latest commit confirmation prompt
+//	Render the reset-latest-commit confirmation popup, displaying a localized
+//	confirmation message that matches the chosen reset type (soft/hard/mixed).
 //
 // ------------------------------------
 func RenderGitResetLatestCommitConfirmPromptPopUp(m *types.GittiModel) string {
@@ -196,7 +204,8 @@ func RenderGitResetLatestCommitConfirmPromptPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For reset selected commit reset type selection pop up
+//	Render the reset-to-selected-commit type selection popup, showing the target
+//	commit hash in the title alongside a soft/hard/mixed option list.
 //
 // ------------------------------------
 func RenderGitResetToSelectedCommitTypeOptionPopUp(m *types.GittiModel) string {
@@ -217,7 +226,9 @@ func RenderGitResetToSelectedCommitTypeOptionPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For reset selected commit confirmation prompt
+//	Render the reset-to-selected-commit confirmation popup, showing the
+//	localized message for the chosen reset type with the target commit hash,
+//	author, and message displayed below when available.
 //
 // ------------------------------------
 func RenderGitResetToSelectedCommitConfirmPromptPopUp(m *types.GittiModel) string {

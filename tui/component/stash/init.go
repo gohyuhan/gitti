@@ -12,8 +12,9 @@ import (
 
 // ------------------------------------
 //
-//	init the list component for Stash info Component
-//	return bool was to tell if we need to reinit the detail component panel or not
+//	Rebuild the stash list widget from the latest git stash data, preserve the previously
+//	selected stash entry by ID, and return true if the selection changed (signals that the
+//	detail panel needs to be reinitialized).
 //
 // ------------------------------------
 func InitStashList(m *types.GittiModel) bool {

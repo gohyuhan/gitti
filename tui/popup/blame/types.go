@@ -14,6 +14,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
+// ------------------------------------
+//
+//	BlamePopUpModel holds the file-selection list, filter text input, and blame
+//	output viewport for the blame popup. ShowingBlameInfo/HasFilePathChosen
+//	control which view is active; SelectedFilePath tracks the current file.
+//
+// ------------------------------------
 type BlamePopUpModel struct {
 	CurrentGitTrackedFilesPathList list.Model
 	BlameViewport                  viewport.Model
@@ -38,7 +45,8 @@ func (bPM *BlamePopUpModel) ResetSelectedBlameFile() {
 
 // ------------------------------------
 //
-//	Display blame information view for selected file path
+//	Transition the blame popup to blame-view state for the given file path,
+//	setting ShowingBlameInfo and HasFilePathChosen to true and storing the path.
 //
 // ------------------------------------
 func (bPM *BlamePopUpModel) ShowBlameInfoView(filePath string) {
@@ -47,11 +55,13 @@ func (bPM *BlamePopUpModel) ShowBlameInfoView(filePath string) {
 	bPM.SelectedFilePath = filePath
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// bubble tea list for selecting a git-tracked file to view blame info
+//	CurrentGitTrackedFilesPathDelegate renders each file path row as a single
+//	line in the git-tracked file selection list inside the blame popup.
+//	CurrentGitTrackedFilesPathItem wraps a single file path string.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	CurrentGitTrackedFilesPathDelegate struct{}
 	CurrentGitTrackedFilesPathItem     struct {
@@ -63,7 +73,6 @@ func (i CurrentGitTrackedFilesPathItem) FilterValue() string {
 	return i.FilePath
 }
 
-// list delegate interface implementation for CurrentGitTrackedFilesPathDelegate
 func (d CurrentGitTrackedFilesPathDelegate) Height() int                             { return 1 }
 func (d CurrentGitTrackedFilesPathDelegate) Spacing() int                            { return 0 }
 func (d CurrentGitTrackedFilesPathDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

@@ -11,6 +11,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
+// ------------------------------------
+//
+//	Handle the async branch-switch result event. Clears IsProcessing, sets
+//	ProcessSuccess or HasError accordingly, and loads the command output into
+//	the switch-branch output viewport.
+//
+// ------------------------------------
 func UpdateSwitchBranchResultEvent(m *types.GittiModel, updateData types.GitSwitchBranchResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {
@@ -27,6 +34,13 @@ func UpdateSwitchBranchResultEvent(m *types.GittiModel, updateData types.GitSwit
 	}
 }
 
+// ------------------------------------
+//
+//	Handle the async branch-deletion result event. Clears IsProcessing, sets
+//	ProcessSuccess or HasError accordingly, and loads the command output into
+//	the branch-delete output viewport.
+//
+// ------------------------------------
 func UpdateDeleteBranchResultEvent(m *types.GittiModel, updateData types.GitDeleteBranchResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*GitDeleteBranchOutputPopUpModel)
 	if ok {
@@ -43,6 +57,13 @@ func UpdateDeleteBranchResultEvent(m *types.GittiModel, updateData types.GitDele
 	}
 }
 
+// ------------------------------------
+//
+//	Handle the async create-branch-from-remote result event. Clears IsProcessing,
+//	sets ProcessSuccess or HasError accordingly, and loads the command output into
+//	the create-branch-based-on-remote output viewport.
+//
+// ------------------------------------
 func UpdateCreateNewBranchBasedOnRemoteResultEvent(m *types.GittiModel, updateData types.GitCreateNewBranchBasedOnRemoteResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*CreateBranchBasedOnRemoteOutputPopUpModel)
 	if ok {
@@ -59,6 +80,12 @@ func UpdateCreateNewBranchBasedOnRemoteResultEvent(m *types.GittiModel, updateDa
 	}
 }
 
+// ------------------------------------
+//
+//	Handle the create-branch-from-remote invalid event by dismissing the popup:
+//	clears the typing flag, hides the popup, resets the popup type and model.
+//
+// ------------------------------------
 func UpdateCreateNewBranchBasedOnRemoteInvalidEvent(m *types.GittiModel, _ types.GitCreateNewBranchBasedOnRemoteInvalidEventDataInterface) {
 	m.IsTyping.Store(false)
 	m.ShowPopUp.Store(false)
@@ -66,7 +93,13 @@ func UpdateCreateNewBranchBasedOnRemoteInvalidEvent(m *types.GittiModel, _ types
 	m.PopUpModel = nil
 }
 
-// only trigger to update the branch selection list and selected branch list when there is a select or unselect action
+// ------------------------------------
+//
+//	Rebuild both the available-branch and selected-branch lists after a select
+//	or unselect action. Moving a branch to/from the selected list resets both
+//	list.Model instances while preserving the nearest valid cursor positions.
+//
+// ------------------------------------
 func UpdateChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*ChooseBranchOptionForMergePopUpModel)
 	if ok {
@@ -165,9 +198,16 @@ func UpdateChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 	}
 }
 
-func UpdateMergeViewport(m *types.GittiModel, UpdateData types.MergeResultEventDataInterface) {
-	success := UpdateData.Success
-	outputResult := UpdateData.Result
+// ------------------------------------
+//
+//	Handle the async branch-merge result event. Clears IsProcessing and sets
+//	ProcessSuccess or HasError based on success, then writes all output lines
+//	to the merge output viewport.
+//
+// ------------------------------------
+func UpdateMergeViewport(m *types.GittiModel, updateData types.MergeResultEventDataInterface) {
+	success := updateData.Success
+	outputResult := updateData.Result
 	popUp, ok := m.PopUpModel.(*BranchMergeOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
 		popUp.IsProcessing.Store(false) // update the processing status

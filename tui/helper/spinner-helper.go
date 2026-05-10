@@ -15,6 +15,13 @@ import (
 	tea "charm.land/bubbletea/v2"
 )
 
+// ------------------------------------
+//
+//	Tick the spinner for every popup that is currently processing. Dispatches
+//	to the correct popup model type based on m.PopUpType, calls Spinner.Update,
+//	and appends the resulting Cmd to cmds.
+//
+// ------------------------------------
 func UpdateSpinner(m *types.GittiModel, msg tea.Msg, cmds []tea.Cmd) []tea.Cmd {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {

@@ -12,7 +12,9 @@ import (
 
 // ------------------------------------
 //
-//	For Creating a tag
+//	Render the create tag popup. Shows a bordered box containing the localized
+//	name title, the tag name text input, the localized message title, and the
+//	message textarea, stacked vertically.
 //
 // ------------------------------------
 func RenderCreateTagPopUp(m *types.GittiModel) string {
@@ -37,7 +39,9 @@ func RenderCreateTagPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Confirming Tag Creation
+//	Render the tag creation confirmation popup. Interpolates the styled commit
+//	hash, commit message, tag name, and tag message into the localized
+//	confirmation template and wraps it in a bordered box.
 //
 // ------------------------------------
 func RenderCreateTagConfirmationPopUp(m *types.GittiModel) string {
@@ -58,7 +62,8 @@ func RenderCreateTagConfirmationPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Choosing a Tag delete option type
+//	Render the delete tag scope selection popup. Shows a titled bordered list
+//	where the user chooses between deleting the tag locally or remotely.
 //
 // ------------------------------------
 func RenderChooseDeleteTagOptionPopUp(m *types.GittiModel) string {
@@ -80,7 +85,9 @@ func RenderChooseDeleteTagOptionPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Choosing a Remote for git delete remote tag if there is more than 1
+//	Render the remote selection popup for remote tag deletion. Shows a titled
+//	bordered list of available remotes (name + URL) when there is more than one
+//	configured remote.
 //
 // ------------------------------------
 func RenderChooseRemoteForDeleteRemoteTagPopUp(m *types.GittiModel) string {
@@ -102,7 +109,9 @@ func RenderChooseRemoteForDeleteRemoteTagPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Delete Tag Output
+//	Render the delete tag output popup. Colors the viewport border red on error
+//	or green on success. When IsProcessing is true, shows a spinner line above
+//	the viewport. The title includes the tag name.
 //
 // ------------------------------------
 func RenderDeleteTagOutputPopUp(m *types.GittiModel) string {
@@ -149,7 +158,9 @@ func RenderDeleteTagOutputPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Push Tag Option PopUp
+//	Render the push tag option popup. Shows a titled bordered list where the user
+//	chooses how to push the tag: push tag, push all tags, force-push tag, or
+//	force-push all tags.
 //
 // ------------------------------------
 func RenderPushTagOptionPopUp(m *types.GittiModel) string {
@@ -171,7 +182,9 @@ func RenderPushTagOptionPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Push Tag Output
+//	Render the push tag output popup. Colors the viewport border red on error or
+//	green on success. When IsProcessing is true, shows a spinner line above the
+//	viewport.
 //
 // ------------------------------------
 func RenderPushTagOutputPopUp(m *types.GittiModel) string {
@@ -218,7 +231,9 @@ func RenderPushTagOutputPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Fetch Tag Option PopUp
+//	Render the fetch tag option popup. Shows a titled bordered list where the
+//	user chooses how to fetch tags: fetch, fetch-overwrite, fetch-prune, or
+//	mirror.
 //
 // ------------------------------------
 func RenderFetchTagOptionPopUp(m *types.GittiModel) string {
@@ -240,7 +255,9 @@ func RenderFetchTagOptionPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Fetch Tag Output
+//	Render the fetch tag output popup. Colors the viewport border red on error or
+//	green on success. When IsProcessing is true, shows a spinner line above the
+//	viewport.
 //
 // ------------------------------------
 func RenderFetchTagOutputPopUp(m *types.GittiModel) string {
