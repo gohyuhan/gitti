@@ -66,6 +66,11 @@ type GitStashOperationResultEventDataInterface struct {
 	Success bool
 }
 
+type GitAddRemoteResultEventDataInterface struct {
+	Result  []string
+	Success bool
+}
+
 type InteractiveRebaseFixupSquashResultEventDataInterface struct {
 	Result  []string
 	Success bool

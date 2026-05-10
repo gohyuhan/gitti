@@ -1,25 +1,28 @@
 package remote
 
 import (
-	"strings"
-
-	"github.com/gohyuhan/gitti/tui/constant"
-	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-func UpdateAddRemoteOutputViewport(m *types.GittiModel, outputLog []string) {
+func UpdateAddRemoteResultEvent(m *types.GittiModel, updateData types.GitAddRemoteResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
-	if ok {
-		popUp.AddRemoteOutputViewport.SetWidth(min(constant.MaxAddRemotePromptPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-		popUp.AddRemoteOutputViewport.SetYOffset(popUp.AddRemoteOutputViewport.YOffset())
-		var addRemoteLogString strings.Builder
-		for _, line := range outputLog {
-			logLine := style.NewStyle.Render(line)
-			addRemoteLogString.WriteString(logLine)
-			addRemoteLogString.WriteRune('\n')
-		}
-		popUp.AddRemoteOutputViewport.SetContent(addRemoteLogString.String())
-		popUp.AddRemoteOutputViewport.PageDown()
+	if !ok || popUp.IsCancelled.Load() {
+		return
 	}
+
+	popUp.IsProcessing.Store(false)
+	popUp.AddRemoteOutputViewport.SetContentLines(updateData.Result)
+	popUp.AddRemoteOutputViewport.PageDown()
+
+	if updateData.Success {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(true)
+		popUp.NoInitialRemote = false
+		popUp.RemoteNameTextInput.Reset()
+		popUp.RemoteUrlTextInput.Reset()
+		return
+	}
+
+	popUp.HasError.Store(true)
+	popUp.ProcessSuccess.Store(false)
 }
