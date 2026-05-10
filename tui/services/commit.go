@@ -15,54 +15,35 @@ import (
 //
 // ------------------------------------
 func GitCommitService(m *types.GittiModel, isAmendCommit bool) {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
 	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
 		popUp.CancelFunc = cancel
-	}
-
-	go func(ctx context.Context) {
-		defer cancel()
-
-		// set to is processing and remove the log content in UI and also in GITCOMMIT in memory
-		popUp, ok := m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
-		var message string
-		var description string
-		var exitStatusCode int
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-			popUp.IsCancelled.Store(false)
-			// retrieve the value of commit message and desc
-			message = popUp.MessageTextInput.Value()
-			description = popUp.DescriptionTextAreaInput.Value()
-		} else {
-			return
-		}
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
+		message := popUp.MessageTextInput.Value()
+		description := popUp.DescriptionTextAreaInput.Value()
 		if len(message) < 1 {
 			popUp.IsProcessing.Store(false)
+			cancel()
 			return
 		}
-		// stage the changes based on what was chosen by user and commit it
-		exitStatusCode = m.GitOperations.GitCommit.GitCommit(ctx, message, description, isAmendCommit)
 
-		popUp, ok = m.PopUpModel.(*commitPopUp.GitCommitPopUpModel)
-		if ok && !popUp.IsCancelled.Load() {
-			popUp.IsProcessing.Store(false) // update the processing status
-			// if sucessful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(true)
-				popUp.MessageTextInput.Reset()
-				popUp.DescriptionTextAreaInput.Reset()
-				popUp.IsProcessing.Store(false)
-				popUp.HasError.Store(false)
-			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
-				popUp.HasError.Store(true)
+		go func(ctx context.Context, message string, description string) {
+			defer cancel()
+
+			exitStatusCode := m.GitOperations.GitCommit.GitCommit(ctx, message, description, isAmendCommit)
+			data := types.GitCommitResultEventDataInterface{
+				Success: exitStatusCode == 0,
 			}
-		}
-	}(ctx)
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.GIT_COMMIT_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx, message, description)
+	}
 }
 
 // ------------------------------------
@@ -97,54 +78,35 @@ func GitCommitCancelService(m *types.GittiModel) {
 //
 // ------------------------------------
 func GitAmendCommitService(m *types.GittiModel, isAmendCommit bool) {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
 	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
 		popUp.CancelFunc = cancel
-	}
-
-	go func(ctx context.Context) {
-		defer cancel()
-
-		// set to is processing and remove the log content in UI and also in GITCOMMIT in memory
-		popUp, ok := m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
-		var message string
-		var description string
-		var exitStatusCode int
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-			popUp.IsCancelled.Store(false)
-			// retrieve the value of commit message and desc
-			message = popUp.MessageTextInput.Value()
-			description = popUp.DescriptionTextAreaInput.Value()
-		} else {
-			return
-		}
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
+		message := popUp.MessageTextInput.Value()
+		description := popUp.DescriptionTextAreaInput.Value()
 		if len(message) < 1 {
 			popUp.IsProcessing.Store(false)
+			cancel()
 			return
 		}
-		// stage the changes based on what was chosen by user and commit it
-		exitStatusCode = m.GitOperations.GitCommit.GitCommit(ctx, message, description, isAmendCommit)
 
-		popUp, ok = m.PopUpModel.(*commitPopUp.GitAmendCommitPopUpModel)
-		if ok && !popUp.IsCancelled.Load() {
-			popUp.IsProcessing.Store(false) // update the processing status
-			// if sucessful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(true)
-				popUp.MessageTextInput.Reset()
-				popUp.DescriptionTextAreaInput.Reset()
-				popUp.IsProcessing.Store(false)
-				popUp.HasError.Store(false)
-			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
-				popUp.HasError.Store(true)
+		go func(ctx context.Context, message string, description string) {
+			defer cancel()
+
+			exitStatusCode := m.GitOperations.GitCommit.GitCommit(ctx, message, description, isAmendCommit)
+			data := types.GitAmendCommitResultEventDataInterface{
+				Success: exitStatusCode == 0,
 			}
-		}
-	}(ctx)
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.GIT_AMEND_COMMIT_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx, message, description)
+	}
 }
 
 // ------------------------------------

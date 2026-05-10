@@ -43,3 +43,41 @@ func UpdatePopUpAmendCommitOutputViewPort(m *types.GittiModel) {
 		popUp.GitAmendCommitOutputViewport.PageDown()
 	}
 }
+
+func UpdateGitCommitResultEvent(m *types.GittiModel, data types.GitCommitResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
+	if !ok || popUp.IsCancelled.Load() {
+		return
+	}
+
+	popUp.IsProcessing.Store(false)
+	if data.Success {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(true)
+		popUp.MessageTextInput.Reset()
+		popUp.DescriptionTextAreaInput.Reset()
+		return
+	}
+
+	popUp.HasError.Store(true)
+	popUp.ProcessSuccess.Store(false)
+}
+
+func UpdateGitAmendCommitResultEvent(m *types.GittiModel, data types.GitAmendCommitResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
+	if !ok || popUp.IsCancelled.Load() {
+		return
+	}
+
+	popUp.IsProcessing.Store(false)
+	if data.Success {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(true)
+		popUp.MessageTextInput.Reset()
+		popUp.DescriptionTextAreaInput.Reset()
+		return
+	}
+
+	popUp.HasError.Store(true)
+	popUp.ProcessSuccess.Store(false)
+}
