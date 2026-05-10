@@ -71,6 +71,10 @@ type GitAddRemoteResultEventDataInterface struct {
 	Success bool
 }
 
+type GitRebaseResultEventDataInterface struct {
+	Success bool
+}
+
 type InteractiveRebaseFixupSquashResultEventDataInterface struct {
 	Result  []string
 	Success bool
