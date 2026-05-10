@@ -61,6 +61,11 @@ type GitFetchTagResultEventDataInterface struct {
 	Success bool
 }
 
+type GitStashOperationResultEventDataInterface struct {
+	Result  []string
+	Success bool
+}
+
 type InteractiveRebaseFixupSquashResultEventDataInterface struct {
 	Result  []string
 	Success bool
