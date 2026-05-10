@@ -24,6 +24,21 @@ func UpdateDeleteTagOutputViewPort(m *types.GittiModel, deleteTagOutput []string
 	}
 }
 
+func UpdateDeleteTagResultEvent(m *types.GittiModel, updateData types.GitDeleteTagResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*DeleteTagOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		popUp.IsProcessing.Store(false)
+		UpdateDeleteTagOutputViewPort(m, updateData.Result)
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+	}
+}
+
 func UpdatePushTagOutputViewPort(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*PushTagOutputPopUpModel)
 	if ok {
@@ -41,6 +56,20 @@ func UpdatePushTagOutputViewPort(m *types.GittiModel) {
 	}
 }
 
+func UpdatePushTagResultEvent(m *types.GittiModel, updateData types.GitPushTagResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*PushTagOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		popUp.IsProcessing.Store(false)
+		UpdatePushTagOutputViewPort(m)
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.HasError.Store(true)
+		}
+	}
+}
+
 func UpdateFetchTagOutputViewPort(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*FetchTagOutputPopUpModel)
 	if ok {
@@ -55,5 +84,19 @@ func UpdateFetchTagOutputViewPort(m *types.GittiModel) {
 		}
 		popUp.FetchTagOutputViewport.SetContent(gitOpsOutputLogString.String())
 		popUp.FetchTagOutputViewport.PageDown()
+	}
+}
+
+func UpdateFetchTagResultEvent(m *types.GittiModel, updateData types.GitFetchTagResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*FetchTagOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		popUp.IsProcessing.Store(false)
+		UpdateFetchTagOutputViewPort(m)
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.HasError.Store(true)
+		}
 	}
 }

@@ -48,6 +48,19 @@ type GitCreateNewBranchBasedOnRemoteInvalidEventDataInterface struct {
 	BranchName string
 }
 
+type GitDeleteTagResultEventDataInterface struct {
+	Result  []string
+	Success bool
+}
+
+type GitPushTagResultEventDataInterface struct {
+	Success bool
+}
+
+type GitFetchTagResultEventDataInterface struct {
+	Success bool
+}
+
 type InteractiveRebaseFixupSquashResultEventDataInterface struct {
 	Result  []string
 	Success bool

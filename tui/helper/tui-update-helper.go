@@ -5,6 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
+	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -29,6 +30,12 @@ func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg)
 		branchPopUp.UpdateCreateNewBranchBasedOnRemoteInvalidEvent(m, updateMsg.Data.(types.GitCreateNewBranchBasedOnRemoteInvalidEventDataInterface))
 	case constant.GIT_MERGE_RESULT_EVENT:
 		branchPopUp.UpdateMergeViewport(m, updateMsg.Data.(types.MergeResultEventDataInterface))
+	case constant.GIT_DELETE_TAG_RESULT_EVENT:
+		tagPopUp.UpdateDeleteTagResultEvent(m, updateMsg.Data.(types.GitDeleteTagResultEventDataInterface))
+	case constant.GIT_PUSH_TAG_RESULT_EVENT:
+		tagPopUp.UpdatePushTagResultEvent(m, updateMsg.Data.(types.GitPushTagResultEventDataInterface))
+	case constant.GIT_FETCH_TAG_RESULT_EVENT:
+		tagPopUp.UpdateFetchTagResultEvent(m, updateMsg.Data.(types.GitFetchTagResultEventDataInterface))
 	case constant.INTERACTIVE_REBASE_FIXUP_SQUASH_RESULT_EVENT:
 		interactiverebasePopUp.UpdateInteractiveRebaseFixupSquashResultEvent(m, updateMsg.Data.(types.InteractiveRebaseFixupSquashResultEventDataInterface))
 	case constant.INTERACTIVE_REBASE_FETCH_COMMITS_INFO_EVENT:
