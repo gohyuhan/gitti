@@ -5,6 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
+	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
@@ -45,6 +46,8 @@ func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg)
 		remotePopUp.UpdateAddRemoteResultEvent(m, updateMsg.Data.(types.GitAddRemoteResultEventDataInterface))
 	case constant.GIT_REBASE_RESULT_EVENT:
 		rebasePopUp.UpdateGitRebaseResultEvent(m, updateMsg.Data.(types.GitRebaseResultEventDataInterface))
+	case constant.GIT_PUSH_RESULT_EVENT:
+		pushPopUp.UpdateGitPushResultEvent(m, updateMsg.Data.(types.GitPushResultEventDataInterface))
 	case constant.INTERACTIVE_REBASE_FIXUP_SQUASH_RESULT_EVENT:
 		interactiverebasePopUp.UpdateInteractiveRebaseFixupSquashResultEvent(m, updateMsg.Data.(types.InteractiveRebaseFixupSquashResultEventDataInterface))
 	case constant.INTERACTIVE_REBASE_FETCH_COMMITS_INFO_EVENT:
