@@ -11,7 +11,8 @@ import (
 
 // ------------------------------------
 //
-//	init the list component for Branch Component
+//	Rebuild the branch list widget from the latest git branch data, preserve the previously
+//	selected branch position, and clamp the selection index if the list shrinks.
 //
 // ------------------------------------
 func InitBranchList(m *types.GittiModel) {

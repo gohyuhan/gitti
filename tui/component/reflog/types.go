@@ -13,11 +13,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/style"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git reflog
+//	GitRefLogItem holds the full info string, description, HEAD reference, action,
+//	action detail, and short hash for one reflog entry. GitRefLogItemDelegate renders
+//	each row as a yellow 7-char hash followed by the truncated description.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitRefLogItemDelegate struct{}
 	GitRefLogItem         struct {
@@ -34,7 +36,6 @@ func (i GitRefLogItem) FilterValue() string {
 	return i.InfoDesc
 }
 
-// for list component of Git branch
 func (d GitRefLogItemDelegate) Height() int                             { return 1 }
 func (d GitRefLogItemDelegate) Spacing() int                            { return 0 }
 func (d GitRefLogItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

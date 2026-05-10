@@ -14,7 +14,10 @@ import (
 
 // ------------------------------------
 //
-//	init the popup model for push output log
+//	Initialize the git remote push output popup. Creates a soft-wrap viewport
+//	sized to a fixed height and 80% of terminal width (minus padding), and a dot
+//	spinner. All atomic state flags (IsProcessing, HasError, ProcessSuccess,
+//	IsCancelled) are reset to false.
 //
 // ------------------------------------
 func InitGitRemotePushPopUpModel(m *types.GittiModel) {
@@ -43,7 +46,9 @@ func InitGitRemotePushPopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	init the popup model for choosing push type
+//	Initialize the choose push type popup. Builds a 3-option list (normal push,
+//	safe force-push with --force-with-lease, dangerous force-push with --force),
+//	disables filtering/pagination/status bar, and attaches a counter help key.
 //
 // ------------------------------------
 func InitChoosePushTypePopUpModel(m *types.GittiModel, remoteName string) {

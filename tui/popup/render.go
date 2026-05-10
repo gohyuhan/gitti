@@ -21,11 +21,10 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
-//   Functions that relate to the rendering of pop up
-
 // ------------------------------------
 //
-//	render the PopUp and the content within it will be a determine dynamically
+//	Dispatch popup rendering to the appropriate package function based on
+//	m.PopUpType. Returns an empty string when no popup type matches.
 //
 // ------------------------------------
 func RenderPopUpComponent(m *types.GittiModel) string {

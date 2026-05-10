@@ -10,11 +10,12 @@ import (
 
 // ------------------------------------
 //
-//	Init the popup model for confirming discard of a single changed line in the detail panel
+//	Initialize the discard-line-change confirmation popup. Creates a non-soft-wrap
+//	viewport pre-filled with the diff line at the cursor position from whichever
+//	detail panel is currently selected (DetailComponentPanel or DetailComponentPanelTwo).
 //
 // ------------------------------------
 func InitGitDiscardFileLineChangeConfirmPopUpModel(m *types.GittiModel) {
-	// for git discard file line change confirmation
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true

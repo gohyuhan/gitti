@@ -4,6 +4,7 @@ import (
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -17,16 +18,16 @@ import (
 //
 // ------------------------------------
 func GitStashOperationService(m *types.GittiModel, filePathName string, stashId string, stashMessage string) {
-	go func() {
-		popUp, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-		} else {
-			return
-		}
+	popUp, ok := m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
+	if ok {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+	} else {
+		return
+	}
 
+	go func() {
 		var exitStatusCode int
 		var resultOutput []string
 
@@ -43,17 +44,13 @@ func GitStashOperationService(m *types.GittiModel, filePathName string, stashId 
 			resultOutput, exitStatusCode = m.GitOperations.GitStash.GitStashDrop(stashId)
 		}
 
-		popUp, ok = m.PopUpModel.(*stashPopUp.GitStashOperationOutputPopUpModel)
-		if ok {
-			popUp.IsProcessing.Store(false) // update the processing status
-			// if sucessful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(true)
-				popUp.HasError.Store(false)
-			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
-				popUp.HasError.Store(true)
-			}
-			popUp.GitStashOperationOutputViewport.SetContentLines(resultOutput)
+		data := types.GitStashOperationResultEventDataStructure{
+			Result:  resultOutput,
+			Success: exitStatusCode == 0,
+		}
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.GIT_STASH_OPERATION_RESULT_EVENT,
+			Data:  data,
 		}
 	}()
 }

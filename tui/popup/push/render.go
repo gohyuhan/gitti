@@ -11,7 +11,9 @@ import (
 
 // ------------------------------------
 //
-//	For Choosing a push option
+//	Render the push type selection popup. Shows a titled bordered list where the
+//	user chooses between a normal push, safe force-push (--force-with-lease), or
+//	dangerous force-push (--force).
 //
 // ------------------------------------
 func RenderChoosePushTypePopUp(m *types.GittiModel) string {
@@ -32,7 +34,9 @@ func RenderChoosePushTypePopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Git Push
+//	Render the git push progress popup. Shows a scrollable output viewport with
+//	a border that turns red on error or green on success. Displays a spinner
+//	above the viewport while IsProcessing is true.
 //
 // ------------------------------------
 func RenderGitRemotePushPopUp(m *types.GittiModel) string {

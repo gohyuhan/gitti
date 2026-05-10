@@ -11,7 +11,9 @@ import (
 
 // ------------------------------------
 //
-//	For resolve conflict option list
+//	Render the resolve conflict option popup. Shows a titled bordered list where
+//	the user chooses how to resolve the conflict: reset, accept ours, or accept
+//	theirs.
 //
 // ------------------------------------
 func RenderGitResolveConflictOptionPopUp(m *types.GittiModel) string {

@@ -8,6 +8,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Render the discard-line-change confirmation popup, showing the localized
+//	title and a viewport with the specific diff hunk the user is about to discard.
+//
+// ------------------------------------
 func RenderGitDiscardFileLineChangeConfirmPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitDiscardFileLineChangeConfirmPopUpModel)
 	if ok {

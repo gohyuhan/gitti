@@ -107,7 +107,7 @@ func main() {
 	default:
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string, 32)
-		tuiUpdateChannel := make(chan string, 32)
+		tuiUpdateChannel := make(chan interface{}, 32)
 		loggingUpdateChannel := make(chan string, 64)
 		daemonUpdateChannel := make(chan string, 16)
 		gittiLogging := logging.InitGittiLogging(settings.GITTICONFIGSETTINGS.MaxLogCount, loggingUpdateChannel, settings.GITTICONFIGSETTINGS.ShowXLog)

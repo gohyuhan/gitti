@@ -11,7 +11,9 @@ import (
 
 // ------------------------------------
 //
-//	init the list component for commit log Component
+//	Rebuild the commit log list widget from the latest git log data, preserve the previously
+//	selected commit by hash, and return true if the selected commit changed (signals that the
+//	detail panel needs to be reinitialized).
 //
 // ------------------------------------
 func InitGitCommitLogList(m *types.GittiModel) bool {

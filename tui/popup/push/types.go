@@ -16,21 +16,26 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// user choose how do they want to push the commit, push /  push --force / push --force-with-lease
+//	ChoosePushTypePopUpModel holds the option list and the target remote name for
+//	the push type selection popup. The list offers three choices: normal push,
+//	safe force-push (--force-with-lease), and dangerous force-push (--force).
 //
-// ---------------------------------
+// ------------------------------------
 type ChoosePushTypePopUpModel struct {
 	PushOptionList list.Model
 	RemoteName     string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for push selection option
+//	GitPushOptionDelegate renders each push type row (name + command info) in
+//	the choose push type option list.
+//	GitPushOptionItem carries the display name, command info string, and the
+//	push type constant for a single push mode choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitPushOptionDelegate struct{}
 	GitPushOptionItem     struct {
@@ -44,7 +49,6 @@ func (i GitPushOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for push selection option
 func (d GitPushOptionDelegate) Height() int                             { return 2 }
 func (d GitPushOptionDelegate) Spacing() int                            { return 0 }
 func (d GitPushOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -80,11 +84,13 @@ func (d GitPushOptionDelegate) Render(w io.Writer, m list.Model, index int, list
 	fmt.Fprint(w, fn(fullStr))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # For Remote push process pop up
+//	GitRemotePushPopUpModel holds the scrollable output viewport and dot spinner
+//	for the git push progress popup, plus atomic flags (IsProcessing, HasError,
+//	ProcessSuccess, IsCancelled) and a CancelFunc to abort the push operation.
 //
-// ---------------------------------
+// ------------------------------------
 type GitRemotePushPopUpModel struct {
 	GitRemotePushOutputViewport viewport.Model // to log out the output from git operation
 	Spinner                     spinner.Model  // spinner for showing processing state

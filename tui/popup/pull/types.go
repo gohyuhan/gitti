@@ -16,19 +16,24 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
-// choose a pull type, git pull, git pull rebase or git pull merge
+// ------------------------------------
 //
-// ---------------------------------
+//	ChooseGitPullTypePopUpModel holds the option list for the pull strategy
+//	selection popup, which offers three choices: git pull, git pull --rebase,
+//	and git pull --no-rebase (merge).
+//
+// ------------------------------------
 type ChooseGitPullTypePopUpModel struct {
 	PullTypeOptionList list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// # A pop up to show git pull result
+//	GitPullOutputPopUpModel holds the scrollable output viewport and dot spinner
+//	for the git pull progress popup, plus atomic flags (IsProcessing, HasError,
+//	ProcessSuccess, IsCancelled) and a CancelFunc to abort the pull operation.
 //
-// ---------------------------------
+// ------------------------------------
 type GitPullOutputPopUpModel struct {
 	PullType              string
 	GitPullOutputViewport viewport.Model // to log out the output from git operation
@@ -41,11 +46,14 @@ type GitPullOutputPopUpModel struct {
 	CancelFunc context.CancelFunc
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// for pull option selection option
+//	GitPullTypeOptionDelegate renders each pull strategy row (name + command info)
+//	in the choose pull type option list.
+//	GitPullTypeOptionItem carries the display name, command info string, and the
+//	pull type constant for a single pull strategy choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitPullTypeOptionDelegate struct{}
 	GitPullTypeOptionItem     struct {
@@ -59,7 +67,6 @@ func (i GitPullTypeOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for pull type selection
 func (d GitPullTypeOptionDelegate) Height() int                             { return 2 }
 func (d GitPullTypeOptionDelegate) Spacing() int                            { return 0 }
 func (d GitPullTypeOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

@@ -14,39 +14,48 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// pop up for cherry picking commits from current checkout branch
+//	GitCherryPickPopUpModel holds the branch name and the commit-log list
+//	for the cherry-pick selection popup, where the user picks commits from the
+//	current branch to cherry-pick.
 //
-// ---------------------------------
+// ------------------------------------
 type GitCherryPickPopUpModel struct {
 	CurrentBranchName                string
 	CurrentBranchCherryPickCommitLog list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// pop up to edit (mainly removal for now) cherry picked commit
+//	GitEditCherryPickPopUpModel holds the ordered list of already-selected
+//	cherry-pick commits. Used in the edit-cherry-pick popup, where the user
+//	can remove or reorder commits before applying them.
 //
-// ---------------------------------
+// ------------------------------------
 type GitEditCherryPickPopUpModel struct {
 	CherryPickedCommitLog list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// pop up to choose to either cherry pick or edit cherry pick
+//	GitCherryPickOptionSelectionPopUpModel holds the operation-type list for
+//	the cherry-pick action selection popup, where the user chooses between
+//	pick, edit-and-pick, and apply.
 //
-// ---------------------------------
+// ------------------------------------
 type GitCherryPickOptionSelectionPopUpModel struct {
 	CherryPickedOpsOption list.Model
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// bubble tea list for selecting commit log for cherry pick
+//	GitCherryPickDelegate renders each commit-log row in the cherry-pick
+//	selection list, showing a checkbox, short hash, author, and message.
+//	GitCherryPickItem carries the hash, message, author, and source branch
+//	for a single candidate commit.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitCherryPickDelegate struct {
 		CherryPickedMap *map[string]git.CherryPickedCommitLog
@@ -63,7 +72,6 @@ func (i GitCherryPickItem) FilterValue() string {
 	return i.Hash
 }
 
-// for list component of Git branch
 func (d GitCherryPickDelegate) Height() int                             { return 2 }
 func (d GitCherryPickDelegate) Spacing() int                            { return 0 }
 func (d GitCherryPickDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -111,11 +119,14 @@ func (d GitCherryPickDelegate) Render(w io.Writer, m list.Model, index int, list
 	fmt.Fprint(w, fn(str))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// bubble tea list for editing commit log for cherry pick (mainly just for removal)
+//	GitEditCherryPickDelegate renders each row in the edit-cherry-pick list,
+//	showing hash, message, author, and source branch across three lines.
+//	GitEditCherryPickItem carries the same fields as GitCherryPickItem and is
+//	used when displaying the already-selected commits for reordering/removal.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitEditCherryPickDelegate struct{}
 	GitEditCherryPickItem     struct {
@@ -130,7 +141,6 @@ func (i GitEditCherryPickItem) FilterValue() string {
 	return i.Hash
 }
 
-// for list component of Git branch
 func (d GitEditCherryPickDelegate) Height() int                             { return 3 }
 func (d GitEditCherryPickDelegate) Spacing() int                            { return 0 }
 func (d GitEditCherryPickDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -171,11 +181,14 @@ func (d GitEditCherryPickDelegate) Render(w io.Writer, m list.Model, index int, 
 	fmt.Fprint(w, fn(str))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// bubble tea list for selecting operation choice for cherry pick
+//	CherryPickOpsOptionDelegate renders each operation-type row (name + info)
+//	in the cherry-pick action selection list.
+//	CherryPickOpsOptionItem carries the display name, info string, and the
+//	cherry-pick operation type constant for a single action choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	CherryPickOpsOptionDelegate struct{}
 	CherryPickOpsOptionItem     struct {
@@ -189,7 +202,6 @@ func (i CherryPickOpsOptionItem) FilterValue() string {
 	return i.Name
 }
 
-// for list component of Git branch
 func (d CherryPickOpsOptionDelegate) Height() int                             { return 2 }
 func (d CherryPickOpsOptionDelegate) Spacing() int                            { return 0 }
 func (d CherryPickOpsOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -225,21 +237,27 @@ func (d CherryPickOpsOptionDelegate) Render(w io.Writer, m list.Model, index int
 	fmt.Fprint(w, fn(fullStr))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// pop up to choose to the parent for git revert (when there is more than 1 parent, eg, merge commit)
+//	GitRevertParentOptionSelectionPopUpModel holds the parent-option list and
+//	the target commit hash for the revert-parent selection popup. This popup
+//	appears when reverting a merge commit that has more than one parent, so the
+//	user can choose which parent to revert to.
 //
-// ---------------------------------
+// ------------------------------------
 type GitRevertParentOptionSelectionPopUpModel struct {
 	GitRevertParentOption list.Model
 	CommitHash            string
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// bubble tea list for selecting parent to revert to
+//	GitRevertParentOptionDelegate renders each parent-commit row (message +
+//	hash) in the revert-parent selection list.
+//	GitRevertParentOptionItem carries the parent commit hash, message, and
+//	parent order for a single revert-parent choice.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitRevertParentOptionDelegate struct{}
 	GitRevertParentOptionItem     struct {
@@ -253,7 +271,6 @@ func (i GitRevertParentOptionItem) FilterValue() string {
 	return i.CommitHash
 }
 
-// for list component of Git branch
 func (d GitRevertParentOptionDelegate) Height() int                             { return 2 }
 func (d GitRevertParentOptionDelegate) Spacing() int                            { return 0 }
 func (d GitRevertParentOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
@@ -289,11 +306,13 @@ func (d GitRevertParentOptionDelegate) Render(w io.Writer, m list.Model, index i
 	fmt.Fprint(w, fn(fullStr))
 }
 
-// ---------------------------------
+// ------------------------------------
 //
-// pop up to confirm git revert
+//	GitRevertConfirmationPopUpModel holds the target commit hash and parent
+//	order for the git revert confirmation popup, shown before the revert is
+//	executed.
 //
-// ---------------------------------
+// ------------------------------------
 type GitRevertConfirmationPopUpModel struct {
 	CommitHash  string
 	ParentOrder int

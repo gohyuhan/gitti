@@ -10,6 +10,13 @@ import (
 
 // those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
 
+// ------------------------------------
+//
+//	Build the styled tab-bar title string for the commit log panel, with the commit log tab
+//	highlighted as active. Falls back to abbreviated icon/letter labels when the rendered
+//	width exceeds widthLimit.
+//
+// ------------------------------------
 func ConstructCommitLogComponentTitle(widthLimit int) string {
 	title := fmt.Sprintf("%s %s %s %s %s %s",
 		style.TitleCurrentComponentStyle.Render("[3]"),

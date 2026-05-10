@@ -165,6 +165,14 @@ func ReinitCherryPickedCommitInfo(m *types.GittiModel) {
 	m.CherryPickedCommitInfo.CherryPickedCommitMap = make(map[string]git.CherryPickedCommitLog)
 }
 
+// ------------------------------------
+//
+//	Suspend the Gitti UI and hand control to a git command that requires GPG
+//	signing (e.g. signed commits/tags). Runs the command via tea.ExecProcess and
+//	returns a GitOperationRequiredSigningFinishedMsg with any stderr error on
+//	completion.
+//
+// ------------------------------------
 func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand []string, GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
 	cmd := exec.Command("git", gitCommand...)
 	var stderr bytes.Buffer
@@ -184,6 +192,13 @@ func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand
 	})
 }
 
+// ------------------------------------
+//
+//	Suspend the Gitti UI and hand control to a pre-built exec.Cmd that requires
+//	GPG signing. Runs cleanUpFunc after the process exits regardless of outcome,
+//	then returns a GitOperationRequiredSigningFinishedMsg with any stderr error.
+//
+// ------------------------------------
 func SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m *types.GittiModel, executor *exec.Cmd, cleanUpFunc func(), GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
 	var stderr bytes.Buffer
 	executor.Stderr = io.MultiWriter(os.Stderr, &stderr)
@@ -203,6 +218,13 @@ func SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m *types.Gitt
 	})
 }
 
+// ------------------------------------
+//
+//	Clear the active popup after a GPG-signing operation completes. Hides the
+//	popup, exits typing mode, and resets PopUpModel and PopUpType to their
+//	no-popup defaults.
+//
+// ------------------------------------
 func ResetPopUpModelStateForGitSigningOps(m *types.GittiModel) {
 	m.ShowPopUp.Store(false)
 	m.IsTyping.Store(false)

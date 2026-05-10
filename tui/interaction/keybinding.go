@@ -13,7 +13,10 @@ import (
 
 // ------------------------------------
 //
-//	the function to handle bubbletea key interactions
+//	Entry point for all Bubbletea key-press events. Handles global shortcuts
+//	(ctrl+c quit, ctrl+s/u stage/unstage all, ctrl+g/l open browser links,
+//	ctrl+f fetch), then dispatches to typing or non-typing key handlers based
+//	on m.IsTyping.
 //
 // ------------------------------------
 func GittiKeyInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {

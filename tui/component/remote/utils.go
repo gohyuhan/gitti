@@ -10,6 +10,13 @@ import (
 
 // those utf-8 icons for the component can be found at https://www.nerdfonts.com/cheat-sheet
 
+// ------------------------------------
+//
+//	Build the styled tab-bar title string for the remote panel, with the remote tab
+//	highlighted as active. Falls back to abbreviated icon/letter labels through up to
+//	four levels when the rendered width exceeds titleWidthLimit.
+//
+// ------------------------------------
 func ConstructRemoteComponentTitle(titleWidthLimit int) string {
 	title := fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
 		style.TitleCurrentComponentStyle.Render("[1]"),

@@ -14,7 +14,9 @@ import (
 
 // ------------------------------------
 //
-//	for resolve conflict option list popup
+//	Initialize the resolve conflict option popup for the given file. Builds a
+//	three-option list: reset conflict, accept our changes, accept their changes.
+//	Filtering and pagination are hidden; an item-count help key is attached.
 //
 // ------------------------------------
 func InitGitResolveConflictOptionPopUpModel(m *types.GittiModel, filePathName string) {

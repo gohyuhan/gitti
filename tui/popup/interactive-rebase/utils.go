@@ -12,8 +12,10 @@ import (
 
 // ------------------------------------
 //
-//	Validates that at least two commits are selected and the base commit is not a merge commit,
-//	then sorts selected commits oldest-first by CommitOrder; sets SelectionError on failure
+//	Validate and sort the current fixup/squash commit selection. Requires at
+//	least two commits selected and the oldest (base) commit must not be a merge
+//	commit. Sorts selected commits oldest-first by CommitOrder and stores the
+//	result in SortedSelectedCommits; sets SelectionError on any validation failure.
 //
 // ------------------------------------
 func InteractiveRebaseFixupSquashSelectionValidationAndSort(m *types.GittiModel) {

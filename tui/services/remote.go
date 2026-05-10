@@ -16,56 +16,43 @@ import (
 //
 // ------------------------------------
 func GitAddRemoteService(m *types.GittiModel) {
-	ctx, cancel := context.WithCancel(context.Background())
-
 	popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
 	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
 		popUp.CancelFunc = cancel
-	}
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
 
-	go func(ctx context.Context) {
-		defer cancel()
-
-		// set to is processing and remove the log content in UI and also in GITCOMMIT in memory
-		popUp, ok := m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
-		var remoteName string
-		var remoteUrl string
-		var exitStatusCode int
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-			popUp.IsCancelled.Store(false)
-
-			// retrieve the value of remote name and remote url
-			remoteName = popUp.RemoteNameTextInput.Value()
-			remoteUrl = popUp.RemoteUrlTextInput.Value()
-		} else {
-			return
-		}
+		remoteName := popUp.RemoteNameTextInput.Value()
+		remoteUrl := popUp.RemoteUrlTextInput.Value()
 		if len(remoteName) < 1 || len(remoteUrl) < 1 {
+			popUp.IsProcessing.Store(false)
+			cancel()
 			return
 		}
-		gitAddRemoteResult, exitStatusCode := m.GitOperations.GitRemote.GitAddRemote(ctx, remoteName, remoteUrl)
-		popUp, ok = m.PopUpModel.(*remotePopUp.AddRemotePromptPopUpModel)
-		if ok && !popUp.IsCancelled.Load() {
-			popUp.IsProcessing.Store(false) // update the processing status
-			// if sucessful exitcode will be 0
-			if exitStatusCode == 0 && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(true)
-				popUp.RemoteNameTextInput.Reset()
-				popUp.RemoteUrlTextInput.Reset()
-				popUp.NoInitialRemote = false
+
+		go func(ctx context.Context, remoteName string, remoteUrl string) {
+			defer cancel()
+
+			gitAddRemoteResult, exitStatusCode := m.GitOperations.GitRemote.GitAddRemote(ctx, remoteName, remoteUrl)
+			if exitStatusCode == 0 {
 				gitAddRemoteResult = append(gitAddRemoteResult, fmt.Sprintf(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteAddSuccess, remoteName, remoteUrl))
-				remotePopUp.UpdateAddRemoteOutputViewport(m, gitAddRemoteResult)
-				popUp.HasError.Store(false)
-				popUp.ProcessSuccess.Store(true)
-			} else if exitStatusCode != 0 && !popUp.IsProcessing.Load() {
-				popUp.HasError.Store(true)
-				remotePopUp.UpdateAddRemoteOutputViewport(m, gitAddRemoteResult)
 			}
-		}
-	}(ctx)
+
+			data := types.GitAddRemoteResultEventDataStructure{
+				Result:  gitAddRemoteResult,
+				Success: exitStatusCode == 0,
+			}
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.GIT_ADD_REMOTE_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx, remoteName, remoteUrl)
+	} else {
+		return
+	}
 }
 
 // ------------------------------------

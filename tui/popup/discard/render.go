@@ -14,7 +14,8 @@ import (
 
 // ------------------------------------
 //
-//	For Discard file changes type list selection
+//	Render the discard type selection popup, showing a titled list of discard
+//	options (discard whole, unstage, or variant actions for renamed/new files).
 //
 // ------------------------------------
 func RenderGitDiscardTypeOptionPopUp(m *types.GittiModel) string {
@@ -35,7 +36,9 @@ func RenderGitDiscardTypeOptionPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	For Discard file changes confirmation prompt
+//	Render the discard confirmation popup, showing a localized message that
+//	describes the specific discard action (whole, unstage, untracked, newly-added,
+//	or revert-rename) and the target file path.
 //
 // ------------------------------------
 func RenderGitDiscardConfirmPromptPopup(m *types.GittiModel) string {

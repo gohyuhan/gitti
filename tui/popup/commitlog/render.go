@@ -10,6 +10,12 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Render the cherry-pick operation type selection popup, showing a titled list
+//	of action options (pick, edit-and-pick, apply) for the user to choose.
+//
+// ------------------------------------
 func RenderGitCherryPickOptionSelectionPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCherryPickOptionSelectionPopUpModel)
 	if ok {
@@ -26,6 +32,13 @@ func RenderGitCherryPickOptionSelectionPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the cherry-pick commit selection popup, showing a titled scrollable
+//	list of commits from the current branch. Already-selected commits are
+//	rendered with a checked box by the delegate.
+//
+// ------------------------------------
 func RenderGitCherryPickPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitCherryPickPopUpModel)
 	if ok {
@@ -45,6 +58,13 @@ func RenderGitCherryPickPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the edit-cherry-pick popup, showing a titled list of already-selected
+//	commits ordered by the user's selection sequence. The user can remove or
+//	reorder commits here before applying the cherry-pick.
+//
+// ------------------------------------
 func RenderGitEditCherryPickPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitEditCherryPickPopUpModel)
 	if ok {
@@ -64,6 +84,12 @@ func RenderGitEditCherryPickPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the cherry-pick apply confirmation popup, showing a localized
+//	confirmation message with the current checkout branch name highlighted.
+//
+// ------------------------------------
 func RenderGitCherryPickApplyConfirmPopUp(m *types.GittiModel) string {
 	popUpWidth := min(constant.MaxGitCherryPickApplyConfirmPopUpWidth, int(float64(m.Width)*0.8))
 	confirmMessage := fmt.Sprintf(i18n.LANGUAGEMAPPING.CherryPickApplyConfirmTitle, style.NewStyle.Foreground(style.ColorYellowWarm).Render(m.CheckOutBranch))
@@ -75,6 +101,13 @@ func RenderGitCherryPickApplyConfirmPopUp(m *types.GittiModel) string {
 	return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 }
 
+// ------------------------------------
+//
+//	Render the revert-parent selection popup, showing a titled list of parent
+//	commits for the target merge commit. Used when the commit has multiple
+//	parents and the user must pick which one to revert to.
+//
+// ------------------------------------
 func RenderGitRevertParentOptionSelectionPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRevertParentOptionSelectionPopUpModel)
 	if ok {
@@ -93,6 +126,12 @@ func RenderGitRevertParentOptionSelectionPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the git revert confirmation popup, showing a localized message with
+//	the target commit hash highlighted, asking the user to confirm the revert.
+//
+// ------------------------------------
 func RenderGitRevertConfirmationPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRevertConfirmationPopUpModel)
 	if ok {

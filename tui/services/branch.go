@@ -20,17 +20,17 @@ import (
 //
 // ------------------------------------
 func GitSwitchBranchService(m *types.GittiModel, branchName string, switchType string) {
+	popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
+
+	if ok {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+	} else {
+		return
+	}
+
 	go func() {
-		popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
-
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-		} else {
-			return
-		}
-
 		var gitOpsOutput []string
 		var success bool
 		switch switchType {
@@ -40,16 +40,13 @@ func GitSwitchBranchService(m *types.GittiModel, branchName string, switchType s
 			gitOpsOutput, success = m.GitOperations.GitBranch.GitSwitchBranchWithChanges(branchName)
 		}
 
-		branchPopUp.UpdateSwitchBranchOutputViewPort(m, gitOpsOutput)
-
-		if success {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(true)
-			popUp.IsProcessing.Store(false)
-		} else {
-			popUp.HasError.Store(true)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(false)
+		data := types.GitSwitchBranchResultEventDataStructure{
+			Result:  gitOpsOutput,
+			Success: success,
+		}
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.GIT_SWITCH_BRANCH_RESULT_EVENT,
+			Data:  data,
 		}
 	}()
 }
@@ -85,20 +82,24 @@ func GitCreateNewBranchAndSwitchService(m *types.GittiModel, validBranchName str
 //
 // ------------------------------------
 func GitDeleteBranchService(m *types.GittiModel, branchName string) {
+	popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
+	if ok {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+	} else {
+		return
+	}
+
 	go func() {
 		result, success := m.GitOperations.GitBranch.DeleteLocalBranch(branchName)
-		popUp, ok := m.PopUpModel.(*branchPopUp.GitDeleteBranchOutputPopUpModel)
-		if ok {
-			if success {
-				popUp.HasError.Store(false)
-				popUp.ProcessSuccess.Store(true)
-			} else {
-				popUp.HasError.Store(true)
-				popUp.ProcessSuccess.Store(false)
-			}
-			popUp.IsProcessing.Store(false)
-			popUp.BranchDeleteOutputViewport.SetContentLines(result)
-			popUp.BranchDeleteOutputViewport.PageDown()
+		data := types.GitDeleteBranchResultEventDataStructure{
+			Result:  result,
+			Success: success,
+		}
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.GIT_DELETE_BRANCH_RESULT_EVENT,
+			Data:  data,
 		}
 	}()
 }
@@ -109,34 +110,41 @@ func GitDeleteBranchService(m *types.GittiModel, branchName string) {
 //
 // ------------------------------------
 func CreateNewBranchBasedOnRemoteService(m *types.GittiModel, remoteName string, branchName string, newBranchCreateType string) {
+	popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
+	if ok {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+	} else {
+		return
+	}
+
 	go func() {
 		if newBranchCreateType == git.NEWBRANCHBASEDONREMOTEUSERSELECT {
 			parts := strings.SplitN(branchName, "/", 2)
 			if len(parts) < 2 {
 				m.GittiLogger.RegisterNewLog(logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, "Invalid Remote Branch Naming"), false)
-				m.IsTyping.Store(false)
-				m.ShowPopUp.Store(false)
-				m.PopUpType = constant.NoPopUp
-				m.PopUpModel = nil
-
+				data := types.GitCreateNewBranchBasedOnRemoteInvalidEventDataStructure{
+					RemoteName: remoteName,
+					BranchName: branchName,
+				}
+				m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+					Event: constant.GIT_CREATE_NEW_BRANCH_BASED_ON_REMOTE_INVALID_EVENT,
+					Data:  data,
+				}
 				return
 			}
 			remoteName = parts[0]
 			branchName = parts[1]
 		}
 		result, success := m.GitOperations.GitBranch.GitCreateNewBranchBasedOnRemote(remoteName, branchName)
-		popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
-		if ok {
-			if success {
-				popUp.HasError.Store(false)
-				popUp.ProcessSuccess.Store(true)
-			} else {
-				popUp.HasError.Store(true)
-				popUp.ProcessSuccess.Store(false)
-			}
-			popUp.IsProcessing.Store(false)
-			popUp.CreateBranchBasedOnRemoteOutputViewport.SetContentLines(result)
-			popUp.CreateBranchBasedOnRemoteOutputViewport.PageDown()
+		data := types.GitCreateNewBranchBasedOnRemoteResultEventDataStructure{
+			Result:  result,
+			Success: success,
+		}
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.GIT_CREATE_NEW_BRANCH_BASED_ON_REMOTE_RESULT_EVENT,
+			Data:  data,
 		}
 	}()
 }
@@ -165,41 +173,24 @@ func GitMergeService(m *types.GittiModel, branchesName []string) {
 
 	popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
 	if ok {
+		popUp.IsProcessing.Store(true)
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsCancelled.Store(false)
 		popUp.CancelFunc = cancel
 	}
 
 	go func(ctx context.Context) {
 		defer cancel()
 
-		// set to is processing and remove the log content in UI and also in GITCOMMIT in memory
-		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-			popUp.IsCancelled.Store(false)
-		} else {
-			return
-		}
 		outputResult, success := m.GitOperations.GitBranch.GitMerge(ctx, branchesName)
-		popUp, ok = m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
-		if ok && !popUp.IsCancelled.Load() {
-			popUp.IsProcessing.Store(false) // update the processing status
-			if success && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(true)
-				popUp.HasError.Store(false)
-			} else if !success && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(false)
-				popUp.HasError.Store(true)
-			}
-
-			var content strings.Builder
-			for index := range outputResult {
-				content.WriteString(outputResult[index])
-				content.WriteRune('\n')
-			}
-
-			popUp.BranchMergeOutputViewport.SetContent(content.String())
+		data := types.MergeResultEventDataStructure{
+			Result:  outputResult,
+			Success: success,
+		}
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.GIT_MERGE_RESULT_EVENT,
+			Data:  data,
 		}
 	}(ctx)
 }

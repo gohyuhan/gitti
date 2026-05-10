@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
 // ------------------------------------
 //
-//	Updates the fixup/squash preview viewport from current selected commits and validation state
+//	Rebuild the fixup/squash preview viewport content from the current selection.
+//	If a validation error is present, shows the error message; otherwise renders
+//	an oldest-to-newest chain of selected commit hashes with arrows, ending with
+//	the newest commit in the original list if it was not selected.
 //
 // ------------------------------------
 func UpdateInteractiveRebaseFixupSquashViewport(m *types.GittiModel) {
@@ -58,5 +62,45 @@ func UpdateInteractiveRebaseFixupSquashViewport(m *types.GittiModel) {
 
 		popUp.CommitFixupSquashViewport.SetContent(content.String())
 
+	}
+}
+
+// ------------------------------------
+//
+//	Handle the async commit-info fetch event. Stores the retrieved commit list
+//	on the matching popup model and populates the commit list with the received
+//	items. Currently handles the fixup/squash selection popup type.
+//
+// ------------------------------------
+func UpdateInteractiveRebaseFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
+	switch updateData.PopUpModel {
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
+		if ok {
+			popUp.OriginalRetrievedCommitList = updateData.CommitInfos
+			popUp.CommitList.SetItems(updateData.ListItems)
+		}
+	}
+}
+
+// ------------------------------------
+//
+//	Handle the async fixup/squash rebase result event. Clears IsProcessing and
+//	sets ProcessSuccess on success or HasError on failure. Loads the output lines
+//	into the viewport. No-ops if the popup was cancelled.
+//
+// ------------------------------------
+func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseFixupSquashResultEventDataStructure) {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+		popUp.FixupSquashOutputViewport.SetContentLines(updateData.Result)
+		popUp.IsProcessing.Store(false)
 	}
 }

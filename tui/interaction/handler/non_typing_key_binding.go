@@ -551,8 +551,10 @@ func handleNonTypingiKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 // ------------------------------------
 func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	// enter line stage state
-	services.EnterOrReinitLineEditingStateService(m)
-	m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
+	layout.EnterOrReinitLineEditingState(m)
+	m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+		Event: constant.DETAIL_COMPONENT_PANEL_LAYOUT_UPDATED_EVENT,
+	}
 	return m, nil
 }
 
@@ -1321,7 +1323,15 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				gitArgs := m.GitOperations.GitCommitLog.GitCherryPickWithSigning(cherryPickedCommitHashes)
 				return utils.SuspendGittiUIForGitOperationRequireSigning(m, gitArgs, logging.CHERRY_PICK_WITH_SIGNING_OPS)
 			} else {
-				services.GitCherryPickService(m, m.CherryPickedCommitInfo.CherryPickedCommitMap)
+				copiedCherryPickedHashmap := make(map[string]git.CherryPickedCommitLog)
+				for k, v := range m.CherryPickedCommitInfo.CherryPickedCommitMap {
+					copiedCherryPickedHashmap[k] = v
+				}
+				services.GitCherryPickService(m, copiedCherryPickedHashmap)
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpModel = nil
+				m.PopUpType = constant.NoPopUp
 				return m, nil
 			}
 		case constant.GitDiscardFileLineChangeConfirmPopUp:
@@ -1905,7 +1915,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 		case constant.DetailComponentPanel:
 			if m.IsLineEditingState.Load() {
 				m.IsLineEditingState.Store(false)
-				m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
+				m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+					Event: constant.DETAIL_COMPONENT_PANEL_LAYOUT_UPDATED_EVENT,
+				}
 			} else {
 				m.CurrentSelectedComponent = m.DetailPanelParentComponent
 				m.DetailPanelParentComponent = ""
@@ -1913,7 +1925,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 		case constant.DetailComponentPanelTwo:
 			if m.IsLineEditingState.Load() {
 				m.IsLineEditingState.Store(false)
-				m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
+				m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+					Event: constant.DETAIL_COMPONENT_PANEL_LAYOUT_UPDATED_EVENT,
+				}
 			} else {
 				m.CurrentSelectedComponent = m.DetailPanelParentComponent
 				m.DetailPanelParentComponent = ""
@@ -2004,7 +2018,7 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gitti
 				} else {
 					m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition -= 1
 				}
-				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				layout.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
@@ -2017,7 +2031,7 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gitti
 				} else {
 					m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition -= 1
 				}
-				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				layout.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				return m, cmd
@@ -2110,7 +2124,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 				} else {
 					m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition += 1
 				}
-				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				layout.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
 				return m, cmd
@@ -2123,7 +2137,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 				} else {
 					m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition += 1
 				}
-				services.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
+				layout.SetLineEditingCursorViewportContent(m, m.DetailPanelViewport.VisibleLineCount(), m.DetailPanelTwoViewport.VisibleLineCount())
 			} else {
 				m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
 				return m, cmd

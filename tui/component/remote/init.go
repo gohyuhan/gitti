@@ -11,7 +11,9 @@ import (
 
 // ------------------------------------
 //
-//	init the list component for Branch Component
+//	Rebuild the remote list widget from the latest configured git remotes, preserve the
+//	previously selected remote by name, and return true if the selection changed (signals
+//	that the detail panel needs to be reinitialized).
 //
 // ------------------------------------
 func InitRemoteList(m *types.GittiModel) bool {

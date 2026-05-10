@@ -17,7 +17,9 @@ import (
 
 // ------------------------------------
 //
-//	init the popup model for git commit
+//	Initialize the git commit popup model with empty message/description text
+//	inputs, a soft-wrap output viewport, a dot spinner, and all atomic state
+//	flags (IsProcessing, IsCancelled, HasError, ProcessSuccess) set to false.
 //
 // ------------------------------------
 func InitGitCommitPopUpModel(m *types.GittiModel) {
@@ -72,7 +74,9 @@ func InitGitCommitPopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	init the popup model for git amend commit
+//	Initialize the git amend-commit popup model, pre-filling the message and
+//	description inputs from the latest commit. All atomic state flags are reset
+//	to false. The description cursor is moved to the end of the existing text.
 //
 // ------------------------------------
 func InitGitAmendCommitPopUpModel(m *types.GittiModel) {
@@ -129,7 +133,9 @@ func InitGitAmendCommitPopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	for reset latest commit option list popup
+//	Initialize the reset-latest-commit type selection popup, populating a list
+//	with the three reset options (soft, hard, mixed) and attaching an item-count
+//	help key. The list has filtering, pagination, and the default help hidden.
 //
 // ------------------------------------
 func InitGitResetLatestCommitTypeOptionPopUpModel(m *types.GittiModel) {
@@ -178,7 +184,9 @@ func InitGitResetLatestCommitTypeOptionPopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	for git reset latest commit confirmation prompt
+//	Initialize the reset-latest-commit confirmation popup model, storing the
+//	chosen reset type (soft/hard/mixed) so the render function can display the
+//	appropriate localized confirmation message.
 //
 // ------------------------------------
 func InitGitResetLatestCommitConfirmPromptPopUpModel(m *types.GittiModel, resetType string) {
@@ -190,7 +198,9 @@ func InitGitResetLatestCommitConfirmPromptPopUpModel(m *types.GittiModel, resetT
 
 // ------------------------------------
 //
-//	for reset selected commit option list popup
+//	Initialize the reset-to-selected-commit type selection popup, populating a
+//	list with soft/hard/mixed options and storing the target commit hash, message,
+//	and author. Attaches an item-count help key; filtering and pagination hidden.
 //
 // ------------------------------------
 func InitGitResetToSelectedCommitTypeOptionPopUpModel(m *types.GittiModel, selectedCommitHash string, commitInfoMessage string, commitInfoAuthor string) {
@@ -242,7 +252,9 @@ func InitGitResetToSelectedCommitTypeOptionPopUpModel(m *types.GittiModel, selec
 
 // ------------------------------------
 //
-//	for git reset selected commit confirmation prompt
+//	Initialize the reset-to-selected-commit confirmation popup model, storing
+//	the reset type, target commit hash, message, and author so the render function
+//	can display the appropriate localized confirmation and commit info.
 //
 // ------------------------------------
 func InitGitResetToSelectedCommitConfirmPromptPopUpModel(m *types.GittiModel, resetType string, selectedCommitHash string, commitInfoMessage string, commitInfoAuthor string) {

@@ -12,7 +12,11 @@ import (
 
 // ------------------------------------
 //
-//	For Key binding/Feature Instructions pop up
+//	Render the keybinding and feature instructions popup. Builds the full content
+//	string by appending the active component's keybindings, then the global
+//	keybindings, then the feature instructions. Sizes the viewport to 80% of the
+//	terminal dimensions (clamped to constants) and renders it inside the keybinding
+//	popup border style.
 //
 // ------------------------------------
 func RenderKeyBindingAndFeatureInstructionsPopUp(m *types.GittiModel) string {
@@ -43,7 +47,11 @@ func RenderKeyBindingAndFeatureInstructionsPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	Render global key binding part
+//	Append the global keybinding section to contentLine. On the first call per
+//	session, scans all global keybinding entries to find the longest key string
+//	and caches it in m.GlobalKeyBindingKeyMapLargestLen for consistent alignment.
+//	Renders each entry as a title (section header), info (key → description), or
+//	warn (highlighted warning) line.
 //
 // ------------------------------------
 func renderGlobalKeyBindingPart(m *types.GittiModel, contentLine *strings.Builder) {
@@ -97,7 +105,12 @@ func renderGlobalKeyBindingPart(m *types.GittiModel, contentLine *strings.Builde
 
 // ------------------------------------
 //
-//	Render selected component key binding part
+//	Append the active component's keybinding section to contentLine. Selects the
+//	correct i18n keybinding slice based on m.CurrentSelectedComponent (and the
+//	active sub-view for multi-mode panels such as branch/tag/remote and
+//	commitlog/reflog). Returns early for the git-status panel, which has no
+//	per-component bindings. On the first call per component per session, scans the
+//	slice to find the longest key string and caches it for column alignment.
 //
 // ------------------------------------
 func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *strings.Builder) {
@@ -192,7 +205,10 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 
 // ------------------------------------
 //
-//	Render features instuctions and steps part
+//	Append the feature instructions section to contentLine. Iterates all entries
+//	in i18n.LANGUAGEMAPPING.FeatureInstructions and renders each as a title
+//	(section header), info (feature name + numbered steps), or warn (highlighted
+//	warning) line.
 //
 // ------------------------------------
 func renderFeaturesInstuctionsAndStepsPart(contentLine *strings.Builder) {

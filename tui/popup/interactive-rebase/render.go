@@ -10,7 +10,8 @@ import (
 
 // ------------------------------------
 //
-//	Render the interactive rebase option selection popup (fixup/squash, reword, drop)
+//	Render the interactive rebase operation type selection popup, showing a
+//	titled list of options (fixup/squash, reword, drop) for the user to choose.
 //
 // ------------------------------------
 func RenderInteractiveRebaseOptionPopUp(m *types.GittiModel) string {
@@ -31,8 +32,9 @@ func RenderInteractiveRebaseOptionPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	Render the split-pane fixup/squash commit selection popup;
-//	the active pane (list or detail viewport) is highlighted with the selected border style
+//	Render the split-pane fixup/squash commit selection popup. The left pane
+//	shows the commit list and the right pane shows a preview of the selected
+//	commits. The active pane is highlighted with the selected border style.
 //
 // ------------------------------------
 func RenderInteractiveRebaseFixupSquashSelectionPopUp(m *types.GittiModel) string {
@@ -82,7 +84,9 @@ func RenderInteractiveRebaseFixupSquashSelectionPopUp(m *types.GittiModel) strin
 
 // ------------------------------------
 //
-//	Render the commit message and description input popup for the fixup/squash rebase operation
+//	Render the fixup/squash commit message editing popup, showing a message text
+//	input and a description textarea pre-filled with the combined commit message
+//	from all selected commits.
 //
 // ------------------------------------
 func RenderInteractiveRebaseFixupSquashCommitPopUp(m *types.GittiModel) string {
@@ -105,8 +109,9 @@ func RenderInteractiveRebaseFixupSquashCommitPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	Render the fixup/squash rebase output popup; shows a spinner while processing,
-//	and changes the viewport border color to reflect error or success state
+//	Render the fixup/squash rebase output popup, showing a scrollable viewport
+//	of rebase command output. Displays a spinner while the rebase is in progress,
+//	and colors the viewport border red on error or green on success.
 //
 // ------------------------------------
 func RenderInteractiveRebaseFixupSquashOutputPopUp(m *types.GittiModel) string {

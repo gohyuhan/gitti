@@ -18,7 +18,9 @@ import (
 
 // ------------------------------------
 //
-//	For Creating Tag Model
+//	Initialize the create tag popup. Creates a focused tag-name text input and an
+//	unfocused dynamic-height message textarea, both with localized placeholders.
+//	CurrentActiveInputIndex is set to 1 (name field focused first).
 //
 // ------------------------------------
 func InitCreateTagPopUpModel(m *types.GittiModel, commitHash string, commitMessage string) {
@@ -56,7 +58,9 @@ func InitCreateTagPopUpModel(m *types.GittiModel, commitHash string, commitMessa
 
 // ------------------------------------
 //
-//	For Confirming Tag Creation Model
+//	Initialize the tag creation confirmation popup with the tag name, optional
+//	message, and the target commit hash and message. The render function uses
+//	these fields to build the localized confirmation string.
 //
 // ------------------------------------
 func InitCreateTagConfirmationPopUpModel(m *types.GittiModel, tagName string, tagMessage string, commitHash string, commitMessage string) {
@@ -71,7 +75,9 @@ func InitCreateTagConfirmationPopUpModel(m *types.GittiModel, tagName string, ta
 
 // ------------------------------------
 //
-//	For Choosing Tag Deletion Option PopUp
+//	Initialize the delete tag scope selection popup. Builds a two-option list
+//	(delete local, delete remote) with localized names and info strings. Filtering
+//	and pagination are hidden; an item-count help key is attached.
 //
 // ------------------------------------
 func InitChooseDeleteTagOptionPopUpModel(m *types.GittiModel, tagName string) {
@@ -107,7 +113,9 @@ func InitChooseDeleteTagOptionPopUpModel(m *types.GittiModel, tagName string) {
 
 // ------------------------------------
 //
-//	For Choosing Remote for Remote Tag Deletion PopUp
+//	Initialize the remote selection popup for remote tag deletion. Builds a list
+//	from the provided remotes (each showing name and URL). Filtering and
+//	pagination are hidden; an item-count help key is attached.
 //
 // ------------------------------------
 func InitChooseRemoteForDeleteRemoteTagPopUpModel(m *types.GittiModel, remoteList []git.GitRemoteInfo, tagName string, deleteOptionType string) {
@@ -137,7 +145,10 @@ func InitChooseRemoteForDeleteRemoteTagPopUpModel(m *types.GittiModel, remoteLis
 
 // ------------------------------------
 //
-//	For Tag Deletion Output PopUp
+//	Initialize the delete tag output popup. Creates a soft-wrap viewport sized
+//	to a fixed height and 80% of terminal width (minus padding), and a dot
+//	spinner. All atomic state flags (IsProcessing, HasError, ProcessSuccess,
+//	IsCancelled) are reset to false.
 //
 // ------------------------------------
 func InitDeleteTagOutputPopUpModel(m *types.GittiModel, tagName string) {
@@ -169,7 +180,9 @@ func InitDeleteTagOutputPopUpModel(m *types.GittiModel, tagName string) {
 
 // ------------------------------------
 //
-//	For Tag Push Option PopUp
+//	Initialize the push tag option popup for the given remote and tag. Builds a
+//	four-option list: push tag, push all tags, force-push tag, force-push all
+//	tags. Filtering and pagination are hidden; an item-count help key is attached.
 //
 // ------------------------------------
 func InitChoosePushTagOptionPopUpModel(m *types.GittiModel, remoteName string, tagName string) {
@@ -216,7 +229,10 @@ func InitChoosePushTagOptionPopUpModel(m *types.GittiModel, remoteName string, t
 
 // ------------------------------------
 //
-//	For Tag Push Output PopUp
+//	Initialize the push tag output popup. Creates a soft-wrap viewport sized to
+//	a fixed height and 80% of terminal width (minus padding), and a dot spinner.
+//	All atomic state flags (IsProcessing, HasError, ProcessSuccess, IsCancelled)
+//	are reset to false.
 //
 // ------------------------------------
 func InitPushTagOutputPopUpModel(m *types.GittiModel) {
@@ -247,7 +263,10 @@ func InitPushTagOutputPopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	For Tag Fetch Option PopUp
+//	Initialize the fetch tag option popup for the given remote. Builds a
+//	four-option list: fetch tags, fetch and overwrite existing tags, fetch and
+//	prune deleted remote tags, or mirror all tags. Filtering and pagination are
+//	hidden; an item-count help key is attached.
 //
 // ------------------------------------
 func InitChooseFetchTagOptionPopUpModel(m *types.GittiModel, remoteName string) {
@@ -293,7 +312,10 @@ func InitChooseFetchTagOptionPopUpModel(m *types.GittiModel, remoteName string) 
 
 // ------------------------------------
 //
-//	For Tag Fetch Output PopUp
+//	Initialize the fetch tag output popup. Creates a soft-wrap viewport sized to
+//	a fixed height and 80% of terminal width (minus padding), and a dot spinner.
+//	All atomic state flags (IsProcessing, HasError, ProcessSuccess, IsCancelled)
+//	are reset to false.
 //
 // ------------------------------------
 func InitFetchTagOutputPopUpModel(m *types.GittiModel) {

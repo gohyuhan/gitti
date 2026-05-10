@@ -23,11 +23,11 @@ func StartGitUpdateListener(p *tea.Program, updateReceiverChannel chan string) {
 //	Listen for TUI update events and forward them to the TUI program
 //
 // ------------------------------------
-func StartTuiUpdateListener(p *tea.Program, updateReceiverChannel chan string) {
+func StartTuiUpdateListener(p *tea.Program, updateReceiverChannel chan interface{}) {
 	go func() {
 		for updateEvent := range updateReceiverChannel {
 			// Push message into the Bubble Tea runtime
-			p.Send(GitUpdateMsg(updateEvent))
+			p.Send(updateEvent)
 		}
 	}()
 }

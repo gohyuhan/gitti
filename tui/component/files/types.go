@@ -13,11 +13,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-// ---------------------------------
+// ------------------------------------
 //
-// for list component of git modified files
+//	GitModifiedFilesItem holds the file path, index status, work-tree status, and
+//	conflict flag for one modified file entry. GitModifiedFilesItemDelegate renders
+//	each row with color-coded index/work-tree status characters and a truncated path.
 //
-// ---------------------------------
+// ------------------------------------
 type (
 	GitModifiedFilesItemDelegate struct{}
 	GitModifiedFilesItem         struct {
@@ -32,7 +34,6 @@ func (i GitModifiedFilesItem) FilterValue() string {
 	return i.FilePathname
 }
 
-// for list component of modified files
 func (d GitModifiedFilesItemDelegate) Height() int                             { return 1 }
 func (d GitModifiedFilesItemDelegate) Spacing() int                            { return 0 }
 func (d GitModifiedFilesItemDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }

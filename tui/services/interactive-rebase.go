@@ -16,40 +16,33 @@ import (
 //
 // ------------------------------------
 func InteractiveRebaseFixupSquashService(m *types.GittiModel, originalRetrievedGitCommitInfo []git.CommitInfo, sortedSelectedCommits []git.CommitInfo, fixupSquashCommitMessage string, fixupSquashCommitDescription string) {
-	ctx, cancel := context.WithCancel(context.Background())
 
 	popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
 	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
 		popUp.CancelFunc = cancel
+
+		go func(ctx context.Context) {
+			defer cancel()
+
+			fixupSquashResult, fixupSquashErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseFixupSquash(ctx, originalRetrievedGitCommitInfo, sortedSelectedCommits, fixupSquashCommitMessage, fixupSquashCommitDescription)
+			data := types.InteractiveRebaseFixupSquashResultEventDataStructure{
+				Result:  fixupSquashResult,
+				Success: fixupSquashErr == nil,
+			}
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.INTERACTIVE_REBASE_FIXUP_SQUASH_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx)
+	} else {
+		return
 	}
 
-	go func(ctx context.Context) {
-		defer cancel()
-
-		// Reset state before starting new fixup/squash execution.
-		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
-		if ok {
-			popUp.HasError.Store(false)
-			popUp.ProcessSuccess.Store(false)
-			popUp.IsProcessing.Store(true)
-			popUp.IsCancelled.Store(false)
-		} else {
-			return
-		}
-		fixupSquashResult, fixupSquashErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseFixupSquash(ctx, originalRetrievedGitCommitInfo, sortedSelectedCommits, fixupSquashCommitMessage, fixupSquashCommitDescription)
-		popUp.FixupSquashOutputViewport.SetContentLines(fixupSquashResult)
-		popUp, ok = m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
-		if ok && !popUp.IsCancelled.Load() {
-			popUp.IsProcessing.Store(false)
-			if fixupSquashErr == nil && !popUp.IsProcessing.Load() {
-				popUp.ProcessSuccess.Store(true)
-				popUp.IsProcessing.Store(false)
-				popUp.HasError.Store(false)
-			} else if fixupSquashErr != nil && !popUp.IsProcessing.Load() {
-				popUp.HasError.Store(true)
-			}
-		}
-	}(ctx)
 }
 
 // ------------------------------------

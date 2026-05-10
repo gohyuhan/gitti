@@ -84,6 +84,12 @@ var Palette = []color.Color{
 	lipgloss.Color("#ffd7ff"), // Pale Pink (Almost white, the final highlight)
 }
 
+// ------------------------------------
+//
+//	Return a color from Palette by index, wrapping with modulo. Returns
+//	lipgloss.NoColor{} for negative IDs.
+//
+// ------------------------------------
 func GetColor(colorID int) color.Color {
 	if colorID < 0 {
 		return lipgloss.NoColor{}
@@ -91,6 +97,13 @@ func GetColor(colorID int) color.Color {
 	return Palette[colorID%len(Palette)]
 }
 
+// ------------------------------------
+//
+//	Apply an HSL gradient to a slice of strings. Each line gets a unique hue
+//	stepping from startHue by hueStep degrees, producing a smooth color sweep
+//	across the output.
+//
+// ------------------------------------
 func GradientLines(lines []string) []string {
 	colored := make([]string, len(lines))
 

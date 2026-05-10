@@ -19,7 +19,9 @@ import (
 
 // ------------------------------------
 //
-//	Init the popup model for choosing an interactive rebase operation type (fixup/squash, reword, drop)
+//	Initialize the interactive rebase operation type selection popup, populating
+//	a list with three options (fixup/squash, reword, drop). Filtering and
+//	pagination are hidden; an item-count help key is attached.
 //
 // ------------------------------------
 func InitInteractiveRebaseOptionPopUpModel(m *types.GittiModel) {
@@ -68,8 +70,10 @@ func InitInteractiveRebaseOptionPopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Init the split-pane popup for selecting commits to fixup or squash;
-//	commit list is populated asynchronously via a goroutine after init
+//	Initialize the split-pane fixup/squash commit selection popup. The left pane
+//	holds a commit list (initially empty); the right pane is a preview viewport.
+//	A goroutine is spawned to fetch commit infos asynchronously and send them
+//	via the TUI update channel once available.
 //
 // ------------------------------------
 func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
@@ -113,9 +117,9 @@ func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
 
 	go func() {
 		commitInfos := m.GitOperations.GitInteractiveRebase.GetCommitInfos()
-		newItems := make([]list.Item, 0, len(commitInfos))
+		listItems := make([]list.Item, 0, len(commitInfos))
 		for _, commitInfo := range commitInfos {
-			newItems = append(newItems, InteractiveRebaseFixupSquashSelectionItem{
+			listItems = append(listItems, InteractiveRebaseFixupSquashSelectionItem{
 				Hash:        commitInfo.Hash,
 				Message:     commitInfo.Message,
 				Author:      commitInfo.Author,
@@ -125,10 +129,15 @@ func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
 			})
 		}
 
-		popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
-		if ok {
-			popUp.OriginalRetrievedCommitList = commitInfos
-			popUp.CommitList.SetItems(newItems)
+		data := types.InteractiveRebaseFetchCommitInfoListEventDataStructure{
+			PopUpModel:  constant.InteractiveRebaseFixupSquashSelectionPopUp,
+			CommitInfos: commitInfos,
+			ListItems:   listItems,
+		}
+
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.INTERACTIVE_REBASE_FETCH_COMMITS_INFO_EVENT,
+			Data:  data,
 		}
 	}()
 
@@ -137,7 +146,10 @@ func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Init the popup model for the fixup/squash commit message input popup
+//	Initialize the fixup/squash commit message editing popup. Pre-fills the
+//	message and description inputs by constructing a combined commit message from
+//	the sorted selected commits, with the oldest commit's message as the subject.
+//	The message input starts focused; the description textarea starts blurred.
 //
 // ------------------------------------
 func InitInteractiveRebaseFixupSquashCommitPopUp(m *types.GittiModel, originalRetrievedCommitList []git.CommitInfo, sortedSelectedCommits []git.CommitInfo) {
@@ -177,9 +189,9 @@ func InitInteractiveRebaseFixupSquashCommitPopUp(m *types.GittiModel, originalRe
 
 // ------------------------------------
 //
-//	Builds the initial commit message and description for a fixup/squash:
-//	uses the oldest selected commit's message as the subject and appends
-//	bullet-style summaries of the remaining commits to the description body
+//	Build the initial commit message and description for a fixup/squash rebase.
+//	Uses the oldest selected commit's message as the subject line and appends
+//	bullet-style summaries of each subsequent commit to the description body.
 //
 // ------------------------------------
 func constructInteractiveRebaseFixupSquashCommitMessageAndDescription(sortedSelectedCommits []git.CommitInfo) (string, string) {
@@ -209,8 +221,9 @@ func constructInteractiveRebaseFixupSquashCommitMessageAndDescription(sortedSele
 
 // ------------------------------------
 //
-//	Init the output popup model for the fixup/squash rebase operation;
-//	sets up the result viewport and spinner, and zeroes all atomic state flags
+//	Initialize the fixup/squash rebase output popup with a scrollable viewport
+//	and a spinner. All atomic state flags (IsProcessing, IsCancelled, HasError,
+//	ProcessSuccess) are reset to false.
 //
 // ------------------------------------
 func InitInteractiveRebaseFixupSquashOutputPopUpModel(m *types.GittiModel) {

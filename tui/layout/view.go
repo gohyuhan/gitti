@@ -14,7 +14,10 @@ import (
 
 // ------------------------------------
 //
-//	Gitti Main Page View component
+//	Assemble and return the full Gitti main page view string. Shows a terminal
+//	size warning if the window is too small. Otherwise joins all left-column
+//	panels and the right-column detail/log panels, then overlays any active
+//	popup centered on screen.
 //
 // ------------------------------------
 func GittiMainPageView(m *types.GittiModel) string {

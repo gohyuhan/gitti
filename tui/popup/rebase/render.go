@@ -12,6 +12,13 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Render the rebase branch-name input popup. Uses a remote-specific title when
+//	a remote name is set, a local-branch title otherwise. Appends an inline
+//	warning if the current input value is not a valid branch name.
+//
+// ------------------------------------
 func RenderGitRebaseBranchInputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*GitRebaseBranchInputPopUpModel)
 	if ok {
@@ -44,7 +51,9 @@ func RenderGitRebaseBranchInputPopUp(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	for git rebase output
+//	Render the git rebase output popup, showing a scrollable viewport of rebase
+//	command output. Displays a spinner while the rebase is in progress, and
+//	colors the viewport border red on error or green on success.
 //
 // ------------------------------------
 func RenderGitRebaseOutputPopUp(m *types.GittiModel) string {

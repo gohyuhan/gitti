@@ -2,7 +2,6 @@ package branch
 
 import (
 	"slices"
-	"strings"
 
 	"charm.land/bubbles/v2/list"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -11,23 +10,95 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-func UpdateSwitchBranchOutputViewPort(m *types.GittiModel, gitOpsOutput []string) {
+// ------------------------------------
+//
+//	Handle the async branch-switch result event. Clears IsProcessing, sets
+//	ProcessSuccess or HasError accordingly, and loads the command output into
+//	the switch-branch output viewport.
+//
+// ------------------------------------
+func UpdateSwitchBranchResultEvent(m *types.GittiModel, updateData types.GitSwitchBranchResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {
-		popUp.SwitchBranchOutputViewport.SetWidth(min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-		popUp.SwitchBranchOutputViewport.SetYOffset(popUp.SwitchBranchOutputViewport.YOffset())
-		var gitOpsOutputLogString strings.Builder
-		for _, line := range gitOpsOutput {
-			logLine := style.NewStyle.Render(line)
-			gitOpsOutputLogString.WriteString(logLine)
-			gitOpsOutputLogString.WriteRune('\n')
+		popUp.IsProcessing.Store(false)
+		if updateData.Success {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(true)
+		} else {
+			popUp.HasError.Store(true)
+			popUp.ProcessSuccess.Store(false)
 		}
-		popUp.SwitchBranchOutputViewport.SetContent(gitOpsOutputLogString.String())
+		popUp.SwitchBranchOutputViewport.SetContentLines(updateData.Result)
 		popUp.SwitchBranchOutputViewport.PageDown()
 	}
 }
 
-// only trigger to update the branch selection list and selected branch list when there is a select or unselect action
+// ------------------------------------
+//
+//	Handle the async branch-deletion result event. Clears IsProcessing, sets
+//	ProcessSuccess or HasError accordingly, and loads the command output into
+//	the branch-delete output viewport.
+//
+// ------------------------------------
+func UpdateDeleteBranchResultEvent(m *types.GittiModel, updateData types.GitDeleteBranchResultEventDataStructure) {
+	popUp, ok := m.PopUpModel.(*GitDeleteBranchOutputPopUpModel)
+	if ok {
+		popUp.IsProcessing.Store(false)
+		if updateData.Success {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(true)
+		} else {
+			popUp.HasError.Store(true)
+			popUp.ProcessSuccess.Store(false)
+		}
+		popUp.BranchDeleteOutputViewport.SetContentLines(updateData.Result)
+		popUp.BranchDeleteOutputViewport.PageDown()
+	}
+}
+
+// ------------------------------------
+//
+//	Handle the async create-branch-from-remote result event. Clears IsProcessing,
+//	sets ProcessSuccess or HasError accordingly, and loads the command output into
+//	the create-branch-based-on-remote output viewport.
+//
+// ------------------------------------
+func UpdateCreateNewBranchBasedOnRemoteResultEvent(m *types.GittiModel, updateData types.GitCreateNewBranchBasedOnRemoteResultEventDataStructure) {
+	popUp, ok := m.PopUpModel.(*CreateBranchBasedOnRemoteOutputPopUpModel)
+	if ok {
+		popUp.IsProcessing.Store(false)
+		if updateData.Success {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(true)
+		} else {
+			popUp.HasError.Store(true)
+			popUp.ProcessSuccess.Store(false)
+		}
+		popUp.CreateBranchBasedOnRemoteOutputViewport.SetContentLines(updateData.Result)
+		popUp.CreateBranchBasedOnRemoteOutputViewport.PageDown()
+	}
+}
+
+// ------------------------------------
+//
+//	Handle the create-branch-from-remote invalid event by dismissing the popup:
+//	clears the typing flag, hides the popup, resets the popup type and model.
+//
+// ------------------------------------
+func UpdateCreateNewBranchBasedOnRemoteInvalidEvent(m *types.GittiModel, _ types.GitCreateNewBranchBasedOnRemoteInvalidEventDataStructure) {
+	m.IsTyping.Store(false)
+	m.ShowPopUp.Store(false)
+	m.PopUpType = constant.NoPopUp
+	m.PopUpModel = nil
+}
+
+// ------------------------------------
+//
+//	Rebuild both the available-branch and selected-branch lists after a select
+//	or unselect action. Moving a branch to/from the selected list resets both
+//	list.Model instances while preserving the nearest valid cursor positions.
+//
+// ------------------------------------
 func UpdateChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*ChooseBranchOptionForMergePopUpModel)
 	if ok {
@@ -123,5 +194,29 @@ func UpdateChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 		// assign the newly constructed lists back to the popUp model
 		popUp.BranchOptionList = cBOFMBOL
 		popUp.SelectedBranchList = cBOFMSBOL
+	}
+}
+
+// ------------------------------------
+//
+//	Handle the async branch-merge result event. Clears IsProcessing and sets
+//	ProcessSuccess or HasError based on success, then writes all output lines
+//	to the merge output viewport.
+//
+// ------------------------------------
+func UpdateMergeViewport(m *types.GittiModel, updateData types.MergeResultEventDataStructure) {
+	success := updateData.Success
+	outputResult := updateData.Result
+	popUp, ok := m.PopUpModel.(*BranchMergeOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		if success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+		popUp.IsProcessing.Store(false) // update the processing status
+		popUp.BranchMergeOutputViewport.SetContentLines(outputResult)
 	}
 }
