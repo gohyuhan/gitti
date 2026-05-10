@@ -11,20 +11,59 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-func UpdateSwitchBranchOutputViewPort(m *types.GittiModel, gitOpsOutput []string) {
+func UpdateSwitchBranchResultEvent(m *types.GittiModel, updateData types.GitSwitchBranchResultEventDataInterface) {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {
-		popUp.SwitchBranchOutputViewport.SetWidth(min(constant.MaxSwitchBranchOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
-		popUp.SwitchBranchOutputViewport.SetYOffset(popUp.SwitchBranchOutputViewport.YOffset())
-		var gitOpsOutputLogString strings.Builder
-		for _, line := range gitOpsOutput {
-			logLine := style.NewStyle.Render(line)
-			gitOpsOutputLogString.WriteString(logLine)
-			gitOpsOutputLogString.WriteRune('\n')
+		popUp.IsProcessing.Store(false)
+		if updateData.Success {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(true)
+		} else {
+			popUp.HasError.Store(true)
+			popUp.ProcessSuccess.Store(false)
 		}
-		popUp.SwitchBranchOutputViewport.SetContent(gitOpsOutputLogString.String())
+		popUp.SwitchBranchOutputViewport.SetContentLines(updateData.Result)
 		popUp.SwitchBranchOutputViewport.PageDown()
 	}
+}
+
+func UpdateDeleteBranchResultEvent(m *types.GittiModel, updateData types.GitDeleteBranchResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*GitDeleteBranchOutputPopUpModel)
+	if ok {
+		popUp.IsProcessing.Store(false)
+		if updateData.Success {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(true)
+		} else {
+			popUp.HasError.Store(true)
+			popUp.ProcessSuccess.Store(false)
+		}
+		popUp.BranchDeleteOutputViewport.SetContentLines(updateData.Result)
+		popUp.BranchDeleteOutputViewport.PageDown()
+	}
+}
+
+func UpdateCreateNewBranchBasedOnRemoteResultEvent(m *types.GittiModel, updateData types.GitCreateNewBranchBasedOnRemoteResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*CreateBranchBasedOnRemoteOutputPopUpModel)
+	if ok {
+		popUp.IsProcessing.Store(false)
+		if updateData.Success {
+			popUp.HasError.Store(false)
+			popUp.ProcessSuccess.Store(true)
+		} else {
+			popUp.HasError.Store(true)
+			popUp.ProcessSuccess.Store(false)
+		}
+		popUp.CreateBranchBasedOnRemoteOutputViewport.SetContentLines(updateData.Result)
+		popUp.CreateBranchBasedOnRemoteOutputViewport.PageDown()
+	}
+}
+
+func UpdateCreateNewBranchBasedOnRemoteInvalidEvent(m *types.GittiModel, _ types.GitCreateNewBranchBasedOnRemoteInvalidEventDataInterface) {
+	m.IsTyping.Store(false)
+	m.ShowPopUp.Store(false)
+	m.PopUpType = constant.NoPopUp
+	m.PopUpModel = nil
 }
 
 // only trigger to update the branch selection list and selected branch list when there is a select or unselect action
@@ -123,5 +162,28 @@ func UpdateChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 		// assign the newly constructed lists back to the popUp model
 		popUp.BranchOptionList = cBOFMBOL
 		popUp.SelectedBranchList = cBOFMSBOL
+	}
+}
+
+func UpdateMergeViewport(m *types.GittiModel, UpdateData types.MergeResultEventDataInterface) {
+	success := UpdateData.Success
+	outputResult := UpdateData.Result
+	popUp, ok := m.PopUpModel.(*BranchMergeOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		popUp.IsProcessing.Store(false) // update the processing status
+		if success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+
+		var content strings.Builder
+		for index := range outputResult {
+			content.WriteString(outputResult[index])
+			content.WriteRune('\n')
+		}
+		popUp.BranchMergeOutputViewport.SetContent(content.String())
 	}
 }

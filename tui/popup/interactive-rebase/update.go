@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -58,5 +59,31 @@ func UpdateInteractiveRebaseFixupSquashViewport(m *types.GittiModel) {
 
 		popUp.CommitFixupSquashViewport.SetContent(content.String())
 
+	}
+}
+
+func UpdateInteractiveRebaseFetchedCommitInfoList(m *types.GittiModel, UpdateData types.InteractiveRebaseFetchCommitInfoListEventDataInterface) {
+	switch UpdateData.PopUpModel {
+	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
+		if ok {
+			popUp.OriginalRetrievedCommitList = UpdateData.CommitInfos
+			popUp.CommitList.SetItems(UpdateData.ListItems)
+		}
+	}
+}
+
+func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseFixupSquashResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+		popUp.FixupSquashOutputViewport.SetContentLines(updateData.Result)
+		popUp.IsProcessing.Store(false)
 	}
 }

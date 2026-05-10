@@ -114,7 +114,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			if contentLine == "" {
 				contentLine = generateAboutGittiContent()
 			}
-			dataInterface := types.DetailPanelStateAndLayoutUpdateInterface{
+			dataInterface := types.DetailPanelStateAndLayoutUpdateEventDataInterface{
 				ContentLine:              contentLine,
 				ContentLine2:             contentLine2,
 				OgLineDiff1:              ogDiffLine1,

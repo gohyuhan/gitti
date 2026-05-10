@@ -184,7 +184,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	m.CurrentRepoStashInfoList.SetHeight(m.StashComponentPanelHeight)
 }
 
-func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, UpdateData types.DetailPanelStateAndLayoutUpdateInterface) {
+func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, UpdateData types.DetailPanelStateAndLayoutUpdateEventDataInterface) {
 	needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponentPanel
 	m.DetailPanelViewport.SetContent(UpdateData.ContentLine)
 	m.DetailPanelViewportOGStringArray = UpdateData.OgLineDiff1

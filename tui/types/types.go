@@ -144,21 +144,3 @@ type GitOperationRequiredSigningFinishedMsg struct {
 	GitOperationOpsTypeForLogging string // for logging purpose
 	Err                           error
 }
-
-// ---------------------------------
-//
-// tea msg (interface, include custom data structure)
-//
-// ---------------------------------
-type GittiTuiUpdateMsg struct {
-	Event string
-	Data  interface{}
-}
-
-type DetailPanelStateAndLayoutUpdateInterface struct {
-	ContentLine              string
-	ContentLine2             string
-	OgLineDiff1              []string
-	OgLineDiff2              []string
-	SetForDetailComponentTwo bool
-}

@@ -113,9 +113,9 @@ func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
 
 	go func() {
 		commitInfos := m.GitOperations.GitInteractiveRebase.GetCommitInfos()
-		newItems := make([]list.Item, 0, len(commitInfos))
+		listItems := make([]list.Item, 0, len(commitInfos))
 		for _, commitInfo := range commitInfos {
-			newItems = append(newItems, InteractiveRebaseFixupSquashSelectionItem{
+			listItems = append(listItems, InteractiveRebaseFixupSquashSelectionItem{
 				Hash:        commitInfo.Hash,
 				Message:     commitInfo.Message,
 				Author:      commitInfo.Author,
@@ -125,10 +125,15 @@ func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
 			})
 		}
 
-		popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
-		if ok {
-			popUp.OriginalRetrievedCommitList = commitInfos
-			popUp.CommitList.SetItems(newItems)
+		data := types.InteractiveRebaseFetchCommitInfoListEventDataInterface{
+			PopUpModel:  constant.InteractiveRebaseFixupSquashSelectionPopUp,
+			CommitInfos: commitInfos,
+			ListItems:   listItems,
+		}
+
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.INTERACTIVE_REBASE_FETCH_COMMITS_INFO_EVENT,
+			Data:  data,
 		}
 	}()
 
