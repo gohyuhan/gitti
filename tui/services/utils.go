@@ -62,7 +62,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 				return
 			default:
 				// The previous goroutine is still running, wait a bit
-				time.Sleep(50 * time.Millisecond)
+				time.Sleep(10 * time.Millisecond)
 			}
 		}
 		defer m.IsDetailComponentPanelInfoFetchProcessing.Store(false)
@@ -114,7 +114,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			if contentLine == "" {
 				contentLine = generateAboutGittiContent()
 			}
-			dataInterface := types.DetailPanelStateAndLayoutUpdateEventDataInterface{
+			DataStructure := types.DetailPanelStateAndLayoutUpdateEventDataStructure{
 				ContentLine:              contentLine,
 				ContentLine2:             contentLine2,
 				OgLineDiff1:              ogDiffLine1,
@@ -123,7 +123,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
 				Event: constant.DETAIL_COMPONENT_PANEL_LAYOUT_STATE_UPDATED_EVENT,
-				Data:  dataInterface,
+				Data:  DataStructure,
 			}
 			return
 		}

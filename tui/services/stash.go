@@ -44,7 +44,7 @@ func GitStashOperationService(m *types.GittiModel, filePathName string, stashId 
 			resultOutput, exitStatusCode = m.GitOperations.GitStash.GitStashDrop(stashId)
 		}
 
-		data := types.GitStashOperationResultEventDataInterface{
+		data := types.GitStashOperationResultEventDataStructure{
 			Result:  resultOutput,
 			Success: exitStatusCode == 0,
 		}

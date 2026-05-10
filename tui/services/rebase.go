@@ -28,7 +28,7 @@ func GitRebaseService(m *types.GittiModel, remote string, branchName string) {
 			defer cancel()
 
 			exitStatusCode := m.GitOperations.GitRebase.GitRebase(ctx, remote, branchName)
-			data := types.GitRebaseResultEventDataInterface{
+			data := types.GitRebaseResultEventDataStructure{
 				Success: exitStatusCode == 0,
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{

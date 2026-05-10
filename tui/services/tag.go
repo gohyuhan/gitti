@@ -39,7 +39,7 @@ func DeleteTagService(m *types.GittiModel, remoteName string, tagName string, de
 			defer cancel()
 
 			output, success := m.GitOperations.GitTag.GitDeleteTag(ctx, remoteName, tagName, deleteType)
-			data := types.GitDeleteTagResultEventDataInterface{
+			data := types.GitDeleteTagResultEventDataStructure{
 				Result:  output,
 				Success: success,
 			}
@@ -102,7 +102,7 @@ func GitPushTagService(m *types.GittiModel, originName string, tagName string, p
 			// Perform the actual git tag push operation via the git service
 			exitStatusCode = m.GitOperations.GitTag.GitPushTag(ctx, originName, tagName, pushType)
 
-			data := types.GitPushTagResultEventDataInterface{
+			data := types.GitPushTagResultEventDataStructure{
 				Success: exitStatusCode == 0,
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
@@ -167,7 +167,7 @@ func GitFetchTagService(m *types.GittiModel, originName string, fetchType string
 			// Perform the actual git tag push operation via the git service
 			exitStatusCode = m.GitOperations.GitTag.GitFetchTag(ctx, originName, fetchType)
 
-			data := types.GitFetchTagResultEventDataInterface{
+			data := types.GitFetchTagResultEventDataStructure{
 				Success: exitStatusCode == 0,
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{

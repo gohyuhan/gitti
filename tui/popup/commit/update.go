@@ -64,7 +64,7 @@ func UpdatePopUpAmendCommitOutputViewPort(m *types.GittiModel) {
 //	popup is not the active commit popup or the operation was cancelled.
 //
 // ------------------------------------
-func UpdateGitCommitResultEvent(m *types.GittiModel, data types.GitCommitResultEventDataInterface) {
+func UpdateGitCommitResultEvent(m *types.GittiModel, data types.GitCommitResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*GitCommitPopUpModel)
 	if !ok || popUp.IsCancelled.Load() {
 		return
@@ -90,7 +90,7 @@ func UpdateGitCommitResultEvent(m *types.GittiModel, data types.GitCommitResultE
 //	the popup is not the active amend-commit popup or the operation was cancelled.
 //
 // ------------------------------------
-func UpdateGitAmendCommitResultEvent(m *types.GittiModel, data types.GitAmendCommitResultEventDataInterface) {
+func UpdateGitAmendCommitResultEvent(m *types.GittiModel, data types.GitAmendCommitResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*GitAmendCommitPopUpModel)
 	if !ok || popUp.IsCancelled.Load() {
 		return

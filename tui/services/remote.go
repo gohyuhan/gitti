@@ -41,7 +41,7 @@ func GitAddRemoteService(m *types.GittiModel) {
 				gitAddRemoteResult = append(gitAddRemoteResult, fmt.Sprintf(i18n.LANGUAGEMAPPING.AddRemotePopUpRemoteAddSuccess, remoteName, remoteUrl))
 			}
 
-			data := types.GitAddRemoteResultEventDataInterface{
+			data := types.GitAddRemoteResultEventDataStructure{
 				Result:  gitAddRemoteResult,
 				Success: exitStatusCode == 0,
 			}

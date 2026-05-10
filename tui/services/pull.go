@@ -28,7 +28,7 @@ func GitPullService(m *types.GittiModel, pullType string) {
 			defer cancel()
 
 			exitStatusCode := m.GitOperations.GitPull.GitPull(ctx, pullType)
-			data := types.GitPullResultEventDataInterface{
+			data := types.GitPullResultEventDataStructure{
 				Success: exitStatusCode == 0,
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{

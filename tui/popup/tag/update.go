@@ -38,7 +38,7 @@ func UpdateDeleteTagOutputViewPort(m *types.GittiModel, deleteTagOutput []string
 //	on success or HasError on failure.
 //
 // ------------------------------------
-func UpdateDeleteTagResultEvent(m *types.GittiModel, updateData types.GitDeleteTagResultEventDataInterface) {
+func UpdateDeleteTagResultEvent(m *types.GittiModel, updateData types.GitDeleteTagResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*DeleteTagOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
 		popUp.IsProcessing.Store(false)
@@ -84,7 +84,7 @@ func UpdatePushTagOutputViewPort(m *types.GittiModel) {
 //	on success or HasError on failure.
 //
 // ------------------------------------
-func UpdatePushTagResultEvent(m *types.GittiModel, updateData types.GitPushTagResultEventDataInterface) {
+func UpdatePushTagResultEvent(m *types.GittiModel, updateData types.GitPushTagResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*PushTagOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
 		popUp.IsProcessing.Store(false)
@@ -129,7 +129,7 @@ func UpdateFetchTagOutputViewPort(m *types.GittiModel) {
 //	on success or HasError on failure.
 //
 // ------------------------------------
-func UpdateFetchTagResultEvent(m *types.GittiModel, updateData types.GitFetchTagResultEventDataInterface) {
+func UpdateFetchTagResultEvent(m *types.GittiModel, updateData types.GitFetchTagResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*FetchTagOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
 		popUp.IsProcessing.Store(false)

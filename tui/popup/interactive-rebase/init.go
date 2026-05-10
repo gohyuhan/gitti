@@ -129,7 +129,7 @@ func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
 			})
 		}
 
-		data := types.InteractiveRebaseFetchCommitInfoListEventDataInterface{
+		data := types.InteractiveRebaseFetchCommitInfoListEventDataStructure{
 			PopUpModel:  constant.InteractiveRebaseFixupSquashSelectionPopUp,
 			CommitInfos: commitInfos,
 			ListItems:   listItems,

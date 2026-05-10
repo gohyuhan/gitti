@@ -30,7 +30,7 @@ func GitRemotePushService(m *types.GittiModel, remoteName string, pushType strin
 			defer cancel()
 
 			exitStatusCode := m.GitOperations.GitCommit.GitPush(ctx, remoteName, pushType, checkoutBranch)
-			data := types.GitPushResultEventDataInterface{
+			data := types.GitPushResultEventDataStructure{
 				Success: exitStatusCode == 0,
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{

@@ -9,7 +9,7 @@ import "github.com/gohyuhan/gitti/tui/types"
 //	into the viewport.
 //
 // ------------------------------------
-func UpdateGitStashOperationResultEvent(m *types.GittiModel, updateData types.GitStashOperationResultEventDataInterface) {
+func UpdateGitStashOperationResultEvent(m *types.GittiModel, updateData types.GitStashOperationResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*GitStashOperationOutputPopUpModel)
 	if ok {
 		popUp.IsProcessing.Store(false)

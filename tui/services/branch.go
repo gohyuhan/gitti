@@ -40,7 +40,7 @@ func GitSwitchBranchService(m *types.GittiModel, branchName string, switchType s
 			gitOpsOutput, success = m.GitOperations.GitBranch.GitSwitchBranchWithChanges(branchName)
 		}
 
-		data := types.GitSwitchBranchResultEventDataInterface{
+		data := types.GitSwitchBranchResultEventDataStructure{
 			Result:  gitOpsOutput,
 			Success: success,
 		}
@@ -93,7 +93,7 @@ func GitDeleteBranchService(m *types.GittiModel, branchName string) {
 
 	go func() {
 		result, success := m.GitOperations.GitBranch.DeleteLocalBranch(branchName)
-		data := types.GitDeleteBranchResultEventDataInterface{
+		data := types.GitDeleteBranchResultEventDataStructure{
 			Result:  result,
 			Success: success,
 		}
@@ -124,7 +124,7 @@ func CreateNewBranchBasedOnRemoteService(m *types.GittiModel, remoteName string,
 			parts := strings.SplitN(branchName, "/", 2)
 			if len(parts) < 2 {
 				m.GittiLogger.RegisterNewLog(logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, "", logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RETRIEVE_LATEST_REMOTE_BRANCH_INFO, "Invalid Remote Branch Naming"), false)
-				data := types.GitCreateNewBranchBasedOnRemoteInvalidEventDataInterface{
+				data := types.GitCreateNewBranchBasedOnRemoteInvalidEventDataStructure{
 					RemoteName: remoteName,
 					BranchName: branchName,
 				}
@@ -138,7 +138,7 @@ func CreateNewBranchBasedOnRemoteService(m *types.GittiModel, remoteName string,
 			branchName = parts[1]
 		}
 		result, success := m.GitOperations.GitBranch.GitCreateNewBranchBasedOnRemote(remoteName, branchName)
-		data := types.GitCreateNewBranchBasedOnRemoteResultEventDataInterface{
+		data := types.GitCreateNewBranchBasedOnRemoteResultEventDataStructure{
 			Result:  result,
 			Success: success,
 		}
@@ -184,7 +184,7 @@ func GitMergeService(m *types.GittiModel, branchesName []string) {
 		defer cancel()
 
 		outputResult, success := m.GitOperations.GitBranch.GitMerge(ctx, branchesName)
-		data := types.MergeResultEventDataInterface{
+		data := types.MergeResultEventDataStructure{
 			Result:  outputResult,
 			Success: success,
 		}

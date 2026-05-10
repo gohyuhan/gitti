@@ -39,7 +39,7 @@ func UpdatePopUpGitRebaseOutputViewport(m *types.GittiModel) {
 //	the popup is not the active rebase output popup or the operation was cancelled.
 //
 // ------------------------------------
-func UpdateGitRebaseResultEvent(m *types.GittiModel, data types.GitRebaseResultEventDataInterface) {
+func UpdateGitRebaseResultEvent(m *types.GittiModel, data types.GitRebaseResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*GitRebaseOutputPopUpModel)
 	if !ok || popUp.IsCancelled.Load() {
 		return

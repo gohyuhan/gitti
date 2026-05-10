@@ -17,7 +17,7 @@ import (
 //	the switch-branch output viewport.
 //
 // ------------------------------------
-func UpdateSwitchBranchResultEvent(m *types.GittiModel, updateData types.GitSwitchBranchResultEventDataInterface) {
+func UpdateSwitchBranchResultEvent(m *types.GittiModel, updateData types.GitSwitchBranchResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*SwitchBranchOutputPopUpModel)
 	if ok {
 		popUp.IsProcessing.Store(false)
@@ -40,7 +40,7 @@ func UpdateSwitchBranchResultEvent(m *types.GittiModel, updateData types.GitSwit
 //	the branch-delete output viewport.
 //
 // ------------------------------------
-func UpdateDeleteBranchResultEvent(m *types.GittiModel, updateData types.GitDeleteBranchResultEventDataInterface) {
+func UpdateDeleteBranchResultEvent(m *types.GittiModel, updateData types.GitDeleteBranchResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*GitDeleteBranchOutputPopUpModel)
 	if ok {
 		popUp.IsProcessing.Store(false)
@@ -63,7 +63,7 @@ func UpdateDeleteBranchResultEvent(m *types.GittiModel, updateData types.GitDele
 //	the create-branch-based-on-remote output viewport.
 //
 // ------------------------------------
-func UpdateCreateNewBranchBasedOnRemoteResultEvent(m *types.GittiModel, updateData types.GitCreateNewBranchBasedOnRemoteResultEventDataInterface) {
+func UpdateCreateNewBranchBasedOnRemoteResultEvent(m *types.GittiModel, updateData types.GitCreateNewBranchBasedOnRemoteResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*CreateBranchBasedOnRemoteOutputPopUpModel)
 	if ok {
 		popUp.IsProcessing.Store(false)
@@ -85,7 +85,7 @@ func UpdateCreateNewBranchBasedOnRemoteResultEvent(m *types.GittiModel, updateDa
 //	clears the typing flag, hides the popup, resets the popup type and model.
 //
 // ------------------------------------
-func UpdateCreateNewBranchBasedOnRemoteInvalidEvent(m *types.GittiModel, _ types.GitCreateNewBranchBasedOnRemoteInvalidEventDataInterface) {
+func UpdateCreateNewBranchBasedOnRemoteInvalidEvent(m *types.GittiModel, _ types.GitCreateNewBranchBasedOnRemoteInvalidEventDataStructure) {
 	m.IsTyping.Store(false)
 	m.ShowPopUp.Store(false)
 	m.PopUpType = constant.NoPopUp
@@ -204,7 +204,7 @@ func UpdateChooseBranchOptionForMergePopUpModel(m *types.GittiModel) {
 //	to the merge output viewport.
 //
 // ------------------------------------
-func UpdateMergeViewport(m *types.GittiModel, updateData types.MergeResultEventDataInterface) {
+func UpdateMergeViewport(m *types.GittiModel, updateData types.MergeResultEventDataStructure) {
 	success := updateData.Success
 	outputResult := updateData.Result
 	popUp, ok := m.PopUpModel.(*BranchMergeOutputPopUpModel)

@@ -72,7 +72,7 @@ func UpdateInteractiveRebaseFixupSquashViewport(m *types.GittiModel) {
 //	items. Currently handles the fixup/squash selection popup type.
 //
 // ------------------------------------
-func UpdateInteractiveRebaseFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataInterface) {
+func UpdateInteractiveRebaseFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
 	switch updateData.PopUpModel {
 	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 		popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
@@ -90,7 +90,7 @@ func UpdateInteractiveRebaseFetchedCommitInfoList(m *types.GittiModel, updateDat
 //	into the viewport. No-ops if the popup was cancelled.
 //
 // ------------------------------------
-func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseFixupSquashResultEventDataInterface) {
+func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseFixupSquashResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
 		if updateData.Success && !popUp.IsProcessing.Load() {

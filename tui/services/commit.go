@@ -35,7 +35,7 @@ func GitCommitService(m *types.GittiModel, isAmendCommit bool) {
 			defer cancel()
 
 			exitStatusCode := m.GitOperations.GitCommit.GitCommit(ctx, message, description, isAmendCommit)
-			data := types.GitCommitResultEventDataInterface{
+			data := types.GitCommitResultEventDataStructure{
 				Success: exitStatusCode == 0,
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
@@ -98,7 +98,7 @@ func GitAmendCommitService(m *types.GittiModel, isAmendCommit bool) {
 			defer cancel()
 
 			exitStatusCode := m.GitOperations.GitCommit.GitCommit(ctx, message, description, isAmendCommit)
-			data := types.GitAmendCommitResultEventDataInterface{
+			data := types.GitAmendCommitResultEventDataStructure{
 				Success: exitStatusCode == 0,
 			}
 			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{

@@ -12,7 +12,7 @@ import (
 //	is not the active add-remote popup or the operation was cancelled.
 //
 // ------------------------------------
-func UpdateAddRemoteResultEvent(m *types.GittiModel, updateData types.GitAddRemoteResultEventDataInterface) {
+func UpdateAddRemoteResultEvent(m *types.GittiModel, updateData types.GitAddRemoteResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*AddRemotePromptPopUpModel)
 	if !ok || popUp.IsCancelled.Load() {
 		return

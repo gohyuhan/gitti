@@ -15,7 +15,7 @@ type GittiTuiUpdateMsg struct {
 	Data  interface{}
 }
 
-type DetailPanelStateAndLayoutUpdateEventDataInterface struct {
+type DetailPanelStateAndLayoutUpdateEventDataStructure struct {
 	ContentLine              string
 	ContentLine2             string
 	OgLineDiff1              []string
@@ -23,80 +23,80 @@ type DetailPanelStateAndLayoutUpdateEventDataInterface struct {
 	SetForDetailComponentTwo bool
 }
 
-type MergeResultEventDataInterface struct {
+type MergeResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type GitSwitchBranchResultEventDataInterface struct {
+type GitSwitchBranchResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type GitDeleteBranchResultEventDataInterface struct {
+type GitDeleteBranchResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type GitCreateNewBranchBasedOnRemoteResultEventDataInterface struct {
+type GitCreateNewBranchBasedOnRemoteResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type GitCreateNewBranchBasedOnRemoteInvalidEventDataInterface struct {
+type GitCreateNewBranchBasedOnRemoteInvalidEventDataStructure struct {
 	RemoteName string
 	BranchName string
 }
 
-type GitDeleteTagResultEventDataInterface struct {
+type GitDeleteTagResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type GitPushTagResultEventDataInterface struct {
+type GitPushTagResultEventDataStructure struct {
 	Success bool
 }
 
-type GitFetchTagResultEventDataInterface struct {
+type GitFetchTagResultEventDataStructure struct {
 	Success bool
 }
 
-type GitStashOperationResultEventDataInterface struct {
+type GitStashOperationResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type GitAddRemoteResultEventDataInterface struct {
+type GitAddRemoteResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type GitRebaseResultEventDataInterface struct {
+type GitRebaseResultEventDataStructure struct {
 	Success bool
 }
 
-type GitPushResultEventDataInterface struct {
+type GitPushResultEventDataStructure struct {
 	Success bool
 }
 
-type GitCommitResultEventDataInterface struct {
+type GitCommitResultEventDataStructure struct {
 	Success bool
 }
 
-type GitAmendCommitResultEventDataInterface struct {
+type GitAmendCommitResultEventDataStructure struct {
 	Success bool
 }
 
-type GitPullResultEventDataInterface struct {
+type GitPullResultEventDataStructure struct {
 	Success bool
 }
 
-type InteractiveRebaseFixupSquashResultEventDataInterface struct {
+type InteractiveRebaseFixupSquashResultEventDataStructure struct {
 	Result  []string
 	Success bool
 }
 
-type InteractiveRebaseFetchCommitInfoListEventDataInterface struct {
+type InteractiveRebaseFetchCommitInfoListEventDataStructure struct {
 	PopUpModel  string
 	CommitInfos []git.CommitInfo
 	ListItems   []list.Item

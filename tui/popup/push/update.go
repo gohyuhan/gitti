@@ -39,7 +39,7 @@ func UpdatePopUpGitRemotePushOutputViewport(m *types.GittiModel) {
 //	the popup is not the active push output popup or the operation was cancelled.
 //
 // ------------------------------------
-func UpdateGitPushResultEvent(m *types.GittiModel, data types.GitPushResultEventDataInterface) {
+func UpdateGitPushResultEvent(m *types.GittiModel, data types.GitPushResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*GitRemotePushPopUpModel)
 	if !ok || popUp.IsCancelled.Load() {
 		return

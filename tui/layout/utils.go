@@ -193,7 +193,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 //	re-enters line-editing state if it was active before the update.
 //
 // ------------------------------------
-func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, updateData types.DetailPanelStateAndLayoutUpdateEventDataInterface) {
+func UpdateDetailComponentViewportContentAndState(m *types.GittiModel, updateData types.DetailPanelStateAndLayoutUpdateEventDataStructure) {
 	needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponentPanel
 	m.DetailPanelViewport.SetContent(updateData.ContentLine)
 	m.DetailPanelViewportOGStringArray = updateData.OgLineDiff1

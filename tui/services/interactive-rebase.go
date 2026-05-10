@@ -30,7 +30,7 @@ func InteractiveRebaseFixupSquashService(m *types.GittiModel, originalRetrievedG
 			defer cancel()
 
 			fixupSquashResult, fixupSquashErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseFixupSquash(ctx, originalRetrievedGitCommitInfo, sortedSelectedCommits, fixupSquashCommitMessage, fixupSquashCommitDescription)
-			data := types.InteractiveRebaseFixupSquashResultEventDataInterface{
+			data := types.InteractiveRebaseFixupSquashResultEventDataStructure{
 				Result:  fixupSquashResult,
 				Success: fixupSquashErr == nil,
 			}
