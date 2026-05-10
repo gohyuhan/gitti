@@ -7,7 +7,6 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
-	"github.com/gohyuhan/gitti/tui/component/files"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
 	reflogComponent "github.com/gohyuhan/gitti/tui/component/reflog"
 	remoteComponent "github.com/gohyuhan/gitti/tui/component/remote"
@@ -409,7 +408,7 @@ func EnterOrReinitLineEditingState(m *types.GittiModel) {
 		// we are already in line editing mode, so we need to update the state
 		// this usually happens when we resize the window or similar event
 		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-		currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
+		currentSelectedFile := currentSelectedFileItem.(filesComponent.GitModifiedFilesItem)
 
 		var detailPanelViewportStageType string
 		var detailPanelTwoViewportStageType string
@@ -458,20 +457,22 @@ func EnterOrReinitLineEditingState(m *types.GittiModel) {
 
 		// recalculate the actual position
 		detailPanelViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
-		detailPanelTwoViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
-		if detailPanelViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
+		if detailPanelViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount {
 			detailPanelViewportActualCurrentIndex -= 1
-			detailPanelTwoViewportActualCurrentIndex -= 1
-		} else if detailPanelViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
+		} else if detailPanelViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount {
 			detailPanelViewportActualCurrentIndex += 1
+		}
+
+		detailPanelTwoViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
+		if detailPanelTwoViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
+			detailPanelTwoViewportActualCurrentIndex -= 1
+		} else if detailPanelTwoViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportOverflowIndexCount {
 			detailPanelTwoViewportActualCurrentIndex += 1
 		}
 
 		// make sure the actual current index is not out of bound
-		detailPanelViewportActualCurrentIndex = min(detailPanelViewportActualCurrentIndex, detailPanelViewportTotalIndex-1)
-		detailPanelTwoViewportActualCurrentIndex = min(detailPanelTwoViewportActualCurrentIndex, detailPanelTwoViewportTotalIndex-1)
+		detailPanelViewportActualCurrentIndex = max(0, min(detailPanelViewportActualCurrentIndex, detailPanelViewportTotalIndex-1))
+		detailPanelTwoViewportActualCurrentIndex = max(0, min(detailPanelTwoViewportActualCurrentIndex, detailPanelTwoViewportTotalIndex-1))
 
 		// recalculate the visible index position
 		// The relationship is: Actual Index = Viewport Offset + Visible Index
