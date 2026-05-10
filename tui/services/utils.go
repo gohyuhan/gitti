@@ -53,6 +53,9 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 
 		// Wait for the previous goroutine to finish (its defer will set processing to false),
 		// then atomically set it to true before starting a new one.
+
+		// this is the only place for something in a bubbletea model gets modified directly in a goroutine.
+		// As this is a flagging, we will allowed this, all other update must go thru channel event
 		for !m.IsDetailComponentPanelInfoFetchProcessing.CompareAndSwap(false, true) {
 			select {
 			case <-ctx.Done():
@@ -66,18 +69,15 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 
 		var contentLine string
 		var contentLine2 string // fro detail panel 2nd (only used for files changes to show staged and unstaged diff in seperated panel)
+		var ogDiffLine1 []string
+		var ogDiffLine2 []string
 		setForDetailComponentTwo := false
 		var theCurrentSelectedComponent string
 		// reinit and render detail component panel viewport
 		if reinit {
-			m.DetailPanelViewport.SetContent(style.NewStyle.Render(i18n.LANGUAGEMAPPING.Loading))
-			m.ShowDetailPanelTwo.Store(false)
-			m.DetailPanelViewportOffset = 0
-			m.DetailPanelViewport.SetXOffset(0)
-			m.DetailPanelViewport.SetYOffset(0)
-			m.DetailPanelTwoViewportOffset = 0
-			m.DetailPanelTwoViewport.SetXOffset(0)
-			m.DetailPanelTwoViewport.SetYOffset(0)
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.DETAIL_COMPONENT_PANEL_LAYOUT_STATE_REINIT_EVENT,
+			}
 		}
 		if m.CurrentSelectedComponent == constant.DetailComponentPanel || m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
 			// if the current selected one is the detail component itself, the current selected one will be its parent (the component that led into the detail component)
@@ -96,7 +96,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 				contentLine = generateRemoteDetailPanelContent(m)
 			}
 		case constant.ModifiedFilesComponentPanel:
-			contentLine, contentLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
+			contentLine, contentLine2, ogDiffLine1, ogDiffLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
 		case constant.CommitLogOrRefLogComponentPanel:
 			contentLine = generateCommitLogOrRefLogDetailPanelContent(ctx, m)
 		case constant.StashComponentPanel:
@@ -111,32 +111,20 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 		case <-ctx.Done():
 			return
 		default:
-			needToScrollToBottom := m.CurrentSelectedComponent == constant.LogComponentPanel
 			if contentLine == "" {
-				// if the content will be empty, render about gitti for detail panel
 				contentLine = generateAboutGittiContent()
-				needToScrollToBottom = false
 			}
-			m.DetailPanelViewport.SetContent(contentLine)
-
-			if needToScrollToBottom {
-				m.DetailPanelViewport.GotoBottom()
+			dataInterface := types.DetailPanelStateAndLayoutUpdateInterface{
+				ContentLine:              contentLine,
+				ContentLine2:             contentLine2,
+				OgLineDiff1:              ogDiffLine1,
+				OgLineDiff2:              ogDiffLine2,
+				SetForDetailComponentTwo: setForDetailComponentTwo,
 			}
-
-			if setForDetailComponentTwo {
-				m.DetailPanelTwoViewport.SetContent(contentLine2)
-				m.ShowDetailPanelTwo.Store(true)
-			} else {
-				// if the detail component two is selected, switch to detail component as it is not set for detail component two
-				// as it will hide the detail component two viewport
-				if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
-					m.CurrentSelectedComponent = constant.DetailComponentPanel
-				}
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.DETAIL_COMPONENT_PANEL_LAYOUT_STATE_UPDATED_EVENT,
+				Data:  dataInterface,
 			}
-			if m.IsLineEditingState.Load() {
-				EnterOrReinitLineEditingStateService(m)
-			}
-			m.TuiUpdateChannel <- constant.DETAIL_COMPONENT_PANEL_UPDATED
 			return
 		}
 	}(ctx)
@@ -250,22 +238,22 @@ func generateRemoteDetailPanelContent(m *types.GittiModel) string {
 //	for modified file detail panel view
 //
 // ------------------------------------
-func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiModel) (string, string, bool) {
+func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.GittiModel) (string, string, []string, []string, bool) {
 	shouldRenderDetailComponentPanelTwo := false
+	var fileDiffLines1 []string
+	var fileDiffLines2 []string
 	currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 	var fileStatus git.FileStatus
 	if currentSelectedModifiedFile != nil {
 		fileStatus = git.FileStatus(currentSelectedModifiedFile.(files.GitModifiedFilesItem))
 	} else {
-		return "", "", shouldRenderDetailComponentPanelTwo
+		return "", "", fileDiffLines1, fileDiffLines2, shouldRenderDetailComponentPanelTwo
 	}
 
 	var vpLine1 strings.Builder
 	vpLine1.WriteString(fmt.Sprintf("[ %s ]\n\n", fileStatus.FilePathname))
 
 	var vpLine2 strings.Builder
-	var fileDiffLines1 []string
-	var fileDiffLines2 []string
 	getDiffTypeForVpLine1 := git.GETCOMBINEDDIFF
 
 	// indicating that the file is not in conflict state and have both staged and unstaged changes and they are not in "?" for both index and worktree
@@ -273,7 +261,6 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 		shouldRenderDetailComponentPanelTwo = true
 		vpLine2.WriteString(fmt.Sprintf("%s\n[ %s ]\n\n", i18n.LANGUAGEMAPPING.UnstagedTitle, fileStatus.FilePathname))
 		fileDiffLines2 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, git.GETUNSTAGEDDIFF)
-		m.DetailPanelTwoViewportOGStringArray = fileDiffLines2
 
 		if fileDiffLines2 == nil {
 			vpLine2.WriteString(i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview)
@@ -295,7 +282,6 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 	}
 
 	fileDiffLines1 = m.GitOperations.GitFiles.GetFilesDiffInfo(ctx, fileStatus, getDiffTypeForVpLine1)
-	m.DetailPanelViewportOGStringArray = fileDiffLines1
 	if fileDiffLines1 == nil {
 		vpLine1.WriteString(i18n.LANGUAGEMAPPING.FileTypeUnSupportedPreview)
 	} else {
@@ -306,7 +292,7 @@ func generateBothModifiedFileDetailPanelContent(ctx context.Context, m *types.Gi
 		}
 	}
 
-	return vpLine1.String(), vpLine2.String(), shouldRenderDetailComponentPanelTwo
+	return vpLine1.String(), vpLine2.String(), fileDiffLines1, fileDiffLines2, shouldRenderDetailComponentPanelTwo
 }
 
 // ------------------------------------
@@ -410,249 +396,6 @@ func generateAboutGittiContent() string {
 	vpLine.WriteString(strings.Join(aboutLines, "\n"))
 
 	return vpLine.String()
-}
-
-// ------------------------------------
-//
-//			For Enter Line Editing State Service
-//		  * this was to enter or reinit the line editing state
-//		  * it will calculate the index position for both visible and actual content
-//	   * it will also determine if the current file selected has staged/unstaged changes or both
-//	   * lastly it will set the cursor viewport content
-//
-// ------------------------------------
-func EnterOrReinitLineEditingStateService(m *types.GittiModel) {
-	if !((m.CurrentSelectedComponent == constant.DetailComponentPanel || m.CurrentSelectedComponent == constant.DetailComponentPanelTwo) && m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil) {
-		// we are eligible to be in line editing mode, so we need to reset the state
-		m.IsLineEditingState.Store(false)
-		// reinit the index position
-		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{}
-		return
-	}
-
-	detailPanelViewportVisibleIndex := m.DetailPanelViewport.VisibleLineCount()
-	detailPanelTwoViewportVisibleIndex := m.DetailPanelTwoViewport.VisibleLineCount()
-	detailPanelViewportTotalIndex := m.DetailPanelViewport.TotalLineCount()
-	detailPanelTwoViewportTotalIndex := m.DetailPanelTwoViewport.TotalLineCount()
-
-	if !m.IsLineEditingState.Load() {
-		// we first confirm that we are not in line editing mode yet, but we are supposed to be
-		// so we need to init the line editing state
-		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-		currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
-
-		var detailPanelViewportStageType string
-		var detailPanelTwoViewportStageType string
-		detailPanelViewportOverflowIndexCount := 0
-		detailPanelTwoViewportOverflowIndexCount := 0
-
-		if currentSelectedFile.HasConflict {
-			// if the file is in conflict state, we cannot do line editing
-			m.IsLineEditingState.Store(false)
-			detailPanelViewportStageType = ""
-			detailPanelTwoViewportStageType = ""
-		} else {
-			m.IsLineEditingState.Store(true)
-			// determine the pop up state
-			if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
-				// newly added untracked file
-				detailPanelViewportStageType = constant.UNSTAGE
-				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
-				detailPanelViewportOverflowIndexCount = 2
-				detailPanelTwoViewportOverflowIndexCount = 2
-			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
-				// tracked file with both staged and unstaged modification
-				detailPanelViewportStageType = constant.STAGE
-				detailPanelTwoViewportStageType = constant.UNSTAGE
-				detailPanelViewportOverflowIndexCount = 3
-				detailPanelTwoViewportOverflowIndexCount = 3
-			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree == " " {
-				// tracked file with only staged modification
-				detailPanelViewportStageType = constant.STAGE
-				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
-				detailPanelViewportOverflowIndexCount = 2
-				detailPanelTwoViewportOverflowIndexCount = 2
-			} else {
-				// tracked file with only unstaged modification
-				detailPanelViewportStageType = constant.UNSTAGE
-				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
-				detailPanelViewportOverflowIndexCount = 2
-				detailPanelTwoViewportOverflowIndexCount = 2
-			}
-		}
-
-		// reinit the index position
-		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{
-			DetailPanelViewportIndexPosition:         0,
-			DetailPanelTwoViewportIndexPosition:      0,
-			DetailPanelViewportStageType:             detailPanelViewportStageType,
-			DetailPanelTwoViewportStageType:          detailPanelTwoViewportStageType,
-			DetailPanelViewportActualCurrentIndex:    0,
-			DetailPanelTwoViewportActualCurrentIndex: 0,
-			DetailPanelViewportOverflowIndexCount:    detailPanelViewportOverflowIndexCount,
-			DetailPanelTwoViewportOverflowIndexCount: detailPanelTwoViewportOverflowIndexCount,
-		}
-
-		// set the cursor viewport
-		SetLineEditingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
-	} else if m.IsLineEditingState.Load() {
-		// we are already in line editing mode, so we need to update the state
-		// this usually happens when we resize the window or similar event
-		currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
-		currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
-
-		var detailPanelViewportStageType string
-		var detailPanelTwoViewportStageType string
-
-		var detailPanelViewportIndexPosition int
-		var detailPanelTwoViewportIndexPosition int
-		var detailPanelViewportActualCurrentIndex int
-		var detailPanelTwoViewportActualCurrentIndex int
-		var detailPanelViewportOverflowIndexCount int
-		var detailPanelTwoViewportOverflowIndexCount int
-
-		if currentSelectedFile.HasConflict {
-			// if the file is in conflict state, we cannot do line editing
-			m.IsLineEditingState.Store(false)
-			detailPanelViewportStageType = ""
-			detailPanelTwoViewportStageType = ""
-		} else {
-			m.IsLineEditingState.Store(true)
-			// determine the pop up state
-			if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
-				// newly added untracked file
-				detailPanelViewportStageType = constant.UNSTAGE
-				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
-				detailPanelViewportOverflowIndexCount = 2
-				detailPanelTwoViewportOverflowIndexCount = 2
-			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
-				// tracked file with both staged and unstaged modification
-				detailPanelViewportStageType = constant.STAGE
-				detailPanelTwoViewportStageType = constant.UNSTAGE
-				detailPanelViewportOverflowIndexCount = 3
-				detailPanelTwoViewportOverflowIndexCount = 3
-			} else if currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree == " " {
-				// tracked file with only staged modification
-				detailPanelViewportStageType = constant.STAGE
-				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
-				detailPanelViewportOverflowIndexCount = 2
-				detailPanelTwoViewportOverflowIndexCount = 2
-			} else {
-				// tracked file with only unstaged modification
-				detailPanelViewportStageType = constant.UNSTAGE
-				detailPanelTwoViewportStageType = constant.NOSTAGESTATUS
-				detailPanelViewportOverflowIndexCount = 2
-				detailPanelTwoViewportOverflowIndexCount = 2
-			}
-		}
-
-		// recalculate the actual position
-		detailPanelViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
-		detailPanelTwoViewportActualCurrentIndex = m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
-		if detailPanelViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount < m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
-			detailPanelViewportActualCurrentIndex -= 1
-			detailPanelTwoViewportActualCurrentIndex -= 1
-		} else if detailPanelViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelViewportOverflowIndexCount &&
-			detailPanelTwoViewportOverflowIndexCount > m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
-			detailPanelViewportActualCurrentIndex += 1
-			detailPanelTwoViewportActualCurrentIndex += 1
-		}
-
-		// make sure the actual current index is not out of bound
-		detailPanelViewportActualCurrentIndex = min(detailPanelViewportActualCurrentIndex, detailPanelViewportTotalIndex-1)
-		detailPanelTwoViewportActualCurrentIndex = min(detailPanelTwoViewportActualCurrentIndex, detailPanelTwoViewportTotalIndex-1)
-
-		// recalculate the visible index position
-		// The relationship is: Actual Index = Viewport Offset + Visible Index
-		// So: Visible Index = Actual Index - Viewport Offset
-
-		// For Panel 1
-		currentOffset := m.DetailPanelViewport.YOffset()
-		calculatedVisibleIndex := detailPanelViewportActualCurrentIndex - currentOffset
-
-		if calculatedVisibleIndex < 0 {
-			// Cursor is above the current view, scroll up to make it the first line
-			m.DetailPanelViewport.SetYOffset(detailPanelViewportActualCurrentIndex)
-			detailPanelViewportIndexPosition = 0
-		} else if calculatedVisibleIndex >= detailPanelViewportVisibleIndex {
-			// Cursor is below the current view, scroll down to make it the last visible line
-			newOffset := detailPanelViewportActualCurrentIndex - (detailPanelViewportVisibleIndex - 1)
-			m.DetailPanelViewport.SetYOffset(newOffset)
-			detailPanelViewportIndexPosition = detailPanelViewportVisibleIndex - 1
-		} else {
-			// Cursor is within view
-			detailPanelViewportIndexPosition = calculatedVisibleIndex
-		}
-
-		// For Panel 2
-		currentOffsetTwo := m.DetailPanelTwoViewport.YOffset()
-		calculatedVisibleIndexTwo := detailPanelTwoViewportActualCurrentIndex - currentOffsetTwo
-
-		if calculatedVisibleIndexTwo < 0 {
-			// Cursor is above, scroll up
-			m.DetailPanelTwoViewport.SetYOffset(detailPanelTwoViewportActualCurrentIndex)
-			detailPanelTwoViewportIndexPosition = 0
-		} else if calculatedVisibleIndexTwo >= detailPanelTwoViewportVisibleIndex {
-			// Cursor is below, scroll down
-			newOffsetTwo := detailPanelTwoViewportActualCurrentIndex - (detailPanelTwoViewportVisibleIndex - 1)
-			m.DetailPanelTwoViewport.SetYOffset(newOffsetTwo)
-			detailPanelTwoViewportIndexPosition = detailPanelTwoViewportVisibleIndex - 1
-		} else {
-			// Cursor is within view
-			detailPanelTwoViewportIndexPosition = calculatedVisibleIndexTwo
-		}
-
-		// reinit the index position
-		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{
-			DetailPanelViewportIndexPosition:         detailPanelViewportIndexPosition,
-			DetailPanelTwoViewportIndexPosition:      detailPanelTwoViewportIndexPosition,
-			DetailPanelViewportStageType:             detailPanelViewportStageType,
-			DetailPanelTwoViewportStageType:          detailPanelTwoViewportStageType,
-			DetailPanelViewportActualCurrentIndex:    detailPanelViewportActualCurrentIndex,
-			DetailPanelTwoViewportActualCurrentIndex: detailPanelTwoViewportActualCurrentIndex,
-			DetailPanelViewportOverflowIndexCount:    detailPanelViewportOverflowIndexCount,
-			DetailPanelTwoViewportOverflowIndexCount: detailPanelTwoViewportOverflowIndexCount,
-		}
-
-		// set the cursor viewport
-		SetLineEditingCursorViewportContent(m, detailPanelViewportVisibleIndex, detailPanelTwoViewportVisibleIndex)
-	}
-}
-
-// ------------------------------------
-//
-//			For Set Line Editing Cursor Viewport Content
-//		  * this was to set the cursor viewport content
-//	   * needed because we are using a dual viewport setup for line editing mode (one for cursor, one for content)
-//
-// ------------------------------------
-func SetLineEditingCursorViewportContent(m *types.GittiModel, detailPanelViewportVisibleIndex int, detailPanelTwoViewportVisibleIndex int) {
-	// set the cursor viewport
-	var cursorVpLine strings.Builder
-	var cursorVpTwoLine strings.Builder
-
-	for index := range detailPanelViewportVisibleIndex {
-		if index == m.LineEditingIndexPositionAndInfo.DetailPanelViewportIndexPosition {
-			cursorVpLine.WriteString(style.SelectedItemStyle.Render("❯  "))
-			cursorVpLine.WriteRune('\n')
-		} else {
-			cursorVpLine.WriteString(style.NewStyle.Render("   "))
-			cursorVpLine.WriteRune('\n')
-		}
-	}
-
-	for index := range detailPanelTwoViewportVisibleIndex {
-		if index == m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportIndexPosition {
-			cursorVpTwoLine.WriteString(style.SelectedItemStyle.Render("❯  "))
-			cursorVpTwoLine.WriteRune('\n')
-		} else {
-			cursorVpTwoLine.WriteString(style.NewStyle.Render("   "))
-			cursorVpTwoLine.WriteRune('\n')
-		}
-	}
-	m.LineEditingIndexCursorViewport.SetContent(cursorVpLine.String())
-	m.LineEditingIndexCursorTwoViewport.SetContent(cursorVpTwoLine.String())
 }
 
 // ------------------------------------

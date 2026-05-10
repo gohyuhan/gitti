@@ -40,7 +40,7 @@ import (
 //	Initialize and return a new GittiAppModel with necessary dependencies and viewport setup
 //
 // ------------------------------------
-func NewGittiAppModel(tuiUpdateChannel chan string, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
+func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
 	vp.MouseWheelEnabled = true
@@ -186,8 +186,6 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case GitUpdateMsg:
 		updateEvent := string(msg)
 		switch updateEvent {
-		case constant.DETAIL_COMPONENT_PANEL_UPDATED:
-			layout.UpdateDetailComponentViewportLayout(m)
 		case git.GIT_BRANCH_UPDATE:
 			branchComponent.InitBranchList(m)
 			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_LOCAL_BRANCH {
@@ -272,6 +270,19 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		model, cmd := interaction.GittiMouseInteraction(msg, m)
 		gAM.model = model
 		return gAM, cmd
+
+	case types.GittiTuiUpdateMsg:
+		updateMsg := types.GittiTuiUpdateMsg(msg)
+		updateEvent := updateMsg.Event
+		switch updateEvent {
+		case constant.DETAIL_COMPONENT_PANEL_LAYOUT_STATE_UPDATED_EVENT:
+			layout.UpdateDetailComponentViewportContentAndState(m, updateMsg.Data.(types.DetailPanelStateAndLayoutUpdateInterface))
+			layout.UpdateDetailComponentViewportLayout(m)
+		case constant.DETAIL_COMPONENT_PANEL_LAYOUT_UPDATED_EVENT:
+			layout.UpdateDetailComponentViewportLayout(m)
+		case constant.DETAIL_COMPONENT_PANEL_LAYOUT_STATE_REINIT_EVENT:
+			layout.DetailComponentReinit(m)
+		}
 	}
 
 	// Update spinners in popups when they are processing

@@ -15,7 +15,7 @@ type GittiAppModel struct {
 
 // ---------------------------------
 //
-// tea msg
+// tea msg (string)
 //
 // ---------------------------------
 type GitUpdateMsg string
