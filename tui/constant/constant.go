@@ -140,7 +140,7 @@ const (
 	MaxBranchMergeOutputPopUpWidth                        = 150
 	// BlamePopUpWidth will not be set as it will always take up 90% of width
 	MaxInteractiveRebaseOptionPopUpWidth = 150
-	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebese display
+	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebase display
 	MaxInteractiveRebaseFixupSquashCommitPopUpWidth = 150
 	MaxInteractiveRebaseFixupSquashOutputPopUpWidth = 150
 
@@ -182,7 +182,7 @@ const (
 	PopUpBranchMergeOutputViewportHeight                      = 16
 	// BlamePopUpWidth will not be set as it will always take up 90% of height
 	PopUpInteractiveRebaseOptionHeight = 8
-	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebese display
+	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebase display
 	PopUpInteractiveRebaseFixupSquashOutputviewportHeight = 8
 )
 
