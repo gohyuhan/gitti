@@ -24,3 +24,20 @@ func UpdatePopUpGitPullOutputViewport(m *types.GittiModel) {
 		popUp.GitPullOutputViewport.PageDown()
 	}
 }
+
+func UpdateGitPullResultEvent(m *types.GittiModel, data types.GitPullResultEventDataInterface) {
+	popUp, ok := m.PopUpModel.(*GitPullOutputPopUpModel)
+	if !ok || popUp.IsCancelled.Load() {
+		return
+	}
+
+	popUp.IsProcessing.Store(false)
+	if data.Success {
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(true)
+		return
+	}
+
+	popUp.HasError.Store(true)
+	popUp.ProcessSuccess.Store(false)
+}

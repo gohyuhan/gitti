@@ -87,6 +87,10 @@ type GitAmendCommitResultEventDataInterface struct {
 	Success bool
 }
 
+type GitPullResultEventDataInterface struct {
+	Success bool
+}
+
 type InteractiveRebaseFixupSquashResultEventDataInterface struct {
 	Result  []string
 	Success bool
