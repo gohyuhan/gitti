@@ -2,7 +2,6 @@ package branch
 
 import (
 	"slices"
-	"strings"
 
 	"charm.land/bubbles/v2/list"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -210,7 +209,6 @@ func UpdateMergeViewport(m *types.GittiModel, updateData types.MergeResultEventD
 	outputResult := updateData.Result
 	popUp, ok := m.PopUpModel.(*BranchMergeOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
-		popUp.IsProcessing.Store(false) // update the processing status
 		if success && !popUp.IsProcessing.Load() {
 			popUp.ProcessSuccess.Store(true)
 			popUp.HasError.Store(false)
@@ -218,12 +216,7 @@ func UpdateMergeViewport(m *types.GittiModel, updateData types.MergeResultEventD
 			popUp.ProcessSuccess.Store(false)
 			popUp.HasError.Store(true)
 		}
-
-		var content strings.Builder
-		for index := range outputResult {
-			content.WriteString(outputResult[index])
-			content.WriteRune('\n')
-		}
-		popUp.BranchMergeOutputViewport.SetContent(content.String())
+		popUp.IsProcessing.Store(false) // update the processing status
+		popUp.BranchMergeOutputViewport.SetContentLines(outputResult)
 	}
 }

@@ -4,8 +4,8 @@ import (
 	"slices"
 
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
-	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // ------------------------------------
@@ -33,8 +33,11 @@ func GitCherryPickService(m *types.GittiModel, cherryPickedCommitLogs map[string
 		}
 
 		m.GitOperations.GitCommitLog.GitCherryPick(cherryPickedCommitHashes)
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT,
+		}
 	}()
-	utils.ReinitCherryPickedCommitInfo(m)
+
 }
 
 // ------------------------------------

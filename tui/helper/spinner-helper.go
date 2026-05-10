@@ -50,9 +50,9 @@ func UpdateSpinner(m *types.GittiModel, msg tea.Msg, cmds []tea.Cmd) []tea.Cmd {
 				cmds = append(cmds, cmd)
 			}
 		case constant.SwitchBranchOutputPopUp:
-			if pullPopup, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel); ok && pullPopup.IsProcessing.Load() {
+			if branchPopup, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel); ok && branchPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
-				pullPopup.Spinner, cmd = pullPopup.Spinner.Update(msg)
+				branchPopup.Spinner, cmd = branchPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		case constant.GitStashOperationOutputPopUp:
@@ -80,10 +80,10 @@ func UpdateSpinner(m *types.GittiModel, msg tea.Msg, cmds []tea.Cmd) []tea.Cmd {
 				cmds = append(cmds, cmd)
 			}
 		case constant.PushTagOutputPopUp:
-			tagPopUp, ok := m.PopUpModel.(*tagPopUp.PushTagOutputPopUpModel)
-			if ok {
+			tagPopup, ok := m.PopUpModel.(*tagPopUp.PushTagOutputPopUpModel)
+			if ok && tagPopup.IsProcessing.Load() {
 				var cmd tea.Cmd
-				tagPopUp.Spinner, cmd = tagPopUp.Spinner.Update(msg)
+				tagPopup.Spinner, cmd = tagPopup.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		case constant.FetchTagOutputPopUp:

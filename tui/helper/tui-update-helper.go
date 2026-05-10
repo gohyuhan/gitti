@@ -13,6 +13,7 @@ import (
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // ------------------------------------
@@ -68,5 +69,7 @@ func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg)
 		interactiverebasePopUp.UpdateInteractiveRebaseFixupSquashResultEvent(m, updateMsg.Data.(types.InteractiveRebaseFixupSquashResultEventDataInterface))
 	case constant.INTERACTIVE_REBASE_FETCH_COMMITS_INFO_EVENT:
 		interactiverebasePopUp.UpdateInteractiveRebaseFetchedCommitInfoList(m, updateMsg.Data.(types.InteractiveRebaseFetchCommitInfoListEventDataInterface))
+	case constant.REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT:
+		utils.ReinitCherryPickedCommitInfo(m)
 	}
 }

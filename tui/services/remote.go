@@ -28,6 +28,7 @@ func GitAddRemoteService(m *types.GittiModel) {
 		remoteName := popUp.RemoteNameTextInput.Value()
 		remoteUrl := popUp.RemoteUrlTextInput.Value()
 		if len(remoteName) < 1 || len(remoteUrl) < 1 {
+			popUp.IsProcessing.Store(false)
 			cancel()
 			return
 		}
