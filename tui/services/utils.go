@@ -62,7 +62,7 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 				return
 			default:
 				// The previous goroutine is still running, wait a bit
-				time.Sleep(10 * time.Millisecond)
+				time.Sleep(50 * time.Millisecond)
 			}
 		}
 		defer m.IsDetailComponentPanelInfoFetchProcessing.Store(false)

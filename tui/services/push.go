@@ -17,6 +17,7 @@ import (
 // ------------------------------------
 func GitRemotePushService(m *types.GittiModel, remoteName string, pushType string) {
 	popUp, ok := m.PopUpModel.(*pushPopUp.GitRemotePushPopUpModel)
+	checkoutBranch := m.CheckOutBranch
 	if ok {
 		ctx, cancel := context.WithCancel(context.Background())
 		popUp.CancelFunc = cancel
@@ -28,7 +29,7 @@ func GitRemotePushService(m *types.GittiModel, remoteName string, pushType strin
 		go func(ctx context.Context) {
 			defer cancel()
 
-			exitStatusCode := m.GitOperations.GitCommit.GitPush(ctx, remoteName, pushType, m.CheckOutBranch)
+			exitStatusCode := m.GitOperations.GitCommit.GitPush(ctx, remoteName, pushType, checkoutBranch)
 			data := types.GitPushResultEventDataInterface{
 				Success: exitStatusCode == 0,
 			}
