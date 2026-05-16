@@ -414,6 +414,24 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			popUp.InteractiveRebaseOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.InteractiveRebaseOptionList, constant.MaxInteractiveRebaseOptionPopUpWidth)
 			return m, nil
 		}
+	case constant.InteractiveRebaseRewordSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordSelectionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.CommitList.Index() > 0 {
+					latestIndex := popUp.CommitList.Index() - 1
+					popUp.CommitList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.CommitList.Index() < len(popUp.CommitList.Items())-1 {
+					latestIndex := popUp.CommitList.Index() + 1
+					popUp.CommitList.Select(latestIndex)
+				}
+			}
+			popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, constant.MaxInteractiveRebaseOptionPopUpWidth)
+			return m, nil
+		}
 
 	// following is for viewport
 	case constant.KeybindingAndFeatureInstructionsPopUp:
@@ -476,6 +494,14 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 		if ok && !popUp.IsProcessing.Load() {
 			// Block viewport scroll while command is actively running.
 			triggerViewportVerticalScrollFromKey(msg, &popUp.FixupSquashOutputViewport)
+			return m, nil
+		}
+
+	case constant.InteractiveRebaseRewordOutputPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+		if ok && !popUp.IsProcessing.Load() {
+			// Block viewport scroll while command is actively running.
+			triggerViewportVerticalScrollFromKey(msg, &popUp.RewordOutputViewport)
 			return m, nil
 		}
 

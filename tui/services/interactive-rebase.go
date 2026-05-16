@@ -9,6 +9,11 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// *************************************************************************************
+//
+//	INTERACTIVE REBASE - FIXUP / SQUASH
+//
+// *************************************************************************************
 // ------------------------------------
 //
 //	Runs fixup/squash interactive rebase asynchronously, streams command output to popup viewport,
@@ -64,6 +69,61 @@ func InteractiveRebaseFixupSquashCancelService(m *types.GittiModel) {
 	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.FixupSquashOutputViewport.SetContent("")
+		popUp.IsProcessing.Store(false)
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+	}
+}
+
+// *************************************************************************************
+//
+//	INTERACTIVE REBASE - REWORD
+//
+// *************************************************************************************
+func InteractiveRebaseRewordService(m *types.GittiModel, originalRetrievedGitCommitInfo []git.CommitInfo, selectedCommit git.CommitInfo, rewordCommitMessage string, rewordCommitDescription string) {
+
+	popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
+		popUp.CancelFunc = cancel
+
+		go func(ctx context.Context) {
+			defer cancel()
+
+			rewordResult, rewordErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseReword(ctx, originalRetrievedGitCommitInfo, selectedCommit, rewordCommitMessage, rewordCommitDescription)
+			data := types.InteractiveRebaseRewordResultEventDataStructure{
+				Result:  rewordResult,
+				Success: rewordErr == nil,
+			}
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.INTERACTIVE_REBASE_REWORD_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx)
+	} else {
+		return
+	}
+
+}
+
+func InteractiveRebaseRewordCancelService(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+	if ok {
+		// Set cancellation marker first, then cancel context.
+		popUp.IsCancelled.Store(true)
+		if popUp.CancelFunc != nil {
+			popUp.CancelFunc()
+		}
+	}
+	m.ShowPopUp.Store(false)
+	m.IsTyping.Store(false)
+	m.PopUpType = constant.NoPopUp
+	if ok {
+		popUp.RewordOutputViewport.SetContent("")
 		popUp.IsProcessing.Store(false)
 		popUp.HasError.Store(false)
 		popUp.ProcessSuccess.Store(false)

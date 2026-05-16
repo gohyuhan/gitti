@@ -33,7 +33,7 @@ func InitInteractiveRebaseOptionPopUpModel(m *types.GittiModel) {
 		},
 		{
 			Name:                  i18n.LANGUAGEMAPPING.InteractiveRebaseReword,
-			Info:                  i18n.LANGUAGEMAPPING.InteractiveRebaseFeatureComingSoon,
+			Info:                  i18n.LANGUAGEMAPPING.InteractiveRebaseRewordDescription,
 			InteractiveRebaseType: git.REWORD,
 		},
 		{
@@ -67,6 +67,10 @@ func InitInteractiveRebaseOptionPopUpModel(m *types.GittiModel) {
 
 	m.PopUpModel = popUpModel
 }
+
+// *************************************************************************************
+//                        INTERACTIVE REBASE - FIXUP / SQUASH
+// *************************************************************************************
 
 // ------------------------------------
 //
@@ -136,7 +140,7 @@ func InitInteractiveRebaseFixupSquashSelectionPopUpModel(m *types.GittiModel) {
 		}
 
 		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
-			Event: constant.INTERACTIVE_REBASE_FETCH_COMMITS_INFO_EVENT,
+			Event: constant.INTERACTIVE_REBASE_FIXUP_SQUASH_FETCH_COMMITS_INFO_EVENT,
 			Data:  data,
 		}
 	}()
@@ -250,3 +254,123 @@ func InitInteractiveRebaseFixupSquashOutputPopUpModel(m *types.GittiModel) {
 
 	m.PopUpModel = popUpModel
 }
+
+// *************************************************************************************
+//
+//	INTERACTIVE REBASE - REWORD
+//
+// *************************************************************************************
+func InitInteractiveRebaseRewordSelectionPopUpModel(m *types.GittiModel) {
+	items := make([]list.Item, 0)
+	popUpWidth := int(float64(m.Width) * 0.9)
+	listWidth := popUpWidth - 2
+
+	height := int(float64(m.Height)*0.8) - 2
+	iRRSL := list.New(items, InteractiveRebaseRewordSelectionDelegate{}, listWidth, height)
+	iRRSL.SetShowPagination(false)
+	iRRSL.SetShowStatusBar(false)
+	iRRSL.SetFilteringEnabled(false)
+	iRRSL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	iRRSL.SetShowHelp(true)
+	iRRSL.KeyMap = list.KeyMap{}
+	iRRSL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	iRRSL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &iRRSL, m.Width)
+
+	popUpModel := &InteractiveRebaseRewordSelectionPopUpModel{
+		CommitList:                  iRRSL,
+		OriginalRetrievedCommitList: []git.CommitInfo{},
+	}
+
+	go func() {
+		commitInfos := m.GitOperations.GitInteractiveRebase.GetCommitInfos()
+		listItems := make([]list.Item, 0, len(commitInfos))
+		for _, commitInfo := range commitInfos {
+			listItems = append(listItems, InteractiveRebaseRewordSelectionItem{
+				Hash:        commitInfo.Hash,
+				Message:     commitInfo.Message,
+				Author:      commitInfo.Author,
+				Description: commitInfo.Description,
+				Parent:      commitInfo.Parent,
+				CommitOrder: commitInfo.CommitOrder,
+			})
+		}
+
+		data := types.InteractiveRebaseFetchCommitInfoListEventDataStructure{
+			PopUpModel:  constant.InteractiveRebaseRewordSelectionPopUp,
+			CommitInfos: commitInfos,
+			ListItems:   listItems,
+		}
+
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.INTERACTIVE_REBASE_REWORD_FETCH_COMMITS_INFO_EVENT,
+			Data:  data,
+		}
+	}()
+
+	m.PopUpModel = popUpModel
+}
+
+func InitInteractiveRebaseRewordCommitPopUp(m *types.GittiModel, originalRetrievedCommitList []git.CommitInfo, SelectedCommit git.CommitInfo) {
+	commitMsg := SelectedCommit.Message
+	commitDesc := SelectedCommit.Description
+	commitMsgPlaceholder := i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitPopUpMessageInputPlaceHolder
+	commitDescPlaceholder := i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitPopUpCommitDescriptionInputPlaceHolder
+
+	CommitMessageTextInput := textinput.New()
+	CommitMessageTextInput.SetValue(commitMsg)
+	CommitMessageTextInput.Placeholder = commitMsgPlaceholder
+	CommitMessageTextInput.Focus()
+	CommitMessageTextInput.SetVirtualCursor(true)
+
+	CommitDescriptionTextAreaInput := textarea.New()
+	CommitDescriptionTextAreaInput.SetValue(commitDesc)
+	CommitDescriptionTextAreaInput.ShowLineNumbers = false
+	CommitDescriptionTextAreaInput.Placeholder = commitDescPlaceholder
+	CommitDescriptionTextAreaInput.DynamicHeight = true
+	CommitDescriptionTextAreaInput.MinHeight = constant.TextAreaInputMinHeight
+	CommitDescriptionTextAreaInput.MaxHeight = constant.TextAreaInputMaxHeight
+	CommitDescriptionTextAreaInput.MaxContentHeight = 9999
+	CommitDescriptionTextAreaInput.MoveToEnd()
+	CommitDescriptionTextAreaInput.Blur()
+
+	popUpModel := &InteractiveRebaseRewordCommitPopUpModel{
+		MessageTextInput:            CommitMessageTextInput,
+		DescriptionTextAreaInput:    CommitDescriptionTextAreaInput,
+		TotalInputCount:             2,
+		CurrentActiveInputIndex:     1,
+		SelectedCommit:              SelectedCommit,
+		OriginalRetrievedCommitList: originalRetrievedCommitList,
+	}
+	m.PopUpModel = popUpModel
+}
+
+func InitInteractiveRebaseRewordOutputPopUpModel(m *types.GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpGitRebaseOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxGitRebaseOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &InteractiveRebaseRewordOutputPopUpModel{
+		RewordOutputViewport: vp,
+		Spinner:              s,
+	}
+
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.IsCancelled.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+
+	m.PopUpModel = popUpModel
+}
+
+// *************************************************************************************
+//                           INTERACTIVE REBASE - DROP
+// *************************************************************************************

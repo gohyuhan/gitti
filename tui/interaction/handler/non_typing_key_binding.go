@@ -25,6 +25,7 @@ import (
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
+	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
@@ -1607,7 +1608,10 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.PopUpType = constant.InteractiveRebaseFixupSquashSelectionPopUp
 						interactiverebasePopUp.InitInteractiveRebaseFixupSquashSelectionPopUpModel(m)
 					case git.REWORD:
-						// COMING IN NEXT VERSION
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.InteractiveRebaseRewordSelectionPopUp
+						interactiverebasePopUp.InitInteractiveRebaseRewordSelectionPopUpModel(m)
 					case git.DROP:
 						// COMING IN NEXT VERSION
 					}
@@ -1624,6 +1628,25 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				}
 			}
 
+		case constant.InteractiveRebaseRewordSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordSelectionPopUpModel)
+			if ok {
+				selectedItem := popUp.CommitList.SelectedItem()
+				// return early is none
+				if selectedItem == nil {
+					return m, nil
+				}
+				parsedSelectedItem := selectedItem.(interactiverebasePopUp.InteractiveRebaseRewordSelectionItem)
+				selectedCommit := git.CommitInfo(parsedSelectedItem)
+				interactiverebase.InteractiveRebaseRewordSelectionValidation(m, selectedCommit)
+
+				if popUp.SelectionError == nil {
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+					m.PopUpType = constant.InteractiveRebaseRewordCommitPopUp
+					interactiverebasePopUp.InitInteractiveRebaseRewordCommitPopUp(m, popUp.OriginalRetrievedCommitList, selectedCommit)
+				}
+			}
 		}
 	}
 	return m, nil
@@ -1830,6 +1853,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 		case constant.InteractiveRebaseFixupSquashOutputPopUp:
 			services.InteractiveRebaseFixupSquashCancelService(m)
 			m.PopUpModel = nil
+		case constant.InteractiveRebaseRewordOutputPopUp:
+			services.InteractiveRebaseRewordCancelService(m)
+			m.PopUpModel = nil
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -1902,7 +1928,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.ChooseRemoteBranchOptionPopUp,
 			constant.ChooseBranchOptionForMergePopUp,
 			constant.InteractiveRebaseOptionPopUp,
-			constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			constant.InteractiveRebaseFixupSquashSelectionPopUp,
+			constant.InteractiveRebaseRewordSelectionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

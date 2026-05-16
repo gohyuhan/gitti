@@ -181,6 +181,19 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 				return m, cmd
 			}
 		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, cmd
 }

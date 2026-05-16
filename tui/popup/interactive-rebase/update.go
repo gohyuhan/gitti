@@ -9,6 +9,10 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// *************************************************************************************
+//                        INTERACTIVE REBASE - FIXUP / SQUASH
+// *************************************************************************************
+
 // ------------------------------------
 //
 //	Rebuild the fixup/squash preview viewport content from the current selection.
@@ -72,7 +76,7 @@ func UpdateInteractiveRebaseFixupSquashViewport(m *types.GittiModel) {
 //	items. Currently handles the fixup/squash selection popup type.
 //
 // ------------------------------------
-func UpdateInteractiveRebaseFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
+func UpdateInteractiveRebaseFixupSquashFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
 	switch updateData.PopUpModel {
 	case constant.InteractiveRebaseFixupSquashSelectionPopUp:
 		popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
@@ -104,3 +108,23 @@ func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateDa
 		popUp.IsProcessing.Store(false)
 	}
 }
+
+// *************************************************************************************
+//
+//	INTERACTIVE REBASE - REWORD
+//
+// *************************************************************************************
+func UpdateInteractiveRebaseRewordFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
+	switch updateData.PopUpModel {
+	case constant.InteractiveRebaseRewordSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordSelectionPopUpModel)
+		if ok {
+			popUp.OriginalRetrievedCommitList = updateData.CommitInfos
+			popUp.CommitList.SetItems(updateData.ListItems)
+		}
+	}
+}
+
+// *************************************************************************************
+//                           INTERACTIVE REBASE - DROP
+// *************************************************************************************

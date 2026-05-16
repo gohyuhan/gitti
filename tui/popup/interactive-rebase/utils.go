@@ -44,3 +44,14 @@ func InteractiveRebaseFixupSquashSelectionValidationAndSort(m *types.GittiModel)
 		}
 	}
 }
+
+func InteractiveRebaseRewordSelectionValidation(m *types.GittiModel, selectedCommit git.CommitInfo) {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
+	if ok {
+		popUp.SelectionError = nil
+
+		if len(selectedCommit.Parent) > 1 {
+			popUp.SelectionError = fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitCannotBeAMergeCommit)
+		}
+	}
+}

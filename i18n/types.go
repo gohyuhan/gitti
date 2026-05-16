@@ -207,7 +207,10 @@ type LanguageMapping struct {
 	KeyBindingForInteractiveRebaseOptionPopUp                  []string
 	KeyBindingForInteractiveRebaseFixupSquashSelectionPopUp    []string
 	KeyBindingForInteractiveRebaseFixupSquashCommitPopUp       []string
-
+	KeyBindingForInteractiveRebaseFixupSquashOutputPopUp       []string
+	KeyBindingForInteractiveRebaseRewordSelectionPopUp         []string
+	KeyBindingForInteractiveRebaseRewordCommitPopUp            []string
+	KeyBindingForInteractiveRebaseRewordOutputPopUp            []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -454,6 +457,12 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupSquashOutputPopUpTitle                             string
 	InteractiveRebaseFixupSquashing                                          string
 	InteractiveRebaseReword                                                  string
+	InteractiveRebaseRewordDescription                                       string
+	InteractiveRebaseRewordCommitPopUpMessageInputPlaceHolder                string
+	InteractiveRebaseRewordCommitPopUpCommitDescriptionInputPlaceHolder      string
+	InteractiveRebaseRewordCommitCannotBeAMergeCommit                        string
+	InteractiveRebaseRewordCommitMessageTitle                                string
+	InteractiveRebaseRewordCommitDescriptionTitle                            string
 	InteractiveRebaseDrop                                                    string
 	InteractiveRebaseFeatureComingSoon                                       string
 	ChooseInteractiveRebaseOption                                            string

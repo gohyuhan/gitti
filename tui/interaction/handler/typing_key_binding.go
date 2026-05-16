@@ -57,7 +57,8 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		constant.CreateTagPopUp,
 		constant.EditRemotePromptPopUp,
 		constant.GitRebaseBranchInputPopUp,
-		constant.InteractiveRebaseFixupSquashCommitPopUp:
+		constant.InteractiveRebaseFixupSquashCommitPopUp,
+		constant.InteractiveRebaseRewordCommitPopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -153,6 +154,19 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 				popUp.DescriptionTextAreaInput.Focus()
 			}
 		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+			case 2:
+				popUp.MessageTextInput.Blur()
+				popUp.DescriptionTextAreaInput.Focus()
+			}
+		}
 	}
 	return m, nil
 }
@@ -233,6 +247,19 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		}
 	case constant.InteractiveRebaseFixupSquashCommitPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+			case 2:
+				popUp.MessageTextInput.Blur()
+				popUp.DescriptionTextAreaInput.Focus()
+			}
+		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
 		if ok {
 			popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
 			switch popUp.CurrentActiveInputIndex {
@@ -337,6 +364,42 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 						popUp.IsProcessing.Store(true)
 						// Non-signing path runs async service with cancellable context.
 						services.InteractiveRebaseFixupSquashService(m, ogRetrievedCommitsList, sortedSelectedCommits, fixupSquashCommitMessage, fixupSquashCommitDescription)
+
+						// Start spinner ticking
+						return m, popUp.Spinner.Tick
+					}
+				}
+			}
+		}
+	case constant.InteractiveRebaseRewordOutputPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			ogRetrievedCommitsList := popUp.OriginalRetrievedCommitList
+			selectedCommit := popUp.SelectedCommit
+			rewordCommitMessage := popUp.MessageTextInput.Value()
+			rewordCommitDescription := popUp.DescriptionTextAreaInput.Value()
+
+			if utf8.RuneCountInString(rewordCommitMessage) > 0 && len(ogRetrievedCommitsList) > 1 {
+				// Switch to output popup before starting execution so errors/progress are visible immediately.
+				interactiverebasePopUp.InitInteractiveRebaseRewordOutputPopUpModel(m)
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+				m.PopUpType = constant.InteractiveRebaseRewordOutputPopUp
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					// Signing path returns prepared exec command; tea.ExecProcess handles terminal suspension.
+					executor, cleanupCallbackFunc, rewordErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseRewordWithSigning(context.TODO(), ogRetrievedCommitsList, selectedCommit, rewordCommitMessage, rewordCommitDescription)
+					if rewordErr != nil {
+						popUp.HasError.Store(true)
+						popUp.RewordOutputViewport.SetContent(rewordErr.Error())
+						return m, nil
+					}
+					return utils.SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m, executor, cleanupCallbackFunc, logging.INTERACTIVE_REBASE_FIXUP_SQUASH)
+				} else {
+					if ok {
+						popUp.IsProcessing.Store(true)
+						// Non-signing path runs async service with cancellable context.
+						services.InteractiveRebaseRewordService(m, ogRetrievedCommitsList, selectedCommit, rewordCommitMessage, rewordCommitDescription)
 
 						// Start spinner ticking
 						return m, popUp.Spinner.Tick
@@ -515,6 +578,26 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 			services.GetFileGitBlameInfoService(m, parsedFilePath)
 			return m, nil
 		}
+
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			if popUp.CurrentActiveInputIndex == 2 {
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			if popUp.CurrentActiveInputIndex == 2 {
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -638,6 +721,21 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				return m, cmd
 			}
 		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -714,6 +812,16 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 		}
 	case constant.InteractiveRebaseFixupSquashCommitPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.MessageTextInput.Value()
+			case 2:
+				content = popUp.DescriptionTextAreaInput.Value()
+			}
+		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:

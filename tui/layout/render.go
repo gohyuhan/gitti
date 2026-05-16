@@ -462,6 +462,14 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseFixupSquashSelectionPopUp
 		case constant.InteractiveRebaseFixupSquashCommitPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseFixupSquashCommitPopUp
+		case constant.InteractiveRebaseFixupSquashOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseFixupSquashOutputPopUp
+		case constant.InteractiveRebaseRewordSelectionPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseRewordSelectionPopUp
+		case constant.InteractiveRebaseRewordCommitPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseRewordCommitPopUp
+		case constant.InteractiveRebaseRewordOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForInteractiveRebaseRewordOutputPopUp
 		}
 	} else {
 		//-----------------------------

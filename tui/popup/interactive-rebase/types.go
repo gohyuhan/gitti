@@ -114,6 +114,10 @@ func (d InteractiveRebaseOptionDelegate) Render(w io.Writer, m list.Model, index
 	fmt.Fprint(w, fn(fullStr))
 }
 
+// *************************************************************************************
+//                        INTERACTIVE REBASE - FIXUP / SQUASH
+// *************************************************************************************
+
 // ------------------------------------
 //
 //	InteractiveRebaseFixupSquashSelectionPopUpModel holds the commit-selection
@@ -272,3 +276,96 @@ type InteractiveRebaseFixupSquashOutputPopUpModel struct {
 	// CancelFunc is used to cancel the git rebase operation
 	CancelFunc context.CancelFunc
 }
+
+// *************************************************************************************
+//
+//	INTERACTIVE REBASE - REWORD
+//
+// *************************************************************************************
+type InteractiveRebaseRewordSelectionPopUpModel struct {
+	CommitList                  list.Model
+	OriginalRetrievedCommitList []git.CommitInfo
+	SelectionError              error
+}
+
+type (
+	InteractiveRebaseRewordSelectionDelegate struct{}
+	InteractiveRebaseRewordSelectionItem     struct {
+		Hash        string
+		Message     string
+		Author      string
+		Description string
+		Parent      []string
+		CommitOrder int
+	}
+)
+
+func (i InteractiveRebaseRewordSelectionItem) FilterValue() string {
+	return i.Hash
+}
+func (d InteractiveRebaseRewordSelectionDelegate) Height() int  { return 2 }
+func (d InteractiveRebaseRewordSelectionDelegate) Spacing() int { return 0 }
+func (d InteractiveRebaseRewordSelectionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
+	return nil
+}
+func (d InteractiveRebaseRewordSelectionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(InteractiveRebaseRewordSelectionItem)
+	if !ok {
+		return
+	}
+
+	var firstStr string
+	var secondStr string
+	var str string
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+
+	firstStr = fmt.Sprintf("  %s  |  %s", i.Hash[:7], i.Author)
+	firstStr = utils.TruncateString(firstStr, componentWidth)
+	secondStr = utils.TruncateString(fmt.Sprintf("         %s", i.Message), componentWidth)
+
+	// if it was a merge commit (parent is more than 1), fade the selection
+	if len(i.Parent) > 1 {
+		firstStr = style.ItemStyle.Faint(true).Render(firstStr)
+	}
+	secondStr = style.ItemStyle.Faint(true).Render(secondStr)
+
+	str = fmt.Sprintf("%s\n%s", firstStr, secondStr)
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(str))
+}
+
+type InteractiveRebaseRewordCommitPopUpModel struct {
+	MessageTextInput            textinput.Model // input index 1
+	DescriptionTextAreaInput    textarea.Model  // input index 2
+	TotalInputCount             int             // to tell us how many input were there
+	CurrentActiveInputIndex     int             // to tell us which input should be shown as highlighted/focus and be updated
+	SelectedCommit              git.CommitInfo
+	OriginalRetrievedCommitList []git.CommitInfo
+}
+
+type InteractiveRebaseRewordOutputPopUpModel struct {
+	RewordOutputViewport viewport.Model // to log out the output from git operation
+	Spinner              spinner.Model  // spinner for showing processing state
+	IsProcessing         atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError             atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess       atomic.Bool    // has the process sucessfuly executed
+	IsCancelled          atomic.Bool    // flag to indicate if the operation was cancelled by user
+	// CancelFunc is used to cancel the git rebase operation
+	CancelFunc context.CancelFunc
+}
+
+// *************************************************************************************
+//                           INTERACTIVE REBASE - DROP
+// *************************************************************************************

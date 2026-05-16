@@ -30,6 +30,10 @@ func RenderInteractiveRebaseOptionPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// *************************************************************************************
+//                        INTERACTIVE REBASE - FIXUP / SQUASH
+// *************************************************************************************
+
 // ------------------------------------
 //
 //	Render the split-pane fixup/squash commit selection popup. The left pane
@@ -155,3 +159,63 @@ func RenderInteractiveRebaseFixupSquashOutputPopUp(m *types.GittiModel) string {
 	}
 	return ""
 }
+
+// *************************************************************************************
+//
+//	INTERACTIVE REBASE - REWORD
+//
+// *************************************************************************************
+func RenderInteractiveRebaseRewordSelectionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordSelectionPopUpModel)
+	if ok {
+		popUpWidth := int(float64(m.Width) * 0.9)
+		listWidth := popUpWidth - 2
+		height := int(float64(m.Height)*0.8) - 2
+
+		popUp.CommitList.SetWidth(listWidth)
+		popUp.CommitList.SetHeight(height)
+
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseReword)
+
+		var content string
+		if popUp.SelectionError != nil {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				popUp.CommitList.View(),
+				style.NewStyle.Foreground(style.ColorError).Render(popUp.SelectionError.Error()),
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				popUp.CommitList.View(),
+			)
+		}
+
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+func RenderInteractiveRebaseRewordCommitPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordCommitPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxInteractiveRebaseRewordCommitPopUpWidth, int(float64(m.Width)*0.8))
+		popUp.MessageTextInput.SetWidth(popUpWidth - 6)
+		popUp.DescriptionTextAreaInput.SetWidth(popUpWidth - 6)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitMessageTitle),
+			popUp.MessageTextInput.View(),
+			style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitDescriptionTitle),
+			popUp.DescriptionTextAreaInput.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// *************************************************************************************
+//                           INTERACTIVE REBASE - DROP
+// *************************************************************************************
