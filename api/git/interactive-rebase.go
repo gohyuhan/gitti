@@ -405,7 +405,7 @@ func (gIR *GitInteractiveRebase) interactiveRebaseReword(ctx context.Context, gi
 	// so gitCommitInfo[:targetCommitPosition+1] gives us HEAD..oldest-selected
 	targetCommitPosition := selectedCommitInfo.CommitOrder
 	if targetCommitPosition < 0 || targetCommitPosition >= len(gitCommitInfo) {
-		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupPositionMismatchError)
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseRewordPositionMismatchError)
 	}
 
 	// copy so we don't mutate gitCommitInfo, then sort oldest → latest for todo construction
@@ -507,6 +507,174 @@ func (gIR *GitInteractiveRebase) constructRewordTodo(sortedAffectedCommitInfos [
 	return rewordTodoString.String()
 }
 
+// *************************************************************************************
+//                           INTERACTIVE REBASE - DROP
+// *************************************************************************************
+
+// ------------------------------------
+//
+//	Interactive Rebase - Drop
+//	Drops one or more commits from history. No editor is opened.
+//
+//	* the oldest selected commit must not be a merge commit
+//	* the oldest selected commit must not be the repository's first commit
+//	* all commits from HEAD down to the oldest selected commit are replayed
+//
+//	Flow:
+//	* builds affected range: HEAD down to oldest selected commit
+//	* todo: drop selected commits, pick the rest
+//	* GIT_SEQUENCE_EDITOR is a temp shell script that replaces the todo file non-interactively
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseDrop(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo) ([]string, error) {
+	if !gIR.gitProcessLock.CanProceedWithGitOps() {
+		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
+	}
+	defer func() {
+		gIR.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	dropCmd, dropCleanup, dropErr := gIR.interactiveRebaseDrop(ctx, gitCommitInfo, sortedSelectedCommitInfos, false)
+	if dropErr != nil {
+		return []string{}, dropErr
+	}
+	if dropCleanup != nil {
+		defer dropCleanup()
+	}
+	gIR.logging.RegisterNewLog(logging.INTERACTIVE_REBASE_DROP, strings.Join(dropCmd.Args, " "), logging.INFO, "", true)
+	dropOutput, runErr := dropCmd.CombinedOutput()
+	parsedDropOutput := processGeneralGitOpsOutputIntoStringArray(dropOutput)
+
+	if runErr != nil {
+		if ctx.Err() != nil {
+			return parsedDropOutput, ctx.Err()
+		}
+		return parsedDropOutput, runErr
+	}
+
+	return parsedDropOutput, nil
+}
+
+// ------------------------------------
+//
+//	Interactive Rebase - Drop (Signing variant)
+//	Returns the rebase cmd without running it — caller (bubbletea) suspends the TUI,
+//	hands the cmd to the OS, and resumes after git finishes.
+//
+//	* gitti lock is released before the cmd runs — intentional
+//	* git's own repo lock (.git/rebase-merge/) prevents concurrent ops during execution
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseDropWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo) (*exec.Cmd, func(), error) {
+	if !gIR.gitProcessLock.CanProceedWithGitOps() {
+		return nil, nil, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
+	}
+	defer func() {
+		gIR.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	return gIR.interactiveRebaseDrop(ctx, gitCommitInfo, sortedSelectedCommitInfos, true)
+}
+
+// ------------------------------------
+//
+//	Builds the rebase command and cleanup callback for drop; validates the selected commits,
+//	generates the todo temp file, and configures a non-interactive sequence editor
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) interactiveRebaseDrop(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, signing bool) (*exec.Cmd, func(), error) {
+	if len(sortedSelectedCommitInfos) < 1 {
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseDropMustHaveAtLeastOneSelectedError)
+	}
+
+	// base is merge commit, does not allow that
+	if len(sortedSelectedCommitInfos[0].Parent) > 1 {
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseDropBaseCommitCannotBeAMergeCommit)
+	}
+
+	// base is the oldest commit, does not allow that
+	if len(sortedSelectedCommitInfos[0].Parent) < 1 {
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseDropCommitCannotBeTheOldestCommit)
+	}
+
+	// oldest selected commit's CommitOrder equals its index in gitCommitInfo (which is latest-first)
+	// so gitCommitInfo[:targetCommitPosition+1] gives us HEAD..oldest-selected
+	targetCommitPosition := sortedSelectedCommitInfos[0].CommitOrder
+	if targetCommitPosition < 0 || targetCommitPosition >= len(gitCommitInfo) {
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseDropPositionMismatchError)
+	}
+
+	// copy so we don't mutate gitCommitInfo, then sort oldest → latest for todo construction
+	sortedAffectedCommitInfos := make([]CommitInfo, targetCommitPosition+1)
+	copy(sortedAffectedCommitInfos, gitCommitInfo[:targetCommitPosition+1])
+	slices.SortFunc(sortedAffectedCommitInfos, func(a, b CommitInfo) int {
+		return cmp.Compare(b.CommitOrder, a.CommitOrder) // largest CommitOrder first = oldest to latest
+	})
+
+	dropTodoString := gIR.constructDropTodo(sortedAffectedCommitInfos, sortedSelectedCommitInfos)
+
+	// write todo to a temp file; the sequence editor script will cp it into git's todo path
+	sequenceEditorScriptPath, cleanupFn, buildCmdErr := gIR.buildNonInteractiveTodoCmd(dropTodoString)
+	if buildCmdErr != nil {
+		return nil, cleanupFn, buildCmdErr
+	}
+
+	// rebase from just before the oldest affected commit;
+	// disallowed to drop the oldest commit. so, we will always expect to have a parent
+	gitArgs := []string{
+		"rebase",
+		"-i",
+		sortedAffectedCommitInfos[0].Parent[0],
+	}
+	// signing path uses no context — bubbletea owns execution, gitti must not cancel it
+	rebaseCmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	if signing {
+		rebaseCmd = executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	}
+	// override git's sequence editor with our script so no interactive editor is ever opened
+	rebaseCmd.Env = append(rebaseCmd.Env, fmt.Sprintf("GIT_SEQUENCE_EDITOR=%s", sequenceEditorScriptPath))
+
+	return rebaseCmd, cleanupFn, nil
+}
+
+// ------------------------------------
+//
+//	Construct Drop Todo
+//	Builds the rebase todo file content for the drop operation.
+//
+//	Todo structure (oldest → latest order):
+//	  drop <selected>   ← commits to be removed from history
+//	  pick <others>     ← replayed on top unchanged
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) constructDropTodo(sortedAffectedCommitInfos []CommitInfo, sortedSelectedCommitInfos []CommitInfo) string {
+	var dropTodoString strings.Builder
+
+	selectedDropSet := make(map[string]struct{}, len(sortedSelectedCommitInfos))
+	for _, c := range sortedSelectedCommitInfos {
+		selectedDropSet[c.Hash] = struct{}{}
+	}
+
+	for _, commitInfo := range sortedAffectedCommitInfos {
+		_, found := selectedDropSet[commitInfo.Hash]
+		if found {
+			dropTodoString.WriteString("drop ")
+			dropTodoString.WriteString(commitInfo.Hash)
+			dropTodoString.WriteRune('\n')
+		} else {
+			dropTodoString.WriteString("pick ")
+			dropTodoString.WriteString(commitInfo.Hash)
+			dropTodoString.WriteRune('\n')
+		}
+	}
+
+	return dropTodoString.String()
+}
+
+// *************************************************************************************
+//                                 GENERAL UTILITIES
+// *************************************************************************************
+
 // ------------------------------------
 //
 //	Build Non-Interactive Todo Cmd
@@ -544,10 +712,6 @@ func (gIR *GitInteractiveRebase) buildNonInteractiveTodoCmd(todoString string) (
 
 	return sequenceEditorScriptPath, cleanupFn, nil
 }
-
-// *************************************************************************************
-//                                 GENERAL UTILITIES
-// *************************************************************************************
 
 // ------------------------------------
 //

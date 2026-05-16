@@ -447,6 +447,7 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError             string
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit                     string
 	InteractiveRebaseFixupPositionMismatchError                              string
+	InteractiveRebaseRewordPositionMismatchError                             string
 	InteractiveRebaseFixupSquashWarning                                      string
 	InteractiveRebaseRewordWarning                                           string
 	InteractiveRebaseFixupSquash                                             string
@@ -467,6 +468,10 @@ type LanguageMapping struct {
 	InteractiveRebaseRewordCommitMessageTitle                                string
 	InteractiveRebaseRewordCommitDescriptionTitle                            string
 	InteractiveRebaseDrop                                                    string
+	InteractiveRebaseDropMustHaveAtLeastOneSelectedError                     string
+	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit                      string
+	InteractiveRebaseDropCommitCannotBeTheOldestCommit                       string
+	InteractiveRebaseDropPositionMismatchError                               string
 	InteractiveRebaseFeatureComingSoon                                       string
 	ChooseInteractiveRebaseOption                                            string
 }

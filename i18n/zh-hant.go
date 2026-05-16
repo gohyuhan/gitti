@@ -707,6 +707,7 @@ var zH_HANT = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "fixup/squash 目標不可為合併提交",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "所選內容的基礎提交不可為合併提交",
 	InteractiveRebaseFixupPositionMismatchError:                    "互動式變基 fixup 的所選提交位置不匹配",
+	InteractiveRebaseRewordPositionMismatchError:                   "互動式變基 reword 的所選提交位置不匹配",
 	InteractiveRebaseFixupSquashWarning:                            "警告：比壓縮目標更新的合併提交將被略過並從變基中捨棄，即使已選取亦然。",
 	InteractiveRebaseRewordWarning:                                 "警告：所選提交與 HEAD 之間的合併提交將被靜默略過並從變基中捨棄。",
 	InteractiveRebaseFixupSquash:                                   "Fixup / Squash",
@@ -727,6 +728,10 @@ var zH_HANT = LanguageMapping{
 	InteractiveRebaseRewordCommitMessageTitle:                                "Reword 提交訊息",
 	InteractiveRebaseRewordCommitDescriptionTitle:                            "Reword 提交描述",
 	InteractiveRebaseDrop:                                                    "Drop",
+	InteractiveRebaseDropMustHaveAtLeastOneSelectedError:                     "互動式變基 drop 至少需要選取 1 個提交",
+	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit:                      "所選提交不可為合併提交",
+	InteractiveRebaseDropCommitCannotBeTheOldestCommit:                       "所選提交不可為最舊的提交",
+	InteractiveRebaseDropPositionMismatchError:                               "互動式變基 drop 的所選提交位置不匹配",
 	InteractiveRebaseFeatureComingSoon:                                       "即將推出",
 	ChooseInteractiveRebaseOption:                                            "選擇互動式變基操作",
 }

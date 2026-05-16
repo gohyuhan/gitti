@@ -707,6 +707,7 @@ var eN = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "The fixup/squash target must not be a merge commit",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "The base commit of the selection cannot be a merge commit",
 	InteractiveRebaseFixupPositionMismatchError:                    "Selected commit position mismatch for interactive rebase fixup",
+	InteractiveRebaseRewordPositionMismatchError:                   "Selected commit position mismatch for interactive rebase reword",
 	InteractiveRebaseFixupSquashWarning:                            "Warning: Any merge commits newer than the squash target will be skipped and dropped from the rebase, even if selected.",
 	InteractiveRebaseRewordWarning:                                 "Warning: Any merge commits between the selected commit and HEAD will be silently skipped and dropped from the rebase.",
 	InteractiveRebaseFixupSquash:                                   "Fixup / Squash",
@@ -727,6 +728,10 @@ var eN = LanguageMapping{
 	InteractiveRebaseRewordCommitMessageTitle:                                "Reword Commit Message",
 	InteractiveRebaseRewordCommitDescriptionTitle:                            "Reword Commit Description",
 	InteractiveRebaseDrop:                                                    "Drop",
+	InteractiveRebaseDropMustHaveAtLeastOneSelectedError:                     "Interactive rebase drop requires at least 1 commit to be selected",
+	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit:                      "The oldest selected commit cannot be a merge commit",
+	InteractiveRebaseDropCommitCannotBeTheOldestCommit:                       "The selected commit cannot be the oldest commit",
+	InteractiveRebaseDropPositionMismatchError:                               "Selected commit position mismatch for interactive rebase drop",
 	InteractiveRebaseFeatureComingSoon:                                       "Coming Soon",
 	ChooseInteractiveRebaseOption:                                            "Choose Interactive Rebase Option",
 }

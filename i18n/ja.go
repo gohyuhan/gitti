@@ -707,6 +707,7 @@ var jA = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "fixup/squash ターゲットはマージコミットであってはなりません",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "選択のベースコミットはマージコミットであってはなりません",
 	InteractiveRebaseFixupPositionMismatchError:                    "インタラクティブリベースfixupの選択コミット位置が一致しません",
+	InteractiveRebaseRewordPositionMismatchError:                   "インタラクティブリベースrewordの選択コミット位置が一致しません",
 	InteractiveRebaseFixupSquashWarning:                            "警告：スカッシュターゲットより新しいマージコミットは、選択されていてもリベースからスキップ・除外されます。",
 	InteractiveRebaseRewordWarning:                                 "警告：選択したコミットとHEADの間にあるマージコミットは、リベースから暗黙的にスキップ・除外されます。",
 	InteractiveRebaseFixupSquash:                                   "Fixup / Squash",
@@ -727,6 +728,10 @@ var jA = LanguageMapping{
 	InteractiveRebaseRewordCommitMessageTitle:                                "Reword コミットメッセージ",
 	InteractiveRebaseRewordCommitDescriptionTitle:                            "Reword コミット説明",
 	InteractiveRebaseDrop:                                                    "Drop",
+	InteractiveRebaseDropMustHaveAtLeastOneSelectedError:                     "インタラクティブリベースのdropには少なくとも1つのコミットを選択する必要があります",
+	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit:                      "選択したコミットはマージコミットであってはなりません",
+	InteractiveRebaseDropCommitCannotBeTheOldestCommit:                       "選択したコミットは最も古いコミットであってはなりません",
+	InteractiveRebaseDropPositionMismatchError:                               "インタラクティブリベースdropの選択コミット位置が一致しません",
 	InteractiveRebaseFeatureComingSoon:                                       "近日公開",
 	ChooseInteractiveRebaseOption:                                            "インタラクティブリベースの操作を選択",
 }
