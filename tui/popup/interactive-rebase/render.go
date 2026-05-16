@@ -190,6 +190,7 @@ func RenderInteractiveRebaseRewordSelectionPopUp(m *types.GittiModel) string {
 				lipgloss.Left,
 				title,
 				popUp.CommitList.View(),
+				style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseWarning),
 			)
 		}
 

@@ -494,6 +494,10 @@ func (gIR *GitInteractiveRebase) constructRewordTodo(sortedAffectedCommitInfos [
 
 	if len(sortedAffectedCommitInfos) > 1 {
 		for _, commitInfo := range sortedAffectedCommitInfos[1:] {
+			// skip any merge commit
+			if len(commitInfo.Parent) > 1 {
+				continue
+			}
 			rewordTodoString.WriteString("pick ")
 			rewordTodoString.WriteString(commitInfo.Hash)
 			rewordTodoString.WriteRune('\n')
