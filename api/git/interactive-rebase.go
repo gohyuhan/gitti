@@ -101,6 +101,10 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() []CommitInfo {
 	return commitInfos
 }
 
+// *************************************************************************************
+//                        INTERACTIVE REBASE - FIXUP / SQUASH
+// *************************************************************************************
+
 // ------------------------------------
 //
 //	Interactive Rebase - Fixup
@@ -118,7 +122,7 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() []CommitInfo {
 //	* message applied via `git commit --amend -F <tempfile>` — no editor flag
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) ([]string, error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDescription string) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -126,7 +130,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Con
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, false)
+	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDescription, false)
 	if fixupErr != nil {
 		return []string{}, fixupErr
 	}
@@ -157,7 +161,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Con
 //	* git's own repo lock (.git/rebase-merge/) prevents concurrent ops during execution
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDescription string) (*exec.Cmd, func(), error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return nil, nil, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -165,7 +169,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx 
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	return gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, true)
+	return gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDescription, true)
 }
 
 // ------------------------------------
@@ -174,7 +178,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx 
 //	generates todo and message temp files, and configures a non-interactive sequence editor
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) interactiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string, signing bool) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) interactiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDescription string, signing bool) (*exec.Cmd, func(), error) {
 	if len(sortedSelectedCommitInfos) < 2 {
 		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError)
 	}
@@ -199,14 +203,14 @@ func (gIR *GitInteractiveRebase) interactiveRebaseFixupSquash(ctx context.Contex
 	})
 
 	// build the `exec git commit --amend -F <tempfile>` line that applies the new message
-	execAmendCommitCommandString, commitMsgTempPath, execErr := gIR.buildRebaseAmendExec(newCommitMessage, newCommitDesceription)
+	execAmendCommitCommandString, commitMsgTempPath, execErr := gIR.buildRebaseAmendExec(newCommitMessage, newCommitDescription)
 	if execErr != nil {
 		return nil, nil, execErr
 	}
 	fixupTodoString := gIR.constructFixupTodo(sortedAffectedCommitInfos, sortedSelectedCommitInfos, execAmendCommitCommandString)
 
 	// write todo to a temp file; the sequence editor script will cp it into git's todo path
-	sequenceEditorScriptPath, cleanupFn, buildCmdErr := gIR.buildNonInteractiveFixupRebaseCmd(fixupTodoString)
+	sequenceEditorScriptPath, cleanupFn, buildCmdErr := gIR.buildNonInteractiveTodoCmd(fixupTodoString)
 	if buildCmdErr != nil {
 		os.Remove(commitMsgTempPath)
 		return nil, cleanupFn, buildCmdErr
@@ -315,69 +319,201 @@ func (gIR *GitInteractiveRebase) constructFixupTodo(sortedAffectedCommitInfos []
 	return fixupTodoString.String()
 }
 
+// *************************************************************************************
+//                           INTERACTIVE REBASE - REWORD
+// *************************************************************************************
+
 // ------------------------------------
 //
-//	Build Rebase Amend Exec Line
-//	Writes the new commit message to a temp file and returns the `exec` line for the todo.
+//	Interactive Rebase - Reword
+//	Renames a single commit's message in-place. No editor is opened.
 //
-//	* description appended after a blank line (git paragraph format) if non-empty
-//	* path is single-quote-escaped so spaces/special chars survive the shell exec line
-//	* caller owns the temp file lifetime — returned path must be removed after rebase finishes
+//	* the selected commit must not be a merge commit
+//	* all commits from HEAD down to the selected commit are replayed
+//	* merge commits in the affected range are silently skipped and dropped
+//
+//	Flow:
+//	* builds affected range: HEAD down to selected commit
+//	* todo: pick selected → exec amend with new message → pick newer commits
+//	* GIT_SEQUENCE_EDITOR is a temp shell script that replaces the todo file non-interactively
+//	* message applied via `git commit --amend -F <tempfile>` — no editor flag
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) buildRebaseAmendExec(message, description string) (string, string, error) {
-	// combine message + description
-	fullMsg := message
-	if strings.TrimSpace(description) != "" {
-		fullMsg += "\n\n" + description
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string) ([]string, error) {
+	if !gIR.gitProcessLock.CanProceedWithGitOps() {
+		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
-	fullMsg += "\n"
+	defer func() {
+		gIR.gitProcessLock.ReleaseGitOpsLock()
+	}()
 
-	// create temp file
-	f, err := os.CreateTemp("", "gitti-commit-msg-*")
-	if err != nil {
-		return "", "", err
+	rewordCmd, rewordCleanup, rewordErr := gIR.interactiveRebaseReword(ctx, gitCommitInfo, selectedCommitInfo, newCommitMessage, newCommitDescription, false)
+	if rewordErr != nil {
+		return []string{}, rewordErr
+	}
+	if rewordCleanup != nil {
+		defer rewordCleanup()
+	}
+	gIR.logging.RegisterNewLog(logging.INTERACTIVE_REBASE_REWORD, strings.Join(rewordCmd.Args, " "), logging.INFO, "", true)
+	rewordOutput, runErr := rewordCmd.CombinedOutput()
+	parsedRewordOutput := processGeneralGitOpsOutputIntoStringArray(rewordOutput)
+
+	if runErr != nil {
+		if ctx.Err() != nil {
+			return parsedRewordOutput, ctx.Err()
+		}
+		return parsedRewordOutput, runErr
 	}
 
-	// write content
-	if _, err := f.WriteString(fullMsg); err != nil {
-		f.Close()
-		return "", "", err
-	}
-
-	if err := f.Close(); err != nil {
-		return "", "", err
-	}
-
-	// shell escape path (safe for rebase exec)
-	escapedPath := "'" + strings.ReplaceAll(f.Name(), "'", `'\''`) + "'"
-
-	// construct exec string
-	execStr := fmt.Sprintf(
-		"exec git commit --amend -F %s",
-		escapedPath,
-	)
-
-	return execStr, f.Name(), nil
+	return parsedRewordOutput, nil
 }
 
 // ------------------------------------
 //
-//	Build Non-Interactive Fixup Rebase Cmd
-//	Writes the todo string to a temp file, then creates the sequence editor script.
+//	Interactive Rebase - Reword (Signing variant)
+//	Returns the rebase cmd without running it — caller (bubbletea) suspends the TUI,
+//	hands the cmd to the OS, and resumes after git finishes.
 //
-//	* sequence editor script: `cp <todo-temp> "$1"` — replaces git's generated todo with ours
-//	* GIT_SEQUENCE_EDITOR points to this script so git never opens an interactive editor
-//	* returned cleanup removes both the todo temp file and the script temp file
+//	* gitti lock is released before the cmd runs — intentional
+//	* git's own repo lock (.git/rebase-merge/) prevents concurrent ops during execution
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) buildNonInteractiveFixupRebaseCmd(fixupTodoString string) (string, func(), error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseRewordWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string) (*exec.Cmd, func(), error) {
+	if !gIR.gitProcessLock.CanProceedWithGitOps() {
+		return nil, nil, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
+	}
+	defer func() {
+		gIR.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	return gIR.interactiveRebaseReword(ctx, gitCommitInfo, selectedCommitInfo, newCommitMessage, newCommitDescription, true)
+}
+
+// ------------------------------------
+//
+//	Builds the rebase command and cleanup callback for reword; validates the selected commit,
+//	generates todo and message temp files, and configures a non-interactive sequence editor
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) interactiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string, signing bool) (*exec.Cmd, func(), error) {
+	// base is merge commit, does not allow that
+	if len(selectedCommitInfo.Parent) > 1 {
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitCannotBeAMergeCommit)
+	}
+
+	// oldest selected commit's CommitOrder equals its index in gitCommitInfo (which is latest-first)
+	// so gitCommitInfo[:targetCommitPosition+1] gives us HEAD..oldest-selected
+	targetCommitPosition := selectedCommitInfo.CommitOrder
+	if targetCommitPosition < 0 || targetCommitPosition >= len(gitCommitInfo) {
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupPositionMismatchError)
+	}
+
+	// copy so we don't mutate gitCommitInfo, then sort oldest → latest for todo construction
+	sortedAffectedCommitInfos := make([]CommitInfo, targetCommitPosition+1)
+	copy(sortedAffectedCommitInfos, gitCommitInfo[:targetCommitPosition+1])
+	slices.SortFunc(sortedAffectedCommitInfos, func(a, b CommitInfo) int {
+		return cmp.Compare(b.CommitOrder, a.CommitOrder) // largest CommitOrder first = oldest to latest
+	})
+
+	// build the `exec git commit --amend -F <tempfile>` line that applies the new message
+	execAmendCommitCommandString, commitMsgTempPath, execErr := gIR.buildRebaseAmendExec(newCommitMessage, newCommitDescription)
+	if execErr != nil {
+		return nil, nil, execErr
+	}
+	rewordTodoString := gIR.constructRewordTodo(sortedAffectedCommitInfos, selectedCommitInfo, execAmendCommitCommandString)
+
+	// write todo to a temp file; the sequence editor script will cp it into git's todo path
+	sequenceEditorScriptPath, cleanupFn, buildCmdErr := gIR.buildNonInteractiveTodoCmd(rewordTodoString)
+	if buildCmdErr != nil {
+		os.Remove(commitMsgTempPath)
+		return nil, cleanupFn, buildCmdErr
+	}
+	// chain commitMsgTempPath removal into the existing cleanup so all temp files are swept together
+	if cleanupFn != nil {
+		oldCleanup := cleanupFn
+		cleanupFn = func() {
+			oldCleanup()
+			os.Remove(commitMsgTempPath)
+		}
+	} else {
+		cleanupFn = func() {
+			os.Remove(commitMsgTempPath)
+		}
+	}
+
+	// rebase from just before the oldest affected commit; use --root only if it has no parent
+	gitArgs := []string{
+		"rebase",
+		"-i",
+		"--root",
+	}
+	if len(sortedAffectedCommitInfos[0].Parent) > 0 {
+		gitArgs = []string{
+			"rebase",
+			"-i",
+			sortedAffectedCommitInfos[0].Parent[0],
+		}
+	}
+	// signing path uses no context — bubbletea owns execution, gitti must not cancel it
+	rebaseCmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	if signing {
+		rebaseCmd = executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	}
+	// override git's sequence editor with our script so no interactive editor is ever opened
+	rebaseCmd.Env = append(rebaseCmd.Env, fmt.Sprintf("GIT_SEQUENCE_EDITOR=%s", sequenceEditorScriptPath))
+
+	return rebaseCmd, cleanupFn, nil
+}
+
+// ------------------------------------
+//
+//	Construct Reword Todo
+//	Builds the rebase todo file content for the reword operation.
+//
+//	Todo structure (oldest → latest order):
+//	  pick <selected>                  ← anchor: the commit whose message is being reworded
+//	  exec git commit --amend -F <f>   ← replace message with user's new message (no editor)
+//	  pick <newer-1>                   ← replayed on top unchanged
+//	  pick <newer-N>
+//
+//	* merge commits in the affected range are skipped (dropped from rebase)
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) constructRewordTodo(sortedAffectedCommitInfos []CommitInfo, selectedCommitInfo CommitInfo, execAmendCommitCommandString string) string {
+	var rewordTodoString strings.Builder
+
+	// oldest selected commit is the rebase anchor — `pick` preserves it as the surviving commit
+	rewordTodoString.WriteString("pick ")
+	rewordTodoString.WriteString(selectedCommitInfo.Hash)
+	rewordTodoString.WriteRune('\n')
+
+	// after reword the surviving commit has the oldest selected commit's message;
+	// `exec` replaces it with the user-supplied message via --amend -F (no editor opened)
+	rewordTodoString.WriteString(execAmendCommitCommandString)
+	rewordTodoString.WriteRune('\n')
+
+	if len(sortedAffectedCommitInfos) > 1 {
+		for _, commitInfo := range sortedAffectedCommitInfos[1:] {
+			// skip any merge commit
+			if len(commitInfo.Parent) > 1 {
+				continue
+			}
+			rewordTodoString.WriteString("pick ")
+			rewordTodoString.WriteString(commitInfo.Hash)
+			rewordTodoString.WriteRune('\n')
+		}
+	}
+
+	return rewordTodoString.String()
+}
+
+func (gIR *GitInteractiveRebase) buildNonInteractiveTodoCmd(todoString string) (string, func(), error) {
 	todoFile, todoFileErr := os.CreateTemp("", "gitti-rebase-todo-*")
 	if todoFileErr != nil {
 		return "", nil, todoFileErr
 	}
 
-	if _, writeTodoFileErr := todoFile.WriteString(fixupTodoString); writeTodoFileErr != nil {
+	if _, writeTodoFileErr := todoFile.WriteString(todoString); writeTodoFileErr != nil {
 		todoFile.Close()
 		os.Remove(todoFile.Name())
 		return "", nil, writeTodoFileErr
@@ -400,6 +536,10 @@ func (gIR *GitInteractiveRebase) buildNonInteractiveFixupRebaseCmd(fixupTodoStri
 
 	return sequenceEditorScriptPath, cleanupFn, nil
 }
+
+// *************************************************************************************
+//                                 GENERAL UTILITIES
+// *************************************************************************************
 
 // ------------------------------------
 //
@@ -434,4 +574,55 @@ func (gIR *GitInteractiveRebase) createSequenceEditorScript(todoFilePath string)
 	}
 
 	return scriptPath, nil
+}
+
+// ------------------------------------
+//
+//	Build Rebase Amend Exec Line
+//	Writes the new commit message to a temp file and returns the `exec` line for the todo.
+//
+//	* description appended after a blank line (git paragraph format) if non-empty
+//	* path is single-quote-escaped so spaces/special chars survive the shell exec line
+//	* caller owns the temp file lifetime — returned path must be removed after rebase finishes
+//
+// ------------------------------------
+func (gIR *GitInteractiveRebase) buildRebaseAmendExec(message, description string) (string, string, error) {
+
+	// combine message + description
+	fullMsg := strings.TrimSpace(message)
+	if utf8.RuneCountInString(fullMsg) < 1 {
+		return "", "", fmt.Errorf("%s", i18n.LANGUAGEMAPPING.CommitMessageMustBeProvided)
+	}
+	if strings.TrimSpace(description) != "" {
+		fullMsg += "\n\n" + strings.TrimSpace(description)
+	}
+	fullMsg += "\n"
+
+	// create temp file
+	f, err := os.CreateTemp("", "gitti-commit-msg-*")
+	if err != nil {
+		return "", "", err
+	}
+
+	// write content
+	if _, err := f.WriteString(fullMsg); err != nil {
+		f.Close()
+		return "", "", err
+	}
+
+	if err := f.Close(); err != nil {
+		os.Remove(f.Name())
+		return "", "", err
+	}
+
+	// shell escape path (safe for rebase exec)
+	escapedPath := "'" + strings.ReplaceAll(f.Name(), "'", `'\''`) + "'"
+
+	// construct exec string
+	execStr := fmt.Sprintf(
+		"exec git commit --amend -F %s",
+		escapedPath,
+	)
+
+	return execStr, f.Name(), nil
 }

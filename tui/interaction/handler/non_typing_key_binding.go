@@ -1607,7 +1607,10 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.PopUpType = constant.InteractiveRebaseFixupSquashSelectionPopUp
 						interactiverebasePopUp.InitInteractiveRebaseFixupSquashSelectionPopUpModel(m)
 					case git.REWORD:
-						// COMING IN NEXT VERSION
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.InteractiveRebaseRewordSelectionPopUp
+						interactiverebasePopUp.InitInteractiveRebaseRewordSelectionPopUpModel(m)
 					case git.DROP:
 						// COMING IN NEXT VERSION
 					}
@@ -1624,6 +1627,25 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				}
 			}
 
+		case constant.InteractiveRebaseRewordSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordSelectionPopUpModel)
+			if ok {
+				selectedItem := popUp.CommitList.SelectedItem()
+				// return early is none
+				if selectedItem == nil {
+					return m, nil
+				}
+				parsedSelectedItem := selectedItem.(interactiverebasePopUp.InteractiveRebaseRewordSelectionItem)
+				selectedCommit := git.CommitInfo(parsedSelectedItem)
+				interactiverebasePopUp.InteractiveRebaseRewordSelectionValidation(m, selectedCommit)
+
+				if popUp.SelectionError == nil {
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+					m.PopUpType = constant.InteractiveRebaseRewordCommitPopUp
+					interactiverebasePopUp.InitInteractiveRebaseRewordCommitPopUp(m, popUp.OriginalRetrievedCommitList, selectedCommit)
+				}
+			}
 		}
 	}
 	return m, nil
@@ -1830,6 +1852,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 		case constant.InteractiveRebaseFixupSquashOutputPopUp:
 			services.InteractiveRebaseFixupSquashCancelService(m)
 			m.PopUpModel = nil
+		case constant.InteractiveRebaseRewordOutputPopUp:
+			services.InteractiveRebaseRewordCancelService(m)
+			m.PopUpModel = nil
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -1902,7 +1927,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.ChooseRemoteBranchOptionPopUp,
 			constant.ChooseBranchOptionForMergePopUp,
 			constant.InteractiveRebaseOptionPopUp,
-			constant.InteractiveRebaseFixupSquashSelectionPopUp:
+			constant.InteractiveRebaseFixupSquashSelectionPopUp,
+			constant.InteractiveRebaseRewordSelectionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -2154,7 +2180,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 //	Scrolls text viewers, detail panels, and wider popup views horizontally to the left.
 //
 // ------------------------------------
-func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingLefthKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponentPanel:
@@ -2210,7 +2236,7 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 //	Scrolls text viewers, detail panels, and wider popup views horizontally to the right.
 //
 // ------------------------------------
-func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingRightlKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponentPanel:

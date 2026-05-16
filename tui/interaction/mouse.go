@@ -60,6 +60,16 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				if ok && popUp.IsCommitFixupSquashViewportSelected {
 					popUp.CommitFixupSquashViewport.ScrollLeft(1)
 				}
+			case constant.InteractiveRebaseFixupSquashOutputPopUp:
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+				if ok {
+					popUp.FixupSquashOutputViewport.ScrollLeft(1)
+				}
+			case constant.InteractiveRebaseRewordOutputPopUp:
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+				if ok {
+					popUp.RewordOutputViewport.ScrollLeft(1)
+				}
 			}
 		}
 
@@ -96,6 +106,16 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashSelectionPopUpModel)
 				if ok && popUp.IsCommitFixupSquashViewportSelected {
 					popUp.CommitFixupSquashViewport.ScrollRight(1)
+				}
+			case constant.InteractiveRebaseFixupSquashOutputPopUp:
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+				if ok {
+					popUp.FixupSquashOutputViewport.ScrollRight(1)
+				}
+			case constant.InteractiveRebaseRewordOutputPopUp:
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+				if ok {
+					popUp.RewordOutputViewport.ScrollRight(1)
 				}
 			}
 		}

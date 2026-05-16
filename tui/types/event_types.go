@@ -96,6 +96,11 @@ type InteractiveRebaseFixupSquashResultEventDataStructure struct {
 	Success bool
 }
 
+type InteractiveRebaseRewordResultEventDataStructure struct {
+	Result  []string
+	Success bool
+}
+
 type InteractiveRebaseFetchCommitInfoListEventDataStructure struct {
 	PopUpModel  string
 	CommitInfos []git.CommitInfo

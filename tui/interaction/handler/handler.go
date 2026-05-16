@@ -57,16 +57,16 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		return handleTypingCtrlyKeyBindingInteraction(m)
 
 	case "up":
-		m, cmd = handleTypingUpKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingUpKeyBindingInteraction(m)
 
 	case "down":
-		m, cmd = handleTypingDownKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingDownKeyBindingInteraction(m)
 
 	case "left":
-		m, cmd = handleTypingLeftKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingLeftKeyBindingInteraction(m)
 
 	case "right":
-		m, cmd = handleTypingRightKeyBindingInteraction(msg, m)
+		m, cmd = handleTypingRightKeyBindingInteraction(m)
 	}
 
 	// for input typing update
@@ -170,6 +170,19 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 		}
 	case constant.InteractiveRebaseFixupSquashCommitPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
 		if ok {
 			switch popUp.CurrentActiveInputIndex {
 			case 1:
@@ -305,10 +318,10 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 		return handleNonTypingDownjKeyBindingInteraction(msg, m)
 
 	case "left", "h":
-		return handleNonTypingLefthKeyBindingInteraction(msg, m)
+		return handleNonTypingLefthKeyBindingInteraction(m)
 
 	case "right", "l":
-		return handleNonTypingRightlKeyBindingInteraction(msg, m)
+		return handleNonTypingRightlKeyBindingInteraction(m)
 	case "-":
 		if !m.ShowPopUp.Load() {
 			m.WindowLeftPanelRatio = max(settings.MINLEFTPANELWIDTHRATIO, m.WindowLeftPanelRatio-0.01)

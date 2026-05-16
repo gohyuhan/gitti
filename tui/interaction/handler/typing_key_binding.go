@@ -57,7 +57,8 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		constant.CreateTagPopUp,
 		constant.EditRemotePromptPopUp,
 		constant.GitRebaseBranchInputPopUp,
-		constant.InteractiveRebaseFixupSquashCommitPopUp:
+		constant.InteractiveRebaseFixupSquashCommitPopUp,
+		constant.InteractiveRebaseRewordCommitPopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -142,6 +143,19 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		}
 	case constant.InteractiveRebaseFixupSquashCommitPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+			case 2:
+				popUp.MessageTextInput.Blur()
+				popUp.DescriptionTextAreaInput.Focus()
+			}
+		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
 		if ok {
 			popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
 			switch popUp.CurrentActiveInputIndex {
@@ -244,6 +258,19 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				popUp.DescriptionTextAreaInput.Focus()
 			}
 		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.MessageTextInput.Focus()
+				popUp.DescriptionTextAreaInput.Blur()
+			case 2:
+				popUp.MessageTextInput.Blur()
+				popUp.DescriptionTextAreaInput.Focus()
+			}
+		}
 	}
 	return m, nil
 }
@@ -320,6 +347,9 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				// Switch to output popup before starting execution so errors/progress are visible immediately.
 				interactiverebasePopUp.InitInteractiveRebaseFixupSquashOutputPopUpModel(m)
 				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+				if !ok {
+					return m, nil
+				}
 				m.PopUpType = constant.InteractiveRebaseFixupSquashOutputPopUp
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
@@ -337,6 +367,45 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 						popUp.IsProcessing.Store(true)
 						// Non-signing path runs async service with cancellable context.
 						services.InteractiveRebaseFixupSquashService(m, ogRetrievedCommitsList, sortedSelectedCommits, fixupSquashCommitMessage, fixupSquashCommitDescription)
+
+						// Start spinner ticking
+						return m, popUp.Spinner.Tick
+					}
+				}
+			}
+		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			ogRetrievedCommitsList := popUp.OriginalRetrievedCommitList
+			selectedCommit := popUp.SelectedCommit
+			rewordCommitMessage := popUp.MessageTextInput.Value()
+			rewordCommitDescription := popUp.DescriptionTextAreaInput.Value()
+
+			if utf8.RuneCountInString(rewordCommitMessage) > 0 && len(ogRetrievedCommitsList) > 0 {
+				// Switch to output popup before starting execution so errors/progress are visible immediately.
+				interactiverebasePopUp.InitInteractiveRebaseRewordOutputPopUpModel(m)
+				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+				if !ok {
+					return m, nil
+				}
+				m.PopUpType = constant.InteractiveRebaseRewordOutputPopUp
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+				if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+					// Signing path returns prepared exec command; tea.ExecProcess handles terminal suspension.
+					executor, cleanupCallbackFunc, rewordErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseRewordWithSigning(context.TODO(), ogRetrievedCommitsList, selectedCommit, rewordCommitMessage, rewordCommitDescription)
+					if rewordErr != nil {
+						popUp.HasError.Store(true)
+						popUp.RewordOutputViewport.SetContent(rewordErr.Error())
+						return m, nil
+					}
+					return utils.SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m, executor, cleanupCallbackFunc, logging.INTERACTIVE_REBASE_REWORD)
+				} else {
+					if ok {
+						popUp.IsProcessing.Store(true)
+						// Non-signing path runs async service with cancellable context.
+						services.InteractiveRebaseRewordService(m, ogRetrievedCommitsList, selectedCommit, rewordCommitMessage, rewordCommitDescription)
 
 						// Start spinner ticking
 						return m, popUp.Spinner.Tick
@@ -515,6 +584,26 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 			services.GetFileGitBlameInfoService(m, parsedFilePath)
 			return m, nil
 		}
+
+	case constant.InteractiveRebaseFixupSquashCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
+		if ok {
+			if popUp.CurrentActiveInputIndex == 2 {
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			if popUp.CurrentActiveInputIndex == 2 {
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -638,6 +727,21 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				return m, cmd
 			}
 		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.MessageTextInput, cmd = popUp.MessageTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -722,6 +826,16 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				content = popUp.DescriptionTextAreaInput.Value()
 			}
 		}
+	case constant.InteractiveRebaseRewordCommitPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.MessageTextInput.Value()
+			case 2:
+				content = popUp.DescriptionTextAreaInput.Value()
+			}
+		}
 	}
 
 	err := clipboard.WriteAll(content)
@@ -739,7 +853,7 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 //	blame info is shown.
 //
 // ------------------------------------
-func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingUpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -764,7 +878,7 @@ func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMode
 //	down when blame info is shown.
 //
 // ------------------------------------
-func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingDownKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -788,7 +902,7 @@ func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 //	viewport left when blame info is shown.
 //
 // ------------------------------------
-func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingLeftKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -810,7 +924,7 @@ func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 //	viewport right when blame info is shown.
 //
 // ------------------------------------
-func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingRightKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:

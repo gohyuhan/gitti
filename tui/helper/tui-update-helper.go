@@ -65,10 +65,14 @@ func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg)
 		commitPopUp.UpdateGitAmendCommitResultEvent(m, updateMsg.Data.(types.GitAmendCommitResultEventDataStructure))
 	case constant.GIT_PULL_RESULT_EVENT:
 		pullPopUp.UpdateGitPullResultEvent(m, updateMsg.Data.(types.GitPullResultEventDataStructure))
+	case constant.INTERACTIVE_REBASE_FIXUP_SQUASH_FETCH_COMMITS_INFO_EVENT:
+		interactiverebasePopUp.UpdateInteractiveRebaseFixupSquashFetchedCommitInfoList(m, updateMsg.Data.(types.InteractiveRebaseFetchCommitInfoListEventDataStructure))
 	case constant.INTERACTIVE_REBASE_FIXUP_SQUASH_RESULT_EVENT:
 		interactiverebasePopUp.UpdateInteractiveRebaseFixupSquashResultEvent(m, updateMsg.Data.(types.InteractiveRebaseFixupSquashResultEventDataStructure))
-	case constant.INTERACTIVE_REBASE_FETCH_COMMITS_INFO_EVENT:
-		interactiverebasePopUp.UpdateInteractiveRebaseFetchedCommitInfoList(m, updateMsg.Data.(types.InteractiveRebaseFetchCommitInfoListEventDataStructure))
+	case constant.INTERACTIVE_REBASE_REWORD_FETCH_COMMITS_INFO_EVENT:
+		interactiverebasePopUp.UpdateInteractiveRebaseRewordFetchedCommitInfoList(m, updateMsg.Data.(types.InteractiveRebaseFetchCommitInfoListEventDataStructure))
+	case constant.INTERACTIVE_REBASE_REWORD_RESULT_EVENT:
+		interactiverebasePopUp.UpdateInteractiveRebaseRewordResultEvent(m, updateMsg.Data.(types.InteractiveRebaseRewordResultEventDataStructure))
 	case constant.REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT:
 		utils.ReinitCherryPickedCommitInfo(m)
 	}

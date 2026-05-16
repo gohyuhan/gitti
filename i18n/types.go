@@ -207,7 +207,10 @@ type LanguageMapping struct {
 	KeyBindingForInteractiveRebaseOptionPopUp                  []string
 	KeyBindingForInteractiveRebaseFixupSquashSelectionPopUp    []string
 	KeyBindingForInteractiveRebaseFixupSquashCommitPopUp       []string
-
+	KeyBindingForInteractiveRebaseFixupSquashOutputPopUp       []string
+	KeyBindingForInteractiveRebaseRewordSelectionPopUp         []string
+	KeyBindingForInteractiveRebaseRewordCommitPopUp            []string
+	KeyBindingForInteractiveRebaseRewordOutputPopUp            []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -243,6 +246,7 @@ type LanguageMapping struct {
 	CommitPopUpMessageInputPlaceHolderAmendVersion           string
 	CommitPopUpDescriptionTitleAmendVersion                  string
 	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion string
+	CommitMessageMustBeProvided                              string
 	// prompt to add remote origin
 	AddRemotePopUpPrompt                 string
 	AddRemotePopUpRemoteNameTitle        string
@@ -443,7 +447,8 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError             string
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit                     string
 	InteractiveRebaseFixupPositionMismatchError                              string
-	InteractiveRebaseFixupWarning                                            string
+	InteractiveRebaseFixupSquashWarning                                      string
+	InteractiveRebaseRewordWarning                                           string
 	InteractiveRebaseFixupSquash                                             string
 	InteractiveRebaseFixupSquashDescription                                  string
 	InteractiveRebaseFixupSquashCommitPopUpMessageInputPlaceHolder           string
@@ -452,7 +457,15 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupSquashCommitDescriptionTitle                       string
 	InteractiveRebaseFixupSquashOutputPopUpTitle                             string
 	InteractiveRebaseFixupSquashing                                          string
+	InteractiveRebaseRewordOutputPopUpTitle                                  string
+	InteractiveRebaseRewording                                               string
 	InteractiveRebaseReword                                                  string
+	InteractiveRebaseRewordDescription                                       string
+	InteractiveRebaseRewordCommitPopUpMessageInputPlaceHolder                string
+	InteractiveRebaseRewordCommitPopUpCommitDescriptionInputPlaceHolder      string
+	InteractiveRebaseRewordCommitCannotBeAMergeCommit                        string
+	InteractiveRebaseRewordCommitMessageTitle                                string
+	InteractiveRebaseRewordCommitDescriptionTitle                            string
 	InteractiveRebaseDrop                                                    string
 	InteractiveRebaseFeatureComingSoon                                       string
 	ChooseInteractiveRebaseOption                                            string
