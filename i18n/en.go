@@ -1833,4 +1833,22 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 		},
 		LineType: INFO,
 	},
+	{
+		Feature: "interactive rebase reword",
+		InstructionLines: []string{
+			"1. Navigate to Commit Log component (press `3`) or switch to Commit Log component (press `< >`)",
+			"2. Press `i` to open the Interactive Rebase option popup",
+			"3. Select 'Reword' using `↑/↓` and press `enter`",
+			"4. In the commit selection popup:",
+			"   - Use `↑/↓` to navigate commits",
+			"   - Merge commits (shown faded) cannot be selected",
+			"5. Press `enter` to proceed to the reword message popup",
+			"6. Edit the commit message:",
+			"   - Press `tab` to move to the description field",
+			"   - Press `shift+tab` to return to the message field",
+			"7. Press `ctrl+e` to execute the reword",
+			"8. Press `esc` to close the output popup",
+		},
+		LineType: INFO,
+	},
 }

@@ -1834,4 +1834,22 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 		},
 		LineType: INFO,
 	},
+	{
+		Feature: "互動式變基 reword (interactive rebase reword)",
+		InstructionLines: []string{
+			"1. 導覽至提交日誌元件（按 `3`）或切換至提交日誌元件（按 `< >`）",
+			"2. 按 `i` 開啟互動式變基選項彈出視窗",
+			"3. 使用 `↑/↓` 選取 'Reword' 後按 `enter`",
+			"4. 在提交選取彈出視窗中：",
+			"   - 使用 `↑/↓` 在提交間導覽",
+			"   - 合併提交（顯示為淡色）不可選取",
+			"5. 按 `enter` 進入提交訊息編輯彈出視窗",
+			"6. 編輯提交訊息：",
+			"   - 按 `tab` 移至描述欄位",
+			"   - 按 `shift+tab` 返回訊息欄位",
+			"7. 按 `ctrl+e` 執行 reword",
+			"8. 按 `esc` 關閉輸出彈出視窗",
+		},
+		LineType: INFO,
+	},
 }

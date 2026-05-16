@@ -44,10 +44,7 @@ func InteractiveRebaseFixupSquashService(m *types.GittiModel, originalRetrievedG
 				Data:  data,
 			}
 		}(ctx)
-	} else {
-		return
 	}
-
 }
 
 // ------------------------------------
@@ -104,10 +101,7 @@ func InteractiveRebaseRewordService(m *types.GittiModel, originalRetrievedGitCom
 				Data:  data,
 			}
 		}(ctx)
-	} else {
-		return
 	}
-
 }
 
 func InteractiveRebaseRewordCancelService(m *types.GittiModel) {

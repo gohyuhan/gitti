@@ -1834,4 +1834,22 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 		},
 		LineType: INFO,
 	},
+	{
+		Feature: "交互式变基 reword (interactive rebase reword)",
+		InstructionLines: []string{
+			"1. 导航到提交日志组件（按 `3`）或切换到提交日志组件（按 `< >`）",
+			"2. 按 `i` 打开交互式变基选项弹窗",
+			"3. 使用 `↑/↓` 选择 'Reword' 后按 `enter`",
+			"4. 在提交选择弹窗中：",
+			"   - 使用 `↑/↓` 在提交间导航",
+			"   - 合并提交（显示为淡色）不可选择",
+			"5. 按 `enter` 进入提交消息编辑弹窗",
+			"6. 编辑提交消息：",
+			"   - 按 `tab` 移至描述字段",
+			"   - 按 `shift+tab` 返回消息字段",
+			"7. 按 `ctrl+e` 执行 reword",
+			"8. 按 `esc` 关闭输出弹窗",
+		},
+		LineType: INFO,
+	},
 }

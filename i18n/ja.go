@@ -1835,4 +1835,22 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 		},
 		LineType: INFO,
 	},
+	{
+		Feature: "インタラクティブリベース reword (interactive rebase reword)",
+		InstructionLines: []string{
+			"1. コミットログコンポーネントに移動（`3` を押す）またはコンポーネント切替（`< >` を押す）",
+			"2. `i` を押してインタラクティブリベースオプションポップアップを開く",
+			"3. `↑/↓` で 'Reword' を選択し `enter` を押す",
+			"4. コミット選択ポップアップ内の操作:",
+			"   - `↑/↓` でコミットを移動",
+			"   - マージコミット（フェードして表示）は選択不可",
+			"5. `enter` を押してコミットメッセージ編集ポップアップへ進む",
+			"6. コミットメッセージを編集:",
+			"   - `tab` で説明フィールドへ移動",
+			"   - `shift+tab` でメッセージフィールドに戻る",
+			"7. `ctrl+e` を押して reword を実行",
+			"8. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
 }
