@@ -3,6 +3,7 @@ package interaction
 import (
 	"strings"
 
+	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -24,7 +25,6 @@ import (
 //
 // ------------------------------------
 func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	switch msg.Mouse().Button {
 	case tea.MouseWheelLeft:
 		if !m.ShowPopUp.Load() {
@@ -103,12 +103,19 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 	case tea.MouseWheelUp, tea.MouseWheelDown:
 		if !m.ShowPopUp.Load() {
 			if !m.IsLineEditingState.Load() {
+				var vpToBeScrolled *viewport.Model
 				if m.CurrentSelectedComponent == constant.DetailComponentPanelTwo {
-					m.DetailPanelTwoViewport, cmd = m.DetailPanelTwoViewport.Update(msg)
+					vpToBeScrolled = &m.DetailPanelTwoViewport
 				} else {
-					m.DetailPanelViewport, cmd = m.DetailPanelViewport.Update(msg)
+					vpToBeScrolled = &m.DetailPanelViewport
 				}
-				return m, cmd
+
+				switch msg.Mouse().Button {
+				case tea.MouseWheelUp:
+					vpToBeScrolled.ScrollUp(1)
+				case tea.MouseWheelDown:
+					vpToBeScrolled.ScrollDown(1)
+				}
 			}
 			return m, nil
 		} else {

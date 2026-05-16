@@ -740,7 +740,6 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 //
 // ------------------------------------
 func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -749,13 +748,13 @@ func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMode
 				if !popUp.ShowingBlameInfo {
 					popUp.CurrentGitTrackedFilesPathList.CursorUp()
 				} else {
-					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+					popUp.BlameViewport.ScrollUp(1)
 				}
 			}
 		}
 	}
 
-	return m, cmd
+	return m, nil
 }
 
 // ------------------------------------
@@ -766,7 +765,6 @@ func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMode
 //
 // ------------------------------------
 func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -775,13 +773,13 @@ func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 				if !popUp.ShowingBlameInfo {
 					popUp.CurrentGitTrackedFilesPathList.CursorDown()
 				} else {
-					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+					popUp.BlameViewport.ScrollDown(1)
 				}
 			}
 		}
 	}
 
-	return m, cmd
+	return m, nil
 }
 
 // ------------------------------------
@@ -791,20 +789,19 @@ func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 //
 // ------------------------------------
 func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
 			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 			if ok {
 				if popUp.ShowingBlameInfo {
-					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+					popUp.BlameViewport.ScrollLeft(1)
 				}
 			}
 		}
 	}
 
-	return m, cmd
+	return m, nil
 }
 
 // ------------------------------------
@@ -814,18 +811,17 @@ func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 //
 // ------------------------------------
 func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	var cmd tea.Cmd
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
 			popUp, ok := m.PopUpModel.(*blamePopUp.BlamePopUpModel)
 			if ok {
 				if popUp.ShowingBlameInfo {
-					popUp.BlameViewport, cmd = popUp.BlameViewport.Update(msg)
+					popUp.BlameViewport.ScrollRight(1)
 				}
 			}
 		}
 	}
 
-	return m, cmd
+	return m, nil
 }
