@@ -611,6 +611,7 @@ func (gIR *GitInteractiveRebase) buildRebaseAmendExec(message, description strin
 	}
 
 	if err := f.Close(); err != nil {
+		os.Remove(f.Name())
 		return "", "", err
 	}
 

@@ -347,6 +347,9 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				// Switch to output popup before starting execution so errors/progress are visible immediately.
 				interactiverebasePopUp.InitInteractiveRebaseFixupSquashOutputPopUpModel(m)
 				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
+				if !ok {
+					return m, nil
+				}
 				m.PopUpType = constant.InteractiveRebaseFixupSquashOutputPopUp
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
@@ -383,6 +386,9 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				// Switch to output popup before starting execution so errors/progress are visible immediately.
 				interactiverebasePopUp.InitInteractiveRebaseRewordOutputPopUpModel(m)
 				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
+				if !ok {
+					return m, nil
+				}
 				m.PopUpType = constant.InteractiveRebaseRewordOutputPopUp
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)

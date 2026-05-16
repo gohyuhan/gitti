@@ -78,7 +78,7 @@ func RenderInteractiveRebaseFixupSquashSelectionPopUp(m *types.GittiModel) strin
 			lipgloss.Left,
 			title,
 			innerContent,
-			style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseWarning),
+			style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseFixupSquashWarning),
 		)
 
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
@@ -190,7 +190,7 @@ func RenderInteractiveRebaseRewordSelectionPopUp(m *types.GittiModel) string {
 				lipgloss.Left,
 				title,
 				popUp.CommitList.View(),
-				style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseWarning),
+				style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseRewordWarning),
 			)
 		}
 

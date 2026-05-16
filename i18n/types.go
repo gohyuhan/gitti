@@ -447,7 +447,8 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError             string
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit                     string
 	InteractiveRebaseFixupPositionMismatchError                              string
-	InteractiveRebaseWarning                                                 string
+	InteractiveRebaseFixupSquashWarning                                      string
+	InteractiveRebaseRewordWarning                                           string
 	InteractiveRebaseFixupSquash                                             string
 	InteractiveRebaseFixupSquashDescription                                  string
 	InteractiveRebaseFixupSquashCommitPopUpMessageInputPlaceHolder           string
