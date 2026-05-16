@@ -456,6 +456,8 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupSquashCommitDescriptionTitle                       string
 	InteractiveRebaseFixupSquashOutputPopUpTitle                             string
 	InteractiveRebaseFixupSquashing                                          string
+	InteractiveRebaseRewordOutputPopUpTitle                                  string
+	InteractiveRebaseRewording                                               string
 	InteractiveRebaseReword                                                  string
 	InteractiveRebaseRewordDescription                                       string
 	InteractiveRebaseRewordCommitPopUpMessageInputPlaceHolder                string

@@ -216,6 +216,48 @@ func RenderInteractiveRebaseRewordCommitPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+func RenderInteractiveRebaseRewordOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxInteractiveRebaseRewordOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseRewordOutputPopUpTitle)
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpInteractiveRebaseRewordOutputviewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.RewordOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.RewordOutputViewport.SetYOffset(popUp.RewordOutputViewport.YOffset())
+		logViewPort := logViewPortStyle.Render(popUp.RewordOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.InteractiveRebaseRewording)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
 // *************************************************************************************
 //                           INTERACTIVE REBASE - DROP
 // *************************************************************************************

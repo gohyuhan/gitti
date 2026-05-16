@@ -125,6 +125,21 @@ func UpdateInteractiveRebaseRewordFetchedCommitInfoList(m *types.GittiModel, upd
 	}
 }
 
+func UpdateInteractiveRebaseRewordResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseRewordResultEventDataStructure) {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+		popUp.RewordOutputViewport.SetContentLines(updateData.Result)
+		popUp.IsProcessing.Store(false)
+	}
+}
+
 // *************************************************************************************
 //                           INTERACTIVE REBASE - DROP
 // *************************************************************************************
