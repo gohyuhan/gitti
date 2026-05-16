@@ -398,7 +398,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseRewordWithSigning(ctx conte
 func (gIR *GitInteractiveRebase) interactiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string, signing bool) (*exec.Cmd, func(), error) {
 	// base is merge commit, does not allow that
 	if len(selectedCommitInfo.Parent) > 1 {
-		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError)
+		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitCannotBeAMergeCommit)
 	}
 
 	// oldest selected commit's CommitOrder equals its index in gitCommitInfo (which is latest-first)

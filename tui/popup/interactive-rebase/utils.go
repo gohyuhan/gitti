@@ -46,7 +46,7 @@ func InteractiveRebaseFixupSquashSelectionValidationAndSort(m *types.GittiModel)
 }
 
 func InteractiveRebaseRewordSelectionValidation(m *types.GittiModel, selectedCommit git.CommitInfo) {
-	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashSelectionPopUpModel)
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordSelectionPopUpModel)
 	if ok {
 		popUp.SelectionError = nil
 

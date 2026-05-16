@@ -371,7 +371,7 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				}
 			}
 		}
-	case constant.InteractiveRebaseRewordOutputPopUp:
+	case constant.InteractiveRebaseRewordCommitPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordCommitPopUpModel)
 		if ok {
 			ogRetrievedCommitsList := popUp.OriginalRetrievedCommitList
@@ -379,7 +379,7 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			rewordCommitMessage := popUp.MessageTextInput.Value()
 			rewordCommitDescription := popUp.DescriptionTextAreaInput.Value()
 
-			if utf8.RuneCountInString(rewordCommitMessage) > 0 && len(ogRetrievedCommitsList) > 1 {
+			if utf8.RuneCountInString(rewordCommitMessage) > 0 && len(ogRetrievedCommitsList) > 0 {
 				// Switch to output popup before starting execution so errors/progress are visible immediately.
 				interactiverebasePopUp.InitInteractiveRebaseRewordOutputPopUpModel(m)
 				popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
@@ -394,7 +394,7 @@ func handleTypingCtrleKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 						popUp.RewordOutputViewport.SetContent(rewordErr.Error())
 						return m, nil
 					}
-					return utils.SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m, executor, cleanupCallbackFunc, logging.INTERACTIVE_REBASE_FIXUP_SQUASH)
+					return utils.SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m, executor, cleanupCallbackFunc, logging.INTERACTIVE_REBASE_REWORD)
 				} else {
 					if ok {
 						popUp.IsProcessing.Store(true)
