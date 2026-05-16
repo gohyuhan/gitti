@@ -519,6 +519,7 @@ var zH_HANT = LanguageMapping{
 	CommitPopUpMessageInputPlaceHolderAmendVersion:                 "編輯提交訊息",
 	CommitPopUpDescriptionTitleAmendVersion:                        "修改描述",
 	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion:       "> 更新你的提交描述...",
+	CommitMessageMustBeProvided:                                    "提交訊息不能為空",
 	AddRemotePopUpPrompt:                                           "* 未檢測到遠端, 請新增一個.",
 	AddRemotePopUpRemoteNameTitle:                                  "遠端名稱",
 	AddRemotePopUpRemoteNamePlaceHolder:                            "例如: origin",

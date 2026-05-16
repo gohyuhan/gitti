@@ -519,6 +519,7 @@ var eN = LanguageMapping{
 	CommitPopUpMessageInputPlaceHolderAmendVersion:                 "Edit commit message",
 	CommitPopUpDescriptionTitleAmendVersion:                        "Amend Description",
 	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion:       "> Update your commit description...",
+	CommitMessageMustBeProvided:                                    "Commit message must be provided",
 	AddRemotePopUpPrompt:                                           "* Remote not detected, please add one.",
 	AddRemotePopUpRemoteNameTitle:                                  "Remote Name",
 	AddRemotePopUpRemoteNamePlaceHolder:                            "eg, origin",

@@ -37,7 +37,6 @@ func GitRebaseService(m *types.GittiModel, remote string, branchName string) {
 			}
 		}(ctx)
 	}
-	return
 }
 
 // ------------------------------------

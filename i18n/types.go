@@ -243,6 +243,7 @@ type LanguageMapping struct {
 	CommitPopUpMessageInputPlaceHolderAmendVersion           string
 	CommitPopUpDescriptionTitleAmendVersion                  string
 	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion string
+	CommitMessageMustBeProvided                              string
 	// prompt to add remote origin
 	AddRemotePopUpPrompt                 string
 	AddRemotePopUpRemoteNameTitle        string

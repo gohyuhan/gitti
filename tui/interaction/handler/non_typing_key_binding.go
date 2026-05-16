@@ -2154,7 +2154,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 //	Scrolls text viewers, detail panels, and wider popup views horizontally to the left.
 //
 // ------------------------------------
-func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingLefthKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponentPanel:
@@ -2210,7 +2210,7 @@ func handleNonTypingLefthKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 //	Scrolls text viewers, detail panels, and wider popup views horizontally to the right.
 //
 // ------------------------------------
-func handleNonTypingRightlKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleNonTypingRightlKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
 		case constant.DetailComponentPanel:

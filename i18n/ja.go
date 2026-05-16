@@ -519,6 +519,7 @@ var jA = LanguageMapping{
 	CommitPopUpMessageInputPlaceHolderAmendVersion:                 "コミットメッセージを編集してください",
 	CommitPopUpDescriptionTitleAmendVersion:                        "説明を修正",
 	CommitPopUpCommitDescriptionInputPlaceHolderAmendVersion:       "> コミットの説明を更新してください...",
+	CommitMessageMustBeProvided:                                    "コミットメッセージを入力してください",
 	AddRemotePopUpPrompt:                                           "* リモートが検出されません. 追加してください.",
 	AddRemotePopUpRemoteNameTitle:                                  "リモート名",
 	AddRemotePopUpRemoteNamePlaceHolder:                            "例: origin",

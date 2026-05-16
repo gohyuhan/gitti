@@ -739,7 +739,7 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 //	blame info is shown.
 //
 // ------------------------------------
-func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingUpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -764,7 +764,7 @@ func handleTypingUpKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMode
 //	down when blame info is shown.
 //
 // ------------------------------------
-func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingDownKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -788,7 +788,7 @@ func handleTypingDownKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 //	viewport left when blame info is shown.
 //
 // ------------------------------------
-func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingLeftKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
@@ -810,7 +810,7 @@ func handleTypingLeftKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiMo
 //	viewport right when blame info is shown.
 //
 // ------------------------------------
-func handleTypingRightKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+func handleTypingRightKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if m.ShowPopUp.Load() {
 		switch m.PopUpType {
 		case constant.BlamePopUp:
