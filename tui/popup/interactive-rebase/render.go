@@ -165,6 +165,14 @@ func RenderInteractiveRebaseFixupSquashOutputPopUp(m *types.GittiModel) string {
 //	INTERACTIVE REBASE - REWORD
 //
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	Render the reword commit selection popup, showing a titled list of commits.
+//	If a selection validation error is present, it is rendered below the list;
+//	otherwise the reword warning hint is shown.
+//
+// ------------------------------------
 func RenderInteractiveRebaseRewordSelectionPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordSelectionPopUpModel)
 	if ok {
@@ -199,6 +207,12 @@ func RenderInteractiveRebaseRewordSelectionPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the reword commit message editing popup, showing a message text input
+//	and a description textarea pre-filled with the selected commit's existing message.
+//
+// ------------------------------------
 func RenderInteractiveRebaseRewordCommitPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordCommitPopUpModel)
 	if ok {
@@ -217,6 +231,13 @@ func RenderInteractiveRebaseRewordCommitPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the reword rebase output popup, showing a scrollable viewport of
+//	rebase command output. Displays a spinner while the rebase is in progress,
+//	and colors the viewport border red on error or green on success.
+//
+// ------------------------------------
 func RenderInteractiveRebaseRewordOutputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordOutputPopUpModel)
 	if ok {

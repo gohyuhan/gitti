@@ -114,6 +114,14 @@ func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateDa
 //	INTERACTIVE REBASE - REWORD
 //
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	Handle the async commit-info fetch event for reword. Stores the retrieved
+//	commit list on the matching popup model and populates the commit list with
+//	the received items.
+//
+// ------------------------------------
 func UpdateInteractiveRebaseRewordFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
 	switch updateData.PopUpModel {
 	case constant.InteractiveRebaseRewordSelectionPopUp:
@@ -125,6 +133,13 @@ func UpdateInteractiveRebaseRewordFetchedCommitInfoList(m *types.GittiModel, upd
 	}
 }
 
+// ------------------------------------
+//
+//	Handle the async reword rebase result event. Clears IsProcessing and
+//	sets ProcessSuccess on success or HasError on failure. Loads the output
+//	lines into the viewport. No-ops if the popup was cancelled.
+//
+// ------------------------------------
 func UpdateInteractiveRebaseRewordResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseRewordResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {

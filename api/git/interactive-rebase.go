@@ -507,6 +507,14 @@ func (gIR *GitInteractiveRebase) constructRewordTodo(sortedAffectedCommitInfos [
 	return rewordTodoString.String()
 }
 
+// ------------------------------------
+//
+//	Build Non-Interactive Todo Cmd
+//	Writes the todo string to a temp file, creates the sequence editor shell
+//	script that will copy it into git's todo path, and returns the script path
+//	with a cleanup callback that removes both temp files.
+//
+// ------------------------------------
 func (gIR *GitInteractiveRebase) buildNonInteractiveTodoCmd(todoString string) (string, func(), error) {
 	todoFile, todoFileErr := os.CreateTemp("", "gitti-rebase-todo-*")
 	if todoFileErr != nil {

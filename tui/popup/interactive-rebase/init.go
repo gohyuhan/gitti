@@ -260,6 +260,14 @@ func InitInteractiveRebaseFixupSquashOutputPopUpModel(m *types.GittiModel) {
 //	INTERACTIVE REBASE - REWORD
 //
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	Initialize the reword commit selection popup with an empty commit list.
+//	A goroutine is spawned to fetch commit infos asynchronously and send them
+//	via the TUI update channel once available.
+//
+// ------------------------------------
 func InitInteractiveRebaseRewordSelectionPopUpModel(m *types.GittiModel) {
 	items := make([]list.Item, 0)
 	popUpWidth := int(float64(m.Width) * 0.9)
@@ -312,6 +320,13 @@ func InitInteractiveRebaseRewordSelectionPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Initialize the reword commit message editing popup. Pre-fills the message
+//	and description inputs with the selected commit's existing message and
+//	description. The message input starts focused; the description textarea starts blurred.
+//
+// ------------------------------------
 func InitInteractiveRebaseRewordCommitPopUp(m *types.GittiModel, originalRetrievedCommitList []git.CommitInfo, selectedCommit git.CommitInfo) {
 	commitMsg := selectedCommit.Message
 	commitDesc := selectedCommit.Description
@@ -346,6 +361,13 @@ func InitInteractiveRebaseRewordCommitPopUp(m *types.GittiModel, originalRetriev
 	m.PopUpModel = popUpModel
 }
 
+// ------------------------------------
+//
+//	Initialize the reword rebase output popup with a scrollable viewport and
+//	a spinner. All atomic state flags (IsProcessing, IsCancelled, HasError,
+//	ProcessSuccess) are reset to false.
+//
+// ------------------------------------
 func InitInteractiveRebaseRewordOutputPopUpModel(m *types.GittiModel) {
 	vp := viewport.New()
 	vp.SoftWrap = true
