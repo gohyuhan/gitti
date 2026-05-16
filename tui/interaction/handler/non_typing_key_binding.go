@@ -25,7 +25,6 @@ import (
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
-	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
@@ -1638,7 +1637,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				}
 				parsedSelectedItem := selectedItem.(interactiverebasePopUp.InteractiveRebaseRewordSelectionItem)
 				selectedCommit := git.CommitInfo(parsedSelectedItem)
-				interactiverebase.InteractiveRebaseRewordSelectionValidation(m, selectedCommit)
+				interactiverebasePopUp.InteractiveRebaseRewordSelectionValidation(m, selectedCommit)
 
 				if popUp.SelectionError == nil {
 					m.ShowPopUp.Store(true)

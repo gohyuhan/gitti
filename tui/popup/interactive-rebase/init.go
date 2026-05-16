@@ -312,9 +312,9 @@ func InitInteractiveRebaseRewordSelectionPopUpModel(m *types.GittiModel) {
 	m.PopUpModel = popUpModel
 }
 
-func InitInteractiveRebaseRewordCommitPopUp(m *types.GittiModel, originalRetrievedCommitList []git.CommitInfo, SelectedCommit git.CommitInfo) {
-	commitMsg := SelectedCommit.Message
-	commitDesc := SelectedCommit.Description
+func InitInteractiveRebaseRewordCommitPopUp(m *types.GittiModel, originalRetrievedCommitList []git.CommitInfo, selectedCommit git.CommitInfo) {
+	commitMsg := selectedCommit.Message
+	commitDesc := selectedCommit.Description
 	commitMsgPlaceholder := i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitPopUpMessageInputPlaceHolder
 	commitDescPlaceholder := i18n.LANGUAGEMAPPING.InteractiveRebaseRewordCommitPopUpCommitDescriptionInputPlaceHolder
 
@@ -340,7 +340,7 @@ func InitInteractiveRebaseRewordCommitPopUp(m *types.GittiModel, originalRetriev
 		DescriptionTextAreaInput:    CommitDescriptionTextAreaInput,
 		TotalInputCount:             2,
 		CurrentActiveInputIndex:     1,
-		SelectedCommit:              SelectedCommit,
+		SelectedCommit:              selectedCommit,
 		OriginalRetrievedCommitList: originalRetrievedCommitList,
 	}
 	m.PopUpModel = popUpModel

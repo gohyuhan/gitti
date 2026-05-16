@@ -707,7 +707,7 @@ var eN = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "The fixup/squash target must not be a merge commit",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "The base commit of the selection cannot be a merge commit",
 	InteractiveRebaseFixupPositionMismatchError:                    "Selected commit position mismatch for interactive rebase fixup",
-	InteractiveRebaseFixupWarning:                                  "Warning: Any merge commits newer than the squash target will be skipped and dropped from the rebase, even if selected.",
+	InteractiveRebaseWarning:                                       "Warning: Any merge commits newer than the squash target will be skipped and dropped from the rebase, even if selected.",
 	InteractiveRebaseFixupSquash:                                   "Fixup / Squash",
 	InteractiveRebaseFixupSquashDescription:                        "Combine selected commits into one, optionally editing the commit message",
 	InteractiveRebaseFixupSquashCommitPopUpMessageInputPlaceHolder: "Commit message",

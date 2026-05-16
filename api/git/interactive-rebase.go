@@ -355,17 +355,17 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context,
 		defer rewordCleanup()
 	}
 	gIR.logging.RegisterNewLog(logging.INTERACTIVE_REBASE_REWORD, strings.Join(rewordCmd.Args, " "), logging.INFO, "", true)
-	fixupOutput, runErr := rewordCmd.CombinedOutput()
-	parsedFixupOutput := processGeneralGitOpsOutputIntoStringArray(fixupOutput)
+	rewordOutput, runErr := rewordCmd.CombinedOutput()
+	parsedRewordOutput := processGeneralGitOpsOutputIntoStringArray(rewordOutput)
 
 	if runErr != nil {
 		if ctx.Err() != nil {
-			return parsedFixupOutput, ctx.Err()
+			return parsedRewordOutput, ctx.Err()
 		}
-		return parsedFixupOutput, runErr
+		return parsedRewordOutput, runErr
 	}
 
-	return parsedFixupOutput, nil
+	return parsedRewordOutput, nil
 }
 
 // ------------------------------------
@@ -494,10 +494,6 @@ func (gIR *GitInteractiveRebase) constructRewordTodo(sortedAffectedCommitInfos [
 
 	if len(sortedAffectedCommitInfos) > 1 {
 		for _, commitInfo := range sortedAffectedCommitInfos[1:] {
-			// skip any merge commit
-			if len(commitInfo.Parent) > 1 {
-				continue
-			}
 			rewordTodoString.WriteString("pick ")
 			rewordTodoString.WriteString(commitInfo.Hash)
 			rewordTodoString.WriteRune('\n')

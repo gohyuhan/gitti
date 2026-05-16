@@ -707,7 +707,7 @@ var jA = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "fixup/squash ターゲットはマージコミットであってはなりません",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "選択のベースコミットはマージコミットであってはなりません",
 	InteractiveRebaseFixupPositionMismatchError:                    "インタラクティブリベースfixupの選択コミット位置が一致しません",
-	InteractiveRebaseFixupWarning:                                  "警告：スカッシュターゲットより新しいマージコミットは、選択されていてもリベースからスキップ・除外されます。",
+	InteractiveRebaseWarning:                                       "警告：スカッシュターゲットより新しいマージコミットは、選択されていてもリベースからスキップ・除外されます。",
 	InteractiveRebaseFixupSquash:                                   "Fixup / Squash",
 	InteractiveRebaseFixupSquashDescription:                        "選択したコミットを1つにまとめます（コミットメッセージの編集も可能）",
 	InteractiveRebaseFixupSquashCommitPopUpMessageInputPlaceHolder: "コミットメッセージ",

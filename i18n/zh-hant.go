@@ -707,7 +707,7 @@ var zH_HANT = LanguageMapping{
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "fixup/squash 目標不可為合併提交",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "所選內容的基礎提交不可為合併提交",
 	InteractiveRebaseFixupPositionMismatchError:                    "互動式變基 fixup 的所選提交位置不匹配",
-	InteractiveRebaseFixupWarning:                                  "警告：比壓縮目標更新的合併提交將被略過並從變基中捨棄，即使已選取亦然。",
+	InteractiveRebaseWarning:                                       "警告：比壓縮目標更新的合併提交將被略過並從變基中捨棄，即使已選取亦然。",
 	InteractiveRebaseFixupSquash:                                   "Fixup / Squash",
 	InteractiveRebaseFixupSquashDescription:                        "將所選提交合併為一個，可選擇編輯提交訊息",
 	InteractiveRebaseFixupSquashCommitPopUpMessageInputPlaceHolder: "提交訊息",

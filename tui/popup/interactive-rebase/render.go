@@ -78,7 +78,7 @@ func RenderInteractiveRebaseFixupSquashSelectionPopUp(m *types.GittiModel) strin
 			lipgloss.Left,
 			title,
 			innerContent,
-			style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseFixupWarning),
+			style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseWarning),
 		)
 
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
