@@ -281,5 +281,95 @@ func RenderInteractiveRebaseRewordOutputPopUp(m *types.GittiModel) string {
 }
 
 // *************************************************************************************
-//                           INTERACTIVE REBASE - DROP
+//
+//	INTERACTIVE REBASE - DROP
+//
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	Render the drop commit selection popup with a scrollable commit list,
+//	selection state, and inline validation error or warning message
+//
+// ------------------------------------
+func RenderInteractiveRebaseDropSelectionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseDropSelectionPopUpModel)
+	if ok {
+		popUpWidth := int(float64(m.Width) * 0.9)
+		listWidth := popUpWidth - 2
+		height := int(float64(m.Height)*0.8) - 2
+
+		popUp.CommitList.SetWidth(listWidth)
+		popUp.CommitList.SetHeight(height)
+
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseDrop)
+
+		var content string
+		if popUp.SelectionError != nil {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				popUp.CommitList.View(),
+				style.NewStyle.Foreground(style.ColorError).Render(popUp.SelectionError.Error()),
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				popUp.CommitList.View(),
+				style.NewStyle.Faint(true).Render(i18n.LANGUAGEMAPPING.InteractiveRebaseDropWarning),
+			)
+		}
+
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	Render the drop output popup with a log viewport, spinner during processing,
+//	and border color reflecting success/error state
+//
+// ------------------------------------
+func RenderInteractiveRebaseDropOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseDropOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxInteractiveRebaseDropOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.InteractiveRebaseDropOutputPopUpTitle)
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpInteractiveRebaseDropOutputviewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.DropOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.DropOutputViewport.SetYOffset(popUp.DropOutputViewport.YOffset())
+		logViewPort := logViewPortStyle.Render(popUp.DropOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.InteractiveRebaseDroping)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}

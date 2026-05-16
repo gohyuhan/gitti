@@ -27,7 +27,8 @@ import (
 //	Handle up/down key messages for pop-up navigation and scrolling.
 //	Responsibility: Routes vertical navigation events (Up/k, Down/j) to the currently
 //	active popup's internal lists or text viewports, including interactive rebase
-//	fixup/squash selection and output popups.
+//	option, fixup/squash, reword, and drop selection popups, and fixup/squash and
+//	reword output viewports (scroll blocked while processing).
 //
 // ------------------------------------
 func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -429,7 +430,25 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 					popUp.CommitList.Select(latestIndex)
 				}
 			}
-			popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, constant.MaxInteractiveRebaseOptionPopUpWidth)
+			popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, popUp.CommitList.Width())
+			return m, nil
+		}
+	case constant.InteractiveRebaseDropSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropSelectionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.CommitList.Index() > 0 {
+					latestIndex := popUp.CommitList.Index() - 1
+					popUp.CommitList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.CommitList.Index() < len(popUp.CommitList.Items())-1 {
+					latestIndex := popUp.CommitList.Index() + 1
+					popUp.CommitList.Select(latestIndex)
+				}
+			}
+			popUp.CommitList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CommitList, popUp.CommitList.Width())
 			return m, nil
 		}
 

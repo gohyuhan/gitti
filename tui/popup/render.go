@@ -151,6 +151,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = interactiverebase.RenderInteractiveRebaseRewordCommitPopUp(m)
 	case constant.InteractiveRebaseRewordOutputPopUp:
 		popUp = interactiverebase.RenderInteractiveRebaseRewordOutputPopUp(m)
+	case constant.InteractiveRebaseDropSelectionPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseDropSelectionPopUp(m)
+	case constant.InteractiveRebaseDropOutputPopUp:
+		popUp = interactiverebase.RenderInteractiveRebaseDropOutputPopUp(m)
 	}
 	return popUp
 }

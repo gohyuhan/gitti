@@ -71,9 +71,7 @@ func UpdateInteractiveRebaseFixupSquashViewport(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Handle the async commit-info fetch event. Stores the retrieved commit list
-//	on the matching popup model and populates the commit list with the received
-//	items. Currently handles the fixup/squash selection popup type.
+//	Populates the fixup/squash selection popup commit list with freshly fetched commit info
 //
 // ------------------------------------
 func UpdateInteractiveRebaseFixupSquashFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
@@ -156,5 +154,44 @@ func UpdateInteractiveRebaseRewordResultEvent(m *types.GittiModel, updateData ty
 }
 
 // *************************************************************************************
-//                           INTERACTIVE REBASE - DROP
+//
+//	INTERACTIVE REBASE - DROP
+//
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	Populates the drop selection popup commit list with freshly fetched commit info
+//
+// ------------------------------------
+func UpdateInteractiveRebaseDropFetchedCommitInfoList(m *types.GittiModel, updateData types.InteractiveRebaseFetchCommitInfoListEventDataStructure) {
+	switch updateData.PopUpModel {
+	case constant.InteractiveRebaseDropSelectionPopUp:
+		popUp, ok := m.PopUpModel.(*InteractiveRebaseDropSelectionPopUpModel)
+		if ok {
+			popUp.OriginalRetrievedCommitList = updateData.CommitInfos
+			popUp.CommitList.SetItems(updateData.ListItems)
+		}
+	}
+}
+
+// ------------------------------------
+//
+//	Applies the drop result to the output popup: sets success/error flags and
+//	populates the log viewport; no-ops if the operation was cancelled
+//
+// ------------------------------------
+func UpdateInteractiveRebaseDropResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseDropResultEventDataStructure) {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseDropOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+		popUp.DropOutputViewport.SetContentLines(updateData.Result)
+		popUp.IsProcessing.Store(false)
+	}
+}

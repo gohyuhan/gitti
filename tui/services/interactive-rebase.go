@@ -16,8 +16,9 @@ import (
 // *************************************************************************************
 // ------------------------------------
 //
-//	Runs fixup/squash interactive rebase asynchronously, streams command output to popup viewport,
-//	and updates popup processing/success/error state
+//	Runs fixup/squash interactive rebase in a goroutine and sends the result event
+//	to the TUI update channel on completion; sets IsProcessing and resets other flags
+//	before launching
 //
 // ------------------------------------
 func InteractiveRebaseFixupSquashService(m *types.GittiModel, originalRetrievedGitCommitInfo []git.CommitInfo, sortedSelectedCommits []git.CommitInfo, fixupSquashCommitMessage string, fixupSquashCommitDescription string) {
@@ -80,8 +81,9 @@ func InteractiveRebaseFixupSquashCancelService(m *types.GittiModel) {
 
 // ------------------------------------
 //
-//	Runs reword interactive rebase asynchronously, streams command output to popup viewport,
-//	and updates popup processing/success/error state
+//	Runs reword interactive rebase in a goroutine and sends the result event
+//	to the TUI update channel on completion; sets IsProcessing and resets other flags
+//	before launching
 //
 // ------------------------------------
 func InteractiveRebaseRewordService(m *types.GittiModel, originalRetrievedGitCommitInfo []git.CommitInfo, selectedCommit git.CommitInfo, rewordCommitMessage string, rewordCommitDescription string) {
@@ -130,6 +132,71 @@ func InteractiveRebaseRewordCancelService(m *types.GittiModel) {
 	m.PopUpType = constant.NoPopUp
 	if ok {
 		popUp.RewordOutputViewport.SetContent("")
+		popUp.IsProcessing.Store(false)
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+	}
+}
+
+// *************************************************************************************
+//
+//	INTERACTIVE REBASE - DROP
+//
+// *************************************************************************************
+
+// ------------------------------------
+//
+//	Runs drop interactive rebase in a goroutine and sends the result event
+//	to the TUI update channel on completion; sets IsProcessing and resets other flags
+//	before launching
+//
+// ------------------------------------
+func InteractiveRebaseDropService(m *types.GittiModel, originalRetrievedGitCommitInfo []git.CommitInfo, sortedSelectedCommits []git.CommitInfo) {
+
+	popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropOutputPopUpModel)
+	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
+		popUp.CancelFunc = cancel
+
+		go func(ctx context.Context) {
+			defer cancel()
+
+			dropResult, dropErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseDrop(ctx, originalRetrievedGitCommitInfo, sortedSelectedCommits)
+			data := types.InteractiveRebaseDropResultEventDataStructure{
+				Result:  dropResult,
+				Success: dropErr == nil,
+			}
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.INTERACTIVE_REBASE_DROP_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx)
+	}
+}
+
+// ------------------------------------
+//
+//	Cancels an in-progress drop rebase, tears down the output popup state, and resets all atomic flags
+//
+// ------------------------------------
+func InteractiveRebaseDropCancelService(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropOutputPopUpModel)
+	if ok {
+		// Set cancellation marker first, then cancel context.
+		popUp.IsCancelled.Store(true)
+		if popUp.CancelFunc != nil {
+			popUp.CancelFunc()
+		}
+	}
+	m.ShowPopUp.Store(false)
+	m.IsTyping.Store(false)
+	m.PopUpType = constant.NoPopUp
+	if ok {
+		popUp.DropOutputViewport.SetContent("")
 		popUp.IsProcessing.Store(false)
 		popUp.HasError.Store(false)
 		popUp.ProcessSuccess.Store(false)

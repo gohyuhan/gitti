@@ -67,6 +67,8 @@ const (
 	InteractiveRebaseRewordSelectionPopUp         = "InteractiveRebaseRewordSelectionPopUp"         // IsTyping will be false
 	InteractiveRebaseRewordCommitPopUp            = "InteractiveRebaseRewordCommitPopUp"            // IsTyping will be true
 	InteractiveRebaseRewordOutputPopUp            = "InteractiveRebaseRewordOutputPopUp"            // IsTyping will be false
+	InteractiveRebaseDropSelectionPopUp           = "InteractiveRebaseDropSelectionPopUp"           // IsTyping will be false
+	InteractiveRebaseDropOutputPopUp              = "InteractiveRebaseDropOutputPopUp"              // IsTyping will be false
 )
 
 const (
@@ -146,9 +148,11 @@ const (
 	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebase display
 	MaxInteractiveRebaseFixupSquashCommitPopUpWidth = 150
 	MaxInteractiveRebaseFixupSquashOutputPopUpWidth = 150
-	// InteractiveRebaseRewordSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebase display
+	// InteractiveRebaseRewordSelectionPopUpWidth will not be set as it will always take up 90% of the width
 	MaxInteractiveRebaseRewordCommitPopUpWidth = 150
 	MaxInteractiveRebaseRewordOutputPopUpWidth = 150
+	// InteractiveRebaseDropSelectionPopUpWidth will not be set as it will always take up 90% of the width
+	MaxInteractiveRebaseDropOutputPopUpWidth = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                       = 18
 	PopUpGitCommitOutputViewPortHeight                        = 10
@@ -186,12 +190,10 @@ const (
 	PopUpChooseBranchOptionForMergeBranchOptionHeight         = 5
 	PopUpChooseBranchOptionForMergeSelectedBranchOptionHeight = 5
 	PopUpBranchMergeOutputViewportHeight                      = 16
-	// BlamePopUpWidth will not be set as it will always take up 90% of height
-	PopUpInteractiveRebaseOptionHeight = 8
-	// InteractiveRebaseFixupSquashSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebase display
-	PopUpInteractiveRebaseFixupSquashOutputviewportHeight = 8
-	// InteractiveRebaseRewordSelectionPopUpWidth will not be set as it will always take up 90% of the width, 65% for selection, 35% for rebase display
-	PopUpInteractiveRebaseRewordOutputviewportHeight = 8
+	PopUpInteractiveRebaseOptionHeight                        = 8
+	PopUpInteractiveRebaseFixupSquashOutputviewportHeight     = 8
+	PopUpInteractiveRebaseRewordOutputviewportHeight          = 8
+	PopUpInteractiveRebaseDropOutputviewportHeight            = 8
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
@@ -288,5 +290,7 @@ const (
 	INTERACTIVE_REBASE_FIXUP_SQUASH_FETCH_COMMITS_INFO_EVENT = "INTERACTIVE_REBASE_FIXUP_SQUASH_FETCH_COMMITS_INFO_EVENT"
 	INTERACTIVE_REBASE_REWORD_RESULT_EVENT                   = "INTERACTIVE_REBASE_REWORD_RESULT_EVENT"
 	INTERACTIVE_REBASE_REWORD_FETCH_COMMITS_INFO_EVENT       = "INTERACTIVE_REBASE_REWORD_FETCH_COMMITS_INFO_EVENT"
+	INTERACTIVE_REBASE_DROP_RESULT_EVENT                     = "INTERACTIVE_REBASE_DROP_RESULT_EVENT"
+	INTERACTIVE_REBASE_DROP_FETCH_COMMITS_INFO_EVENT         = "INTERACTIVE_REBASE_DROP_FETCH_COMMITS_INFO_EVENT"
 	REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT                   = "REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT"
 )

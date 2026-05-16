@@ -211,6 +211,8 @@ type LanguageMapping struct {
 	KeyBindingForInteractiveRebaseRewordSelectionPopUp         []string
 	KeyBindingForInteractiveRebaseRewordCommitPopUp            []string
 	KeyBindingForInteractiveRebaseRewordOutputPopUp            []string
+	KeyBindingForInteractiveRebaseDropSelectionPopUp           []string
+	KeyBindingForInteractiveRebaseDropOutputPopUp              []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -468,6 +470,10 @@ type LanguageMapping struct {
 	InteractiveRebaseRewordCommitMessageTitle                                string
 	InteractiveRebaseRewordCommitDescriptionTitle                            string
 	InteractiveRebaseDrop                                                    string
+	InteractiveRebaseDropDescription                                         string
+	InteractiveRebaseDropWarning                                             string
+	InteractiveRebaseDropOutputPopUpTitle                                    string
+	InteractiveRebaseDroping                                                 string
 	InteractiveRebaseDropMustHaveAtLeastOneSelectedError                     string
 	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit                      string
 	InteractiveRebaseDropCommitCannotBeTheOldestCommit                       string
