@@ -48,7 +48,7 @@ func InteractiveRebaseFixupSquashSelectionValidationAndSort(m *types.GittiModel)
 // ------------------------------------
 //
 //	Validate the reword commit selection. Sets SelectionError if the selected
-//	commit is a merge commit, which cannot be rewarded. Clears the error otherwise.
+//	commit is a merge commit, which cannot be reworded. Clears the error otherwise.
 //
 // ------------------------------------
 func InteractiveRebaseRewordSelectionValidation(m *types.GittiModel, selectedCommit git.CommitInfo) {
