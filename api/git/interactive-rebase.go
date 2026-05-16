@@ -122,7 +122,7 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() []CommitInfo {
 //	* message applied via `git commit --amend -F <tempfile>` — no editor flag
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) ([]string, error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDescription string) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -130,7 +130,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Con
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, false)
+	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDescription, false)
 	if fixupErr != nil {
 		return []string{}, fixupErr
 	}
@@ -161,7 +161,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Con
 //	* git's own repo lock (.git/rebase-merge/) prevents concurrent ops during execution
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDescription string) (*exec.Cmd, func(), error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return nil, nil, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -169,7 +169,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx 
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	return gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDesceription, true)
+	return gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDescription, true)
 }
 
 // ------------------------------------
@@ -178,7 +178,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquashWithSigning(ctx 
 //	generates todo and message temp files, and configures a non-interactive sequence editor
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) interactiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDesceription string, signing bool) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) interactiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDescription string, signing bool) (*exec.Cmd, func(), error) {
 	if len(sortedSelectedCommitInfos) < 2 {
 		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError)
 	}
@@ -203,7 +203,7 @@ func (gIR *GitInteractiveRebase) interactiveRebaseFixupSquash(ctx context.Contex
 	})
 
 	// build the `exec git commit --amend -F <tempfile>` line that applies the new message
-	execAmendCommitCommandString, commitMsgTempPath, execErr := gIR.buildRebaseAmendExec(newCommitMessage, newCommitDesceription)
+	execAmendCommitCommandString, commitMsgTempPath, execErr := gIR.buildRebaseAmendExec(newCommitMessage, newCommitDescription)
 	if execErr != nil {
 		return nil, nil, execErr
 	}
@@ -339,7 +339,7 @@ func (gIR *GitInteractiveRebase) constructFixupTodo(sortedAffectedCommitInfos []
 //	* message applied via `git commit --amend -F <tempfile>` — no editor flag
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDesceription string) ([]string, error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -347,7 +347,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context,
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	rewordCmd, rewordCleanup, rewordErr := gIR.interactiveRebaseReword(ctx, gitCommitInfo, selectedCommitInfo, newCommitMessage, newCommitDesceription, false)
+	rewordCmd, rewordCleanup, rewordErr := gIR.interactiveRebaseReword(ctx, gitCommitInfo, selectedCommitInfo, newCommitMessage, newCommitDescription, false)
 	if rewordErr != nil {
 		return []string{}, rewordErr
 	}
@@ -378,7 +378,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context,
 //	* git's own repo lock (.git/rebase-merge/) prevents concurrent ops during execution
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) GitInteractiveRebaseRewordWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDesceription string) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) GitInteractiveRebaseRewordWithSigning(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string) (*exec.Cmd, func(), error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
 		return nil, nil, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
@@ -386,7 +386,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseRewordWithSigning(ctx conte
 		gIR.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	return gIR.interactiveRebaseReword(ctx, gitCommitInfo, selectedCommitInfo, newCommitMessage, newCommitDesceription, true)
+	return gIR.interactiveRebaseReword(ctx, gitCommitInfo, selectedCommitInfo, newCommitMessage, newCommitDescription, true)
 }
 
 // ------------------------------------
@@ -395,7 +395,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseRewordWithSigning(ctx conte
 //	generates todo and message temp files, and configures a non-interactive sequence editor
 //
 // ------------------------------------
-func (gIR *GitInteractiveRebase) interactiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDesceription string, signing bool) (*exec.Cmd, func(), error) {
+func (gIR *GitInteractiveRebase) interactiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string, signing bool) (*exec.Cmd, func(), error) {
 	// base is merge commit, does not allow that
 	if len(selectedCommitInfo.Parent) > 1 {
 		return nil, nil, fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError)
@@ -416,7 +416,7 @@ func (gIR *GitInteractiveRebase) interactiveRebaseReword(ctx context.Context, gi
 	})
 
 	// build the `exec git commit --amend -F <tempfile>` line that applies the new message
-	execAmendCommitCommandString, commitMsgTempPath, execErr := gIR.buildRebaseAmendExec(newCommitMessage, newCommitDesceription)
+	execAmendCommitCommandString, commitMsgTempPath, execErr := gIR.buildRebaseAmendExec(newCommitMessage, newCommitDescription)
 	if execErr != nil {
 		return nil, nil, execErr
 	}

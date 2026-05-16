@@ -63,10 +63,10 @@ const (
 	InteractiveRebaseOptionPopUp                  = "InteractiveRebaseOptionPopUp"                  // IsTyping will be false
 	InteractiveRebaseFixupSquashSelectionPopUp    = "InteractiveRebaseFixupSquashSelectionPopUp"    // IsTyping will be false
 	InteractiveRebaseFixupSquashCommitPopUp       = "InteractiveRebaseFixupSquashCommitPopUp"       // IsTyping will be true
-	InteractiveRebaseFixupSquashOutputPopUp       = "InteractiveRebaseFixupSquashOutputPopUp"       // Istyping will be false
+	InteractiveRebaseFixupSquashOutputPopUp       = "InteractiveRebaseFixupSquashOutputPopUp"       // IsTyping will be false
 	InteractiveRebaseRewordSelectionPopUp         = "InteractiveRebaseRewordSelectionPopUp"         // IsTyping will be false
 	InteractiveRebaseRewordCommitPopUp            = "InteractiveRebaseRewordCommitPopUp"            // IsTyping will be true
-	InteractiveRebaseRewordOutputPopUp            = "InteractiveRebaseRewordOutputPopUp"            // Istyping will be false
+	InteractiveRebaseRewordOutputPopUp            = "InteractiveRebaseRewordOutputPopUp"            // IsTyping will be false
 )
 
 const (
