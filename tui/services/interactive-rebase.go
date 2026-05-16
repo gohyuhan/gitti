@@ -77,6 +77,13 @@ func InteractiveRebaseFixupSquashCancelService(m *types.GittiModel) {
 //	INTERACTIVE REBASE - REWORD
 //
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	Runs reword interactive rebase asynchronously, streams command output to popup viewport,
+//	and updates popup processing/success/error state
+//
+// ------------------------------------
 func InteractiveRebaseRewordService(m *types.GittiModel, originalRetrievedGitCommitInfo []git.CommitInfo, selectedCommit git.CommitInfo, rewordCommitMessage string, rewordCommitDescription string) {
 
 	popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
@@ -104,6 +111,11 @@ func InteractiveRebaseRewordService(m *types.GittiModel, originalRetrievedGitCom
 	}
 }
 
+// ------------------------------------
+//
+//	Cancels an in-progress reword rebase, tears down the output popup state, and resets all atomic flags
+//
+// ------------------------------------
 func InteractiveRebaseRewordCancelService(m *types.GittiModel) {
 	popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseRewordOutputPopUpModel)
 	if ok {
