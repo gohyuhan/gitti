@@ -3,7 +3,7 @@
 $ErrorActionPreference = "Stop"
 
 # Version to install
-$Version = "v0.6.3"
+$Version = "v0.7.0"
 
 Write-Host "Installing Gitti version: $Version" -ForegroundColor Cyan
 

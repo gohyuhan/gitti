@@ -215,6 +215,16 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.7.0]
+
+- feature: git blame — view line-by-line blame with commit info
+- feature: interactive rebase
+  - drop commit
+  - reword commit
+  - fixup/squash commit
+- optimize: mouse interaction improvements
+- optimize: rendering interaction improvements
+
 ### [v0.6.3]
 -  fix: rework v0.6.2 UI freeze fix with better handling to prevent UX degradation
 -  other: bump dep package version and utilize latest api
