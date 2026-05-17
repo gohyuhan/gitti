@@ -473,7 +473,7 @@ type LanguageMapping struct {
 	InteractiveRebaseDropDescription                                         string
 	InteractiveRebaseDropWarning                                             string
 	InteractiveRebaseDropOutputPopUpTitle                                    string
-	InteractiveRebaseDroping                                                 string
+	InteractiveRebaseDropping                                                string
 	InteractiveRebaseDropMustHaveAtLeastOneSelectedError                     string
 	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit                      string
 	InteractiveRebaseDropCommitCannotBeTheOldestCommit                       string

@@ -740,7 +740,7 @@ var jA = LanguageMapping{
 	InteractiveRebaseDropDescription:                                         "1つ以上のコミットを履歴から削除する",
 	InteractiveRebaseDropWarning:                                             "警告：drop対象の最も古いコミットとHEADの間にあるマージコミットも削除されます。",
 	InteractiveRebaseDropOutputPopUpTitle:                                    "Drop 結果",
-	InteractiveRebaseDroping:                                                 "Drop 中...",
+	InteractiveRebaseDropping:                                                "Drop 中...",
 	InteractiveRebaseDropMustHaveAtLeastOneSelectedError:                     "インタラクティブリベースのdropには少なくとも1つのコミットを選択する必要があります",
 	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit:                      "選択したコミットはマージコミットであってはなりません",
 	InteractiveRebaseDropCommitCannotBeTheOldestCommit:                       "選択したコミットは最も古いコミットであってはなりません",

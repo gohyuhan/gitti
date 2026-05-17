@@ -740,7 +740,7 @@ var zH_HANS = LanguageMapping{
 	InteractiveRebaseDropDescription:                                         "从历史记录中删除一个或多个提交",
 	InteractiveRebaseDropWarning:                                             "警告：drop 中最旧所选提交与 HEAD 之间的合并提交也将被删除。",
 	InteractiveRebaseDropOutputPopUpTitle:                                    "Drop 结果",
-	InteractiveRebaseDroping:                                                 "Drop 中...",
+	InteractiveRebaseDropping:                                                "Drop 中...",
 	InteractiveRebaseDropMustHaveAtLeastOneSelectedError:                     "交互式变基 drop 至少需要选择 1 个提交",
 	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit:                      "所选提交不能是合并提交",
 	InteractiveRebaseDropCommitCannotBeTheOldestCommit:                       "所选提交不能是最旧的提交",

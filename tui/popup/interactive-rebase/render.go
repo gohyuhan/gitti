@@ -354,7 +354,7 @@ func RenderInteractiveRebaseDropOutputPopUp(m *types.GittiModel) string {
 		var content string
 		// Show spinner above viewport when processing
 		if popUp.IsProcessing.Load() {
-			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.InteractiveRebaseDroping)
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.InteractiveRebaseDropping)
 			content = lipgloss.JoinVertical(
 				lipgloss.Left,
 				title,

@@ -740,7 +740,7 @@ var eN = LanguageMapping{
 	InteractiveRebaseDropDescription:                                         "Remove one or more commits from history",
 	InteractiveRebaseDropWarning:                                             "Warning: Any merge commits between the oldest selected commit for drop and HEAD will also be dropped.",
 	InteractiveRebaseDropOutputPopUpTitle:                                    "Drop Result",
-	InteractiveRebaseDroping:                                                 "Dropping...",
+	InteractiveRebaseDropping:                                                "Dropping...",
 	InteractiveRebaseDropMustHaveAtLeastOneSelectedError:                     "Interactive rebase drop requires at least 1 commit to be selected",
 	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit:                      "The oldest selected commit cannot be a merge commit",
 	InteractiveRebaseDropCommitCannotBeTheOldestCommit:                       "The selected commit cannot be the oldest commit",
