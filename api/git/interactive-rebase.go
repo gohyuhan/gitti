@@ -124,7 +124,7 @@ func (gIR *GitInteractiveRebase) GetCommitInfos() []CommitInfo {
 // ------------------------------------
 func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo, newCommitMessage string, newCommitDescription string) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
-		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
+		return []string{gIR.gitProcessLock.OtherProcessRunningWarning()}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
 	defer func() {
 		gIR.gitProcessLock.ReleaseGitOpsLock()
@@ -132,7 +132,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseFixupSquash(ctx context.Con
 
 	fixupCmd, fixupCleanup, fixupErr := gIR.interactiveRebaseFixupSquash(ctx, gitCommitInfo, sortedSelectedCommitInfos, newCommitMessage, newCommitDescription, false)
 	if fixupErr != nil {
-		return []string{}, fixupErr
+		return []string{fixupErr.Error()}, fixupErr
 	}
 	if fixupCleanup != nil {
 		defer fixupCleanup()
@@ -341,7 +341,7 @@ func (gIR *GitInteractiveRebase) constructFixupTodo(sortedAffectedCommitInfos []
 // ------------------------------------
 func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context, gitCommitInfo []CommitInfo, selectedCommitInfo CommitInfo, newCommitMessage string, newCommitDescription string) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
-		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
+		return []string{gIR.gitProcessLock.OtherProcessRunningWarning()}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
 	defer func() {
 		gIR.gitProcessLock.ReleaseGitOpsLock()
@@ -349,7 +349,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseReword(ctx context.Context,
 
 	rewordCmd, rewordCleanup, rewordErr := gIR.interactiveRebaseReword(ctx, gitCommitInfo, selectedCommitInfo, newCommitMessage, newCommitDescription, false)
 	if rewordErr != nil {
-		return []string{}, rewordErr
+		return []string{rewordErr.Error()}, rewordErr
 	}
 	if rewordCleanup != nil {
 		defer rewordCleanup()
@@ -528,7 +528,7 @@ func (gIR *GitInteractiveRebase) constructRewordTodo(sortedAffectedCommitInfos [
 // ------------------------------------
 func (gIR *GitInteractiveRebase) GitInteractiveRebaseDrop(ctx context.Context, gitCommitInfo []CommitInfo, sortedSelectedCommitInfos []CommitInfo) ([]string, error) {
 	if !gIR.gitProcessLock.CanProceedWithGitOps() {
-		return []string{}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
+		return []string{gIR.gitProcessLock.OtherProcessRunningWarning()}, fmt.Errorf("%s", gIR.gitProcessLock.OtherProcessRunningWarning())
 	}
 	defer func() {
 		gIR.gitProcessLock.ReleaseGitOpsLock()
@@ -536,7 +536,7 @@ func (gIR *GitInteractiveRebase) GitInteractiveRebaseDrop(ctx context.Context, g
 
 	dropCmd, dropCleanup, dropErr := gIR.interactiveRebaseDrop(ctx, gitCommitInfo, sortedSelectedCommitInfos, false)
 	if dropErr != nil {
-		return []string{}, dropErr
+		return []string{dropErr.Error()}, dropErr
 	}
 	if dropCleanup != nil {
 		defer dropCleanup()
