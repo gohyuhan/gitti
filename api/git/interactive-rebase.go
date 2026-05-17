@@ -657,6 +657,9 @@ func (gIR *GitInteractiveRebase) constructDropTodo(sortedAffectedCommitInfos []C
 
 	for _, commitInfo := range sortedAffectedCommitInfos {
 		_, found := selectedDropSet[commitInfo.Hash]
+		if len(commitInfo.Parent) > 1 {
+			continue
+		}
 		if found {
 			dropTodoString.WriteString("drop ")
 			dropTodoString.WriteString(commitInfo.Hash)
@@ -759,7 +762,6 @@ func (gIR *GitInteractiveRebase) createSequenceEditorScript(todoFilePath string)
 //
 // ------------------------------------
 func (gIR *GitInteractiveRebase) buildRebaseAmendExec(message, description string) (string, string, error) {
-
 	// combine message + description
 	fullMsg := strings.TrimSpace(message)
 	if utf8.RuneCountInString(fullMsg) < 1 {
