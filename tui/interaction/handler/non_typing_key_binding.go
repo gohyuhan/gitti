@@ -1656,7 +1656,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			if ok {
 				ogRetrievedCommitsList := popUp.OriginalRetrievedCommitList
 				sortedSelectedCommits := popUp.SortedSelectedCommits
-				if len(ogRetrievedCommitsList) > 1 && len(sortedSelectedCommits) > 0 {
+				if len(ogRetrievedCommitsList) > 1 && len(sortedSelectedCommits) > 0 && popUp.SelectionError == nil {
 					// Switch to output popup before starting execution so errors/progress are visible immediately.
 					interactiverebasePopUp.InitInteractiveRebaseDropOutputPopUpModel(m)
 					popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropOutputPopUpModel)

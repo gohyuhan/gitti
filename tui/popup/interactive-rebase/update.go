@@ -95,6 +95,8 @@ func UpdateInteractiveRebaseFixupSquashFetchedCommitInfoList(m *types.GittiModel
 func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseFixupSquashResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseFixupSquashOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
+		popUp.FixupSquashOutputViewport.SetContentLines(updateData.Result)
+		popUp.IsProcessing.Store(false)
 		if updateData.Success && !popUp.IsProcessing.Load() {
 			popUp.ProcessSuccess.Store(true)
 			popUp.HasError.Store(false)
@@ -102,8 +104,7 @@ func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateDa
 			popUp.ProcessSuccess.Store(false)
 			popUp.HasError.Store(true)
 		}
-		popUp.FixupSquashOutputViewport.SetContentLines(updateData.Result)
-		popUp.IsProcessing.Store(false)
+
 	}
 }
 
@@ -141,6 +142,8 @@ func UpdateInteractiveRebaseRewordFetchedCommitInfoList(m *types.GittiModel, upd
 func UpdateInteractiveRebaseRewordResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseRewordResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseRewordOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
+		popUp.RewordOutputViewport.SetContentLines(updateData.Result)
+		popUp.IsProcessing.Store(false)
 		if updateData.Success && !popUp.IsProcessing.Load() {
 			popUp.ProcessSuccess.Store(true)
 			popUp.HasError.Store(false)
@@ -148,8 +151,6 @@ func UpdateInteractiveRebaseRewordResultEvent(m *types.GittiModel, updateData ty
 			popUp.ProcessSuccess.Store(false)
 			popUp.HasError.Store(true)
 		}
-		popUp.RewordOutputViewport.SetContentLines(updateData.Result)
-		popUp.IsProcessing.Store(false)
 	}
 }
 
@@ -184,6 +185,8 @@ func UpdateInteractiveRebaseDropFetchedCommitInfoList(m *types.GittiModel, updat
 func UpdateInteractiveRebaseDropResultEvent(m *types.GittiModel, updateData types.InteractiveRebaseDropResultEventDataStructure) {
 	popUp, ok := m.PopUpModel.(*InteractiveRebaseDropOutputPopUpModel)
 	if ok && !popUp.IsCancelled.Load() {
+		popUp.DropOutputViewport.SetContentLines(updateData.Result)
+		popUp.IsProcessing.Store(false)
 		if updateData.Success && !popUp.IsProcessing.Load() {
 			popUp.ProcessSuccess.Store(true)
 			popUp.HasError.Store(false)
@@ -191,7 +194,5 @@ func UpdateInteractiveRebaseDropResultEvent(m *types.GittiModel, updateData type
 			popUp.ProcessSuccess.Store(false)
 			popUp.HasError.Store(true)
 		}
-		popUp.DropOutputViewport.SetContentLines(updateData.Result)
-		popUp.IsProcessing.Store(false)
 	}
 }
