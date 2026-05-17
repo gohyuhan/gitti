@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"context"
 	"slices"
 	"strings"
 	"unicode/utf8"
@@ -948,7 +949,8 @@ func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.
 //	Handle Enter key interaction.
 //	Responsibility: Core confirmation and drill-down action. Depends heavily on context:
 //	- Active Popup (e.g., choosing remote, selecting branch type, confirming discard): Executes the chosen workflow or triggers git commands (push, pull, reset, discard, tag operations, etc.).
-//	- Interactive Rebase Option Popup: Confirms the selected operation type and navigates to the next popup (e.g., fixup/squash commit selection).
+//	- Interactive Rebase Option Popup: Confirms the selected operation type and navigates to the next popup (fixup/squash, reword, or drop selection).
+//	- Interactive Rebase Selection Popups: Validates selection and transitions to the output popup; forks into signing or async service path.
 //	- Component Panels (when no popup active): Typically drills down into a "detail view" for the selected item (e.g., viewing diffs for a file, showing commit details), or triggers context menus like switching branches.
 //
 // ------------------------------------
@@ -1612,7 +1614,10 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						m.PopUpType = constant.InteractiveRebaseRewordSelectionPopUp
 						interactiverebasePopUp.InitInteractiveRebaseRewordSelectionPopUpModel(m)
 					case git.DROP:
-						// COMING IN NEXT VERSION
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.InteractiveRebaseDropSelectionPopUp
+						interactiverebasePopUp.InitInteractiveRebaseDropSelectionPopUpModel(m)
 					}
 				}
 			}
@@ -1644,6 +1649,40 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.IsTyping.Store(true)
 					m.PopUpType = constant.InteractiveRebaseRewordCommitPopUp
 					interactiverebasePopUp.InitInteractiveRebaseRewordCommitPopUp(m, popUp.OriginalRetrievedCommitList, selectedCommit)
+				}
+			}
+		case constant.InteractiveRebaseDropSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropSelectionPopUpModel)
+			if ok {
+				ogRetrievedCommitsList := popUp.OriginalRetrievedCommitList
+				sortedSelectedCommits := popUp.SortedSelectedCommits
+				if len(ogRetrievedCommitsList) > 1 && len(sortedSelectedCommits) > 0 {
+					// Switch to output popup before starting execution so errors/progress are visible immediately.
+					interactiverebasePopUp.InitInteractiveRebaseDropOutputPopUpModel(m)
+					popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropOutputPopUpModel)
+					if !ok {
+						return m, nil
+					}
+					m.PopUpType = constant.InteractiveRebaseDropOutputPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					if m.GitCommitRequireSigning && !settings.GITTICONFIGSETTINGS.OverrideSigningUISuspend {
+						// Signing path returns prepared exec command; tea.ExecProcess handles terminal suspension.
+						executor, cleanupCallbackFunc, dropErr := m.GitOperations.GitInteractiveRebase.GitInteractiveRebaseDropWithSigning(context.TODO(), ogRetrievedCommitsList, sortedSelectedCommits)
+						if dropErr != nil {
+							popUp.HasError.Store(true)
+							popUp.DropOutputViewport.SetContent(dropErr.Error())
+							return m, nil
+						}
+						return utils.SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m, executor, cleanupCallbackFunc, logging.INTERACTIVE_REBASE_DROP)
+					} else {
+						popUp.IsProcessing.Store(true)
+						// Non-signing path runs async service with cancellable context.
+						services.InteractiveRebaseDropService(m, ogRetrievedCommitsList, sortedSelectedCommits)
+
+						// Start spinner ticking
+						return m, popUp.Spinner.Tick
+					}
 				}
 			}
 		}
@@ -1727,6 +1766,7 @@ func handleNonTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.G
 //	- Cherry Pick Popup: Selects/toggles the currently highlighted commit to be added to the cherry-pick queue.
 //	- Merge Popup: Toggles the currently highlighted branch between the available and selected branch lists.
 //	- Interactive Rebase Fixup/Squash Popup: Toggles the highlighted commit's inclusion in the fixup/squash target set.
+//	- Interactive Rebase Drop Popup: Toggles the highlighted commit's inclusion in the drop target set.
 //
 // ------------------------------------
 func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -1810,6 +1850,23 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					}
 				}
 			}
+		case constant.InteractiveRebaseDropSelectionPopUp:
+			popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropSelectionPopUpModel)
+			if ok {
+				selectedItem := popUp.CommitList.SelectedItem()
+				if selectedItem != nil {
+					// check if the selected item is pick for selection or not
+					// if not, include it for selection, else unselect it
+					parsedSelectedItem := selectedItem.(interactiverebasePopUp.InteractiveRebaseDropSelectionItem)
+					_, exist := popUp.SelectedCommitHashMap[parsedSelectedItem.Hash]
+					if exist {
+						delete(popUp.SelectedCommitHashMap, parsedSelectedItem.Hash)
+					} else {
+						popUp.SelectedCommitHashMap[parsedSelectedItem.Hash] = git.CommitInfo(parsedSelectedItem)
+					}
+					interactiverebasePopUp.InteractiveRebaseDropSelectionValidationAndSort(m)
+				}
+			}
 		}
 	}
 	return m, nil
@@ -1854,6 +1911,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			m.PopUpModel = nil
 		case constant.InteractiveRebaseRewordOutputPopUp:
 			services.InteractiveRebaseRewordCancelService(m)
+			m.PopUpModel = nil
+		case constant.InteractiveRebaseDropOutputPopUp:
+			services.InteractiveRebaseDropCancelService(m)
 			m.PopUpModel = nil
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
@@ -1928,7 +1988,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.ChooseBranchOptionForMergePopUp,
 			constant.InteractiveRebaseOptionPopUp,
 			constant.InteractiveRebaseFixupSquashSelectionPopUp,
-			constant.InteractiveRebaseRewordSelectionPopUp:
+			constant.InteractiveRebaseRewordSelectionPopUp,
+			constant.InteractiveRebaseDropSelectionPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

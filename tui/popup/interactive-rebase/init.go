@@ -38,7 +38,7 @@ func InitInteractiveRebaseOptionPopUpModel(m *types.GittiModel) {
 		},
 		{
 			Name:                  i18n.LANGUAGEMAPPING.InteractiveRebaseDrop,
-			Info:                  i18n.LANGUAGEMAPPING.InteractiveRebaseFeatureComingSoon,
+			Info:                  i18n.LANGUAGEMAPPING.InteractiveRebaseDropDescription,
 			InteractiveRebaseType: git.DROP,
 		},
 	}
@@ -394,5 +394,100 @@ func InitInteractiveRebaseRewordOutputPopUpModel(m *types.GittiModel) {
 }
 
 // *************************************************************************************
-//                           INTERACTIVE REBASE - DROP
+//
+//	INTERACTIVE REBASE - DROP
+//
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	Initialize the drop commit selection popup with an empty commit list and
+//	selection hash map. A goroutine is spawned to fetch commit infos asynchronously
+//	and send them via the TUI update channel once available.
+//
+// ------------------------------------
+func InitInteractiveRebaseDropSelectionPopUpModel(m *types.GittiModel) {
+	items := make([]list.Item, 0)
+	popUpWidth := int(float64(m.Width) * 0.9)
+	listWidth := popUpWidth - 2
+
+	selectedCommitHashMap := make(map[string]git.CommitInfo)
+	height := int(float64(m.Height)*0.8) - 2
+	iRDSL := list.New(items, InteractiveRebaseDropSelectionDelegate{&selectedCommitHashMap}, listWidth, height)
+	iRDSL.SetShowPagination(false)
+	iRDSL.SetShowStatusBar(false)
+	iRDSL.SetFilteringEnabled(false)
+	iRDSL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	iRDSL.SetShowHelp(true)
+	iRDSL.KeyMap = list.KeyMap{}
+	iRDSL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	iRDSL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &iRDSL, m.Width)
+
+	popUpModel := &InteractiveRebaseDropSelectionPopUpModel{
+		CommitList:                  iRDSL,
+		OriginalRetrievedCommitList: []git.CommitInfo{},
+		SelectedCommitHashMap:       selectedCommitHashMap,
+	}
+
+	go func() {
+		commitInfos := m.GitOperations.GitInteractiveRebase.GetCommitInfos()
+		listItems := make([]list.Item, 0, len(commitInfos))
+		for _, commitInfo := range commitInfos {
+			listItems = append(listItems, InteractiveRebaseDropSelectionItem{
+				Hash:        commitInfo.Hash,
+				Message:     commitInfo.Message,
+				Author:      commitInfo.Author,
+				Description: commitInfo.Description,
+				Parent:      commitInfo.Parent,
+				CommitOrder: commitInfo.CommitOrder,
+			})
+		}
+
+		data := types.InteractiveRebaseFetchCommitInfoListEventDataStructure{
+			PopUpModel:  constant.InteractiveRebaseDropSelectionPopUp,
+			CommitInfos: commitInfos,
+			ListItems:   listItems,
+		}
+
+		m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+			Event: constant.INTERACTIVE_REBASE_DROP_FETCH_COMMITS_INFO_EVENT,
+			Data:  data,
+		}
+	}()
+
+	m.PopUpModel = popUpModel
+}
+
+// ------------------------------------
+//
+//	Initialize the drop rebase output popup with a scrollable viewport and
+//	a spinner. All atomic state flags (IsProcessing, IsCancelled, HasError,
+//	ProcessSuccess) are reset to false.
+//
+// ------------------------------------
+func InitInteractiveRebaseDropOutputPopUpModel(m *types.GittiModel) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpGitRebaseOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxGitRebaseOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &InteractiveRebaseDropOutputPopUpModel{
+		DropOutputViewport: vp,
+		Spinner:            s,
+	}
+
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.IsCancelled.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+
+	m.PopUpModel = popUpModel
+}

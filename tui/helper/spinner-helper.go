@@ -116,6 +116,12 @@ func UpdateSpinner(m *types.GittiModel, msg tea.Msg, cmds []tea.Cmd) []tea.Cmd {
 				interactiveRebaseReword.Spinner, cmd = interactiveRebaseReword.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
+		case constant.InteractiveRebaseDropOutputPopUp:
+			if interactiveRebaseDrop, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropOutputPopUpModel); ok && interactiveRebaseDrop.IsProcessing.Load() {
+				var cmd tea.Cmd
+				interactiveRebaseDrop.Spinner, cmd = interactiveRebaseDrop.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
 		}
 	}
 

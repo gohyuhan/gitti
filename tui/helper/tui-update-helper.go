@@ -73,6 +73,10 @@ func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg)
 		interactiverebasePopUp.UpdateInteractiveRebaseRewordFetchedCommitInfoList(m, updateMsg.Data.(types.InteractiveRebaseFetchCommitInfoListEventDataStructure))
 	case constant.INTERACTIVE_REBASE_REWORD_RESULT_EVENT:
 		interactiverebasePopUp.UpdateInteractiveRebaseRewordResultEvent(m, updateMsg.Data.(types.InteractiveRebaseRewordResultEventDataStructure))
+	case constant.INTERACTIVE_REBASE_DROP_FETCH_COMMITS_INFO_EVENT:
+		interactiverebasePopUp.UpdateInteractiveRebaseDropFetchedCommitInfoList(m, updateMsg.Data.(types.InteractiveRebaseFetchCommitInfoListEventDataStructure))
+	case constant.INTERACTIVE_REBASE_DROP_RESULT_EVENT:
+		interactiverebasePopUp.UpdateInteractiveRebaseDropResultEvent(m, updateMsg.Data.(types.InteractiveRebaseDropResultEventDataStructure))
 	case constant.REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT:
 		utils.ReinitCherryPickedCommitInfo(m)
 	}

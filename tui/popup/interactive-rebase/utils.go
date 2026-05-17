@@ -61,3 +61,39 @@ func InteractiveRebaseRewordSelectionValidation(m *types.GittiModel, selectedCom
 		}
 	}
 }
+
+// ------------------------------------
+//
+//	Validates and sorts selected drop commits by CommitOrder (oldest first);
+//	sets SelectionError if fewer than 1 selected, base commit is a merge commit,
+//	or base commit is the oldest commit in the repo
+//
+// ------------------------------------
+func InteractiveRebaseDropSelectionValidationAndSort(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*InteractiveRebaseDropSelectionPopUpModel)
+	if ok {
+		popUp.SelectionError = nil
+		var sortedSelectedCommitArray []git.CommitInfo
+
+		for _, commit := range popUp.SelectedCommitHashMap {
+			sortedSelectedCommitArray = append(sortedSelectedCommitArray, commit)
+		}
+
+		slices.SortFunc(sortedSelectedCommitArray, func(a, b git.CommitInfo) int {
+			return cmp.Compare(b.CommitOrder, a.CommitOrder) // largest CommitOrder first = oldest to latest
+		})
+
+		popUp.SortedSelectedCommits = sortedSelectedCommitArray
+
+		if len(sortedSelectedCommitArray) < 1 {
+			popUp.SelectionError = fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseDropMustHaveAtLeastOneSelectedError)
+			return
+		}
+
+		if len(sortedSelectedCommitArray[0].Parent) > 1 {
+			popUp.SelectionError = fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseDropBaseCommitCannotBeAMergeCommit)
+		} else if len(sortedSelectedCommitArray[0].Parent) < 1 {
+			popUp.SelectionError = fmt.Errorf("%s", i18n.LANGUAGEMAPPING.InteractiveRebaseDropCommitCannotBeTheOldestCommit)
+		}
+	}
+}

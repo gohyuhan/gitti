@@ -282,12 +282,29 @@ type InteractiveRebaseFixupSquashOutputPopUpModel struct {
 //	INTERACTIVE REBASE - REWORD
 //
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	InteractiveRebaseRewordSelectionPopUpModel holds the commit list, retrieved
+//	commit infos, and any current validation error for the reword commit
+//	selection popup.
+//
+// ------------------------------------
 type InteractiveRebaseRewordSelectionPopUpModel struct {
 	CommitList                  list.Model
 	OriginalRetrievedCommitList []git.CommitInfo
 	SelectionError              error
 }
 
+// ------------------------------------
+//
+//	InteractiveRebaseRewordSelectionDelegate renders each commit row (short hash,
+//	author, message) in the reword selection list, fading merge commits since they
+//	cannot be reworded.
+//	InteractiveRebaseRewordSelectionItem carries the hash, message, author,
+//	description, parent list, and commit order for a single commit row.
+//
+// ------------------------------------
 type (
 	InteractiveRebaseRewordSelectionDelegate struct{}
 	InteractiveRebaseRewordSelectionItem     struct {
@@ -300,14 +317,44 @@ type (
 	}
 )
 
+// ------------------------------------
+//
+//	Returns filter text for reword commit selection list item
+//
+// ------------------------------------
 func (i InteractiveRebaseRewordSelectionItem) FilterValue() string {
 	return i.Hash
 }
-func (d InteractiveRebaseRewordSelectionDelegate) Height() int  { return 2 }
+
+// ------------------------------------
+//
+//	Returns list delegate row height for reword commit selection items
+//
+// ------------------------------------
+func (d InteractiveRebaseRewordSelectionDelegate) Height() int { return 2 }
+
+// ------------------------------------
+//
+//	Returns list delegate row spacing for reword commit selection items
+//
+// ------------------------------------
 func (d InteractiveRebaseRewordSelectionDelegate) Spacing() int { return 0 }
+
+// ------------------------------------
+//
+//	No-op update hook for reword commit selection list delegate
+//
+// ------------------------------------
 func (d InteractiveRebaseRewordSelectionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
 	return nil
 }
+
+// ------------------------------------
+//
+//	Renders one reword commit selection row; fades merge commits (parent > 1)
+//	since they are ineligible for reword
+//
+// ------------------------------------
 func (d InteractiveRebaseRewordSelectionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
 	i, ok := listItem.(InteractiveRebaseRewordSelectionItem)
 	if !ok {
@@ -346,6 +393,13 @@ func (d InteractiveRebaseRewordSelectionDelegate) Render(w io.Writer, m list.Mod
 	fmt.Fprint(w, fn(str))
 }
 
+// ------------------------------------
+//
+//	InteractiveRebaseRewordCommitPopUpModel holds the message text input, the
+//	description textarea, input count and active index tracking, the selected
+//	commit, and the full retrieved commit list for the reword commit editing popup.
+//
+// ------------------------------------
 type InteractiveRebaseRewordCommitPopUpModel struct {
 	MessageTextInput            textinput.Model // input index 1
 	DescriptionTextAreaInput    textarea.Model  // input index 2
@@ -355,6 +409,14 @@ type InteractiveRebaseRewordCommitPopUpModel struct {
 	OriginalRetrievedCommitList []git.CommitInfo
 }
 
+// ------------------------------------
+//
+//	InteractiveRebaseRewordOutputPopUpModel holds the output viewport, spinner,
+//	and atomic state flags (IsProcessing, IsCancelled, HasError, ProcessSuccess)
+//	for the reword rebase output popup. CancelFunc allows the in-progress git
+//	rebase operation to be cancelled by the user.
+//
+// ------------------------------------
 type InteractiveRebaseRewordOutputPopUpModel struct {
 	RewordOutputViewport viewport.Model // to log out the output from git operation
 	Spinner              spinner.Model  // spinner for showing processing state
@@ -369,3 +431,141 @@ type InteractiveRebaseRewordOutputPopUpModel struct {
 // *************************************************************************************
 //                           INTERACTIVE REBASE - DROP
 // *************************************************************************************
+
+// ------------------------------------
+//
+//	InteractiveRebaseDropSelectionPopUpModel holds the commit list, retrieved
+//	commit infos, the selected-commit map, the sorted selection array, and any
+//	current validation error for the drop commit selection popup.
+//
+// ------------------------------------
+type InteractiveRebaseDropSelectionPopUpModel struct {
+	CommitList                  list.Model
+	OriginalRetrievedCommitList []git.CommitInfo
+	SelectedCommitHashMap       map[string]git.CommitInfo // key is commit hash
+	SortedSelectedCommits       []git.CommitInfo
+	SelectionError              error
+}
+
+// ------------------------------------
+//
+//	InteractiveRebaseDropSelectionDelegate renders each commit row (checkbox,
+//	short hash, author, message) in the drop selection list, marking already-
+//	selected commits with a checked box.
+//	InteractiveRebaseDropSelectionItem carries the hash, message, author,
+//	description, parent list, and commit order for a single commit row.
+//
+// ------------------------------------
+type (
+	InteractiveRebaseDropSelectionDelegate struct {
+		SelectedCommitHashMap *map[string]git.CommitInfo // key is commit hash
+	}
+	InteractiveRebaseDropSelectionItem struct {
+		Hash        string
+		Message     string
+		Author      string
+		Description string
+		Parent      []string
+		CommitOrder int
+	}
+)
+
+// ------------------------------------
+//
+//	Returns filter text for drop commit selection list item
+//
+// ------------------------------------
+func (i InteractiveRebaseDropSelectionItem) FilterValue() string {
+	return i.Hash
+}
+
+// ------------------------------------
+//
+//	Returns list delegate row height for drop commit selection items
+//
+// ------------------------------------
+func (d InteractiveRebaseDropSelectionDelegate) Height() int { return 2 }
+
+// ------------------------------------
+//
+//	Returns list delegate row spacing for drop commit selection items
+//
+// ------------------------------------
+func (d InteractiveRebaseDropSelectionDelegate) Spacing() int { return 0 }
+
+// ------------------------------------
+//
+//	No-op update hook for drop commit selection list delegate
+//
+// ------------------------------------
+func (d InteractiveRebaseDropSelectionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd {
+	return nil
+}
+
+// ------------------------------------
+//
+//	Renders one drop commit selection row with selected checkbox state and selected styling
+//
+// ------------------------------------
+func (d InteractiveRebaseDropSelectionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(InteractiveRebaseDropSelectionItem)
+	if !ok {
+		return
+	}
+
+	var firstStr string
+	var secondStr string
+	var str string
+
+	var selected bool
+	if d.SelectedCommitHashMap != nil {
+		_, selected = (*d.SelectedCommitHashMap)[i.Hash]
+	}
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
+
+	if selected {
+		firstStr = fmt.Sprintf("[X]  %s  |  %s", i.Hash[:7], i.Author)
+	} else {
+		firstStr = fmt.Sprintf("[ ]  %s  |  %s", i.Hash[:7], i.Author)
+	}
+
+	firstStr = utils.TruncateString(firstStr, componentWidth)
+	secondStr = utils.TruncateString(fmt.Sprintf("         %s", i.Message), componentWidth)
+
+	// except for the first string, all other string should be faded
+	secondStr = style.ItemStyle.Faint(true).Render(secondStr)
+
+	str = fmt.Sprintf("%s\n%s", firstStr, secondStr)
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(str))
+}
+
+// ------------------------------------
+//
+//	InteractiveRebaseDropOutputPopUpModel holds the output viewport, spinner,
+//	and atomic state flags (IsProcessing, IsCancelled, HasError, ProcessSuccess)
+//	for the drop rebase output popup. CancelFunc allows the in-progress git
+//	rebase operation to be cancelled by the user.
+//
+// ------------------------------------
+type InteractiveRebaseDropOutputPopUpModel struct {
+	DropOutputViewport viewport.Model // to log out the output from git operation
+	Spinner            spinner.Model  // spinner for showing processing state
+	IsProcessing       atomic.Bool    // indicator to prevent multiple thread spawning reacting to the key binding trigger
+	HasError           atomic.Bool    // indicate if git commit exitcode is not 0 (meaning have error)
+	ProcessSuccess     atomic.Bool    // has the process sucessfuly executed
+	IsCancelled        atomic.Bool    // flag to indicate if the operation was cancelled by user
+	// CancelFunc is used to cancel the git rebase operation
+	CancelFunc context.CancelFunc
+}

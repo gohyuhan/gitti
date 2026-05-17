@@ -211,6 +211,8 @@ type LanguageMapping struct {
 	KeyBindingForInteractiveRebaseRewordSelectionPopUp         []string
 	KeyBindingForInteractiveRebaseRewordCommitPopUp            []string
 	KeyBindingForInteractiveRebaseRewordOutputPopUp            []string
+	KeyBindingForInteractiveRebaseDropSelectionPopUp           []string
+	KeyBindingForInteractiveRebaseDropOutputPopUp              []string
 	// -----------------
 	//  For Pop Up
 	// -----------------
@@ -447,6 +449,7 @@ type LanguageMapping struct {
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError             string
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit                     string
 	InteractiveRebaseFixupPositionMismatchError                              string
+	InteractiveRebaseRewordPositionMismatchError                             string
 	InteractiveRebaseFixupSquashWarning                                      string
 	InteractiveRebaseRewordWarning                                           string
 	InteractiveRebaseFixupSquash                                             string
@@ -467,6 +470,14 @@ type LanguageMapping struct {
 	InteractiveRebaseRewordCommitMessageTitle                                string
 	InteractiveRebaseRewordCommitDescriptionTitle                            string
 	InteractiveRebaseDrop                                                    string
+	InteractiveRebaseDropDescription                                         string
+	InteractiveRebaseDropWarning                                             string
+	InteractiveRebaseDropOutputPopUpTitle                                    string
+	InteractiveRebaseDropping                                                string
+	InteractiveRebaseDropMustHaveAtLeastOneSelectedError                     string
+	InteractiveRebaseDropBaseCommitCannotBeAMergeCommit                      string
+	InteractiveRebaseDropCommitCannotBeTheOldestCommit                       string
+	InteractiveRebaseDropPositionMismatchError                               string
 	InteractiveRebaseFeatureComingSoon                                       string
 	ChooseInteractiveRebaseOption                                            string
 }

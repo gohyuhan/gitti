@@ -101,6 +101,11 @@ type InteractiveRebaseRewordResultEventDataStructure struct {
 	Success bool
 }
 
+type InteractiveRebaseDropResultEventDataStructure struct {
+	Result  []string
+	Success bool
+}
+
 type InteractiveRebaseFetchCommitInfoListEventDataStructure struct {
 	PopUpModel  string
 	CommitInfos []git.CommitInfo
