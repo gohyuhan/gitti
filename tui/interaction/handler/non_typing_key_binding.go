@@ -1676,14 +1676,12 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						}
 						return utils.SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m, executor, cleanupCallbackFunc, logging.INTERACTIVE_REBASE_DROP)
 					} else {
-						if ok {
-							popUp.IsProcessing.Store(true)
-							// Non-signing path runs async service with cancellable context.
-							services.InteractiveRebaseDropService(m, ogRetrievedCommitsList, sortedSelectedCommits)
+						popUp.IsProcessing.Store(true)
+						// Non-signing path runs async service with cancellable context.
+						services.InteractiveRebaseDropService(m, ogRetrievedCommitsList, sortedSelectedCommits)
 
-							// Start spinner ticking
-							return m, popUp.Spinner.Tick
-						}
+						// Start spinner ticking
+						return m, popUp.Spinner.Tick
 					}
 				}
 			}
