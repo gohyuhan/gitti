@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+	"sync"
 
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
@@ -179,15 +180,7 @@ func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand
 
 	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(gitCommand, " "), logging.INFO, "", true)
 	return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
-		if err != nil {
-			if stderrStr := sanitizeGitSigningStderr(strings.TrimSpace(stderr.String())); stderrStr != "" {
-				err = fmt.Errorf("%w\n\n%s", err, stderrStr)
-			}
-		}
-		return types.GitOperationRequiredSigningFinishedMsg{
-			GitOperationOpsTypeForLogging: GitOperationOpsTypeForLogging,
-			Err:                           err,
-		}
+		return buildSigningFinishedMsg(GitOperationOpsTypeForLogging, err, sanitizeGitSigningStderr(strings.TrimSpace(stderr.String())))
 	})
 }
 
@@ -206,24 +199,26 @@ func SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m *types.Gitt
 	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(executor.Args, " "), logging.INFO, "", true)
 	return m, tea.ExecProcess(executor, func(err error) tea.Msg {
 		cleanUpFunc()
-		if err != nil {
-			if stderrStr := sanitizeGitSigningStderr(strings.TrimSpace(stderr.String())); stderrStr != "" {
-				err = fmt.Errorf("%w\n\n%s", err, stderrStr)
-			}
-		}
-		return types.GitOperationRequiredSigningFinishedMsg{
-			GitOperationOpsTypeForLogging: GitOperationOpsTypeForLogging,
-			Err:                           err,
-		}
+		return buildSigningFinishedMsg(GitOperationOpsTypeForLogging, err, sanitizeGitSigningStderr(strings.TrimSpace(stderr.String())))
 	})
 }
 
+var (
+	ansiEscapePattern     *regexp.Regexp
+	ansiEscapePatternOnce sync.Once
+)
+
 // ------------------------------------
 //
-//	Compiled regex for ANSI escape sequence stripping in signing stderr cleanup.
+//	Lazily initialize and return the compiled regex for ANSI escape sequence stripping.
 //
 // ------------------------------------
-var ansiEscapePattern = regexp.MustCompile(`\x1b\[[0-9;]*[A-Za-z]`)
+func getAnsiEscapePattern() *regexp.Regexp {
+	ansiEscapePatternOnce.Do(func() {
+		ansiEscapePattern = regexp.MustCompile(`\x1b\[[0-9;]*[A-Za-z]`)
+	})
+	return ansiEscapePattern
+}
 
 // ------------------------------------
 //
@@ -235,7 +230,7 @@ func sanitizeGitSigningStderr(raw string) string {
 	if raw == "" {
 		return ""
 	}
-	raw = ansiEscapePattern.ReplaceAllString(raw, "")
+	raw = getAnsiEscapePattern().ReplaceAllString(raw, "")
 	raw = strings.ReplaceAll(raw, "\r\n", "\n")
 	raw = strings.ReplaceAll(raw, "\r", "\n")
 	raw = strings.ReplaceAll(raw, "\x00", "")
@@ -259,6 +254,22 @@ func sanitizeGitSigningStderr(raw string) string {
 	}
 
 	return strings.TrimSpace(strings.Join(cleaned, "\n"))
+}
+
+// ------------------------------------
+//
+//	Build a GitOperationRequiredSigningFinishedMsg, appending stderr to the error
+//	if present. Used by both signing functions to consolidate error-building logic.
+//
+// ------------------------------------
+func buildSigningFinishedMsg(opsType string, err error, stderrStr string) types.GitOperationRequiredSigningFinishedMsg {
+	if stderrStr != "" {
+		err = fmt.Errorf("%w\n\n%s", err, stderrStr)
+	}
+	return types.GitOperationRequiredSigningFinishedMsg{
+		GitOperationOpsTypeForLogging: opsType,
+		Err:                           err,
+	}
 }
 
 // ------------------------------------
