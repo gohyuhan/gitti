@@ -3,9 +3,8 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"io"
-	"os"
 	"os/exec"
+	"regexp"
 	"strings"
 
 	"charm.land/bubbles/v2/key"
@@ -168,20 +167,20 @@ func ReinitCherryPickedCommitInfo(m *types.GittiModel) {
 // ------------------------------------
 //
 //	Suspend the Gitti UI and hand control to a git command that requires GPG
-//	signing (e.g. signed commits/tags). Runs the command via tea.ExecProcess and
-//	returns a GitOperationRequiredSigningFinishedMsg with any stderr error on
-//	completion.
+//	signing (e.g. signed commits/tags). Runs the command via tea.ExecProcess,
+//	captures stderr silently (no direct terminal passthrough), sanitizes it, and
+//	returns a GitOperationRequiredSigningFinishedMsg with the cleaned error output.
 //
 // ------------------------------------
 func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand []string, GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
 	cmd := exec.Command("git", gitCommand...)
 	var stderr bytes.Buffer
-	cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
+	cmd.Stderr = &stderr
 
 	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(gitCommand, " "), logging.INFO, "", true)
 	return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
 		if err != nil {
-			if stderrStr := strings.TrimSpace(stderr.String()); stderrStr != "" {
+			if stderrStr := sanitizeGitSigningStderr(strings.TrimSpace(stderr.String())); stderrStr != "" {
 				err = fmt.Errorf("%w\n\n%s", err, stderrStr)
 			}
 		}
@@ -196,18 +195,19 @@ func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand
 //
 //	Suspend the Gitti UI and hand control to a pre-built exec.Cmd that requires
 //	GPG signing. Runs cleanUpFunc after the process exits regardless of outcome,
-//	then returns a GitOperationRequiredSigningFinishedMsg with any stderr error.
+//	captures stderr silently (no direct terminal passthrough), sanitizes it, then
+//	returns a GitOperationRequiredSigningFinishedMsg with the cleaned error output.
 //
 // ------------------------------------
 func SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m *types.GittiModel, executor *exec.Cmd, cleanUpFunc func(), GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
 	var stderr bytes.Buffer
-	executor.Stderr = io.MultiWriter(os.Stderr, &stderr)
+	executor.Stderr = &stderr
 
 	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(executor.Args, " "), logging.INFO, "", true)
 	return m, tea.ExecProcess(executor, func(err error) tea.Msg {
 		cleanUpFunc()
 		if err != nil {
-			if stderrStr := strings.TrimSpace(stderr.String()); stderrStr != "" {
+			if stderrStr := sanitizeGitSigningStderr(strings.TrimSpace(stderr.String())); stderrStr != "" {
 				err = fmt.Errorf("%w\n\n%s", err, stderrStr)
 			}
 		}
@@ -216,6 +216,49 @@ func SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m *types.Gitt
 			Err:                           err,
 		}
 	})
+}
+
+// ------------------------------------
+//
+//	Compiled regex for ANSI escape sequence stripping in signing stderr cleanup.
+//
+// ------------------------------------
+var ansiEscapePattern = regexp.MustCompile(`\x1b\[[0-9;]*[A-Za-z]`)
+
+// ------------------------------------
+//
+//	Normalize git signing stderr for safe TUI rendering. Strips ANSI escapes,
+//	converts CR/CRLF to LF, removes null bytes, and compresses repeated blank lines.
+//
+// ------------------------------------
+func sanitizeGitSigningStderr(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	raw = ansiEscapePattern.ReplaceAllString(raw, "")
+	raw = strings.ReplaceAll(raw, "\r\n", "\n")
+	raw = strings.ReplaceAll(raw, "\r", "\n")
+	raw = strings.ReplaceAll(raw, "\x00", "")
+
+	lines := strings.Split(raw, "\n")
+	cleaned := make([]string, 0, len(lines))
+	prevEmpty := false
+	for _, line := range lines {
+		line = strings.TrimRight(line, " \t")
+		isEmpty := strings.TrimSpace(line) == ""
+		if isEmpty {
+			if prevEmpty {
+				continue
+			}
+			prevEmpty = true
+			cleaned = append(cleaned, "")
+			continue
+		}
+		prevEmpty = false
+		cleaned = append(cleaned, line)
+	}
+
+	return strings.TrimSpace(strings.Join(cleaned, "\n"))
 }
 
 // ------------------------------------
