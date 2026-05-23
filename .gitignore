@@ -9,3 +9,5 @@ lag.prof
 dist/
 
 assets/demo.tape
+.claude/
+.pi-lens/

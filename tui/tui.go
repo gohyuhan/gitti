@@ -262,6 +262,8 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			utils.ReinitCherryPickedCommitInfo(m)
 		}
 
+		// ensure resumed signing flow does not preserve horizontal log scroll offset
+		m.CurrentLogComponentViewport.SetXOffset(0)
 		return gAM, nil
 	case tea.MouseMsg:
 		model, cmd := interaction.GittiMouseInteraction(msg, m)

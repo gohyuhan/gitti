@@ -14,8 +14,9 @@ import (
 //
 //	Build and return the styled log viewport content string from the logger's entries.
 //	When ForLogComponent is true, only the visible (recent) log slice is used; otherwise
-//	the full log history is rendered. Each entry is colorized by severity (INFO/WARN/ERROR)
-//	and the context is checked between iterations to allow cancellation.
+//	the full log history is rendered. Each entry is colorized by severity (INFO/WARN/ERROR),
+//	WARN/ERROR descriptions normalize CR/CRLF to LF for safe panel rendering, and the
+//	context is checked between iterations to allow cancellation.
 //
 // ------------------------------------
 func InitGittiLogViewport(m *types.GittiModel, ForLogComponent bool, ctx context.Context) string {
