@@ -51,6 +51,8 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 🔏 **Commit & Tag Signing** - GPG and SSH signing support
 - 📊 **Commit Log & Branch Graph** - Visualize commit history with branching graph
 - 🔎 **Reflog** - Browse and restore from Git reference logs
+- 🫵 **Git Blame** - View line-by-line blame with commit author and message
+- 🕹️ **Interactive Rebase** - Drop, reword, fixup, and squash commits interactively
 - 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
 - 🪵 **Logging & Log Export** - Built-in logging panel with log export capability
 - 🌍 **Multi-language Support** - English, Japanese, 简体中文, 繁體中文
@@ -214,6 +216,12 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+
+### [v0.7.1]
+
+- fix: fix line overflow when rebase results in conflict
+  - commit signing enabled
+  - suspend not configured
 
 ### [v0.7.0]
 
