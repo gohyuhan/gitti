@@ -219,7 +219,13 @@ gitti --init-dbranch main --global
 
 ### [v0.7.1]
 
-- fix: fix line overflow when rebase results in conflict
+- fix: fix pop up state not reset under the following condition:
+  - after a successful git ops that require signing
+  - suspend not configured
+
+### [v0.7.1]
+
+- fix: fix line overflow when rebase results in conflict with following condition:
   - commit signing enabled
   - suspend not configured
 
@@ -234,15 +240,18 @@ gitti --init-dbranch main --global
 - optimize: rendering interaction improvements
 
 ### [v0.6.3]
--  fix: rework v0.6.2 UI freeze fix with better handling to prevent UX degradation
--  other: bump dep package version and utilize latest api
+
+- fix: rework v0.6.2 UI freeze fix with better handling to prevent UX degradation
+- other: bump dep package version and utilize latest api
 
 ### [v0.6.2]
--  fix: update commit log parsing seperator to prevent weird parse behaviour
--  fix: fix UI freeze when git ops that require signing returns error
+
+- fix: update commit log parsing seperator to prevent weird parse behaviour
+- fix: fix UI freeze when git ops that require signing returns error
 
 ### [v0.6.1]
--  fix: fix rebase incorrect git command flag and arguments for local branch rebase
+
+- fix: fix rebase incorrect git command flag and arguments for local branch rebase
 
 ### [v0.6.0]
 
