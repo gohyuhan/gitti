@@ -3,6 +3,8 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -176,7 +178,7 @@ func ReinitCherryPickedCommitInfo(m *types.GittiModel) {
 func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand []string, GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
 	cmd := exec.Command("git", gitCommand...)
 	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
+	cmd.Stderr = io.MultiWriter(os.Stderr, &stderr)
 
 	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(gitCommand, " "), logging.INFO, "", true)
 	return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
@@ -194,7 +196,7 @@ func SuspendGittiUIForGitOperationRequireSigning(m *types.GittiModel, gitCommand
 // ------------------------------------
 func SuspendGittiUIForGitOperationRequireSigningWithExecAndCleanUp(m *types.GittiModel, executor *exec.Cmd, cleanUpFunc func(), GitOperationOpsTypeForLogging string) (*types.GittiModel, tea.Cmd) {
 	var stderr bytes.Buffer
-	executor.Stderr = &stderr
+	executor.Stderr = io.MultiWriter(os.Stderr, &stderr)
 
 	m.GittiLogger.RegisterNewLog(GitOperationOpsTypeForLogging, strings.Join(executor.Args, " "), logging.INFO, "", true)
 	return m, tea.ExecProcess(executor, func(err error) tea.Msg {
@@ -263,7 +265,7 @@ func sanitizeGitSigningStderr(raw string) string {
 //
 // ------------------------------------
 func buildSigningFinishedMsg(opsType string, err error, stderrStr string) types.GitOperationRequiredSigningFinishedMsg {
-	if stderrStr != "" {
+	if stderrStr != "" && err != nil {
 		err = fmt.Errorf("%w\n\n%s", err, stderrStr)
 	}
 	return types.GitOperationRequiredSigningFinishedMsg{
