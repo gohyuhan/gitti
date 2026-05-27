@@ -38,6 +38,7 @@ var jA = LanguageMapping{
 	FailToGetCWD:                        "現在の作業ディレクトリの取得に失敗しました",
 	TuiRunFail:                          "エラーが発生しました",
 	OtherGitOpsIsRunningWarning:         "Gitti 内で他の Git 操作が実行中です. しばらくしてから再度お試しください",
+	GittiDoesNotSupportBareRepo:         "Gitti はベアリポジトリに対応していません\n",
 	LanguageNotSupportedPanic:           "[%s] はサポートされていません, 使用可能な言語は %v です",
 	LanguageSet:                         "言語を %s に設定しました",
 	GittiDefaultBranchSet:               "Gitti のデフォルト初期ブランチが「%s」に設定されました",

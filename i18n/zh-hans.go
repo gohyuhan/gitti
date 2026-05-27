@@ -38,6 +38,7 @@ var zH_HANS = LanguageMapping{
 	FailToGetCWD:                        "获取当前工作目录失败",
 	TuiRunFail:                          "发生错误",
 	OtherGitOpsIsRunningWarning:         "Gitti 中有其他 Git 操作正在运行, 请稍后再试",
+	GittiDoesNotSupportBareRepo:         "Gitti 不支持裸仓库\n",
 	LanguageNotSupportedPanic:           "不支持[%s], 请选择 %v 之一",
 	LanguageSet:                         "语言已设置为 %s",
 	GittiDefaultBranchSet:               "Gitti 默认初始化分支已设置为“%s”",

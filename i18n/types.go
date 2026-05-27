@@ -60,6 +60,7 @@ type LanguageMapping struct {
 	FailToGetCWD                string
 	TuiRunFail                  string
 	OtherGitOpsIsRunningWarning string
+	GittiDoesNotSupportBareRepo string
 	// i18n
 	LanguageNotSupportedPanic string
 	LanguageSet               string

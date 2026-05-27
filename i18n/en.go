@@ -38,6 +38,7 @@ var eN = LanguageMapping{
 	FailToGetCWD:                        "Failed to get current working directory",
 	TuiRunFail:                          "Alas, there's been an error",
 	OtherGitOpsIsRunningWarning:         "There are other git operarion running within gitti, please try again shortly",
+	GittiDoesNotSupportBareRepo:         "Gitti does not support bare repositories\n",
 	LanguageNotSupportedPanic:           "[%s] is not supported, Please choose between %v",
 	LanguageSet:                         "Language set to %s",
 	GittiDefaultBranchSet:               "Gitti default init branch set to '%s'",
