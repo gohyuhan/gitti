@@ -105,6 +105,12 @@ func main() {
 	case *ffMerge != "":
 		config.SetFfMerge(*ffMerge)
 	default:
+		// gitti don't support any bare repo at the moment
+		if api.IsBareRepo() {
+			fmt.Printf("%s", i18n.LANGUAGEMAPPING.GittiDoesNotSupportBareRepo)
+			os.Exit(1)
+		}
+
 		// create the channel that will be the bring to emit update event back to main thread
 		gitUpdateChannel := make(chan string, 32)
 		tuiUpdateChannel := make(chan interface{}, 32)

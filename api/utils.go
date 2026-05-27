@@ -258,3 +258,20 @@ func CheckSigningRequiredOperation() (bool, bool, bool) {
 
 	return commitRequireSigning, tagRequireSigning, pushRequireSigning
 }
+
+func IsBareRepo() bool {
+	var isBareRepo bool
+	isBareRepoGitArgs := []string{"rev-parse", "--is-bare-repository"}
+
+	isBareRepoCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(isBareRepoGitArgs, false)
+
+	isBareRepoOutput, isBareRepoErr := isBareRepoCmdExecutor.Output()
+
+	if isBareRepoErr != nil {
+		isBareRepo = false
+	} else {
+		isBareRepo = strings.ToLower(strings.TrimSpace(string(isBareRepoOutput))) == "true"
+	}
+
+	return isBareRepo
+}
