@@ -2,7 +2,6 @@ package git
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -14,6 +13,8 @@ type WorktreeInfo struct {
 	WorktreePath        string
 	IsMain              bool
 	IsInCurrentWorktree bool
+	IsLocked            bool
+	IsPrunable          bool
 }
 
 type GitWorktree struct {
@@ -77,47 +78,59 @@ func (gwt *GitWorktree) GetLatestWorktreeInfos() {
 	}
 
 	currentWorktreePath := filepath.Clean(gwt.currentWorktreePath)
-	for index, worktreeInlineInfo := range parsedOutput {
+	for outputIndex, worktreeInlineInfo := range parsedOutput {
+		worktree := WorktreeInfo{IsMain: outputIndex == 0}
+
 		// Split a single record into its attribute lines (worktree/HEAD/branch/...)
 		parsedWorktreeInfoArray := processOutputIntoStringArrayWithCustomSeperator([]byte(worktreeInlineInfo), WORKTREE_FIELD_SEPARATOR)
 		if len(parsedWorktreeInfoArray) < 1 {
 			continue
 		}
 
-		// The `worktree <path>` attribute is always the first line of a record
-		firstLine := strings.TrimSpace(parsedWorktreeInfoArray[0])
-		if !strings.HasPrefix(firstLine, "worktree ") {
-			gwt.logging.RegisterNewLog(logging.GET_LATEST_WORKTREE_INFO, "", logging.WARN, "skip malformed worktree record", false)
-			continue
-		}
+		// The `worktree <path>` attribute is always the first line of a record, a record
+		// without a resolvable path is malformed and skipped entirely
+		skipRecord := false
+		for index, parsedWorktreeInfo := range parsedWorktreeInfoArray {
+			if index == 0 {
+				if !strings.HasPrefix(parsedWorktreeInfo, "worktree ") {
+					gwt.logging.RegisterNewLog(logging.GET_LATEST_WORKTREE_INFO, "", logging.WARN, "skip malformed worktree record", false)
+					skipRecord = true
+					break
+				}
 
-		actualWorktreePath := strings.TrimSpace(strings.TrimPrefix(firstLine, "worktree "))
-		if actualWorktreePath == "" {
-			continue
-		}
+				actualWorktreePath := strings.TrimSpace(strings.TrimPrefix(parsedWorktreeInfo, "worktree "))
+				if actualWorktreePath == "" {
+					skipRecord = true
+					break
+				}
 
-		// A submodule worktree may be reported as its `.git/modules/...` git dir, resolve it back to the real checkout
-		if isSubmoduleGitDirPath(actualWorktreePath) {
-			processedPath, processError := processSubmoduleActualDirPath(actualWorktreePath)
-			if processError != nil {
-				gwt.logging.RegisterNewLog(logging.GET_LATEST_WORKTREE_INFO, "", logging.WARN, fmt.Sprintf("skip unresolvable submodule worktree path: %s", processError.Error()), false)
-				continue
+				// A submodule worktree may be reported as its `.git/modules/...` git dir, resolve it back to the real checkout
+				if isSubmoduleGitDirPath(actualWorktreePath) {
+					processedPath, processError := processSubmoduleActualDirPath(actualWorktreePath)
+					if processError != nil {
+						gwt.logging.RegisterNewLog(logging.GET_LATEST_WORKTREE_INFO, "", logging.WARN, fmt.Sprintf("skip unresolvable submodule worktree path: %s", processError.Error()), false)
+						skipRecord = true
+						break
+					}
+					actualWorktreePath = processedPath
+				}
+
+				normalizedWorktreePath := filepath.Clean(actualWorktreePath)
+				worktree.WorktreePath = normalizedWorktreePath
+				worktree.IsInCurrentWorktree = normalizedWorktreePath == currentWorktreePath
 			}
-			actualWorktreePath = processedPath
+
+			if strings.HasPrefix(parsedWorktreeInfo, "prunable") {
+				worktree.IsPrunable = true
+			}
+
+			if strings.HasPrefix(parsedWorktreeInfo, "locked") {
+				worktree.IsLocked = true
+			}
 		}
 
-		normalizedWorktreePath := filepath.Clean(actualWorktreePath)
-		// Drop bare/pruned/non-checked-out entries that have no real working tree on disk
-		if !isUsableWorktreePath(normalizedWorktreePath) {
-			gwt.logging.RegisterNewLog(logging.GET_LATEST_WORKTREE_INFO, "", logging.WARN, fmt.Sprintf("skip unusable worktree path: %s", normalizedWorktreePath), false)
+		if skipRecord {
 			continue
-		}
-
-		worktree := WorktreeInfo{
-			WorktreePath: normalizedWorktreePath,
-			// git always lists the main worktree first
-			IsMain:              index == 0,
-			IsInCurrentWorktree: normalizedWorktreePath == currentWorktreePath,
 		}
 
 		latestWorktreeInfo = append(latestWorktreeInfo, worktree)
@@ -152,25 +165,4 @@ func processSubmoduleActualDirPath(submoduleWorktreeGitPath string) (string, err
 func isSubmoduleGitDirPath(path string) bool {
 	normalized := filepath.ToSlash(filepath.Clean(path))
 	return strings.Contains(normalized, "/.git/modules/")
-}
-
-// ------------------------------------
-//
-//	Report whether the path is a real worktree on disk, an existing directory that contains a `.git` entry
-//
-// ------------------------------------
-func isUsableWorktreePath(path string) bool {
-	if path == "" {
-		return false
-	}
-
-	info, err := os.Stat(path)
-	if err != nil || !info.IsDir() {
-		return false
-	}
-
-	// .git is a dir for the main worktree and a file for linked worktrees, either is valid
-	gitPath := filepath.Join(path, ".git")
-	_, gitErr := os.Stat(gitPath)
-	return gitErr == nil
 }
