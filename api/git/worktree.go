@@ -139,6 +139,26 @@ func (gwt *GitWorktree) GetLatestWorktreeInfos() {
 	gwt.allWorktree = latestWorktreeInfo
 }
 
+func (gwt *GitWorktree) AddNewWorktree(newWorktreeName string) {
+	if !gwt.gitProcessLock.CanProceedWithGitOps() {
+		gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gwt.gitProcessLock.ReleaseGitOpsLock()
+	}()
+	newWorktreePath := filepath.Clean(filepath.Join(gwt.currentWorktreePath, fmt.Sprintf("../%s", newWorktreeName)))
+	gitArgs := []string{"worktree", "add", newWorktreePath}
+
+	newWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	newWorktreeError := newWorktreeCmdExecutor.Run()
+
+	if newWorktreeError != nil {
+		gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.ADD_NEW_WORKTREE_OPS, newWorktreeError.Error()), true)
+	}
+}
+
 // ------------------------------------
 //
 //	Resolve a submodule `.git/modules/...` git dir to its real working tree path

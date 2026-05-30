@@ -101,7 +101,8 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 
 // ------------------------------------
 //
-//	Register the repo directory paths for file watching, skipping objects and hooks directories
+//	Register the repo directory paths for file watching, skipping noisy/irrelevant
+//	dirs (objects, hooks, lfs, rr-cache, lost-found)
 //
 // ------------------------------------
 func (gd *GitDaemon) watchPath() {
@@ -111,7 +112,8 @@ func (gd *GitDaemon) watchPath() {
 	}
 	err = filepath.WalkDir(gd.repoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
-			if d.IsDir() && (d.Name() == "objects" || d.Name() == "hooks") {
+			switch d.Name() {
+			case "objects", "hooks", "lfs", "rr-cache", "lost-found":
 				return fs.SkipDir
 			}
 			gd.watcher.Add(path)
@@ -309,7 +311,8 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 		if err == nil && fi.IsDir() {
 			filepath.WalkDir(event.Name, func(path string, d fs.DirEntry, err error) error {
 				if err == nil && d.IsDir() {
-					if d.IsDir() && (d.Name() == "objects" || d.Name() == "hooks") {
+					switch d.Name() {
+					case "objects", "hooks", "lfs", "rr-cache", "lost-found":
 						return fs.SkipDir
 					}
 					_ = gd.watcher.Add(path)
