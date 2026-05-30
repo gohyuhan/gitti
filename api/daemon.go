@@ -112,8 +112,7 @@ func (gd *GitDaemon) watchPath() {
 	}
 	err = filepath.WalkDir(gd.repoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
-			switch d.Name() {
-			case "objects", "hooks", "lfs", "rr-cache", "lost-found":
+			if gd.isSkippableGitDir(path) {
 				return fs.SkipDir
 			}
 			gd.watcher.Add(path)
@@ -123,6 +122,24 @@ func (gd *GitDaemon) watchPath() {
 	if err != nil {
 		gd.errorLog = append(gd.errorLog, err)
 	}
+}
+
+// ------------------------------------
+//
+//	Report whether path is a top-level .git metadata dir that is noisy/irrelevant to
+//	git state and should not be watched. Only direct children of the .git dir are
+//	skipped, so branch/ref namespaces like refs/heads/lfs/... stay watched.
+//
+// ------------------------------------
+func (gd *GitDaemon) isSkippableGitDir(path string) bool {
+	if filepath.Dir(path) != filepath.Clean(gd.repoPath) {
+		return false
+	}
+	switch filepath.Base(path) {
+	case "objects", "hooks", "lfs", "rr-cache", "lost-found":
+		return true
+	}
+	return false
 }
 
 // ------------------------------------
@@ -311,8 +328,7 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 		if err == nil && fi.IsDir() {
 			filepath.WalkDir(event.Name, func(path string, d fs.DirEntry, err error) error {
 				if err == nil && d.IsDir() {
-					switch d.Name() {
-					case "objects", "hooks", "lfs", "rr-cache", "lost-found":
+					if gd.isSkippableGitDir(path) {
 						return fs.SkipDir
 					}
 					_ = gd.watcher.Add(path)
