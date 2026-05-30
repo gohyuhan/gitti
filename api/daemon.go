@@ -32,6 +32,7 @@ type GitDaemon struct {
 	isGitRemoteSyncStatusActiveRunning  atomic.Bool
 	isGitTagPassiveRunning              atomic.Bool
 	isGitRemotePassiveRunning           atomic.Bool
+	isGitWorktreePassiveRunning         atomic.Bool
 	watcherTimer                        *time.Timer
 	gitFilesActiveTimer                 *time.Timer
 	gitRemoteSyncStatusActiveTimer      *time.Timer
@@ -275,6 +276,12 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 			defer gd.isGitRemotePassiveRunning.Store(false)
 			gd.gitOperations.GitRemote.CheckRemoteExist(true)
 			gd.updateChannel <- git.GIT_REMOTE_UPDATE
+		}
+	}()
+	go func() {
+		if gd.isGitWorktreePassiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitWorktreePassiveRunning.Store(false)
+			gd.gitOperations.GitWorktree.GetLatestWorktreeInfos()
 		}
 	}()
 }

@@ -35,6 +35,22 @@ func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {
 
 // ------------------------------------
 //
+//	Parse raw bytes into a clean string array, split on the given seperator, returning empty slice when there is no content
+//
+// ------------------------------------
+func processOutputIntoStringArrayWithCustomSeperator(dirtyGitOutput []byte, seperator string) []string {
+	var cleanedStringArray []string
+	cleanedStringArray = strings.Split(strings.TrimSpace(string(dirtyGitOutput)), seperator)
+
+	if len(cleanedStringArray) == 1 && cleanedStringArray[0] == "" {
+		return []string{}
+	}
+
+	return cleanedStringArray
+}
+
+// ------------------------------------
+//
 //	Custom bufio split function that splits on both carriage return and newline,
 //	preserving \r in the token while stripping \n for proper git progress stream handling
 //
@@ -271,4 +287,35 @@ func timeAgo(unixTsString string) string {
 	default:
 		return fmt.Sprintf(i18n.LANGUAGEMAPPING.TimeAgoYears, int(duration.Hours()/(24*365)))
 	}
+}
+
+// ------------------------------------
+//
+//	Read a submodule git dir's config file and return its `core.worktree` value,
+//	the working tree path of the submodule relative to that git dir
+//
+// ------------------------------------
+func getSubmoduleWorktreePath(configPath string) (string, error) {
+	f, err := os.Open(configPath)
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+
+	// Scan for the `worktree = <path>` entry under the config's [core] section
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "worktree = ") {
+			worktreePath := strings.TrimSpace(strings.TrimPrefix(line, "worktree = "))
+			if worktreePath == "" {
+				return "", fmt.Errorf("empty worktree path in config: %s", configPath)
+			}
+			return worktreePath, nil
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+	return "", fmt.Errorf("worktree path not found in config: %s", configPath)
 }

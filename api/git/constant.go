@@ -1,6 +1,12 @@
 package git
 
-const SEPARATOR = "\x00"
+const (
+	SEPARATOR = "\x00"
+
+	// worktree list --porcelain: attrs newline-separated, records blank-line separated
+	WORKTREE_FIELD_SEPARATOR  = "\n"
+	WORKTREE_RECORD_SEPARATOR = "\n\n"
+)
 
 // Git Push operation types
 const (
