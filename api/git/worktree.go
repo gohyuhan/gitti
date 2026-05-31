@@ -295,8 +295,13 @@ func processSubmoduleActualDirPath(submoduleWorktreeGitPath string) (string, err
 		return realPath, error
 	}
 
-	// core.worktree is stored relative to the git dir, join them to get the absolute checkout path
-	realPath = filepath.Clean(filepath.Join(submoduleWorktreeGitPath, worktreeRelative))
+	// core.worktree may be stored as an absolute path (valid git config); use it
+	// directly. Otherwise it is relative to the git dir, so join to resolve the checkout path.
+	if filepath.IsAbs(worktreeRelative) {
+		realPath = filepath.Clean(worktreeRelative)
+	} else {
+		realPath = filepath.Clean(filepath.Join(submoduleWorktreeGitPath, worktreeRelative))
+	}
 	return realPath, nil
 }
 
