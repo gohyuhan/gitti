@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/logging"
@@ -139,24 +140,43 @@ func (gwt *GitWorktree) GetLatestWorktreeInfos() {
 	gwt.allWorktree = latestWorktreeInfo
 }
 
-func (gwt *GitWorktree) AddNewWorktree(newWorktreeName string) {
+// ------------------------------------
+//
+//	Add a new worktree as a sibling of the current worktree, named newWorktreeName.
+//	If checkoutWorktreeBranchName is non-empty, it is passed to `git worktree add`
+//	to check out an existing local or remote branch; a name that is neither a local
+//	nor remote branch will error. If empty, git derives a branch from the path.
+//	Acquires the git ops lock first; returns the lock-busy warning if another git
+//	process is running. Returns the command output and whether the add succeeded.
+//
+// ------------------------------------
+func (gwt *GitWorktree) AddNewWorktree(newWorktreeName string, checkoutWorktreeBranchName string) (string, bool) {
 	if !gwt.gitProcessLock.CanProceedWithGitOps() {
 		gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
-		return
+		return gwt.gitProcessLock.OtherProcessRunningWarning(), false
 	}
 	defer func() {
 		gwt.gitProcessLock.ReleaseGitOpsLock()
 	}()
+
+	success := false
 	newWorktreePath := filepath.Clean(filepath.Join(gwt.currentWorktreePath, fmt.Sprintf("../%s", newWorktreeName)))
 	gitArgs := []string{"worktree", "add", newWorktreePath}
+	if utf8.RuneCountInString(checkoutWorktreeBranchName) > 0 {
+		gitArgs = append(gitArgs, checkoutWorktreeBranchName)
+	}
 
 	newWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
-	newWorktreeError := newWorktreeCmdExecutor.Run()
+	newWorktreeOutput, newWorktreeError := newWorktreeCmdExecutor.Output()
 
 	if newWorktreeError != nil {
 		gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.ADD_NEW_WORKTREE_OPS, newWorktreeError.Error()), true)
+	} else {
+		success = true
 	}
+
+	return string(newWorktreeOutput), success
 }
 
 // ------------------------------------
