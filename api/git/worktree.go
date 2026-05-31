@@ -13,6 +13,8 @@ import (
 
 type WorktreeInfo struct {
 	WorktreePath        string
+	WorktreeHead        string
+	WorktreeBranch      string
 	IsMain              bool
 	IsInCurrentWorktree bool
 	IsLocked            bool
@@ -121,6 +123,14 @@ func (gwt *GitWorktree) GetLatestWorktreeInfos() {
 				normalizedWorktreePath := filepath.Clean(actualWorktreePath)
 				worktree.WorktreePath = normalizedWorktreePath
 				worktree.IsInCurrentWorktree = normalizedWorktreePath == currentWorktreePath
+			}
+
+			if strings.HasPrefix(parsedWorktreeInfo, "HEAD") {
+				worktree.WorktreeHead = strings.TrimSpace(strings.TrimPrefix(parsedWorktreeInfo, "HEAD"))
+			}
+
+			if strings.HasPrefix(parsedWorktreeInfo, "branch") {
+				worktree.WorktreeBranch = strings.TrimSpace(strings.TrimPrefix(parsedWorktreeInfo, "branch"))
 			}
 
 			if strings.HasPrefix(parsedWorktreeInfo, "prunable") {

@@ -104,6 +104,12 @@ type LanguageMapping struct {
 	Stash                       string
 	Tag                         string
 	Remote                      string
+	Worktree                    string
+	WorktreeIsMain              string
+	WorktreeIsCurrent           string
+	WorktreeIsLocked            string
+	WorktreeIsPrunable          string
+	WorktreeLockedReason        string
 	Fetch                       string
 	Push                        string
 	FileTypeUnSupportedPreview  string
@@ -138,6 +144,7 @@ type LanguageMapping struct {
 	KeyBindingTagComponentDefault                              []string
 	KeyBindingRemoteComponentNone                              []string
 	KeyBindingRemoteComponentDefault                           []string
+	KeyBindingWorktreeComponent                                []string
 	KeyBindingModifiedFilesComponentConflict                   []string
 	KeyBindingModifiedFilesComponentIsStaged                   []string
 	KeyBindingModifiedFilesComponentDefault                    []string
@@ -225,6 +232,8 @@ type LanguageMapping struct {
 	TagComponentKeyBinding []KeyBindingMappingFormat
 	// Remote Component KeyBinding
 	RemoteComponentKeyBinding []KeyBindingMappingFormat
+	// Worktree Component KeyBinding
+	WorktreeComponentKeyBinding []KeyBindingMappingFormat
 	// Modified Files Component KeyBinding
 	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Commit Log Component KeyBinding

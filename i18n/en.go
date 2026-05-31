@@ -77,6 +77,12 @@ var eN = LanguageMapping{
 	Stash:                               "Stash",
 	Tag:                                 "Tag",
 	Remote:                              "Remote",
+	Worktree:                            "Worktree",
+	WorktreeIsMain:                      "Main",
+	WorktreeIsCurrent:                   "Current",
+	WorktreeIsLocked:                    "Locked",
+	WorktreeIsPrunable:                  "Prunable",
+	WorktreeLockedReason:                "Locked Reason",
 	Fetch:                               "Fetch",
 	Push:                                "Push",
 	FileTypeUnSupportedPreview:          "The current selected file type is not supported for preview",
@@ -147,6 +153,14 @@ var eN = LanguageMapping{
 		"[d] remove remote",
 		"[e] edit remote",
 		"[enter] set as tracking upstream",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingWorktreeComponent: []string{
+		"[</>] switch component",
+		"[backspace] remove worktree",
+		"[n] new worktree",
+		"[l] lock / unlock worktree",
+		"[ctrl+p] prune worktree",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -530,6 +544,7 @@ var eN = LanguageMapping{
 	LocalBranchComponentKeyBinding:                                 enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                         enTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                      enRemoteComponentKeyBinding,
+	WorktreeComponentKeyBinding:                                    enWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                               enModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                   enCommitLogComponentKeyBinding,
 	RefLogComponentKeyBinding:                                      enRefLogComponentKeyBinding,
@@ -1042,6 +1057,50 @@ var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "set as tracking upstream",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+}
+
+// Worktree Component Key Binding for en
+var enWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Worktree Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between local branch, tag, remote and worktree component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "remove worktree",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "new worktree",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "l",
+		TitleOrInfoLine: "lock / unlock worktree",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "prune worktree",
 		LineType:        INFO,
 	},
 	{

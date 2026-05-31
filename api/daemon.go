@@ -306,6 +306,7 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 		if gd.isGitWorktreePassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitWorktreePassiveRunning.Store(false)
 			gd.gitOperations.GitWorktree.GetLatestWorktreeInfos()
+			gd.updateChannel <- git.GIT_WORKTREE_UPDATE
 		}
 	}()
 }

@@ -77,6 +77,12 @@ var zH_HANS = LanguageMapping{
 	Stash:                               "暂存",
 	Tag:                                 "标签",
 	Remote:                              "远程",
+	Worktree:                            "工作树",
+	WorktreeIsMain:                      "主工作树",
+	WorktreeIsCurrent:                   "当前",
+	WorktreeIsLocked:                    "已锁定",
+	WorktreeIsPrunable:                  "可清理",
+	WorktreeLockedReason:                "锁定原因",
 	Fetch:                               "获取",
 	Push:                                "推送",
 	FileTypeUnSupportedPreview:          "当前选择的文件类型不支持预览",
@@ -147,6 +153,14 @@ var zH_HANS = LanguageMapping{
 		"[d] 移除远程",
 		"[e] 编辑远程",
 		"[enter] 设置为上游追踪分支",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingWorktreeComponent: []string{
+		"[</>] 切换组件",
+		"[backspace] 删除工作树",
+		"[n] 新建工作树",
+		"[l] 锁定/解锁工作树",
+		"[ctrl+p] 清理工作树",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -530,6 +544,7 @@ var zH_HANS = LanguageMapping{
 	LocalBranchComponentKeyBinding:                                 zhHansLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                         zhHansTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                      zhHansRemoteComponentKeyBinding,
+	WorktreeComponentKeyBinding:                                    zhHansWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                               zhHansModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                   zhHansCommitLogComponentKeyBinding,
 	RefLogComponentKeyBinding:                                      zhHansRefLogComponentKeyBinding,
@@ -1043,6 +1058,50 @@ var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "设置为上游追踪分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+}
+
+// Worktree Component Key Binding for zh-hans
+var zhHansWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 工作树组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支、标签、远程和工作树组件之间切换",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "删除工作树",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新建工作树",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "l",
+		TitleOrInfoLine: "锁定/解锁工作树",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "清理工作树",
 		LineType:        INFO,
 	},
 	{

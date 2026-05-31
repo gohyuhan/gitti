@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
@@ -15,6 +16,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
+	"github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -94,6 +96,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 				contentLine = generateTagDetailPanelContent(ctx, m)
 			case constant.SHOW_REMOTE:
 				contentLine = generateRemoteDetailPanelContent(m)
+			case constant.SHOW_WORKTREE:
+				contentLine = generateWorktreeDetailPanelContent(m)
 			}
 		case constant.ModifiedFilesComponentPanel:
 			contentLine, contentLine2, ogDiffLine1, ogDiffLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
@@ -229,6 +233,96 @@ func generateRemoteDetailPanelContent(m *types.GittiModel) string {
 		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
 	}
 	vpLine.WriteRune('\n')
+
+	return vpLine.String()
+}
+
+func generateWorktreeDetailPanelContent(m *types.GittiModel) string {
+	currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
+	var worktreeItem worktree.GitWorktreeItem
+	if currentSelectedWorktree != nil {
+		worktreeItem = currentSelectedWorktree.(worktree.GitWorktreeItem)
+	} else {
+		return ""
+	}
+
+	var vpLine strings.Builder
+
+	vpLine.WriteRune('[')
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(worktreeItem.WorktreePath))
+	vpLine.WriteRune(']')
+	vpLine.WriteRune('\n')
+	vpLine.WriteRune('\n')
+
+	if utf8.RuneCountInString(worktreeItem.WorktreeHead) > 0 {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("HEAD "))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(worktreeItem.WorktreeHead))
+		vpLine.WriteRune('\n')
+	}
+
+	if utf8.RuneCountInString(worktreeItem.WorktreeBranch) > 0 {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("branch "))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(worktreeItem.WorktreeBranch))
+		vpLine.WriteRune('\n')
+	}
+
+	vpLine.WriteRune('\n')
+
+	mainLabel := i18n.LANGUAGEMAPPING.WorktreeIsMain + ":"
+	currentLabel := i18n.LANGUAGEMAPPING.WorktreeIsCurrent + ":"
+	lockedLabel := i18n.LANGUAGEMAPPING.WorktreeIsLocked + " \uf456" + ":"
+	prunableLabel := i18n.LANGUAGEMAPPING.WorktreeIsPrunable + " \uea81" + ":"
+	lockedReasonLabel := i18n.LANGUAGEMAPPING.WorktreeLockedReason + ":"
+
+	maxLabelLen := max(
+		utf8.RuneCountInString(mainLabel),
+		max(
+			utf8.RuneCountInString(currentLabel),
+			max(
+				utf8.RuneCountInString(lockedLabel),
+				max(utf8.RuneCountInString(prunableLabel), utf8.RuneCountInString(lockedReasonLabel)),
+			),
+		),
+	)
+
+	writeLabel := func(label string) {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(label))
+		for i := 0; i < maxLabelLen-utf8.RuneCountInString(label)+1; i++ {
+			vpLine.WriteString(" ")
+		}
+	}
+
+	writeCheckBox := func(isChecked bool) {
+		if isChecked {
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		} else {
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("[ ]"))
+		}
+	}
+
+	writeLabel(mainLabel)
+	writeCheckBox(worktreeItem.IsMain)
+	vpLine.WriteRune('\n')
+
+	writeLabel(currentLabel)
+	writeCheckBox(worktreeItem.IsInCurrentWorktree)
+	vpLine.WriteRune('\n')
+
+	writeLabel(lockedLabel)
+	writeCheckBox(worktreeItem.IsLocked)
+	vpLine.WriteRune('\n')
+
+	writeLabel(prunableLabel)
+	writeCheckBox(worktreeItem.IsPrunable)
+	vpLine.WriteRune('\n')
+
+	if worktreeItem.IsLocked && utf8.RuneCountInString(worktreeItem.LockReason) > 0 {
+		writeLabel(lockedReasonLabel)
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(worktreeItem.LockReason))
+		vpLine.WriteRune('\n')
+	}
 
 	return vpLine.String()
 }

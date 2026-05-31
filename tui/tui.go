@@ -15,6 +15,7 @@ import (
 	remoteComponent "github.com/gohyuhan/gitti/tui/component/remote"
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	tagComponent "github.com/gohyuhan/gitti/tui/component/tag"
+	worktreeComponent "github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/helper"
 	"github.com/gohyuhan/gitti/tui/interaction"
@@ -100,6 +101,7 @@ func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoNa
 		CurrentRepoRefLogInfoList:                                 list.New([]list.Item{}, reflogComponent.GitRefLogItemDelegate{}, 0, 0),
 		CurrentRepoStashInfoList:                                  list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
 		CurrentRepoRemoteInfoList:                                 list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0),
+		CurrentRepoWorktreeInfoList:                               list.New([]list.Item{}, worktreeComponent.GitWorktreeItemDelegate{}, 0, 0),
 		DetailPanelParentComponent:                                "",
 		DetailPanelViewport:                                       vp,
 		DetailPanelViewportOffset:                                 0,
@@ -107,7 +109,7 @@ func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoNa
 		DetailPanelTwoViewportOffset:                              0,
 		DetailComponentPanelLayout:                                constant.HORIZONTAL,
 		CurrentLogComponentViewport:                               logVp,
-		ListNavigationIndexPosition:                               types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0},
+		ListNavigationIndexPosition:                               types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0, WorktreeComponet: 0},
 		PopUpType:                                                 constant.NoPopUp,
 		PopUpModel:                                                struct{}{},
 		GitOperations:                                             gitOperations,
@@ -196,6 +198,11 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case git.GIT_REMOTE_UPDATE:
 			needReinit := remoteComponent.InitRemoteList(m)
 			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_REMOTE {
+				services.FetchDetailComponentPanelInfoService(m, needReinit)
+			}
+		case git.GIT_WORKTREE_UPDATE:
+			needReinit := worktreeComponent.InitWorktreeList(m)
+			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_WORKTREE {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_FILES_STATUS_UPDATE:

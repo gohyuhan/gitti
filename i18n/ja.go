@@ -77,6 +77,12 @@ var jA = LanguageMapping{
 	Stash:                               "スタッシュ",
 	Tag:                                 "タグ",
 	Remote:                              "リモート",
+	Worktree:                            "ワークツリー",
+	WorktreeIsMain:                      "メイン",
+	WorktreeIsCurrent:                   "現在",
+	WorktreeIsLocked:                    "ロック",
+	WorktreeIsPrunable:                  "プルーン可能",
+	WorktreeLockedReason:                "ロック理由",
 	Fetch:                               "フェッチ",
 	Push:                                "プッシュ",
 	FileTypeUnSupportedPreview:          "現在選択されているファイル形式はプレビューに対応していません",
@@ -147,6 +153,14 @@ var jA = LanguageMapping{
 		"[d] リモートを削除",
 		"[e] リモートを編集",
 		"[enter] 上流として追跡を設定",
+		"[?] キー操作と説明",
+	},
+	KeyBindingWorktreeComponent: []string{
+		"[</>] コンポーネントを切り替え",
+		"[backspace] ワークツリーを削除",
+		"[n] 新しいワークツリー",
+		"[l] ワークツリーをロック/解除",
+		"[ctrl+p] ワークツリーをプルーン",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -530,6 +544,7 @@ var jA = LanguageMapping{
 	LocalBranchComponentKeyBinding:                                 jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                         jaTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                      jaRemoteComponentKeyBinding,
+	WorktreeComponentKeyBinding:                                    jaWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                               jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                   jaCommitLogComponentKeyBinding,
 	RefLogComponentKeyBinding:                                      jaRefLogComponentKeyBinding,
@@ -1044,6 +1059,50 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "上流として追跡を設定",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Worktree Component Key Binding for ja
+var jaWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- ワークツリーコンポーネントパネル キー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチ/タグ/リモート/ワークツリーを切り替え",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "ワークツリーを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新しいワークツリー",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "l",
+		TitleOrInfoLine: "ワークツリーをロック/解除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "ワークツリーをプルーン",
 		LineType:        INFO,
 	},
 	{

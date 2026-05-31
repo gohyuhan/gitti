@@ -12,6 +12,7 @@ import (
 	remoteComponent "github.com/gohyuhan/gitti/tui/component/remote"
 	stashComponent "github.com/gohyuhan/gitti/tui/component/stash"
 	tagComponent "github.com/gohyuhan/gitti/tui/component/tag"
+	worktreeComponent "github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -46,6 +47,7 @@ func TuiWindowSizing(m *types.GittiModel) {
 	m.CurrentRepoBranchesInfoList.Title = ansi.Truncate(branchComponent.ConstructLocalBranchComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoTagInfoList.Title = ansi.Truncate(tagComponent.ConstructTagComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoRemoteInfoList.Title = ansi.Truncate(remoteComponent.ConstructRemoteComponentTitle(titleWidthLimit), titleWidthLimit, "...")
+	m.CurrentRepoWorktreeInfoList.Title = ansi.Truncate(worktreeComponent.ConstructWorktreeComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoModifiedFilesInfoList.Title = ansi.Truncate(filesComponent.ConstructModifiedFilesComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoCommitLogInfoList.Title = ansi.Truncate(commitlogComponent.ConstructCommitLogComponentTitle(titleWidthLimit), titleWidthLimit, "...")
 	m.CurrentRepoRefLogInfoList.Title = ansi.Truncate(reflogComponent.ConstructRefLogComponentTitle(titleWidthLimit), titleWidthLimit, "...")
@@ -110,6 +112,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	m.LocalBranchesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.TagsComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.RemoteComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
+	m.WorktreeComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.ModifiedFilesComponentPanelHeight = unSelectedComponentPanelHeightPerComponent + remainingHeight
 	m.CommitLogComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 	m.RefLogComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
@@ -120,6 +123,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 		m.TagsComponentPanelHeight = selectedComponentPanelHeight
 		m.RemoteComponentPanelHeight = selectedComponentPanelHeight
+		m.WorktreeComponentPanelHeight = selectedComponentPanelHeight
 	case constant.ModifiedFilesComponentPanel:
 		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
 	case constant.CommitLogOrRefLogComponentPanel:
@@ -133,12 +137,14 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 		m.TagsComponentPanelHeight = selectedComponentPanelHeight
 		m.RemoteComponentPanelHeight = selectedComponentPanelHeight
+		m.WorktreeComponentPanelHeight = selectedComponentPanelHeight
 	case constant.DetailComponentPanelTwo:
 		switch m.DetailPanelParentComponent {
 		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 			m.TagsComponentPanelHeight = selectedComponentPanelHeight
 			m.RemoteComponentPanelHeight = selectedComponentPanelHeight
+			m.WorktreeComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
 		case constant.CommitLogOrRefLogComponentPanel:
@@ -153,6 +159,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 			m.TagsComponentPanelHeight = selectedComponentPanelHeight
 			m.RemoteComponentPanelHeight = selectedComponentPanelHeight
+			m.WorktreeComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
 		case constant.CommitLogOrRefLogComponentPanel:
@@ -172,6 +179,9 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 
 	m.CurrentRepoRemoteInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoRemoteInfoList.SetHeight(m.RemoteComponentPanelHeight)
+
+	m.CurrentRepoWorktreeInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoWorktreeInfoList.SetHeight(m.WorktreeComponentPanelHeight)
 
 	m.CurrentRepoModifiedFilesInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoModifiedFilesInfoList.SetHeight(m.ModifiedFilesComponentPanelHeight)

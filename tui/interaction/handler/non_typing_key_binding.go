@@ -2419,6 +2419,9 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 			case constant.SHOW_REMOTE:
 				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_TAG
 				services.FetchDetailComponentPanelInfoService(m, true)
+			case constant.SHOW_WORKTREE:
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_REMOTE
+				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
@@ -2464,6 +2467,9 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_REMOTE
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_REMOTE:
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_WORKTREE
+				services.FetchDetailComponentPanelInfoService(m, true)
+			case constant.SHOW_WORKTREE:
 				// do nothing, as remote is currently the most right option in the local branch or tag or remote component panel
 			}
 		case constant.CommitLogOrRefLogComponentPanel:

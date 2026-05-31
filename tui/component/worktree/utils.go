@@ -1,4 +1,4 @@
-package branch
+package worktree
 
 import (
 	"fmt"
@@ -12,16 +12,17 @@ import (
 
 // ------------------------------------
 //
-//	Build the styled tab-bar title string for the branch panel, with the branch tab
+//	Build the styled tab-bar title string for the tag panel, with the tag tab
 //	highlighted as active. Falls back to abbreviated icon/letter labels through up to
 //	four levels when the rendered width exceeds titleWidthLimit.
 //
 // ------------------------------------
-func ConstructLocalBranchComponentTitle(titleWidthLimit int) string {
-	title := fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
+func ConstructWorktreeComponentTitle(titleWidthLimit int) string {
+	title := fmt.Sprintf(
+		"%s %s %s %s %s %s %s %s %s %s %s %s",
 		style.TitleCurrentComponentStyle.Render("[1]"),
-		style.TitleCurrentComponentStyle.Render("\uf418"),
-		style.TitleCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
+		style.TitleNonCurrentComponentStyle.Render("\uf418"),
+		style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
 		style.TitleNonCurrentComponentStyle.Render("•"),
 		style.TitleNonCurrentComponentStyle.Render("\uf412"),
 		style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Tag),
@@ -29,14 +30,15 @@ func ConstructLocalBranchComponentTitle(titleWidthLimit int) string {
 		style.TitleNonCurrentComponentStyle.Render("\ueb39"),
 		style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Remote),
 		style.TitleNonCurrentComponentStyle.Render("•"),
-		style.TitleNonCurrentComponentStyle.Render("\ueb86"),
-		style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Worktree),
+		style.TitleCurrentComponentStyle.Render("\ueb86"),
+		style.TitleCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Worktree),
 	)
 	if lipgloss.Width(title) > titleWidthLimit {
-		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
+		title = fmt.Sprintf(
+			"%s %s %s %s %s %s %s %s %s %s %s %s",
 			style.TitleCurrentComponentStyle.Render("[1]"),
-			style.TitleCurrentComponentStyle.Render("\uf418"),
-			style.TitleCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
+			style.TitleNonCurrentComponentStyle.Render("\uf418"),
+			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
 			style.TitleNonCurrentComponentStyle.Render("•"),
 			style.TitleNonCurrentComponentStyle.Render("\uf412"),
 			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Tag),
@@ -44,15 +46,33 @@ func ConstructLocalBranchComponentTitle(titleWidthLimit int) string {
 			style.TitleNonCurrentComponentStyle.Render("\ueb39"),
 			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Remote),
 			style.TitleNonCurrentComponentStyle.Render("•"),
-			style.TitleNonCurrentComponentStyle.Render("\ueb86"),
-			style.TitleNonCurrentComponentStyle.Render("W"),
+			style.TitleCurrentComponentStyle.Render("\ueb86"),
+			style.TitleCurrentComponentStyle.Render("W"),
 		)
 	}
 	if lipgloss.Width(title) > titleWidthLimit {
-		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
+		title = fmt.Sprintf(
+			"%s %s %s %s %s %s %s %s %s %s %s %s",
 			style.TitleCurrentComponentStyle.Render("[1]"),
-			style.TitleCurrentComponentStyle.Render("\uf418"),
-			style.TitleCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
+			style.TitleNonCurrentComponentStyle.Render("\uf418"),
+			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
+			style.TitleNonCurrentComponentStyle.Render("•"),
+			style.TitleNonCurrentComponentStyle.Render("\uf412"),
+			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Tag),
+			style.TitleNonCurrentComponentStyle.Render("•"),
+			style.TitleNonCurrentComponentStyle.Render("\ueb39"),
+			style.TitleNonCurrentComponentStyle.Render("R"),
+			style.TitleNonCurrentComponentStyle.Render("•"),
+			style.TitleCurrentComponentStyle.Render("\ueb86"),
+			style.TitleCurrentComponentStyle.Render("W"),
+		)
+	}
+	if lipgloss.Width(title) > titleWidthLimit {
+		title = fmt.Sprintf(
+			"%s %s %s %s %s %s %s %s %s %s %s %s",
+			style.TitleCurrentComponentStyle.Render("[1]"),
+			style.TitleNonCurrentComponentStyle.Render("\uf418"),
+			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
 			style.TitleNonCurrentComponentStyle.Render("•"),
 			style.TitleNonCurrentComponentStyle.Render("\uf412"),
 			style.TitleNonCurrentComponentStyle.Render("T"),
@@ -60,15 +80,16 @@ func ConstructLocalBranchComponentTitle(titleWidthLimit int) string {
 			style.TitleNonCurrentComponentStyle.Render("\ueb39"),
 			style.TitleNonCurrentComponentStyle.Render("R"),
 			style.TitleNonCurrentComponentStyle.Render("•"),
-			style.TitleNonCurrentComponentStyle.Render("\ueb86"),
-			style.TitleNonCurrentComponentStyle.Render("W"),
+			style.TitleCurrentComponentStyle.Render("\ueb86"),
+			style.TitleCurrentComponentStyle.Render("W"),
 		)
 	}
 	if lipgloss.Width(title) > titleWidthLimit {
-		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
+		title = fmt.Sprintf(
+			"%s %s %s %s %s %s %s %s %s %s %s %s",
 			style.TitleCurrentComponentStyle.Render("[1]"),
-			style.TitleCurrentComponentStyle.Render("\uf418"),
-			style.TitleCurrentComponentStyle.Render("B"),
+			style.TitleNonCurrentComponentStyle.Render("\uf418"),
+			style.TitleNonCurrentComponentStyle.Render("B"),
 			style.TitleNonCurrentComponentStyle.Render("•"),
 			style.TitleNonCurrentComponentStyle.Render("\uf412"),
 			style.TitleNonCurrentComponentStyle.Render("T"),
@@ -76,8 +97,8 @@ func ConstructLocalBranchComponentTitle(titleWidthLimit int) string {
 			style.TitleNonCurrentComponentStyle.Render("\ueb39"),
 			style.TitleNonCurrentComponentStyle.Render("R"),
 			style.TitleNonCurrentComponentStyle.Render("•"),
-			style.TitleNonCurrentComponentStyle.Render("\ueb86"),
-			style.TitleNonCurrentComponentStyle.Render("W"),
+			style.TitleCurrentComponentStyle.Render("\ueb86"),
+			style.TitleCurrentComponentStyle.Render("W"),
 		)
 	}
 	return title

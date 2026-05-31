@@ -131,6 +131,9 @@ func renderSelectedComponentKeyBindingPart(m *types.GittiModel, contentLine *str
 		case constant.SHOW_REMOTE:
 			selectedComponentKeyBindingKeyMapLargestLen = &m.RemoteComponentKeyBindingKeyMapLargestLen
 			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.RemoteComponentKeyBinding
+		case constant.SHOW_WORKTREE:
+			selectedComponentKeyBindingKeyMapLargestLen = &m.WorktreeComponentKeyBindingKeyMapLargestLen
+			selectedComponenti18nKeybinding = i18n.LANGUAGEMAPPING.WorktreeComponentKeyBinding
 		}
 	case constant.ModifiedFilesComponentPanel:
 		selectedComponentKeyBindingKeyMapLargestLen = &m.ModifiedFilesComponentKeyBindingKeyMapLargestLen
