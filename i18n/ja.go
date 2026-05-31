@@ -79,7 +79,7 @@ var jA = LanguageMapping{
 	Remote:                              "リモート",
 	Worktree:                            "ワークツリー",
 	WorktreeIsMain:                      "メイン",
-	WorktreeIsCurrent:                   "現在",
+	WorktreeIsCurrent:                   "現在のワークツリー",
 	WorktreeIsLocked:                    "ロック",
 	WorktreeIsPrunable:                  "プルーン可能",
 	WorktreeLockedReason:                "ロック理由",
@@ -155,6 +155,14 @@ var jA = LanguageMapping{
 		"[enter] 上流として追跡を設定",
 		"[?] キー操作と説明",
 	},
+	KeyBindingWorktreeComponentMainWorktree: []string{
+		"[</>] コンポーネントを切り替え",
+		"[n] 新しいワークツリー",
+		"[l] ワークツリーをロック/解除",
+		"[ctrl+p] ワークツリーをプルーン",
+		"[?] キー操作と説明",
+	},
+
 	KeyBindingWorktreeComponent: []string{
 		"[</>] コンポーネントを切り替え",
 		"[backspace] ワークツリーを削除",

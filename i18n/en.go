@@ -79,7 +79,7 @@ var eN = LanguageMapping{
 	Remote:                              "Remote",
 	Worktree:                            "Worktree",
 	WorktreeIsMain:                      "Main",
-	WorktreeIsCurrent:                   "Current",
+	WorktreeIsCurrent:                   "Current Worktree",
 	WorktreeIsLocked:                    "Locked",
 	WorktreeIsPrunable:                  "Prunable",
 	WorktreeLockedReason:                "Locked Reason",
@@ -155,6 +155,14 @@ var eN = LanguageMapping{
 		"[enter] set as tracking upstream",
 		"[?] keybinding and instructions",
 	},
+	KeyBindingWorktreeComponentMainWorktree: []string{
+		"[</>] switch component",
+		"[n] new worktree",
+		"[l] lock / unlock worktree",
+		"[ctrl+p] prune worktree",
+		"[?] keybinding and instructions",
+	},
+
 	KeyBindingWorktreeComponent: []string{
 		"[</>] switch component",
 		"[backspace] remove worktree",

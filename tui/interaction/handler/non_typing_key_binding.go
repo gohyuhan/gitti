@@ -2060,6 +2060,13 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gitti
 					m.ListNavigationIndexPosition.RemoteComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
+			case constant.SHOW_WORKTREE:
+				if m.CurrentRepoWorktreeInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoWorktreeInfoList.Index() - 1
+					m.CurrentRepoWorktreeInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.WorktreeComponet = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
 			}
 		case constant.ModifiedFilesComponentPanel:
 			// we don't use the list native Update() because we need to also track the current selected index
@@ -2163,6 +2170,13 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 					latestIndex := m.CurrentRepoRemoteInfoList.Index() + 1
 					m.CurrentRepoRemoteInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.RemoteComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+			case constant.SHOW_WORKTREE:
+				if m.CurrentRepoWorktreeInfoList.Index() < len(m.CurrentRepoWorktreeInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoWorktreeInfoList.Index() + 1
+					m.CurrentRepoWorktreeInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.WorktreeComponet = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}

@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
+	worktreeComponent "github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
@@ -489,11 +490,11 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-				CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
-				if CurrentSelectedBranch == nil {
+				currentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
+				if currentSelectedBranch == nil {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentNone
 				} else {
-					isCurrentSelectedBranchCheckedOutBranch := CurrentSelectedBranch.(branchComponent.GitBranchItem).IsCheckedOut
+					isCurrentSelectedBranchCheckedOutBranch := currentSelectedBranch.(branchComponent.GitBranchItem).IsCheckedOut
 					if isCurrentSelectedBranchCheckedOutBranch {
 						keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentIsCheckOut
 					} else {
@@ -501,21 +502,26 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					}
 				}
 			case constant.SHOW_TAG:
-				CurrentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
-				if CurrentSelectedTag == nil {
+				currentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+				if currentSelectedTag == nil {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentNone
 				} else {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentDefault
 				}
 			case constant.SHOW_REMOTE:
-				CurrentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
-				if CurrentSelectedRemote == nil {
+				currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if currentSelectedRemote == nil {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingRemoteComponentNone
 				} else {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingRemoteComponentDefault
 				}
 			case constant.SHOW_WORKTREE:
-				keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponent
+				currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if currentSelectedWorktree != nil && currentSelectedWorktree.(worktreeComponent.GitWorktreeItem).IsMain {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentMainWorktree
+				} else {
+					keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponent
+				}
 			}
 		case constant.ModifiedFilesComponentPanel:
 			CurrentSelectedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()

@@ -79,7 +79,7 @@ var zH_HANT = LanguageMapping{
 	Remote:                              "遠端",
 	Worktree:                            "工作樹",
 	WorktreeIsMain:                      "主工作樹",
-	WorktreeIsCurrent:                   "目前",
+	WorktreeIsCurrent:                   "目前工作樹",
 	WorktreeIsLocked:                    "已鎖定",
 	WorktreeIsPrunable:                  "可清理",
 	WorktreeLockedReason:                "鎖定原因",
@@ -155,6 +155,14 @@ var zH_HANT = LanguageMapping{
 		"[enter] 設定為上游追蹤分支",
 		"[?] 快捷鍵與說明",
 	},
+	KeyBindingWorktreeComponentMainWorktree: []string{
+		"[</>] 切換元件",
+		"[n] 新增工作樹",
+		"[l] 鎖定/解鎖工作樹",
+		"[ctrl+p] 清理工作樹",
+		"[?] 快捷鍵與說明",
+	},
+
 	KeyBindingWorktreeComponent: []string{
 		"[</>] 切換元件",
 		"[backspace] 刪除工作樹",
