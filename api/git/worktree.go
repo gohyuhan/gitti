@@ -1,6 +1,7 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -150,7 +151,7 @@ func (gwt *GitWorktree) GetLatestWorktreeInfos() {
 //	process is running. Returns the command output and whether the add succeeded.
 //
 // ------------------------------------
-func (gwt *GitWorktree) AddNewWorktree(newWorktreeName string, checkoutWorktreeBranchName string) (string, bool) {
+func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName string, checkoutWorktreeBranchName string) (string, bool) {
 	if !gwt.gitProcessLock.CanProceedWithGitOps() {
 		gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
 		return gwt.gitProcessLock.OtherProcessRunningWarning(), false
@@ -166,7 +167,7 @@ func (gwt *GitWorktree) AddNewWorktree(newWorktreeName string, checkoutWorktreeB
 		gitArgs = append(gitArgs, checkoutWorktreeBranchName)
 	}
 
-	newWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	newWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
 	gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	newWorktreeOutput, newWorktreeError := newWorktreeCmdExecutor.Output()
 
@@ -177,6 +178,39 @@ func (gwt *GitWorktree) AddNewWorktree(newWorktreeName string, checkoutWorktreeB
 	}
 
 	return string(newWorktreeOutput), success
+}
+
+// ------------------------------------
+//
+//	Remove the worktree at worktreePath via `git worktree remove`. No --force is
+//	passed, so git refuses to remove a worktree with uncommitted/untracked changes
+//	or a locked worktree, returning that error as the output.
+//	Acquires the git ops lock first; returns the lock-busy warning if another git
+//	process is running. Returns the command output and whether the remove succeeded.
+//
+// ------------------------------------
+func (gwt *GitWorktree) RemoveWorktree(ctx context.Context, worktreePath string) (string, bool) {
+	if !gwt.gitProcessLock.CanProceedWithGitOps() {
+		gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
+		return gwt.gitProcessLock.OtherProcessRunningWarning(), false
+	}
+	defer func() {
+		gwt.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	success := false
+	gitArgs := []string{"worktree", "remove", worktreePath}
+	removeWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	removeWorktreeOutput, removeWorktreeError := removeWorktreeCmdExecutor.Output()
+
+	if removeWorktreeError != nil {
+		gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REMOVE_WORKTREE_OPS, removeWorktreeError.Error()), true)
+	} else {
+		success = true
+	}
+
+	return string(removeWorktreeOutput), success
 }
 
 // ------------------------------------
