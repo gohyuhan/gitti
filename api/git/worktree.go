@@ -169,7 +169,7 @@ func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName stri
 
 	newWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
 	gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
-	newWorktreeOutput, newWorktreeError := newWorktreeCmdExecutor.Output()
+	newWorktreeOutput, newWorktreeError := newWorktreeCmdExecutor.CombinedOutput()
 
 	if newWorktreeError != nil {
 		gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.ADD_NEW_WORKTREE_OPS, newWorktreeError.Error()), true)
@@ -202,7 +202,7 @@ func (gwt *GitWorktree) RemoveWorktree(ctx context.Context, worktreePath string)
 	gitArgs := []string{"worktree", "remove", worktreePath}
 	removeWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
 	gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
-	removeWorktreeOutput, removeWorktreeError := removeWorktreeCmdExecutor.Output()
+	removeWorktreeOutput, removeWorktreeError := removeWorktreeCmdExecutor.CombinedOutput()
 
 	if removeWorktreeError != nil {
 		gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REMOVE_WORKTREE_OPS, removeWorktreeError.Error()), true)
@@ -211,6 +211,28 @@ func (gwt *GitWorktree) RemoveWorktree(ctx context.Context, worktreePath string)
 	}
 
 	return string(removeWorktreeOutput), success
+}
+
+// ------------------------------------
+//
+//	Prune all stale worktree admin entries in one pass via `git worktree prune`,
+//	removing the bookkeeping under `.git/worktrees/*` for worktrees whose
+//	working dir is gone or otherwise unusable. Valid worktrees are untouched.
+//	Acquires the git ops lock first; no-ops if another git process is running.
+//
+// ------------------------------------
+func (gwt *GitWorktree) PruneWorktrees() {
+	if !gwt.gitProcessLock.CanProceedWithGitOps() {
+		gwt.logging.RegisterNewLog(logging.PRUNE_WORKTREES_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
+		return
+	}
+	defer func() {
+		gwt.gitProcessLock.ReleaseGitOpsLock()
+	}()
+
+	gitArgs := []string{"worktree", "prune"}
+	pruneWorktreesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	pruneWorktreesCmdExecutor.Run()
 }
 
 // ------------------------------------
