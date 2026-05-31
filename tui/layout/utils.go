@@ -116,7 +116,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 	m.StashComponentPanelHeight = unSelectedComponentPanelHeightPerComponent
 
 	switch m.CurrentSelectedComponent {
-	case constant.LocalBranchOrTagOrRemoteComponentPanel:
+	case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 		m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 		m.TagsComponentPanelHeight = selectedComponentPanelHeight
 		m.RemoteComponentPanelHeight = selectedComponentPanelHeight
@@ -135,7 +135,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		m.RemoteComponentPanelHeight = selectedComponentPanelHeight
 	case constant.DetailComponentPanelTwo:
 		switch m.DetailPanelParentComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 			m.TagsComponentPanelHeight = selectedComponentPanelHeight
 			m.RemoteComponentPanelHeight = selectedComponentPanelHeight
@@ -149,7 +149,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		}
 	case constant.DetailComponentPanel:
 		switch m.DetailPanelParentComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			m.LocalBranchesComponentPanelHeight = selectedComponentPanelHeight
 			m.TagsComponentPanelHeight = selectedComponentPanelHeight
 			m.RemoteComponentPanelHeight = selectedComponentPanelHeight

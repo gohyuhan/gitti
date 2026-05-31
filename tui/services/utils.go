@@ -86,8 +86,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			theCurrentSelectedComponent = m.CurrentSelectedComponent
 		}
 		switch theCurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				contentLine = generateAboutGittiContent()
 			case constant.SHOW_TAG:

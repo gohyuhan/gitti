@@ -75,16 +75,16 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 // ------------------------------------
 //
 //	Render the left-column panel that switches between local branches, tags, and
-//	remotes based on m.CurrentLocalBranchOrTagOrRemoteComponentShowing.
+//	remotes based on m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing.
 //
 // ------------------------------------
 func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel {
+	if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	var content string
-	switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+	switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 	case constant.SHOW_LOCAL_BRANCH:
 		content = m.CurrentRepoBranchesInfoList.View()
 	case constant.SHOW_TAG:
@@ -484,8 +484,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		switch m.CurrentSelectedComponent {
 		case constant.GitStatusComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStatusComponent
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 				if CurrentSelectedBranch == nil {

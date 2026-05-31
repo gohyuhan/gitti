@@ -79,52 +79,52 @@ func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoNa
 		UserSetEditor:                 settings.GITTICONFIGSETTINGS.Editor,
 		CurrentSelectedComponent:      constant.ModifiedFilesComponentPanel,
 		CurrentSelectedComponentIndex: 2,
-		CurrentLocalBranchOrTagOrRemoteComponentShowing:  constant.SHOW_LOCAL_BRANCH,
-		CurrentCommitLogOrRefLogComponentShowing:         constant.SHOW_COMMITLOG,
-		TotalComponentCount:                              4,
-		RepoPath:                                         repoPath,
-		RepoName:                                         repoName,
-		CheckOutBranch:                                   "",
-		RemoteSyncLocalState:                             "",
-		RemoteSyncRemoteState:                            "",
-		CurrentGitRepoStatus:                             "",
-		BranchUpStream:                                   "",
-		TrackedUpstreamOrBranchIcon:                      "",
-		Width:                                            0,
-		Height:                                           0,
-		WindowLeftPanelRatio:                             settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio,
-		CurrentRepoBranchesInfoList:                      list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
-		CurrentRepoTagInfoList:                           list.New([]list.Item{}, tagComponent.GitTagItemDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfoList:                 list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
-		CurrentRepoCommitLogInfoList:                     list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
-		CurrentRepoRefLogInfoList:                        list.New([]list.Item{}, reflogComponent.GitRefLogItemDelegate{}, 0, 0),
-		CurrentRepoStashInfoList:                         list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
-		CurrentRepoRemoteInfoList:                        list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0),
-		DetailPanelParentComponent:                       "",
-		DetailPanelViewport:                              vp,
-		DetailPanelViewportOffset:                        0,
-		DetailPanelTwoViewport:                           vpTwo,
-		DetailPanelTwoViewportOffset:                     0,
-		DetailComponentPanelLayout:                       constant.HORIZONTAL,
-		CurrentLogComponentViewport:                      logVp,
-		ListNavigationIndexPosition:                      types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0},
-		PopUpType:                                        constant.NoPopUp,
-		PopUpModel:                                       struct{}{},
-		GitOperations:                                    gitOperations,
-		GlobalKeyBindingKeyMapLargestLen:                 0,
-		LocalBranchComponentKeyBindingKeyMapLargestLen:   0,
-		TagComponentKeyBindingKeyMapLargestLen:           0,
-		RemoteComponentKeyBindingKeyMapLargestLen:        0,
-		ModifiedFilesComponentKeyBindingKeyMapLargestLen: 0,
-		CommitLogComponentKeyBindingKeyMapLargestLen:     0,
-		RefLogComponentKeyBindingKeyMapLargestLen:        0,
-		StashComponentKeyBindingKeyMapLargestLen:         0,
-		LogComponentKeyBindingKeyMapLargestLen:           0,
-		DetailComponentKeyBindingKeyMapLargestLen:        0,
-		LineEditingIndexPositionAndInfo:                  types.GittiLineEditingIndexPositionAndInfo{},
-		LineEditingIndexCursorViewport:                   lineEditingIndexCursorVp,
-		LineEditingIndexCursorTwoViewport:                lineEditingIndexCursorVpTwo,
-		CherryPickedCommitInfo:                           types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)},
+		CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing: constant.SHOW_LOCAL_BRANCH,
+		CurrentCommitLogOrRefLogComponentShowing:                  constant.SHOW_COMMITLOG,
+		TotalComponentCount:                                       4,
+		RepoPath:                                                  repoPath,
+		RepoName:                                                  repoName,
+		CheckOutBranch:                                            "",
+		RemoteSyncLocalState:                                      "",
+		RemoteSyncRemoteState:                                     "",
+		CurrentGitRepoStatus:                                      "",
+		BranchUpStream:                                            "",
+		TrackedUpstreamOrBranchIcon:                               "",
+		Width:                                                     0,
+		Height:                                                    0,
+		WindowLeftPanelRatio:                                      settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio,
+		CurrentRepoBranchesInfoList:                               list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
+		CurrentRepoTagInfoList:                                    list.New([]list.Item{}, tagComponent.GitTagItemDelegate{}, 0, 0),
+		CurrentRepoModifiedFilesInfoList:                          list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
+		CurrentRepoCommitLogInfoList:                              list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
+		CurrentRepoRefLogInfoList:                                 list.New([]list.Item{}, reflogComponent.GitRefLogItemDelegate{}, 0, 0),
+		CurrentRepoStashInfoList:                                  list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
+		CurrentRepoRemoteInfoList:                                 list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0),
+		DetailPanelParentComponent:                                "",
+		DetailPanelViewport:                                       vp,
+		DetailPanelViewportOffset:                                 0,
+		DetailPanelTwoViewport:                                    vpTwo,
+		DetailPanelTwoViewportOffset:                              0,
+		DetailComponentPanelLayout:                                constant.HORIZONTAL,
+		CurrentLogComponentViewport:                               logVp,
+		ListNavigationIndexPosition:                               types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0},
+		PopUpType:                                                 constant.NoPopUp,
+		PopUpModel:                                                struct{}{},
+		GitOperations:                                             gitOperations,
+		GlobalKeyBindingKeyMapLargestLen:                          0,
+		LocalBranchComponentKeyBindingKeyMapLargestLen:            0,
+		TagComponentKeyBindingKeyMapLargestLen:                    0,
+		RemoteComponentKeyBindingKeyMapLargestLen:                 0,
+		ModifiedFilesComponentKeyBindingKeyMapLargestLen:          0,
+		CommitLogComponentKeyBindingKeyMapLargestLen:              0,
+		RefLogComponentKeyBindingKeyMapLargestLen:                 0,
+		StashComponentKeyBindingKeyMapLargestLen:                  0,
+		LogComponentKeyBindingKeyMapLargestLen:                    0,
+		DetailComponentKeyBindingKeyMapLargestLen:                 0,
+		LineEditingIndexPositionAndInfo:                           types.GittiLineEditingIndexPositionAndInfo{},
+		LineEditingIndexCursorViewport:                            lineEditingIndexCursorVp,
+		LineEditingIndexCursorTwoViewport:                         lineEditingIndexCursorVpTwo,
+		CherryPickedCommitInfo:                                    types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)},
 	}
 	gittiModel.IsRenderInit.Store(false)
 	gittiModel.ShowPopUp.Store(false)
@@ -185,17 +185,17 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch updateEvent {
 		case git.GIT_BRANCH_UPDATE:
 			branchComponent.InitBranchList(m)
-			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_LOCAL_BRANCH {
+			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_LOCAL_BRANCH {
 				services.FetchDetailComponentPanelInfoService(m, false)
 			}
 		case git.GIT_TAG_UPDATE:
 			needReinit := tagComponent.InitTagList(m)
-			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_TAG {
+			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_TAG {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_REMOTE_UPDATE:
 			needReinit := remoteComponent.InitRemoteList(m)
-			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_REMOTE {
+			if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_REMOTE {
 				services.FetchDetailComponentPanelInfoService(m, needReinit)
 			}
 		case git.GIT_FILES_STATUS_UPDATE:
