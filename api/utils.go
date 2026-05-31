@@ -84,7 +84,7 @@ func PromptUserForGitInitConfirmation(repoPath string) {
 //	Initialize all git operation handlers with the given path and shared dependencies
 //
 // ------------------------------------
-func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogging *logging.GittiLogging) *GitOperations {
+func InitGitOperations(absoluteGitRepoPath string, absoluteWorktreePath string, updateChannel chan string, gittiLogging *logging.GittiLogging) *GitOperations {
 	gitProcessLock := git.InitGitProcessLock(gittiLogging)
 	return &GitOperations{
 		GitBranch:              git.InitGitBranch(gitProcessLock, settings.GITTICONFIGSETTINGS.FfMerge, gittiLogging),
@@ -97,9 +97,10 @@ func InitGitOperations(absolutePath string, updateChannel chan string, gittiLogg
 		GitCommitLog:           git.InitGitCommitLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount, gittiLogging),
 		GitRefLog:              git.InitGitRefLog(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxRefLogCount, gittiLogging),
 		GitTag:                 git.InitGitTag(updateChannel, gitProcessLock, gittiLogging),
-		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absolutePath, gitProcessLock, gittiLogging),
+		GitStateUniversalUtils: git.InitGitStateUniversalUtils(absoluteGitRepoPath, gitProcessLock, gittiLogging),
 		GitBlame:               git.InitGitBlame(updateChannel, gitProcessLock, gittiLogging),
 		GitInteractiveRebase:   git.InitGitInteractiveRebase(updateChannel, gitProcessLock, settings.GITTICONFIGSETTINGS.MaxCommitLogCount, gittiLogging),
+		GitWorktree:            git.InitGitWorktree(updateChannel, gitProcessLock, gittiLogging, absoluteWorktreePath),
 	}
 }
 
@@ -183,7 +184,7 @@ func IsBranchNameValid(branchName string) (string, bool) {
 
 // ------------------------------------
 //
-//	Get the top-level and absolute git path
+//	Get the top-level, absolute git path and the absolute worktree path
 //
 // ------------------------------------
 func getGitPathInfo() (GitRepoPath, error) {
@@ -206,10 +207,13 @@ func getGitPathInfo() (GitRepoPath, error) {
 
 	repoName := filepath.Base(strings.TrimSpace(string(topLevelGitPathOutput)))
 
+	absoluteGitRepoPath := strings.TrimSpace(string(absGitPathOutput))
+
 	gitRepoPath := GitRepoPath{
-		AbsoluteGitRepoPath: strings.TrimSpace(string(absGitPathOutput)),
-		TopLevelRepoPath:    strings.TrimSpace(string(topLevelGitPathOutput)),
-		RepoName:            repoName,
+		AbsoluteGitRepoPath:  absoluteGitRepoPath,
+		TopLevelRepoPath:     strings.TrimSpace(string(topLevelGitPathOutput)),
+		AbsoluteWorktreePath: strings.TrimSpace(string(topLevelGitPathOutput)),
+		RepoName:             repoName,
 	}
 
 	return gitRepoPath, nil

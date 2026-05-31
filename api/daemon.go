@@ -32,6 +32,7 @@ type GitDaemon struct {
 	isGitRemoteSyncStatusActiveRunning  atomic.Bool
 	isGitTagPassiveRunning              atomic.Bool
 	isGitRemotePassiveRunning           atomic.Bool
+	isGitWorktreePassiveRunning         atomic.Bool
 	watcherTimer                        *time.Timer
 	gitFilesActiveTimer                 *time.Timer
 	gitRemoteSyncStatusActiveTimer      *time.Timer
@@ -100,7 +101,8 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 
 // ------------------------------------
 //
-//	Register the repo directory paths for file watching, skipping objects and hooks directories
+//	Register the repo directory paths for file watching, skipping noisy/irrelevant
+//	dirs (objects, hooks, lfs, rr-cache, lost-found)
 //
 // ------------------------------------
 func (gd *GitDaemon) watchPath() {
@@ -110,7 +112,7 @@ func (gd *GitDaemon) watchPath() {
 	}
 	err = filepath.WalkDir(gd.repoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
-			if d.IsDir() && (d.Name() == "objects" || d.Name() == "hooks") {
+			if gd.isSkippableGitDir(path) {
 				return fs.SkipDir
 			}
 			gd.watcher.Add(path)
@@ -120,6 +122,29 @@ func (gd *GitDaemon) watchPath() {
 	if err != nil {
 		gd.errorLog = append(gd.errorLog, err)
 	}
+}
+
+// ------------------------------------
+//
+//	Report whether path is a metadata dir directly under a git dir root (the
+//	top-level .git or any submodule gitdir under .git/modules/...) that is
+//	noisy/irrelevant to git state and should not be watched. The parent is
+//	treated as a git dir root only when it contains a HEAD file, so branch/ref
+//	namespaces like refs/heads/lfs/... stay watched while submodule object/pack
+//	dirs are skipped.
+//
+// ------------------------------------
+func (gd *GitDaemon) isSkippableGitDir(path string) bool {
+	switch filepath.Base(path) {
+	case "objects", "hooks", "lfs", "rr-cache", "lost-found":
+	default:
+		return false
+	}
+	parent := filepath.Dir(path)
+	if _, err := os.Stat(filepath.Join(parent, "HEAD")); err == nil {
+		return true
+	}
+	return false
 }
 
 // ------------------------------------
@@ -277,6 +302,12 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 			gd.updateChannel <- git.GIT_REMOTE_UPDATE
 		}
 	}()
+	go func() {
+		if gd.isGitWorktreePassiveRunning.CompareAndSwap(false, true) {
+			defer gd.isGitWorktreePassiveRunning.Store(false)
+			gd.gitOperations.GitWorktree.GetLatestWorktreeInfos()
+		}
+	}()
 }
 
 // ------------------------------------
@@ -302,7 +333,7 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 		if err == nil && fi.IsDir() {
 			filepath.WalkDir(event.Name, func(path string, d fs.DirEntry, err error) error {
 				if err == nil && d.IsDir() {
-					if d.IsDir() && (d.Name() == "objects" || d.Name() == "hooks") {
+					if gd.isSkippableGitDir(path) {
 						return fs.SkipDir
 					}
 					_ = gd.watcher.Add(path)

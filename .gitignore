@@ -11,3 +11,6 @@ dist/
 assets/demo.tape
 .claude/
 .pi-lens/
+
+# repowise
+.repowise/

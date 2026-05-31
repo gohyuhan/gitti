@@ -16,11 +16,13 @@ type GitOperations struct {
 	GitStateUniversalUtils *git.GitStateUniversalUtils
 	GitBlame               *git.GitBlame
 	GitInteractiveRebase   *git.GitInteractiveRebase
+	GitWorktree            *git.GitWorktree
 }
 
 type GitRepoPath struct {
 	// having both these path is to support submodule
-	AbsoluteGitRepoPath string // this is the most root level path where .git folder is located
-	TopLevelRepoPath    string // this is the path where the top level .git file/folder is located at
-	RepoName            string
+	AbsoluteGitRepoPath  string // this is the most root level path where .git folder is located
+	TopLevelRepoPath     string // this is the path where the top level .git file/folder is located at
+	AbsoluteWorktreePath string // the absolute path for the current repo worktree
+	RepoName             string
 }

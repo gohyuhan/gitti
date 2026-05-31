@@ -1,6 +1,14 @@
 package git
 
-const SEPARATOR = "\x00"
+const (
+	SEPARATOR = "\x00"
+
+	// worktree list --porcelain -z: attrs NUL-terminated, records separated by an
+	// extra NUL (so a record boundary is two consecutive NULs). NUL is the only
+	// delimiter that cannot appear in a worktree path, keeping paths intact.
+	WORKTREE_FIELD_SEPARATOR  = "\x00"
+	WORKTREE_RECORD_SEPARATOR = "\x00\x00"
+)
 
 // Git Push operation types
 const (
