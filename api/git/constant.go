@@ -3,9 +3,11 @@ package git
 const (
 	SEPARATOR = "\x00"
 
-	// worktree list --porcelain: attrs newline-separated, records blank-line separated
-	WORKTREE_FIELD_SEPARATOR  = "\n"
-	WORKTREE_RECORD_SEPARATOR = "\n\n"
+	// worktree list --porcelain -z: attrs NUL-terminated, records separated by an
+	// extra NUL (so a record boundary is two consecutive NULs). NUL is the only
+	// delimiter that cannot appear in a worktree path, keeping paths intact.
+	WORKTREE_FIELD_SEPARATOR  = "\x00"
+	WORKTREE_RECORD_SEPARATOR = "\x00\x00"
 )
 
 // Git Push operation types

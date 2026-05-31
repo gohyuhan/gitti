@@ -40,7 +40,9 @@ func processGeneralGitOpsOutputIntoStringArray(dirtyGitOutput []byte) []string {
 // ------------------------------------
 func processOutputIntoStringArrayWithCustomSeperator(dirtyGitOutput []byte, seperator string) []string {
 	var cleanedStringArray []string
-	cleanedStringArray = strings.Split(strings.TrimSpace(string(dirtyGitOutput)), seperator)
+	// Trim NUL alongside whitespace so NUL-delimited (-z) output does not leave a
+	// trailing empty record/field from the final separator
+	cleanedStringArray = strings.Split(strings.Trim(string(dirtyGitOutput), " \t\r\n\x00"), seperator)
 
 	if len(cleanedStringArray) == 1 && cleanedStringArray[0] == "" {
 		return []string{}

@@ -61,7 +61,7 @@ func (gwt *GitWorktree) AllWorktree() []WorktreeInfo {
 //
 // ------------------------------------
 func (gwt *GitWorktree) GetLatestWorktreeInfos() {
-	gitArgs := []string{"worktree", "list", "--porcelain"}
+	gitArgs := []string{"worktree", "list", "--porcelain", "-z"}
 
 	getLatestGitWoktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	getLatestGitWorktreeCmdOutput, getLatestGitWorktreeCmdErr := getLatestGitWoktreeCmdExecutor.Output()
