@@ -126,17 +126,22 @@ func (gd *GitDaemon) watchPath() {
 
 // ------------------------------------
 //
-//	Report whether path is a top-level .git metadata dir that is noisy/irrelevant to
-//	git state and should not be watched. Only direct children of the .git dir are
-//	skipped, so branch/ref namespaces like refs/heads/lfs/... stay watched.
+//	Report whether path is a metadata dir directly under a git dir root (the
+//	top-level .git or any submodule gitdir under .git/modules/...) that is
+//	noisy/irrelevant to git state and should not be watched. The parent is
+//	treated as a git dir root only when it contains a HEAD file, so branch/ref
+//	namespaces like refs/heads/lfs/... stay watched while submodule object/pack
+//	dirs are skipped.
 //
 // ------------------------------------
 func (gd *GitDaemon) isSkippableGitDir(path string) bool {
-	if filepath.Dir(path) != filepath.Clean(gd.repoPath) {
-		return false
-	}
 	switch filepath.Base(path) {
 	case "objects", "hooks", "lfs", "rr-cache", "lost-found":
+	default:
+		return false
+	}
+	parent := filepath.Dir(path)
+	if _, err := os.Stat(filepath.Join(parent, "HEAD")); err == nil {
 		return true
 	}
 	return false
