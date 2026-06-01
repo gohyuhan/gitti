@@ -10,6 +10,7 @@ import (
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
+	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/types"
 
 	tea "charm.land/bubbletea/v2"
@@ -120,6 +121,12 @@ func UpdateSpinner(m *types.GittiModel, msg tea.Msg, cmds []tea.Cmd) []tea.Cmd {
 			if interactiveRebaseDrop, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseDropOutputPopUpModel); ok && interactiveRebaseDrop.IsProcessing.Load() {
 				var cmd tea.Cmd
 				interactiveRebaseDrop.Spinner, cmd = interactiveRebaseDrop.Spinner.Update(msg)
+				cmds = append(cmds, cmd)
+			}
+		case constant.WorktreeAddNewWorktreeOutputPopUp:
+			if addNewWorktreeOutputPopUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreeOutputPopUpModel); ok && addNewWorktreeOutputPopUp.IsProcessing.Load() {
+				var cmd tea.Cmd
+				addNewWorktreeOutputPopUp.Spinner, cmd = addNewWorktreeOutputPopUp.Spinner.Update(msg)
 				cmds = append(cmds, cmd)
 			}
 		}

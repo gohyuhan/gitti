@@ -36,6 +36,7 @@ import (
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
+	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
@@ -612,6 +613,11 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				} else {
 					remotePopUp.InitAddRemotePromptPopUpModel(m, true)
 				}
+			case constant.SHOW_WORKTREE:
+				m.PopUpType = constant.WorktreeAddNewWorktreePopUp
+				m.IsTyping.Store(true)
+				m.ShowPopUp.Store(true)
+				worktreePopUp.InitWorktreeAddNewWorktreePopUpModel(m)
 			}
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
@@ -1915,6 +1921,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 		case constant.InteractiveRebaseDropOutputPopUp:
 			services.InteractiveRebaseDropCancelService(m)
 			m.PopUpModel = nil
+		case constant.WorktreeAddNewWorktreeOutputPopUp:
+			services.AddNewWorktreeCancelService(m)
+			m.PopUpModel = nil
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -2064,7 +2073,7 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gitti
 				if m.CurrentRepoWorktreeInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoWorktreeInfoList.Index() - 1
 					m.CurrentRepoWorktreeInfoList.Select(latestIndex)
-					m.ListNavigationIndexPosition.WorktreeComponet = latestIndex
+					m.ListNavigationIndexPosition.WorktreeComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
@@ -2176,7 +2185,7 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 				if m.CurrentRepoWorktreeInfoList.Index() < len(m.CurrentRepoWorktreeInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoWorktreeInfoList.Index() + 1
 					m.CurrentRepoWorktreeInfoList.Select(latestIndex)
-					m.ListNavigationIndexPosition.WorktreeComponet = latestIndex
+					m.ListNavigationIndexPosition.WorktreeComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
@@ -2426,7 +2435,7 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-			// do nothing, as local branch will be the most left option in the local branch or tag or remote component panel
+			// do nothing, as local branch will be the most left option in the local branch or tag or remote or worktree component panel
 			case constant.SHOW_TAG:
 				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_LOCAL_BRANCH
 				services.FetchDetailComponentPanelInfoService(m, true)
@@ -2484,7 +2493,7 @@ func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) 
 				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_WORKTREE
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_WORKTREE:
-				// do nothing, as remote is currently the most right option in the local branch or tag or remote component panel
+				// do nothing, as worktree is currently the most right option in the local branch or tag or remote or worktree component panel
 			}
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {

@@ -111,3 +111,8 @@ type InteractiveRebaseFetchCommitInfoListEventDataStructure struct {
 	CommitInfos []git.CommitInfo
 	ListItems   []list.Item
 }
+
+type WorktreeNewWorktreeResultEventDataStructure struct {
+	Result  []string
+	Success bool
+}

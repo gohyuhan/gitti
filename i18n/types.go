@@ -168,6 +168,8 @@ type LanguageMapping struct {
 	KeyBindingForChoosePushTypePopUp                           []string
 	KeyBindingForChooseNewBranchTypePopUp                      []string
 	KeyBindingForCreateNewBranchPopUp                          []string
+	KeyBindingForWorktreeAddNewWorktreePopUp                   []string
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp             []string
 	KeyBindingForChooseSwitchBranchTypePopUp                   []string
 	KeyBindingForSwitchBranchOutputPopUp                       []string
 	KeyBindingForChooseGitPullTypePopUp                        []string
@@ -281,6 +283,12 @@ type LanguageMapping struct {
 	// Create New Branch
 	CreateNewBranchPrompt    string
 	EnterRemoteBranchPrompt  string
+	CreateNewWorktreePrompt  string
+	NewWorktreeBranchPrompt  string
+	AddNewWorktreeTitle      string
+	NewWorktreeTitle         string
+	AddingNewWorktree        string
+	NewWorktreeBranchTitle   string
 	ChooseNewBranchTypeTitle string
 	NewBranchInvalidWarning  string
 	// Create Branch Option

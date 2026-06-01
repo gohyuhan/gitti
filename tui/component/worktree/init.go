@@ -62,13 +62,13 @@ func InitWorktreeList(m *types.GittiModel) bool {
 
 	if selectedWorktreePosition >= 0 {
 		m.CurrentRepoWorktreeInfoList.Select(selectedWorktreePosition)
-		m.ListNavigationIndexPosition.WorktreeComponet = selectedWorktreePosition
+		m.ListNavigationIndexPosition.WorktreeComponent = selectedWorktreePosition
 	} else {
-		if m.ListNavigationIndexPosition.WorktreeComponet > len(m.CurrentRepoWorktreeInfoList.Items())-1 {
+		if m.ListNavigationIndexPosition.WorktreeComponent > len(m.CurrentRepoWorktreeInfoList.Items())-1 {
 			m.CurrentRepoWorktreeInfoList.Select(len(m.CurrentRepoWorktreeInfoList.Items()) - 1)
-			m.ListNavigationIndexPosition.WorktreeComponet = len(m.CurrentRepoWorktreeInfoList.Items()) - 1
+			m.ListNavigationIndexPosition.WorktreeComponent = len(m.CurrentRepoWorktreeInfoList.Items()) - 1
 		} else {
-			m.CurrentRepoWorktreeInfoList.Select(m.ListNavigationIndexPosition.WorktreeComponet)
+			m.CurrentRepoWorktreeInfoList.Select(m.ListNavigationIndexPosition.WorktreeComponent)
 		}
 	}
 

@@ -12,6 +12,7 @@ import (
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
+	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 )
@@ -79,5 +80,7 @@ func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg)
 		interactiverebasePopUp.UpdateInteractiveRebaseDropResultEvent(m, updateMsg.Data.(types.InteractiveRebaseDropResultEventDataStructure))
 	case constant.REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT:
 		utils.ReinitCherryPickedCommitInfo(m)
+	case constant.WORKTREE_NEW_WORKTREE_RESULT_EVENT:
+		worktreePopUp.UpdateWorktreeAddNewWorktreeOutputViewPort(m, updateMsg.Data.(types.WorktreeNewWorktreeResultEventDataStructure))
 	}
 }

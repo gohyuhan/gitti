@@ -12,7 +12,7 @@ import (
 
 // ------------------------------------
 //
-//	Build the styled tab-bar title string for the tag panel, with the tag tab
+//	Build the styled tab-bar title string for the worktree panel, with the worktree tab
 //	highlighted as active. Falls back to abbreviated icon/letter labels through up to
 //	four levels when the rendered width exceeds titleWidthLimit.
 //

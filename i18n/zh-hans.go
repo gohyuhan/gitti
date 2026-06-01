@@ -305,6 +305,15 @@ var zH_HANS = LanguageMapping{
 		"[enter] 添加分支",
 		"[esc] 取消并关闭",
 	},
+	KeyBindingForWorktreeAddNewWorktreePopUp: []string{
+		"[tab] 移动到下一个输入",
+		"[shift+tab] 移动到上一个输入",
+		"[enter] 添加工作树",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
+		"[esc] 关闭",
+	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下移动",
 		"[enter] 选择切换分支选项",
@@ -586,6 +595,12 @@ var zH_HANS = LanguageMapping{
 	ForcePushDangerous:                                             "强制推送（危险）",
 	CreateNewBranchPrompt:                                          "请输入新的分支名称",
 	EnterRemoteBranchPrompt:                                        "请输入远程分支名称",
+	CreateNewWorktreePrompt:                                        "请输入新的工作树名称",
+	NewWorktreeBranchPrompt:                                        "可选: 分支名（远程或本地）. origin/<branch> 将进入 detached HEAD",
+	AddNewWorktreeTitle:                                            "新工作树名称",
+	NewWorktreeTitle:                                               "添加新工作树",
+	AddingNewWorktree:                                              "正在添加新工作树...",
+	NewWorktreeBranchTitle:                                         "工作树分支（可选）",
 	ChooseNewBranchTypeTitle:                                       "您希望如何创建新的 Git 分支？",
 	NewBranchInvalidWarning:                                        "分支名称无效，将替换为 `%s`",
 	CreateNewBranchTitle:                                           "创建新分支",

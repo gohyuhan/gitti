@@ -19,6 +19,7 @@ import (
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
+	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
@@ -58,7 +59,8 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		constant.EditRemotePromptPopUp,
 		constant.GitRebaseBranchInputPopUp,
 		constant.InteractiveRebaseFixupSquashCommitPopUp,
-		constant.InteractiveRebaseRewordCommitPopUp:
+		constant.InteractiveRebaseRewordCommitPopUp,
+		constant.WorktreeAddNewWorktreePopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -167,6 +169,19 @@ func handleTypingTabKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 				popUp.DescriptionTextAreaInput.Focus()
 			}
 		}
+	case constant.WorktreeAddNewWorktreePopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreePopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = min(popUp.CurrentActiveInputIndex+1, popUp.TotalInputCount)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.WorktreeNameTextInput.Focus()
+				popUp.WorktreeBranchNameTextInput.Blur()
+			case 2:
+				popUp.WorktreeNameTextInput.Blur()
+				popUp.WorktreeBranchNameTextInput.Focus()
+			}
+		}
 	}
 	return m, nil
 }
@@ -269,6 +284,19 @@ func handleTypingShiftTabKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			case 2:
 				popUp.MessageTextInput.Blur()
 				popUp.DescriptionTextAreaInput.Focus()
+			}
+		}
+	case constant.WorktreeAddNewWorktreePopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreePopUpModel)
+		if ok {
+			popUp.CurrentActiveInputIndex = max(popUp.CurrentActiveInputIndex-1, 1)
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.WorktreeNameTextInput.Focus()
+				popUp.WorktreeBranchNameTextInput.Blur()
+			case 2:
+				popUp.WorktreeNameTextInput.Blur()
+				popUp.WorktreeBranchNameTextInput.Focus()
 			}
 		}
 	}
@@ -540,6 +568,29 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 				}
 			}
 		}
+	case constant.WorktreeAddNewWorktreePopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreePopUpModel)
+		if ok {
+			// we directly close the pop up and trigger the new worktree creation operation
+			newWorktreeName := popUp.WorktreeNameTextInput.Value()
+			checkoutWorktreeBranchName := popUp.WorktreeBranchNameTextInput.Value()
+			if utf8.RuneCountInString(newWorktreeName) > 0 {
+				worktreePopUp.InitWorktreeAddNewWorktreeOutputPopUpModel(m)
+				popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreeOutputPopUpModel)
+				if ok {
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.WorktreeAddNewWorktreeOutputPopUp
+					popUp.IsProcessing.Store(true)
+					services.AddNewWorktreeService(m, newWorktreeName, checkoutWorktreeBranchName)
+					return m, popUp.Spinner.Tick
+				} else {
+					m.ShowPopUp.Store(false)
+					m.IsTyping.Store(false)
+					m.PopUpType = constant.NoPopUp
+				}
+			}
+		}
 
 	// the following is to handle the change line for textarea input
 	case constant.CommitPopUp:
@@ -742,6 +793,21 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				return m, cmd
 			}
 		}
+	case constant.WorktreeAddNewWorktreePopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreePopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				var cmd tea.Cmd
+				popUp.WorktreeNameTextInput, cmd = popUp.WorktreeNameTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				var cmd tea.Cmd
+				popUp.WorktreeBranchNameTextInput, cmd = popUp.WorktreeBranchNameTextInput.Update(msg)
+				return m, cmd
+			}
+		}
 	}
 	return m, nil
 }
@@ -834,6 +900,16 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				content = popUp.MessageTextInput.Value()
 			case 2:
 				content = popUp.DescriptionTextAreaInput.Value()
+			}
+		}
+	case constant.WorktreeAddNewWorktreePopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreePopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				content = popUp.WorktreeNameTextInput.Value()
+			case 2:
+				content = popUp.WorktreeBranchNameTextInput.Value()
 			}
 		}
 	}

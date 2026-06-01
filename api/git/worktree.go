@@ -163,10 +163,10 @@ func (gwt *GitWorktree) GetLatestWorktreeInfos() {
 //	process is running. Returns the command output and whether the add succeeded.
 //
 // ------------------------------------
-func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName string, checkoutWorktreeBranchName string) (string, bool) {
+func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName string, checkoutWorktreeBranchName string) ([]string, bool) {
 	if !gwt.gitProcessLock.CanProceedWithGitOps() {
 		gwt.logging.RegisterNewLog(logging.ADD_NEW_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
-		return gwt.gitProcessLock.OtherProcessRunningWarning(), false
+		return []string{gwt.gitProcessLock.OtherProcessRunningWarning()}, false
 	}
 	defer func() {
 		gwt.gitProcessLock.ReleaseGitOpsLock()
@@ -189,7 +189,7 @@ func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName stri
 		success = true
 	}
 
-	return string(newWorktreeOutput), success
+	return processGeneralGitOpsOutputIntoStringArray(newWorktreeOutput), success
 }
 
 // ------------------------------------
@@ -201,10 +201,10 @@ func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName stri
 //	process is running. Returns the command output and whether the remove succeeded.
 //
 // ------------------------------------
-func (gwt *GitWorktree) RemoveWorktree(ctx context.Context, worktreePath string) (string, bool) {
+func (gwt *GitWorktree) RemoveWorktree(ctx context.Context, worktreePath string) ([]string, bool) {
 	if !gwt.gitProcessLock.CanProceedWithGitOps() {
 		gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
-		return gwt.gitProcessLock.OtherProcessRunningWarning(), false
+		return []string{gwt.gitProcessLock.OtherProcessRunningWarning()}, false
 	}
 	defer func() {
 		gwt.gitProcessLock.ReleaseGitOpsLock()
@@ -222,7 +222,7 @@ func (gwt *GitWorktree) RemoveWorktree(ctx context.Context, worktreePath string)
 		success = true
 	}
 
-	return string(removeWorktreeOutput), success
+	return processGeneralGitOpsOutputIntoStringArray(removeWorktreeOutput), success
 }
 
 // ------------------------------------

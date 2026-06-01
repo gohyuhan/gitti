@@ -72,7 +72,7 @@ type GittiModel struct {
 	LocalBranchComponentKeyBindingKeyMapLargestLen            int                // this was use for local branch component key binding pop up styling, we save it once so we don't have to recompute
 	TagComponentKeyBindingKeyMapLargestLen                    int                // this was use for tag component key binding pop up styling, we save it once so we don't have to recompute
 	RemoteComponentKeyBindingKeyMapLargestLen                 int                // this was use for remote component key binding pop up styling, we save it once so we don't have to recompute
-	WorktreeComponentKeyBindingKeyMapLargestLen               int                // this was use for remote component key binding pop up styling, we save it once so we don't have to recompute
+	WorktreeComponentKeyBindingKeyMapLargestLen               int                // this was use for worktree component key binding pop up styling, we save it once so we don't have to recompute
 	ModifiedFilesComponentKeyBindingKeyMapLargestLen          int                // this was use for modified files component key binding pop up styling, we save it once so we don't have to recompute
 	CommitLogComponentKeyBindingKeyMapLargestLen              int                // this was use for commit log component key binding pop up styling, we save it once so we don't have to recompute
 	RefLogComponentKeyBindingKeyMapLargestLen                 int                // this was use for ref log component key binding pop up styling, we save it once so we don't have to recompute
@@ -116,7 +116,7 @@ type GittiComponentsCurrentListNavigationIndexPosition struct {
 	StashComponent         int
 	TagComponent           int
 	RemoteComponent        int
-	WorktreeComponet       int
+	WorktreeComponent      int
 }
 
 // ---------------------------------

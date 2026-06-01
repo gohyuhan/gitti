@@ -305,6 +305,15 @@ var jA = LanguageMapping{
 		"[enter] ブランチを追加",
 		"[esc] キャンセルして閉じる",
 	},
+	KeyBindingForWorktreeAddNewWorktreePopUp: []string{
+		"[tab] 次の入力へ移動",
+		"[shift+tab] 前の入力へ移動",
+		"[enter] ワークツリーを追加",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
+		"[esc] 閉じる",
+	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] ブランチ切り替えオプションを選択",
@@ -586,6 +595,12 @@ var jA = LanguageMapping{
 	ForcePushDangerous:                                             "強制プッシュ（危険）",
 	CreateNewBranchPrompt:                                          "新しいブランチ名を入力してください",
 	EnterRemoteBranchPrompt:                                        "リモートブランチ名を入力してください",
+	CreateNewWorktreePrompt:                                        "新しいワークツリー名を入力してください",
+	NewWorktreeBranchPrompt:                                        "任意: ブランチ名（remote/local）. origin/<branch> は detached HEAD",
+	AddNewWorktreeTitle:                                            "新しいワークツリー名",
+	NewWorktreeTitle:                                               "新しいワークツリーを追加",
+	AddingNewWorktree:                                              "新しいワークツリーを追加中...",
+	NewWorktreeBranchTitle:                                         "ワークツリーブランチ（任意）",
 	ChooseNewBranchTypeTitle:                                       "新しい Git ブランチを作成する際、どの方法で進めますか？",
 	NewBranchInvalidWarning:                                        "ブランチ名の命名が無効です。代わりに `%s` に置き換えられます",
 	CreateNewBranchTitle:                                           "新しいブランチを作成",

@@ -109,7 +109,7 @@ func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoNa
 		DetailPanelTwoViewportOffset:                              0,
 		DetailComponentPanelLayout:                                constant.HORIZONTAL,
 		CurrentLogComponentViewport:                               logVp,
-		ListNavigationIndexPosition:                               types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0, WorktreeComponet: 0},
+		ListNavigationIndexPosition:                               types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0, WorktreeComponent: 0},
 		PopUpType:                                                 constant.NoPopUp,
 		PopUpModel:                                                struct{}{},
 		GitOperations:                                             gitOperations,

@@ -13,6 +13,7 @@ import (
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
+	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -191,6 +192,19 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 
 			case 2:
 				popUp.DescriptionTextAreaInput, cmd = popUp.DescriptionTextAreaInput.Update(msg)
+				return m, cmd
+			}
+		}
+	case constant.WorktreeAddNewWorktreePopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeAddNewWorktreePopUpModel)
+		if ok {
+			switch popUp.CurrentActiveInputIndex {
+			case 1:
+				popUp.WorktreeNameTextInput, cmd = popUp.WorktreeNameTextInput.Update(msg)
+				return m, cmd
+
+			case 2:
+				popUp.WorktreeBranchNameTextInput, cmd = popUp.WorktreeBranchNameTextInput.Update(msg)
 				return m, cmd
 			}
 		}

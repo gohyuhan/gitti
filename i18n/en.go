@@ -305,6 +305,15 @@ var eN = LanguageMapping{
 		"[enter] add branch",
 		"[esc] cancel and close",
 	},
+	KeyBindingForWorktreeAddNewWorktreePopUp: []string{
+		"[tab] move to next input",
+		"[shift+tab] move to previous input",
+		"[enter] add worktree",
+		"[esc] cancel / close",
+	},
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
+		"[esc] close",
+	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] move up and down",
 		"[enter] select switch branch option",
@@ -586,6 +595,12 @@ var eN = LanguageMapping{
 	ForcePushDangerous:                                             "Force Push (Dangerous)",
 	CreateNewBranchPrompt:                                          "Enter the new branch name",
 	EnterRemoteBranchPrompt:                                        "Enter the remote branch name",
+	CreateNewWorktreePrompt:                                        "Enter the new worktree name",
+	NewWorktreeBranchPrompt:                                        "Optional: branch name (remote/local). origin/<branch> = detached HEAD",
+	AddNewWorktreeTitle:                                            "New Worktree Name",
+	NewWorktreeTitle:                                               "Add New Worktree",
+	AddingNewWorktree:                                              "Adding new worktree...",
+	NewWorktreeBranchTitle:                                         "Worktree Branch (Optional)",
 	ChooseNewBranchTypeTitle:                                       "How would you like to proceed with creating a new git branch",
 	NewBranchInvalidWarning:                                        "Invalid naming for a branch name, it will be replace with `%s` instead",
 	CreateNewBranchTitle:                                           "Create new branch",

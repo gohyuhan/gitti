@@ -14,8 +14,8 @@ import (
 
 // ------------------------------------
 //
-//	GitTagItem holds the name of a single git tag.
-//	GitTagItemDelegate renders each row as the truncated tag name.
+//	GitWorktreeItem holds the info of a single git worktree.
+//	GitWorktreeItemDelegate renders each row as the truncated worktree path.
 //
 // ------------------------------------
 type (

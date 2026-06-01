@@ -75,8 +75,8 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	Render the left-column panel that switches between local branches, tags, and
-//	remotes based on m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing.
+//	Render the left-column panel that switches between local branches, tags,
+//	remotes, and worktrees based on m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing.
 //
 // ------------------------------------
 func renderLocalBranchesOrTagOrRemoteOrWorktreeComponentPanel(width int, height int, m *types.GittiModel) string {
@@ -342,6 +342,10 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseNewBranchTypePopUp
 		case constant.CreateNewBranchPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateNewBranchPopUp
+		case constant.WorktreeAddNewWorktreePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeAddNewWorktreePopUp
+		case constant.WorktreeAddNewWorktreeOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeAddNewWorktreeOutputPopUp
 		case constant.ChooseSwitchBranchTypePopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseSwitchBranchTypePopUp
 		case constant.SwitchBranchOutputPopUp:

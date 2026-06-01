@@ -218,6 +218,11 @@ func generateRemoteDetailPanelContent(m *types.GittiModel) string {
 	return vpLine.String()
 }
 
+// ------------------------------------
+//
+//	Generate worktree detail panel content
+//
+// ------------------------------------
 func generateWorktreeDetailPanelContent(m *types.GittiModel) string {
 	currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
 	var worktreeItem worktree.GitWorktreeItem
