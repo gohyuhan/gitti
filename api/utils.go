@@ -209,8 +209,24 @@ func getGitPathInfo() (GitRepoPath, error) {
 
 	absoluteGitRepoPath := strings.TrimSpace(string(absGitPathOutput))
 
+	// get the common (main) git dir; differs from the absolute git dir when running
+	// inside a linked worktree. Used as the file-watch root so worktree add/remove
+	// (which lands in the shared .git/worktrees) is observed.
+	// --path-format=absolute forces git to return a full path (plain --git-common-dir
+	// may be relative to cwd, which is not reliably the repo dir)
+	repoMainGitDirPath := absoluteGitRepoPath
+	mainGitDirArgs := []string{"rev-parse", "--path-format=absolute", "--git-common-dir"}
+	mainGitDirCmd := executor.GittiCmdExecutor.RunGitCmd(mainGitDirArgs, false)
+	mainGitDirOutput, mainGitDirErr := mainGitDirCmd.Output()
+	if mainGitDirErr == nil {
+		if commonDir := strings.TrimSpace(string(mainGitDirOutput)); commonDir != "" {
+			repoMainGitDirPath = commonDir
+		}
+	}
+
 	gitRepoPath := GitRepoPath{
 		AbsoluteGitRepoPath:  absoluteGitRepoPath,
+		RepoMainGitDirPath:   repoMainGitDirPath,
 		TopLevelRepoPath:     strings.TrimSpace(string(topLevelGitPathOutput)),
 		AbsoluteWorktreePath: strings.TrimSpace(string(topLevelGitPathOutput)),
 		RepoName:             repoName,
