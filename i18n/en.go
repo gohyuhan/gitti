@@ -158,7 +158,6 @@ var eN = LanguageMapping{
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] switch component",
 		"[n] new worktree",
-		"[o] lock / unlock worktree",
 		"[ctrl+p] prune worktree",
 		"[?] keybinding and instructions",
 	},

@@ -646,6 +646,10 @@ func handleNonTypingoKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				selectedWorktreeItem := m.CurrentRepoWorktreeInfoList.SelectedItem()
 				if selectedWorktreeItem != nil {
 					parsedSelectedWorktree := selectedWorktreeItem.(worktree.GitWorktreeItem)
+					// main worktree cannot be lock and unlock, silent return
+					if parsedSelectedWorktree.IsMain {
+						return m, nil
+					}
 					if parsedSelectedWorktree.IsLocked {
 						services.UnlockWorktreeService(m, parsedSelectedWorktree.WorktreePath)
 					} else {

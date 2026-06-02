@@ -158,7 +158,6 @@ var jA = LanguageMapping{
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] コンポーネントを切り替え",
 		"[n] 新しいワークツリー",
-		"[o] ワークツリーをロック/解除",
 		"[ctrl+p] ワークツリーをプルーン",
 		"[?] キー操作と説明",
 	},

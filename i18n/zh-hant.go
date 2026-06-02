@@ -158,7 +158,6 @@ var zH_HANT = LanguageMapping{
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] 切換元件",
 		"[n] 新增工作樹",
-		"[o] 鎖定/解鎖工作樹",
 		"[ctrl+p] 清理工作樹",
 		"[?] 快捷鍵與說明",
 	},
