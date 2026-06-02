@@ -318,6 +318,10 @@ var eN = LanguageMapping{
 		"[enter] lock worktree",
 		"[esc] cancel / close",
 	},
+	KeyBindingForWorktreeRemoveConfirmationPopUp: []string{
+		"[enter] remove worktree",
+		"[esc] cancel / close",
+	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] move up and down",
 		"[enter] select switch branch option",
@@ -603,6 +607,7 @@ var eN = LanguageMapping{
 	NewWorktreeBranchPrompt:                                        "Optional: branch name (remote/local). origin/<branch> = detached HEAD",
 	WorktreeLockReasonPrompt:                                       "Optional: reason for locking this worktree",
 	WorktreeLockReasonTitle:                                        "Lock Worktree Reason (%s)",
+	WorktreeRemoveConfirmation:                                     "Are you sure you want to remove the following worktree?",
 	AddNewWorktreeTitle:                                            "New Worktree Name",
 	NewWorktreeTitle:                                               "Add New Worktree",
 	AddingNewWorktree:                                              "Adding new worktree...",

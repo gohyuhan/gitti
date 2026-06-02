@@ -171,6 +171,7 @@ type LanguageMapping struct {
 	KeyBindingForWorktreeAddNewWorktreePopUp                   []string
 	KeyBindingForWorktreeAddNewWorktreeOutputPopUp             []string
 	KeyBindingForWorktreeLockReasonInputPopUp                  []string
+	KeyBindingForWorktreeRemoveConfirmationPopUp               []string
 	KeyBindingForChooseSwitchBranchTypePopUp                   []string
 	KeyBindingForSwitchBranchOutputPopUp                       []string
 	KeyBindingForChooseGitPullTypePopUp                        []string
@@ -282,18 +283,19 @@ type LanguageMapping struct {
 	ForcePushSafe      string
 	ForcePushDangerous string
 	// Create New Branch
-	CreateNewBranchPrompt    string
-	EnterRemoteBranchPrompt  string
-	CreateNewWorktreePrompt  string
-	NewWorktreeBranchPrompt  string
-	WorktreeLockReasonPrompt string
-	WorktreeLockReasonTitle  string
-	AddNewWorktreeTitle      string
-	NewWorktreeTitle         string
-	AddingNewWorktree        string
-	NewWorktreeBranchTitle   string
-	ChooseNewBranchTypeTitle string
-	NewBranchInvalidWarning  string
+	CreateNewBranchPrompt      string
+	EnterRemoteBranchPrompt    string
+	CreateNewWorktreePrompt    string
+	NewWorktreeBranchPrompt    string
+	WorktreeLockReasonPrompt   string
+	WorktreeLockReasonTitle    string
+	WorktreeRemoveConfirmation string
+	AddNewWorktreeTitle        string
+	NewWorktreeTitle           string
+	AddingNewWorktree          string
+	NewWorktreeBranchTitle     string
+	ChooseNewBranchTypeTitle   string
+	NewBranchInvalidWarning    string
 	// Create Branch Option
 	CreateNewBranchTitle                                 string
 	CreateNewBranchDescription                           string

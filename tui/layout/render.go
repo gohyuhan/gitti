@@ -348,6 +348,8 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeAddNewWorktreeOutputPopUp
 		case constant.WorktreeLockReasonInputPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeLockReasonInputPopUp
+		case constant.WorktreeRemoveWorktreeConfirmationPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeRemoveConfirmationPopUp
 		case constant.ChooseSwitchBranchTypePopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseSwitchBranchTypePopUp
 		case constant.SwitchBranchOutputPopUp:

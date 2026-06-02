@@ -318,6 +318,10 @@ var jA = LanguageMapping{
 		"[enter] ワークツリーをロック",
 		"[esc] キャンセル / 閉じる",
 	},
+	KeyBindingForWorktreeRemoveConfirmationPopUp: []string{
+		"[enter] ワークツリーを削除",
+		"[esc] キャンセル / 閉じる",
+	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] ブランチ切り替えオプションを選択",
@@ -603,6 +607,7 @@ var jA = LanguageMapping{
 	NewWorktreeBranchPrompt:                                        "任意: ブランチ名（remote/local）. origin/<branch> は detached HEAD",
 	WorktreeLockReasonPrompt:                                       "任意: このワークツリーをロックする理由",
 	WorktreeLockReasonTitle:                                        "ワークツリーのロック理由 (%s)",
+	WorktreeRemoveConfirmation:                                     "次のワークツリーを削除してもよろしいですか？",
 	AddNewWorktreeTitle:                                            "新しいワークツリー名",
 	NewWorktreeTitle:                                               "新しいワークツリーを追加",
 	AddingNewWorktree:                                              "新しいワークツリーを追加中...",

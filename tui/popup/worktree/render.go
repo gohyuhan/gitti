@@ -82,6 +82,12 @@ func RenderWorktreeAddNewWorktreeOutputPopUp(m *types.GittiModel) string {
 	return ""
 }
 
+// ------------------------------------
+//
+//	Render the lock-reason input popup: a title showing the target worktree path
+//	followed by the optional lock-reason input, resized to the current popup width.
+//
+// ------------------------------------
 func RenderWorktreeLockReasonInputPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*WorktreeLockReasonInputPopUpModel)
 	if ok {
@@ -91,6 +97,26 @@ func RenderWorktreeLockReasonInputPopUp(m *types.GittiModel) string {
 			lipgloss.Left,
 			style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.WorktreeLockReasonTitle, popUp.WorktreePath)),
 			popUp.WorktreeLockReasonTextInput.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	Render the remove-worktree confirmation popup: a confirmation prompt followed
+//	by the target worktree path, resized to the current popup width.
+//
+// ------------------------------------
+func RenderWorktreeRemoveWorktreeConfirmationPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*WorktreeRemoveWorktreeConfirmationPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxWorktreeRemoveWorktreeConfirmationPopUpWdith, int(float64(m.Width)*0.8))
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			style.TitleStyle.Render(i18n.LANGUAGEMAPPING.WorktreeRemoveConfirmation),
+			style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(fmt.Sprintf("[%s]", popUp.WorktreePath)),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}

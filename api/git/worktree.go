@@ -196,9 +196,9 @@ func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName stri
 //
 //	Remove the worktree at worktreePath via `git worktree remove`. No --force is
 //	passed, so git refuses to remove a worktree with uncommitted/untracked changes
-//	or a locked worktree, returning that error as the output.
-//	Acquires the git ops lock first; returns the lock-busy warning if another git
-//	process is running. Returns the command output and whether the remove succeeded.
+//	or a locked worktree, and that error is logged.
+//	Acquires the git ops lock first; no-ops with a lock-busy warning if another git
+//	process is running.
 //
 // ------------------------------------
 func (gwt *GitWorktree) RemoveWorktree(worktreePath string) {

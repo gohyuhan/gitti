@@ -46,3 +46,12 @@ type WorktreeLockReasonInputPopUpModel struct {
 	WorktreePath                string          // path of the worktree to be locked
 	WorktreeLockReasonTextInput textinput.Model // input for the lock reason
 }
+
+// ------------------------------------
+//
+//	Holds the state for the remove-worktree confirmation pop-up
+//
+// ------------------------------------
+type WorktreeRemoveWorktreeConfirmationPopUpModel struct {
+	WorktreePath string // path of the worktree to be removed
+}

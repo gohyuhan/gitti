@@ -85,3 +85,15 @@ func InitWorktreeLockReasonInputPopUpModel(m *types.GittiModel, worktreePath str
 		WorktreePath:                worktreePath,
 	}
 }
+
+// ------------------------------------
+//
+//	Initialize the remove-worktree confirmation popup model tied to the worktree
+//	at worktreePath.
+//
+// ------------------------------------
+func InitWorktreeRemoveWorktreeConfirmationPopUpModel(m *types.GittiModel, worktreePath string) {
+	m.PopUpModel = &WorktreeRemoveWorktreeConfirmationPopUpModel{
+		WorktreePath: worktreePath,
+	}
+}

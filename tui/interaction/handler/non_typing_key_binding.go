@@ -951,13 +951,28 @@ func handleNonTypingqQKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 //
 // ------------------------------------
 func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponentPanel {
-		selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
-		if selectedStashId != nil {
-			stashPopUp.InitGitStashConfirmPromptPopUpModel(m, git.POPSTASH, "", selectedStashId.(stash.GitStashItem).Id, selectedStashId.(stash.GitStashItem).Message)
-			m.PopUpType = constant.GitStashConfirmPromptPopUp
-			m.ShowPopUp.Store(true)
-			m.IsTyping.Store(false)
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.StashComponentPanel:
+			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
+			if selectedStashId != nil {
+				stashPopUp.InitGitStashConfirmPromptPopUpModel(m, git.POPSTASH, "", selectedStashId.(stash.GitStashItem).Id, selectedStashId.(stash.GitStashItem).Message)
+				m.PopUpType = constant.GitStashConfirmPromptPopUp
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+			}
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
+			case constant.SHOW_WORKTREE:
+				selectedWorktreeItem := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if selectedWorktreeItem != nil {
+					worktreeItem := selectedWorktreeItem.(worktree.GitWorktreeItem)
+					m.PopUpType = constant.WorktreeRemoveWorktreeConfirmationPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					worktreePopUp.InitWorktreeRemoveWorktreeConfirmationPopUpModel(m, worktreeItem.WorktreePath)
+				}
+			}
 		}
 	} else if m.ShowPopUp.Load() {
 		switch m.PopUpType {
@@ -1716,6 +1731,14 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					}
 				}
 			}
+		case constant.WorktreeRemoveWorktreeConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeRemoveWorktreeConfirmationPopUpModel)
+			if ok {
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				services.RemoveWorktreeService(m, popUp.WorktreePath)
+			}
 		}
 	}
 	return m, nil
@@ -2023,7 +2046,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.InteractiveRebaseOptionPopUp,
 			constant.InteractiveRebaseFixupSquashSelectionPopUp,
 			constant.InteractiveRebaseRewordSelectionPopUp,
-			constant.InteractiveRebaseDropSelectionPopUp:
+			constant.InteractiveRebaseDropSelectionPopUp,
+			constant.WorktreeRemoveWorktreeConfirmationPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)

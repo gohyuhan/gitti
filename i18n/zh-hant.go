@@ -318,6 +318,10 @@ var zH_HANT = LanguageMapping{
 		"[enter] 鎖定工作樹",
 		"[esc] 取消 / 關閉",
 	},
+	KeyBindingForWorktreeRemoveConfirmationPopUp: []string{
+		"[enter] 移除工作樹",
+		"[esc] 取消 / 關閉",
+	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下移動",
 		"[enter] 選擇切換分支選項",
@@ -603,6 +607,7 @@ var zH_HANT = LanguageMapping{
 	NewWorktreeBranchPrompt:                                        "可選: 分支名稱（遠端或本地）. origin/<branch> 會進入 detached HEAD",
 	WorktreeLockReasonPrompt:                                       "可選: 鎖定此工作樹的原因",
 	WorktreeLockReasonTitle:                                        "鎖定工作樹原因 (%s)",
+	WorktreeRemoveConfirmation:                                     "確定要移除以下工作樹嗎？",
 	AddNewWorktreeTitle:                                            "新工作樹名稱",
 	NewWorktreeTitle:                                               "新增工作樹",
 	AddingNewWorktree:                                              "正在新增工作樹...",
