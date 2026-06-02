@@ -3,6 +3,7 @@ package worktree
 import (
 	"fmt"
 	"io"
+	"unicode/utf8"
 
 	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
@@ -14,7 +15,8 @@ import (
 // ------------------------------------
 //
 //	GitWorktreeItem holds the info of a single git worktree.
-//	GitWorktreeItemDelegate renders each row as the truncated worktree path.
+//	GitWorktreeItemDelegate renders each row as the truncated worktree path,
+//	prefixed with a lock icon when locked and a trash icon when prunable.
 //
 // ------------------------------------
 type (
@@ -56,7 +58,16 @@ func (d GitWorktreeItemDelegate) Render(w io.Writer, m list.Model, index int, li
 			return style.ItemStyle.Faint(shouldFaint).Render("  " + s)
 		}
 	}
-	str := utils.TruncateString(i.WorktreePath, componentWidth)
+
+	// prefix status icons: lock icon when locked, trash icon when prunable, then the path
+	var iconPrefix string
+	if i.IsLocked {
+		iconPrefix += "\uf456 "
+	}
+	if i.IsPrunable {
+		iconPrefix += "\uea81 "
+	}
+	str := iconPrefix + utils.TruncateString(i.WorktreePath, componentWidth-utf8.RuneCountInString(iconPrefix))
 
 	fmt.Fprint(w, fn(str, i.IsPrunable))
 }

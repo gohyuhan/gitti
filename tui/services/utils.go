@@ -287,18 +287,18 @@ func generateWorktreeDetailPanelContent(m *types.GittiModel) string {
 	writeLabel(lockedLabel)
 	vpLine.WriteRune('\n')
 
-	writeCheckBox(worktreeItem.IsPrunable)
-	writeLabel(prunableLabel)
-	vpLine.WriteRune('\n')
-
 	if worktreeItem.IsLocked && utf8.RuneCountInString(worktreeItem.LockReason) > 0 {
 		// indent 4 to align with labels that follow the "[X] " checkbox prefix
 		vpLine.WriteString("    ")
-		writeLabel(lockedReasonLabel)
+		writeLabel(lockedReasonLabel + ":")
 		vpLine.WriteString(" ")
 		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(worktreeItem.LockReason))
 		vpLine.WriteRune('\n')
 	}
+
+	writeCheckBox(worktreeItem.IsPrunable)
+	writeLabel(prunableLabel)
+	vpLine.WriteRune('\n')
 
 	return vpLine.String()
 }

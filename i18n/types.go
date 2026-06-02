@@ -170,6 +170,7 @@ type LanguageMapping struct {
 	KeyBindingForCreateNewBranchPopUp                          []string
 	KeyBindingForWorktreeAddNewWorktreePopUp                   []string
 	KeyBindingForWorktreeAddNewWorktreeOutputPopUp             []string
+	KeyBindingForWorktreeLockReasonInputPopUp                  []string
 	KeyBindingForChooseSwitchBranchTypePopUp                   []string
 	KeyBindingForSwitchBranchOutputPopUp                       []string
 	KeyBindingForChooseGitPullTypePopUp                        []string
@@ -285,6 +286,8 @@ type LanguageMapping struct {
 	EnterRemoteBranchPrompt  string
 	CreateNewWorktreePrompt  string
 	NewWorktreeBranchPrompt  string
+	WorktreeLockReasonPrompt string
+	WorktreeLockReasonTitle  string
 	AddNewWorktreeTitle      string
 	NewWorktreeTitle         string
 	AddingNewWorktree        string

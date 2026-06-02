@@ -18,21 +18,21 @@ import (
 //
 // ------------------------------------
 func InitWorktreeAddNewWorktreePopUpModel(m *types.GittiModel) {
-	NewWorktreeNameInput := textinput.New()
-	NewWorktreeNameInput.Placeholder = i18n.LANGUAGEMAPPING.CreateNewWorktreePrompt
-	NewWorktreeNameInput.Focus()
-	NewWorktreeNameInput.SetVirtualCursor(true)
+	newWorktreeNameInput := textinput.New()
+	newWorktreeNameInput.Placeholder = i18n.LANGUAGEMAPPING.CreateNewWorktreePrompt
+	newWorktreeNameInput.Focus()
+	newWorktreeNameInput.SetVirtualCursor(true)
 
-	NewWorktreeBranchInput := textinput.New()
-	NewWorktreeBranchInput.Placeholder = i18n.LANGUAGEMAPPING.NewWorktreeBranchPrompt
-	NewWorktreeBranchInput.Blur()
-	NewWorktreeBranchInput.SetVirtualCursor(true)
+	newWorktreeBranchInput := textinput.New()
+	newWorktreeBranchInput.Placeholder = i18n.LANGUAGEMAPPING.NewWorktreeBranchPrompt
+	newWorktreeBranchInput.Blur()
+	newWorktreeBranchInput.SetVirtualCursor(true)
 
-	NewWorktreeNameInput.SetWidth(min(constant.MaxWorktreeAddNewWorktreePopUpWidth, int(float64(m.Width)*0.8)) - 6)
-	NewWorktreeBranchInput.SetWidth(min(constant.MaxWorktreeAddNewWorktreePopUpWidth, int(float64(m.Width)*0.8)) - 6)
+	newWorktreeNameInput.SetWidth(min(constant.MaxWorktreeAddNewWorktreePopUpWidth, int(float64(m.Width)*0.8)) - 6)
+	newWorktreeBranchInput.SetWidth(min(constant.MaxWorktreeAddNewWorktreePopUpWidth, int(float64(m.Width)*0.8)) - 6)
 	m.PopUpModel = &WorktreeAddNewWorktreePopUpModel{
-		WorktreeNameTextInput:       NewWorktreeNameInput,
-		WorktreeBranchNameTextInput: NewWorktreeBranchInput,
+		WorktreeNameTextInput:       newWorktreeNameInput,
+		WorktreeBranchNameTextInput: newWorktreeBranchInput,
 		TotalInputCount:             2,
 		CurrentActiveInputIndex:     1,
 	}
@@ -65,4 +65,23 @@ func InitWorktreeAddNewWorktreeOutputPopUpModel(m *types.GittiModel) {
 	popUpModel.ProcessSuccess.Store(false)
 	popUpModel.IsCancelled.Store(false)
 	m.PopUpModel = popUpModel
+}
+
+// ------------------------------------
+//
+//	Initialize the lock-reason input popup model with a single focused text input
+//	sized to fit the terminal width, tied to the worktree at worktreePath.
+//
+// ------------------------------------
+func InitWorktreeLockReasonInputPopUpModel(m *types.GittiModel, worktreePath string) {
+	worktreeLockReasonInput := textinput.New()
+	worktreeLockReasonInput.Placeholder = i18n.LANGUAGEMAPPING.WorktreeLockReasonPrompt
+	worktreeLockReasonInput.Focus()
+	worktreeLockReasonInput.SetVirtualCursor(true)
+
+	worktreeLockReasonInput.SetWidth(min(constant.MaxWorktreeLockReasonInputPopUpWidth, int(float64(m.Width)*0.8)) - 6)
+	m.PopUpModel = &WorktreeLockReasonInputPopUpModel{
+		WorktreeLockReasonTextInput: worktreeLockReasonInput,
+		WorktreePath:                worktreePath,
+	}
 }

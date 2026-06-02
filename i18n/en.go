@@ -158,7 +158,7 @@ var eN = LanguageMapping{
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] switch component",
 		"[n] new worktree",
-		"[l] lock / unlock worktree",
+		"[o] lock / unlock worktree",
 		"[ctrl+p] prune worktree",
 		"[?] keybinding and instructions",
 	},
@@ -167,7 +167,7 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[backspace] remove worktree",
 		"[n] new worktree",
-		"[l] lock / unlock worktree",
+		"[o] lock / unlock worktree",
 		"[ctrl+p] prune worktree",
 		"[?] keybinding and instructions",
 	},
@@ -313,6 +313,10 @@ var eN = LanguageMapping{
 	},
 	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
 		"[esc] close",
+	},
+	KeyBindingForWorktreeLockReasonInputPopUp: []string{
+		"[enter] lock worktree",
+		"[esc] cancel / close",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] move up and down",
@@ -597,6 +601,8 @@ var eN = LanguageMapping{
 	EnterRemoteBranchPrompt:                                        "Enter the remote branch name",
 	CreateNewWorktreePrompt:                                        "Enter the new worktree name",
 	NewWorktreeBranchPrompt:                                        "Optional: branch name (remote/local). origin/<branch> = detached HEAD",
+	WorktreeLockReasonPrompt:                                       "Optional: reason for locking this worktree",
+	WorktreeLockReasonTitle:                                        "Lock Worktree Reason (%s)",
 	AddNewWorktreeTitle:                                            "New Worktree Name",
 	NewWorktreeTitle:                                               "Add New Worktree",
 	AddingNewWorktree:                                              "Adding new worktree...",
@@ -1117,7 +1123,7 @@ var enWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "l",
+		KeyBindingLine:  "o",
 		TitleOrInfoLine: "lock / unlock worktree",
 		LineType:        INFO,
 	},

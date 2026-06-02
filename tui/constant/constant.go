@@ -71,6 +71,7 @@ const (
 	InteractiveRebaseDropOutputPopUp              = "InteractiveRebaseDropOutputPopUp"              // IsTyping will be false
 	WorktreeAddNewWorktreePopUp                   = "WorktreeAddNewWorktreePopUp"                   // IsTyping will be true
 	WorktreeAddNewWorktreeOutputPopUp             = "WorktreeAddNewWorktreeOutputPopUp"             // IsTyping will be false
+	WorktreeLockReasonInputPopUp                  = "WorktreeLockReasonInputPopUp"                  // IsTyping will be true
 )
 
 const (
@@ -157,6 +158,7 @@ const (
 	MaxInteractiveRebaseDropOutputPopUpWidth  = 150
 	MaxWorktreeAddNewWorktreePopUpWidth       = 150
 	MaxWorktreeAddNewWorktreeOutputPopUpWidth = 150
+	MaxWorktreeLockReasonInputPopUpWidth      = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                       = 18
 	PopUpGitCommitOutputViewPortHeight                        = 10

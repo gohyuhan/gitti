@@ -160,6 +160,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = worktree.RenderWorktreeAddNewWorktreePopUp(m)
 	case constant.WorktreeAddNewWorktreeOutputPopUp:
 		popUp = worktree.RenderWorktreeAddNewWorktreeOutputPopUp(m)
+	case constant.WorktreeLockReasonInputPopUp:
+		popUp = worktree.RenderWorktreeLockReasonInputPopUp(m)
 	}
 	return popUp
 }

@@ -158,7 +158,7 @@ var jA = LanguageMapping{
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] コンポーネントを切り替え",
 		"[n] 新しいワークツリー",
-		"[l] ワークツリーをロック/解除",
+		"[o] ワークツリーをロック/解除",
 		"[ctrl+p] ワークツリーをプルーン",
 		"[?] キー操作と説明",
 	},
@@ -167,7 +167,7 @@ var jA = LanguageMapping{
 		"[</>] コンポーネントを切り替え",
 		"[backspace] ワークツリーを削除",
 		"[n] 新しいワークツリー",
-		"[l] ワークツリーをロック/解除",
+		"[o] ワークツリーをロック/解除",
 		"[ctrl+p] ワークツリーをプルーン",
 		"[?] キー操作と説明",
 	},
@@ -313,6 +313,10 @@ var jA = LanguageMapping{
 	},
 	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
 		"[esc] 閉じる",
+	},
+	KeyBindingForWorktreeLockReasonInputPopUp: []string{
+		"[enter] ワークツリーをロック",
+		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下に移動",
@@ -597,6 +601,8 @@ var jA = LanguageMapping{
 	EnterRemoteBranchPrompt:                                        "リモートブランチ名を入力してください",
 	CreateNewWorktreePrompt:                                        "新しいワークツリー名を入力してください",
 	NewWorktreeBranchPrompt:                                        "任意: ブランチ名（remote/local）. origin/<branch> は detached HEAD",
+	WorktreeLockReasonPrompt:                                       "任意: このワークツリーをロックする理由",
+	WorktreeLockReasonTitle:                                        "ワークツリーのロック理由 (%s)",
 	AddNewWorktreeTitle:                                            "新しいワークツリー名",
 	NewWorktreeTitle:                                               "新しいワークツリーを追加",
 	AddingNewWorktree:                                              "新しいワークツリーを追加中...",
@@ -1119,7 +1125,7 @@ var jaWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "l",
+		KeyBindingLine:  "o",
 		TitleOrInfoLine: "ワークツリーをロック/解除",
 		LineType:        INFO,
 	},

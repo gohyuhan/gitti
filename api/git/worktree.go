@@ -201,28 +201,24 @@ func (gwt *GitWorktree) AddNewWorktree(ctx context.Context, newWorktreeName stri
 //	process is running. Returns the command output and whether the remove succeeded.
 //
 // ------------------------------------
-func (gwt *GitWorktree) RemoveWorktree(ctx context.Context, worktreePath string) ([]string, bool) {
+func (gwt *GitWorktree) RemoveWorktree(worktreePath string) {
 	if !gwt.gitProcessLock.CanProceedWithGitOps() {
 		gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
-		return []string{gwt.gitProcessLock.OtherProcessRunningWarning()}, false
+		return
 	}
 	defer func() {
 		gwt.gitProcessLock.ReleaseGitOpsLock()
 	}()
 
-	success := false
 	gitArgs := []string{"worktree", "remove", worktreePath}
-	removeWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	removeWorktreeCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	removeWorktreeOutput, removeWorktreeError := removeWorktreeCmdExecutor.CombinedOutput()
 
 	if removeWorktreeError != nil {
-		gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REMOVE_WORKTREE_OPS, removeWorktreeError.Error()), true)
-	} else {
-		success = true
+		errorMsg := processGeneralGitOpsOutputIntoStringArray(removeWorktreeOutput)
+		gwt.logging.RegisterNewLog(logging.REMOVE_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.REMOVE_WORKTREE_OPS, errorMsg), true)
 	}
-
-	return processGeneralGitOpsOutputIntoStringArray(removeWorktreeOutput), success
 }
 
 // ------------------------------------
@@ -256,7 +252,7 @@ func (gwt *GitWorktree) PruneWorktrees() {
 //	Acquires the git ops lock first; no-ops if another git process is running.
 //
 // ------------------------------------
-func (gwt *GitWorktree) LockWorktree(lockReason string, worktreePath string) {
+func (gwt *GitWorktree) LockWorktree(worktreePath string, lockReason string) {
 	if !gwt.gitProcessLock.CanProceedWithGitOps() {
 		gwt.logging.RegisterNewLog(logging.LOCK_WORKTREE_OPS, "", logging.WARN, fmt.Sprintf("[WARN]: %s", gwt.gitProcessLock.OtherProcessRunningWarning()), false)
 		return

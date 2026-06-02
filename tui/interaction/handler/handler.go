@@ -208,6 +208,12 @@ func HandleTypingKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel)
 				return m, cmd
 			}
 		}
+	case constant.WorktreeLockReasonInputPopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeLockReasonInputPopUpModel)
+		if ok {
+			popUp.WorktreeLockReasonTextInput, cmd = popUp.WorktreeLockReasonTextInput.Update(msg)
+			return m, cmd
+		}
 	}
 	return m, cmd
 }
@@ -270,6 +276,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 
 	case "n":
 		return handleNonTypingnKeyBindingInteraction(m)
+
+	case "o":
+		return handleNonTypingoKeyBindingInteraction(m)
 
 	case "p":
 		return handleNonTypingpKeyBindingInteraction(m)

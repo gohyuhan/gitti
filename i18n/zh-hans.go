@@ -158,7 +158,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] 切换组件",
 		"[n] 新建工作树",
-		"[l] 锁定/解锁工作树",
+		"[o] 锁定/解锁工作树",
 		"[ctrl+p] 清理工作树",
 		"[?] 快捷键与说明",
 	},
@@ -167,7 +167,7 @@ var zH_HANS = LanguageMapping{
 		"[</>] 切换组件",
 		"[backspace] 删除工作树",
 		"[n] 新建工作树",
-		"[l] 锁定/解锁工作树",
+		"[o] 锁定/解锁工作树",
 		"[ctrl+p] 清理工作树",
 		"[?] 快捷键与说明",
 	},
@@ -313,6 +313,10 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
 		"[esc] 关闭",
+	},
+	KeyBindingForWorktreeLockReasonInputPopUp: []string{
+		"[enter] 锁定工作树",
+		"[esc] 取消 / 关闭",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下移动",
@@ -597,6 +601,8 @@ var zH_HANS = LanguageMapping{
 	EnterRemoteBranchPrompt:                                        "请输入远程分支名称",
 	CreateNewWorktreePrompt:                                        "请输入新的工作树名称",
 	NewWorktreeBranchPrompt:                                        "可选: 分支名（远程或本地）. origin/<branch> 将进入 detached HEAD",
+	WorktreeLockReasonPrompt:                                       "可选: 锁定此工作树的原因",
+	WorktreeLockReasonTitle:                                        "锁定工作树原因 (%s)",
 	AddNewWorktreeTitle:                                            "新工作树名称",
 	NewWorktreeTitle:                                               "添加新工作树",
 	AddingNewWorktree:                                              "正在添加新工作树...",
@@ -1118,7 +1124,7 @@ var zhHansWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
-		KeyBindingLine:  "l",
+		KeyBindingLine:  "o",
 		TitleOrInfoLine: "锁定/解锁工作树",
 		LineType:        INFO,
 	},

@@ -18,6 +18,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
+	"github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/layout"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
@@ -629,6 +630,30 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					m.IsTyping.Store(true)
 					m.ShowPopUp.Store(true)
 					branchPopUp.InitCreateNewBranchPopUpModel(m, git.NEWBRANCHBASEDONCOMMITHASH, parsedReflog.Hash)
+				}
+			}
+		}
+	}
+	return m, nil
+}
+
+func handleNonTypingoKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
+			case constant.SHOW_WORKTREE:
+				selectedWorktreeItem := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if selectedWorktreeItem != nil {
+					parsedSelectedWorktree := selectedWorktreeItem.(worktree.GitWorktreeItem)
+					if parsedSelectedWorktree.IsLocked {
+						services.UnlockWorktreeService(m, parsedSelectedWorktree.WorktreePath)
+					} else {
+						m.PopUpType = constant.WorktreeLockReasonInputPopUp
+						m.IsTyping.Store(true)
+						m.ShowPopUp.Store(true)
+						worktreePopUp.InitWorktreeLockReasonInputPopUpModel(m, parsedSelectedWorktree.WorktreePath)
+					}
 				}
 			}
 		}

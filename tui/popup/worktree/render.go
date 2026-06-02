@@ -1,6 +1,8 @@
 package worktree
 
 import (
+	"fmt"
+
 	"charm.land/lipgloss/v2"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -76,6 +78,21 @@ func RenderWorktreeAddNewWorktreeOutputPopUp(m *types.GittiModel) string {
 			)
 		}
 		return style.PopUpBorderStyle.Render(content)
+	}
+	return ""
+}
+
+func RenderWorktreeLockReasonInputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*WorktreeLockReasonInputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxWorktreeLockReasonInputPopUpWidth, int(float64(m.Width)*0.8))
+		popUp.WorktreeLockReasonTextInput.SetWidth(popUpWidth - 6)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.WorktreeLockReasonTitle, popUp.WorktreePath)),
+			popUp.WorktreeLockReasonTextInput.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}
 	return ""
 }

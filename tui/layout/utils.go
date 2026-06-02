@@ -342,7 +342,7 @@ func UpdateDetailComponentViewportLayout(m *types.GittiModel) {
 // ------------------------------------
 func EnterOrReinitLineEditingState(m *types.GittiModel) {
 	if !((m.CurrentSelectedComponent == constant.DetailComponentPanel || m.CurrentSelectedComponent == constant.DetailComponentPanelTwo) && m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel && m.CurrentRepoModifiedFilesInfoList.SelectedItem() != nil) {
-		// we are eligible to be in line editing mode, so we need to reset the state
+		// we are not eligible to be in line editing mode, so we need to reset the state
 		m.IsLineEditingState.Store(false)
 		// reinit the index position
 		m.LineEditingIndexPositionAndInfo = types.GittiLineEditingIndexPositionAndInfo{}

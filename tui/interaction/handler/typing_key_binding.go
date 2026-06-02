@@ -60,7 +60,8 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		constant.GitRebaseBranchInputPopUp,
 		constant.InteractiveRebaseFixupSquashCommitPopUp,
 		constant.InteractiveRebaseRewordCommitPopUp,
-		constant.WorktreeAddNewWorktreePopUp:
+		constant.WorktreeAddNewWorktreePopUp,
+		constant.WorktreeLockReasonInputPopUp:
 		m.ShowPopUp.Store(false)
 		m.IsTyping.Store(false)
 		m.PopUpType = constant.NoPopUp
@@ -591,6 +592,15 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 				}
 			}
 		}
+	case constant.WorktreeLockReasonInputPopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeLockReasonInputPopUpModel)
+		if ok {
+			lockReason := popUp.WorktreeLockReasonTextInput.Value()
+			m.ShowPopUp.Store(false)
+			m.IsTyping.Store(false)
+			m.PopUpType = constant.NoPopUp
+			services.LockWorktreeService(m, popUp.WorktreePath, lockReason)
+		}
 
 	// the following is to handle the change line for textarea input
 	case constant.CommitPopUp:
@@ -808,6 +818,13 @@ func handleTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 				return m, cmd
 			}
 		}
+	case constant.WorktreeLockReasonInputPopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeLockReasonInputPopUpModel)
+		if ok {
+			var cmd tea.Cmd
+			popUp.WorktreeLockReasonTextInput, cmd = popUp.WorktreeLockReasonTextInput.Update(msg)
+			return m, cmd
+		}
 	}
 	return m, nil
 }
@@ -911,6 +928,11 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 			case 2:
 				content = popUp.WorktreeBranchNameTextInput.Value()
 			}
+		}
+	case constant.WorktreeLockReasonInputPopUp:
+		popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeLockReasonInputPopUpModel)
+		if ok {
+			content = popUp.WorktreeLockReasonTextInput.Value()
 		}
 	}
 

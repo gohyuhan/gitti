@@ -64,8 +64,46 @@ func AddNewWorktreeCancelService(m *types.GittiModel) {
 	}
 }
 
+// ------------------------------------
+//
+//	Prune stale worktree administrative files in the background
+//
+// ------------------------------------
 func PruneWorktreesService(m *types.GittiModel) {
 	go func() {
 		m.GitOperations.GitWorktree.PruneWorktrees()
+	}()
+}
+
+// ------------------------------------
+//
+//	Remove the worktree at worktreePath in the background
+//
+// ------------------------------------
+func RemoveWorktreeService(m *types.GittiModel, worktreePath string) {
+	go func() {
+		m.GitOperations.GitWorktree.RemoveWorktree(worktreePath)
+	}()
+}
+
+// ------------------------------------
+//
+//	Lock the worktree at worktreePath in the background, with an optional lock reason
+//
+// ------------------------------------
+func LockWorktreeService(m *types.GittiModel, worktreePath string, lockReason string) {
+	go func() {
+		m.GitOperations.GitWorktree.LockWorktree(worktreePath, lockReason)
+	}()
+}
+
+// ------------------------------------
+//
+//	Unlock the worktree at worktreePath in the background
+//
+// ------------------------------------
+func UnlockWorktreeService(m *types.GittiModel, worktreePath string) {
+	go func() {
+		m.GitOperations.GitWorktree.UnlockWorktree(worktreePath)
 	}()
 }
