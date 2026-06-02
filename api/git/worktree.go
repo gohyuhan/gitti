@@ -243,6 +243,7 @@ func (gwt *GitWorktree) PruneWorktrees() {
 	}()
 
 	gitArgs := []string{"worktree", "prune"}
+	gwt.logging.RegisterNewLog(logging.PRUNE_WORKTREES_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	pruneWorktreesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	pruneWorktreesCmdExecutor.Run()
 }
@@ -268,8 +269,13 @@ func (gwt *GitWorktree) LockWorktree(lockReason string, worktreePath string) {
 		gitArgs = append(gitArgs, "--reason", lockReason)
 	}
 	gitArgs = append(gitArgs, worktreePath)
+	gwt.logging.RegisterNewLog(logging.LOCK_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	lockWorktreesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	lockWorktreesCmdExecutor.Run()
+	lockWorktreeOutput, lockWorktreeErr := lockWorktreesCmdExecutor.CombinedOutput()
+	if lockWorktreeErr != nil {
+		errorMsg := strings.Join(processGeneralGitOpsOutputIntoStringArray(lockWorktreeOutput), " ")
+		gwt.logging.RegisterNewLog(logging.LOCK_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.LOCK_WORKTREE_OPS, errorMsg), true)
+	}
 }
 
 // ------------------------------------
@@ -288,8 +294,13 @@ func (gwt *GitWorktree) UnlockWorktree(worktreePath string) {
 		gwt.gitProcessLock.ReleaseGitOpsLock()
 	}()
 	gitArgs := []string{"worktree", "unlock", worktreePath}
+	gwt.logging.RegisterNewLog(logging.UNLOCK_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	unlockWorktreesCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	unlockWorktreesCmdExecutor.Run()
+	unlockWorktreeOutput, unlockWorktreeErr := unlockWorktreesCmdExecutor.CombinedOutput()
+	if unlockWorktreeErr != nil {
+		errorMsg := strings.Join(processGeneralGitOpsOutputIntoStringArray(unlockWorktreeOutput), " ")
+		gwt.logging.RegisterNewLog(logging.UNLOCK_WORKTREE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.UNLOCK_WORKTREE_OPS, errorMsg), true)
+	}
 }
 
 // ------------------------------------

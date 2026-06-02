@@ -63,3 +63,9 @@ func AddNewWorktreeCancelService(m *types.GittiModel) {
 		popUp.ProcessSuccess.Store(false)
 	}
 }
+
+func PruneWorktreesService(m *types.GittiModel) {
+	go func() {
+		m.GitOperations.GitWorktree.PruneWorktrees()
+	}()
+}

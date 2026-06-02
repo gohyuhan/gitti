@@ -2624,6 +2624,9 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.TAGPUSHACTION)
 				}
 			}
+		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel) &&
+			len(m.CurrentRepoWorktreeInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_WORKTREE {
+			services.PruneWorktreesService(m)
 		}
 	}
 	return m, nil

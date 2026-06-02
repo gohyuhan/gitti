@@ -3,7 +3,6 @@ package worktree
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
@@ -47,17 +46,17 @@ func (d GitWorktreeItemDelegate) Render(w io.Writer, m list.Model, index int, li
 
 	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad
 
-	var fn func(...string) string
+	var fn func(str string, shouldFaint bool) string
 	if index == m.Index() {
-		fn = func(s ...string) string {
-			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		fn = func(s string, shouldFaint bool) string {
+			return style.SelectedItemStyle.Faint(shouldFaint).Render("❯ " + s)
 		}
 	} else {
-		fn = func(s ...string) string {
-			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		fn = func(s string, shouldFaint bool) string {
+			return style.ItemStyle.Faint(shouldFaint).Render("  " + s)
 		}
 	}
 	str := utils.TruncateString(i.WorktreePath, componentWidth)
 
-	fmt.Fprint(w, fn(str))
+	fmt.Fprint(w, fn(str, i.IsPrunable))
 }
