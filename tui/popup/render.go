@@ -18,6 +18,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/resolve"
 	"github.com/gohyuhan/gitti/tui/popup/stash"
 	"github.com/gohyuhan/gitti/tui/popup/tag"
+	"github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -155,6 +156,14 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = interactiverebase.RenderInteractiveRebaseDropSelectionPopUp(m)
 	case constant.InteractiveRebaseDropOutputPopUp:
 		popUp = interactiverebase.RenderInteractiveRebaseDropOutputPopUp(m)
+	case constant.WorktreeAddNewWorktreePopUp:
+		popUp = worktree.RenderWorktreeAddNewWorktreePopUp(m)
+	case constant.WorktreeAddNewWorktreeOutputPopUp:
+		popUp = worktree.RenderWorktreeAddNewWorktreeOutputPopUp(m)
+	case constant.WorktreeLockReasonInputPopUp:
+		popUp = worktree.RenderWorktreeLockReasonInputPopUp(m)
+	case constant.WorktreeRemoveWorktreeConfirmationPopUp:
+		popUp = worktree.RenderWorktreeRemoveWorktreeConfirmationPopUp(m)
 	}
 	return popUp
 }

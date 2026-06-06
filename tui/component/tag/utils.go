@@ -18,7 +18,7 @@ import (
 //
 // ------------------------------------
 func ConstructTagComponentTitle(titleWidthLimit int) string {
-	title := fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
+	title := fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
 		style.TitleCurrentComponentStyle.Render("[1]"),
 		style.TitleNonCurrentComponentStyle.Render("\uf418"),
 		style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
@@ -28,9 +28,12 @@ func ConstructTagComponentTitle(titleWidthLimit int) string {
 		style.TitleNonCurrentComponentStyle.Render("•"),
 		style.TitleNonCurrentComponentStyle.Render("\ueb39"),
 		style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Remote),
+		style.TitleNonCurrentComponentStyle.Render("•"),
+		style.TitleNonCurrentComponentStyle.Render("\ueb86"),
+		style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Worktree),
 	)
 	if lipgloss.Width(title) > titleWidthLimit {
-		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
+		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
 			style.TitleCurrentComponentStyle.Render("[1]"),
 			style.TitleNonCurrentComponentStyle.Render("\uf418"),
 			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
@@ -39,11 +42,14 @@ func ConstructTagComponentTitle(titleWidthLimit int) string {
 			style.TitleCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Tag),
 			style.TitleNonCurrentComponentStyle.Render("•"),
 			style.TitleNonCurrentComponentStyle.Render("\ueb39"),
-			style.TitleNonCurrentComponentStyle.Render("R"),
+			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Remote),
+			style.TitleNonCurrentComponentStyle.Render("•"),
+			style.TitleNonCurrentComponentStyle.Render("\ueb86"),
+			style.TitleNonCurrentComponentStyle.Render("W"),
 		)
 	}
 	if lipgloss.Width(title) > titleWidthLimit {
-		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
+		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
 			style.TitleCurrentComponentStyle.Render("[1]"),
 			style.TitleNonCurrentComponentStyle.Render("\uf418"),
 			style.TitleNonCurrentComponentStyle.Render(i18n.LANGUAGEMAPPING.Branches),
@@ -53,10 +59,13 @@ func ConstructTagComponentTitle(titleWidthLimit int) string {
 			style.TitleNonCurrentComponentStyle.Render("•"),
 			style.TitleNonCurrentComponentStyle.Render("\ueb39"),
 			style.TitleNonCurrentComponentStyle.Render("R"),
+			style.TitleNonCurrentComponentStyle.Render("•"),
+			style.TitleNonCurrentComponentStyle.Render("\ueb86"),
+			style.TitleNonCurrentComponentStyle.Render("W"),
 		)
 	}
 	if lipgloss.Width(title) > titleWidthLimit {
-		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s",
+		title = fmt.Sprintf("%s %s %s %s %s %s %s %s %s %s %s %s",
 			style.TitleCurrentComponentStyle.Render("[1]"),
 			style.TitleNonCurrentComponentStyle.Render("\uf418"),
 			style.TitleNonCurrentComponentStyle.Render("B"),
@@ -66,6 +75,9 @@ func ConstructTagComponentTitle(titleWidthLimit int) string {
 			style.TitleNonCurrentComponentStyle.Render("•"),
 			style.TitleNonCurrentComponentStyle.Render("\ueb39"),
 			style.TitleNonCurrentComponentStyle.Render("R"),
+			style.TitleNonCurrentComponentStyle.Render("•"),
+			style.TitleNonCurrentComponentStyle.Render("\ueb86"),
+			style.TitleNonCurrentComponentStyle.Render("W"),
 		)
 	}
 	return title

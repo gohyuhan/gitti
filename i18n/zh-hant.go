@@ -77,6 +77,12 @@ var zH_HANT = LanguageMapping{
 	Stash:                               "暫存",
 	Tag:                                 "標籤",
 	Remote:                              "遠端",
+	Worktree:                            "工作樹",
+	WorktreeIsMain:                      "主工作樹",
+	WorktreeIsCurrent:                   "目前工作樹",
+	WorktreeIsLocked:                    "已鎖定",
+	WorktreeIsPrunable:                  "可清理",
+	WorktreeLockedReason:                "鎖定原因",
 	Fetch:                               "獲取",
 	Push:                                "推送",
 	FileTypeUnSupportedPreview:          "目前選擇的檔案類型不支援預覽",
@@ -147,6 +153,37 @@ var zH_HANT = LanguageMapping{
 		"[d] 移除遠端",
 		"[e] 編輯遠端",
 		"[enter] 設定為上游追蹤分支",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingWorktreeComponentMainWorktree: []string{
+		"[</>] 切換元件",
+		"[n] 新增工作樹",
+		"[ctrl+p] 清理工作樹",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
+		"[</>] 切換元件",
+		"[Enter] 切換工作樹",
+		"[n] 新增工作樹",
+		"[ctrl+p] 清理工作樹",
+		"[?] 快捷鍵與說明",
+	},
+
+	KeyBindingWorktreeComponent: []string{
+		"[</>] 切換元件",
+		"[backspace] 刪除工作樹",
+		"[n] 新增工作樹",
+		"[o] 鎖定/解鎖工作樹",
+		"[ctrl+p] 清理工作樹",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingWorktreeComponentSwitchable: []string{
+		"[</>] 切換元件",
+		"[Enter] 切換工作樹",
+		"[backspace] 刪除工作樹",
+		"[n] 新增工作樹",
+		"[o] 鎖定/解鎖工作樹",
+		"[ctrl+p] 清理工作樹",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -282,6 +319,23 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForCreateNewBranchPopUp: []string{
 		"[enter] 添加分支",
 		"[esc] 取消並關閉",
+	},
+	KeyBindingForWorktreeAddNewWorktreePopUp: []string{
+		"[tab] 移動到下一個輸入",
+		"[shift+tab] 移動到上一個輸入",
+		"[enter] 添加工作樹",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
+		"[esc] 關閉",
+	},
+	KeyBindingForWorktreeLockReasonInputPopUp: []string{
+		"[enter] 鎖定工作樹",
+		"[esc] 取消 / 關閉",
+	},
+	KeyBindingForWorktreeRemoveConfirmationPopUp: []string{
+		"[enter] 移除工作樹",
+		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下移動",
@@ -530,6 +584,7 @@ var zH_HANT = LanguageMapping{
 	LocalBranchComponentKeyBinding:                                 zhHantLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                         zhHantTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                      zhHantRemoteComponentKeyBinding,
+	WorktreeComponentKeyBinding:                                    zhHantWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                               zhHantModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                   zhHantCommitLogComponentKeyBinding,
 	RefLogComponentKeyBinding:                                      zhHantRefLogComponentKeyBinding,
@@ -563,6 +618,15 @@ var zH_HANT = LanguageMapping{
 	ForcePushDangerous:                                             "強制推送（危險）",
 	CreateNewBranchPrompt:                                          "請輸入新的分支名稱",
 	EnterRemoteBranchPrompt:                                        "請輸入遠端分支名稱",
+	CreateNewWorktreePrompt:                                        "請輸入新的工作樹名稱",
+	NewWorktreeBranchPrompt:                                        "可選: 分支名稱（遠端或本地）. origin/<branch> 會進入 detached HEAD",
+	WorktreeLockReasonPrompt:                                       "可選: 鎖定此工作樹的原因",
+	WorktreeLockReasonTitle:                                        "鎖定工作樹原因 (%s)",
+	WorktreeRemoveConfirmation:                                     "確定要移除以下工作樹嗎？",
+	AddNewWorktreeTitle:                                            "新工作樹名稱",
+	NewWorktreeTitle:                                               "新增工作樹",
+	AddingNewWorktree:                                              "正在新增工作樹...",
+	NewWorktreeBranchTitle:                                         "工作樹分支（可選）",
 	ChooseNewBranchTypeTitle:                                       "您希望如何建立新的 Git 分支？",
 	NewBranchInvalidWarning:                                        "分支名稱無效，將替換為 `%s`",
 	CreateNewBranchTitle:                                           "建立新分支",
@@ -1043,6 +1107,55 @@ var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "設定為上游追蹤分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+}
+
+// Worktree Component Key Binding for zh-hant
+var zhHantWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 工作樹組件面板快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "在本地分支、標籤、遠端和工作樹組件之間切換",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "切換工作樹（目前或可清理時不可用）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "刪除工作樹",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新增工作樹",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "鎖定/解鎖工作樹",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "清理工作樹",
 		LineType:        INFO,
 	},
 	{
@@ -1885,6 +1998,59 @@ var zhHantFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 最舊所選提交與 HEAD 之間的合併提交也將被刪除",
 			"5. 按 `enter` 進入 drop 輸出彈出視窗",
 			"6. 按 `esc` 關閉輸出彈出視窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "新增工作樹 (add worktree)",
+		InstructionLines: []string{
+			"1. 導覽至工作樹元件（按 `1`，然後按 `< >` 直到顯示工作樹元件）",
+			"2. 按 `n` 開啟新增工作樹彈出視窗",
+			"3. 輸入工作樹名稱",
+			"   - 按 `tab` 移動至分支輸入欄並設定檢出分支",
+			"   - 按 `shift+tab` 返回上一個輸入欄",
+			"4. 按 `enter` 建立工作樹",
+			"5. 按 `esc` 關閉輸出彈出視窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "切換工作樹 (switch worktree)",
+		InstructionLines: []string{
+			"1. 導覽至工作樹元件（按 `1`，然後按 `< >` 直到顯示工作樹元件）",
+			"2. 使用 `↑/↓` 選取目標工作樹",
+			"3. 按 `enter` 切換至該工作樹",
+			"   - 若為目前工作樹或可清理工作樹，則不可用",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "刪除工作樹 (remove worktree)",
+		InstructionLines: []string{
+			"1. 導覽至工作樹元件（按 `1`，然後按 `< >` 直到顯示工作樹元件）",
+			"2. 使用 `↑/↓` 選取要刪除的工作樹",
+			"3. 按 `backspace` 開啟刪除確認彈出視窗",
+			"4. 按 `enter` 確認刪除，或按 `esc` 取消",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "清理工作樹 (prune worktree)",
+		InstructionLines: []string{
+			"1. 導覽至工作樹元件（按 `1`，然後按 `< >` 直到顯示工作樹元件）",
+			"2. 按 `ctrl+p` 清理陳舊的工作樹管理檔案",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "鎖定 / 解鎖工作樹 (lock / unlock worktree)",
+		InstructionLines: []string{
+			"1. 導覽至工作樹元件（按 `1`，然後按 `< >` 直到顯示工作樹元件）",
+			"2. 使用 `↑/↓` 選取目標工作樹",
+			"3. 按 `o` 切換鎖定狀態",
+			"   - 若目前未鎖定，將開啟鎖定原因彈出視窗；可選填原因後按 `enter` 鎖定",
+			"   - 若目前已鎖定，將立即解鎖",
+			"   - 主工作樹無法鎖定或解鎖",
 		},
 		LineType: INFO,
 	},

@@ -207,7 +207,7 @@ func InitGitAndAPI(repoPath string, updateChannel chan string, gittiLogging *log
 	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
 	// various initialization
 	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, gitRepoPathInfo.AbsoluteWorktreePath, updateChannel, gittiLogging)
-	api.InitGitDaemon(gitRepoPathInfo.AbsoluteGitRepoPath, updateChannel, gitOperations, settings.GITTICONFIGSETTINGS.AllowCommitGraphWrite, daemonUpdateChannel, gittiLogging)
+	api.InitGitDaemon(gitRepoPathInfo.RepoMainGitDirPath, updateChannel, gitOperations, settings.GITTICONFIGSETTINGS.AllowCommitGraphWrite, daemonUpdateChannel, gittiLogging)
 
 	return gitOperations, gitRepoPathInfo
 }

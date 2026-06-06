@@ -77,6 +77,12 @@ var eN = LanguageMapping{
 	Stash:                               "Stash",
 	Tag:                                 "Tag",
 	Remote:                              "Remote",
+	Worktree:                            "Worktree",
+	WorktreeIsMain:                      "Main",
+	WorktreeIsCurrent:                   "Current Worktree",
+	WorktreeIsLocked:                    "Locked",
+	WorktreeIsPrunable:                  "Prunable",
+	WorktreeLockedReason:                "Locked Reason",
 	Fetch:                               "Fetch",
 	Push:                                "Push",
 	FileTypeUnSupportedPreview:          "The current selected file type is not supported for preview",
@@ -147,6 +153,36 @@ var eN = LanguageMapping{
 		"[d] remove remote",
 		"[e] edit remote",
 		"[enter] set as tracking upstream",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingWorktreeComponentMainWorktree: []string{
+		"[</>] switch component",
+		"[n] new worktree",
+		"[ctrl+p] prune worktree",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
+		"[</>] switch component",
+		"[Enter] switch worktree",
+		"[n] new worktree",
+		"[ctrl+p] prune worktree",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingWorktreeComponent: []string{
+		"[</>] switch component",
+		"[backspace] remove worktree",
+		"[n] new worktree",
+		"[o] lock / unlock worktree",
+		"[ctrl+p] prune worktree",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingWorktreeComponentSwitchable: []string{
+		"[</>] switch component",
+		"[Enter] switch worktree",
+		"[backspace] remove worktree",
+		"[n] new worktree",
+		"[o] lock / unlock worktree",
+		"[ctrl+p] prune worktree",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -282,6 +318,23 @@ var eN = LanguageMapping{
 	KeyBindingForCreateNewBranchPopUp: []string{
 		"[enter] add branch",
 		"[esc] cancel and close",
+	},
+	KeyBindingForWorktreeAddNewWorktreePopUp: []string{
+		"[tab] move to next input",
+		"[shift+tab] move to previous input",
+		"[enter] add worktree",
+		"[esc] cancel / close",
+	},
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
+		"[esc] close",
+	},
+	KeyBindingForWorktreeLockReasonInputPopUp: []string{
+		"[enter] lock worktree",
+		"[esc] cancel / close",
+	},
+	KeyBindingForWorktreeRemoveConfirmationPopUp: []string{
+		"[enter] remove worktree",
+		"[esc] cancel / close",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] move up and down",
@@ -530,6 +583,7 @@ var eN = LanguageMapping{
 	LocalBranchComponentKeyBinding:                                 enLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                         enTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                      enRemoteComponentKeyBinding,
+	WorktreeComponentKeyBinding:                                    enWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                               enModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                   enCommitLogComponentKeyBinding,
 	RefLogComponentKeyBinding:                                      enRefLogComponentKeyBinding,
@@ -563,6 +617,15 @@ var eN = LanguageMapping{
 	ForcePushDangerous:                                             "Force Push (Dangerous)",
 	CreateNewBranchPrompt:                                          "Enter the new branch name",
 	EnterRemoteBranchPrompt:                                        "Enter the remote branch name",
+	CreateNewWorktreePrompt:                                        "Enter the new worktree name",
+	NewWorktreeBranchPrompt:                                        "Optional: branch name (remote/local). origin/<branch> = detached HEAD",
+	WorktreeLockReasonPrompt:                                       "Optional: reason for locking this worktree",
+	WorktreeLockReasonTitle:                                        "Lock Worktree Reason (%s)",
+	WorktreeRemoveConfirmation:                                     "Are you sure you want to remove the following worktree?",
+	AddNewWorktreeTitle:                                            "New Worktree Name",
+	NewWorktreeTitle:                                               "Add New Worktree",
+	AddingNewWorktree:                                              "Adding new worktree...",
+	NewWorktreeBranchTitle:                                         "Worktree Branch (Optional)",
 	ChooseNewBranchTypeTitle:                                       "How would you like to proceed with creating a new git branch",
 	NewBranchInvalidWarning:                                        "Invalid naming for a branch name, it will be replace with `%s` instead",
 	CreateNewBranchTitle:                                           "Create new branch",
@@ -1042,6 +1105,55 @@ var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "set as tracking upstream",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+}
+
+// Worktree Component Key Binding for en
+var enWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Worktree Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "switch between local branch, tag, remote and worktree component",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "switch worktree (not available if current or prunable)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "remove worktree",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "new worktree",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "lock / unlock worktree",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "prune worktree",
 		LineType:        INFO,
 	},
 	{
@@ -1884,6 +1996,59 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - Any merge commits between the oldest selected commit and HEAD will also be dropped",
 			"5. Press `enter` to proceed to the drop output popup",
 			"6. Press `esc` to close the output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "add worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Press `n` to open the Add New Worktree popup",
+			"3. Enter the worktree name",
+			"   - Press `tab` to move to the branch field and set the checkout branch",
+			"   - Press `shift+tab` to move back to the previous input",
+			"4. Press `enter` to create the worktree",
+			"5. Press `esc` to close the output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "switch worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Select the target worktree using `↑/↓`",
+			"3. Press `enter` to switch to it",
+			"   - Not available if the worktree is the current one or is prunable",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "remove worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Select the worktree to remove using `↑/↓`",
+			"3. Press `backspace` to open the remove confirmation popup",
+			"4. Press `enter` to confirm removal, or `esc` to cancel",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "prune worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Press `ctrl+p` to prune stale worktree administrative files",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "lock / unlock worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Select the target worktree using `↑/↓`",
+			"3. Press `o` to toggle lock state",
+			"   - If currently unlocked, the Lock Reason popup opens; enter an optional reason and press `enter` to lock",
+			"   - If currently locked, it is unlocked immediately",
+			"   - The main worktree cannot be locked or unlocked",
 		},
 		LineType: INFO,
 	},

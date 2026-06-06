@@ -18,6 +18,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
+	"github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/layout"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
@@ -36,6 +37,7 @@ import (
 	resolvePopUp "github.com/gohyuhan/gitti/tui/popup/resolve"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
+	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
@@ -66,8 +68,8 @@ func handleNonTypingGlobalKeyBindingInteraction(m *types.GittiModel) (*types.Git
 // ------------------------------------
 func handleNonTyping1KeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
-		if m.CurrentSelectedComponent != constant.LocalBranchOrTagOrRemoteComponentPanel {
-			m.CurrentSelectedComponent = constant.LocalBranchOrTagOrRemoteComponentPanel
+		if m.CurrentSelectedComponent != constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel {
+			m.CurrentSelectedComponent = constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel
 			m.CurrentSelectedComponentIndex = 1
 			m.DetailPanelParentComponent = ""
 			layout.LeftPanelDynamicResize(m)
@@ -267,8 +269,8 @@ func handleNonTypingCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				selectedBranchItem := m.CurrentRepoBranchesInfoList.SelectedItem()
 				if selectedBranchItem != nil {
@@ -441,8 +443,8 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		}
 	} else {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_REMOTE:
 				selectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
 				if selectedRemote != nil {
@@ -488,8 +490,8 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 // ------------------------------------
 func handleNonTypingfKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
-		if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
-			m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_TAG {
+		if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel) &&
+			m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_TAG {
 			if !m.GitOperations.GitRemote.CheckRemoteExist(false) {
 				// if no remote found, we add one
 				m.PopUpType = constant.AddRemotePromptPopUp
@@ -570,8 +572,8 @@ func handleNonTypingLKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingmKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				m.PopUpType = constant.ChooseBranchOptionForMergePopUp
 				m.IsTyping.Store(false)
@@ -594,8 +596,8 @@ func handleNonTypingmKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				m.PopUpType = constant.ChooseNewBranchTypePopUp
 				m.IsTyping.Store(false)
@@ -612,6 +614,11 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				} else {
 					remotePopUp.InitAddRemotePromptPopUpModel(m, true)
 				}
+			case constant.SHOW_WORKTREE:
+				m.PopUpType = constant.WorktreeAddNewWorktreePopUp
+				m.IsTyping.Store(true)
+				m.ShowPopUp.Store(true)
+				worktreePopUp.InitWorktreeAddNewWorktreePopUpModel(m)
 			}
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
@@ -623,6 +630,34 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 					m.IsTyping.Store(true)
 					m.ShowPopUp.Store(true)
 					branchPopUp.InitCreateNewBranchPopUpModel(m, git.NEWBRANCHBASEDONCOMMITHASH, parsedReflog.Hash)
+				}
+			}
+		}
+	}
+	return m, nil
+}
+
+func handleNonTypingoKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
+			case constant.SHOW_WORKTREE:
+				selectedWorktreeItem := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if selectedWorktreeItem != nil {
+					parsedSelectedWorktree := selectedWorktreeItem.(worktree.GitWorktreeItem)
+					// main worktree cannot be lock and unlock, silent return
+					if parsedSelectedWorktree.IsMain {
+						return m, nil
+					}
+					if parsedSelectedWorktree.IsLocked {
+						services.UnlockWorktreeService(m, parsedSelectedWorktree.WorktreePath)
+					} else {
+						m.PopUpType = constant.WorktreeLockReasonInputPopUp
+						m.IsTyping.Store(true)
+						m.ShowPopUp.Store(true)
+						worktreePopUp.InitWorktreeLockReasonInputPopUpModel(m, parsedSelectedWorktree.WorktreePath)
+					}
 				}
 			}
 		}
@@ -720,8 +755,8 @@ func handleNonTypingPKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 func handleNonTypingrKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				selectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 				if selectedBranch != nil {
@@ -920,13 +955,28 @@ func handleNonTypingqQKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 //
 // ------------------------------------
 func handleNonTypingBackspaceKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	if !m.ShowPopUp.Load() && m.CurrentSelectedComponent == constant.StashComponentPanel {
-		selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
-		if selectedStashId != nil {
-			stashPopUp.InitGitStashConfirmPromptPopUpModel(m, git.POPSTASH, "", selectedStashId.(stash.GitStashItem).Id, selectedStashId.(stash.GitStashItem).Message)
-			m.PopUpType = constant.GitStashConfirmPromptPopUp
-			m.ShowPopUp.Store(true)
-			m.IsTyping.Store(false)
+	if !m.ShowPopUp.Load() {
+		switch m.CurrentSelectedComponent {
+		case constant.StashComponentPanel:
+			selectedStashId := m.CurrentRepoStashInfoList.SelectedItem()
+			if selectedStashId != nil {
+				stashPopUp.InitGitStashConfirmPromptPopUpModel(m, git.POPSTASH, "", selectedStashId.(stash.GitStashItem).Id, selectedStashId.(stash.GitStashItem).Message)
+				m.PopUpType = constant.GitStashConfirmPromptPopUp
+				m.ShowPopUp.Store(true)
+				m.IsTyping.Store(false)
+			}
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
+			case constant.SHOW_WORKTREE:
+				selectedWorktreeItem := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if selectedWorktreeItem != nil {
+					worktreeItem := selectedWorktreeItem.(worktree.GitWorktreeItem)
+					m.PopUpType = constant.WorktreeRemoveWorktreeConfirmationPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+					worktreePopUp.InitWorktreeRemoveWorktreeConfirmationPopUpModel(m, worktreeItem.WorktreePath)
+				}
+			}
 		}
 	} else if m.ShowPopUp.Load() {
 		switch m.PopUpType {
@@ -980,8 +1030,8 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.CurrentSelectedComponent = constant.DetailComponentPanel
 				m.DetailPanelParentComponent = constant.StashComponentPanel
 			}
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				selectedLocalBranchItem := m.CurrentRepoBranchesInfoList.SelectedItem()
 				if selectedLocalBranchItem != nil {
@@ -1004,6 +1054,20 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.ShowPopUp.Store(true)
 					remotePopUp.InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m, selectedRemote.Name, selectedRemote.Url)
 				}
+			case constant.SHOW_WORKTREE:
+				currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if currentSelectedWorktree != nil {
+					selectedWorktree := currentSelectedWorktree.(worktree.GitWorktreeItem)
+					// can't switch into the worktree we're already in, and a prunable
+					// (stale/missing) worktree is not a valid switch target
+					if selectedWorktree.IsInCurrentWorktree || selectedWorktree.IsPrunable {
+						return m, nil
+					}
+					services.SwitchWorktreeService(m, selectedWorktree.WorktreePath)
+					layout.LeftPanelDynamicResize(m)
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+
 			}
 		case constant.LogComponentPanel:
 			m.CurrentSelectedComponent = constant.DetailComponentPanel
@@ -1685,6 +1749,14 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					}
 				}
 			}
+		case constant.WorktreeRemoveWorktreeConfirmationPopUp:
+			popUp, ok := m.PopUpModel.(*worktreePopUp.WorktreeRemoveWorktreeConfirmationPopUpModel)
+			if ok {
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				services.RemoveWorktreeService(m, popUp.WorktreePath)
+			}
 		}
 	}
 	return m, nil
@@ -1915,6 +1987,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 		case constant.InteractiveRebaseDropOutputPopUp:
 			services.InteractiveRebaseDropCancelService(m)
 			m.PopUpModel = nil
+		case constant.WorktreeAddNewWorktreeOutputPopUp:
+			services.AddNewWorktreeCancelService(m)
+			m.PopUpModel = nil
 		case constant.SwitchBranchOutputPopUp:
 			// Block ESC during branch switching - operation must complete
 			popUp, ok := m.PopUpModel.(*branchPopUp.SwitchBranchOutputPopUpModel)
@@ -1989,7 +2064,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.InteractiveRebaseOptionPopUp,
 			constant.InteractiveRebaseFixupSquashSelectionPopUp,
 			constant.InteractiveRebaseRewordSelectionPopUp,
-			constant.InteractiveRebaseDropSelectionPopUp:
+			constant.InteractiveRebaseDropSelectionPopUp,
+			constant.WorktreeRemoveWorktreeConfirmationPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -2036,9 +2112,9 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			// we don't use the list native Update() because we track the current selected index
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				if m.CurrentRepoBranchesInfoList.Index() > 0 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() - 1
@@ -2058,6 +2134,13 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gitti
 					latestIndex := m.CurrentRepoRemoteInfoList.Index() - 1
 					m.CurrentRepoRemoteInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.RemoteComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+			case constant.SHOW_WORKTREE:
+				if m.CurrentRepoWorktreeInfoList.Index() > 0 {
+					latestIndex := m.CurrentRepoWorktreeInfoList.Index() - 1
+					m.CurrentRepoWorktreeInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.WorktreeComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
@@ -2141,9 +2224,9 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gitti
 func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			// we don't use the list native Update() because we track the current selected index
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				if m.CurrentRepoBranchesInfoList.Index() < len(m.CurrentRepoBranchesInfoList.Items())-1 {
 					latestIndex := m.CurrentRepoBranchesInfoList.Index() + 1
@@ -2163,6 +2246,13 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 					latestIndex := m.CurrentRepoRemoteInfoList.Index() + 1
 					m.CurrentRepoRemoteInfoList.Select(latestIndex)
 					m.ListNavigationIndexPosition.RemoteComponent = latestIndex
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+			case constant.SHOW_WORKTREE:
+				if m.CurrentRepoWorktreeInfoList.Index() < len(m.CurrentRepoWorktreeInfoList.Items())-1 {
+					latestIndex := m.CurrentRepoWorktreeInfoList.Index() + 1
+					m.CurrentRepoWorktreeInfoList.Select(latestIndex)
+					m.ListNavigationIndexPosition.WorktreeComponent = latestIndex
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
@@ -2409,15 +2499,18 @@ func handleNonTypingSlashKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-			// do nothing, as local branch will be the most left option in the local branch or tag or remote component panel
+			// do nothing, as local branch will be the most left option in the local branch or tag or remote or worktree component panel
 			case constant.SHOW_TAG:
-				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_LOCAL_BRANCH
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_LOCAL_BRANCH
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_REMOTE:
-				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_TAG
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_TAG
+				services.FetchDetailComponentPanelInfoService(m, true)
+			case constant.SHOW_WORKTREE:
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_REMOTE
 				services.FetchDetailComponentPanelInfoService(m, true)
 			}
 		case constant.CommitLogOrRefLogComponentPanel:
@@ -2455,16 +2548,19 @@ func handleNonTypingLeftAngleBracketKeyBindingInteraction(m *types.GittiModel) (
 func handleNonTypingRightAngleBracketKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
 	if !m.ShowPopUp.Load() {
 		switch m.CurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_TAG
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_TAG
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_TAG:
-				m.CurrentLocalBranchOrTagOrRemoteComponentShowing = constant.SHOW_REMOTE
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_REMOTE
 				services.FetchDetailComponentPanelInfoService(m, true)
 			case constant.SHOW_REMOTE:
-				// do nothing, as remote is currently the most right option in the local branch or tag or remote component panel
+				m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing = constant.SHOW_WORKTREE
+				services.FetchDetailComponentPanelInfoService(m, true)
+			case constant.SHOW_WORKTREE:
+				// do nothing, as worktree is currently the most right option in the local branch or tag or remote or worktree component panel
 			}
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
@@ -2565,8 +2661,8 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.PopUpType = constant.GitCherryPickFromRefLogApplyConfirmationPopUp
 				reflogPopUp.InitGitCherryPickFromRefLogApplyConfirmationPopUpModel(m, parsedSelectedReflog.Hash, parsedSelectedReflog.Head, parsedSelectedReflog.Action, parsedSelectedReflog.ActionInfo)
 			}
-		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteComponentPanel) &&
-			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagOrRemoteComponentShowing == constant.SHOW_TAG {
+		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel) &&
+			len(m.CurrentRepoTagInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_TAG {
 			selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
 			if selectedTag == nil {
 				return m, nil
@@ -2595,6 +2691,9 @@ func handleNonTypingCtrlpKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					remotePopUp.InitChooseRemotePopUpModel(m, remotes, constant.TAGPUSHACTION)
 				}
 			}
+		} else if (m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel || m.DetailPanelParentComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel) &&
+			len(m.CurrentRepoWorktreeInfoList.Items()) > 0 && m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing == constant.SHOW_WORKTREE {
+			services.PruneWorktreesService(m)
 		}
 	}
 	return m, nil

@@ -104,6 +104,12 @@ type LanguageMapping struct {
 	Stash                       string
 	Tag                         string
 	Remote                      string
+	Worktree                    string
+	WorktreeIsMain              string
+	WorktreeIsCurrent           string
+	WorktreeIsLocked            string
+	WorktreeIsPrunable          string
+	WorktreeLockedReason        string
 	Fetch                       string
 	Push                        string
 	FileTypeUnSupportedPreview  string
@@ -138,6 +144,10 @@ type LanguageMapping struct {
 	KeyBindingTagComponentDefault                              []string
 	KeyBindingRemoteComponentNone                              []string
 	KeyBindingRemoteComponentDefault                           []string
+	KeyBindingWorktreeComponentMainWorktree                    []string
+	KeyBindingWorktreeComponentMainWorktreeSwitchable          []string
+	KeyBindingWorktreeComponent                                []string
+	KeyBindingWorktreeComponentSwitchable                      []string
 	KeyBindingModifiedFilesComponentConflict                   []string
 	KeyBindingModifiedFilesComponentIsStaged                   []string
 	KeyBindingModifiedFilesComponentDefault                    []string
@@ -160,6 +170,10 @@ type LanguageMapping struct {
 	KeyBindingForChoosePushTypePopUp                           []string
 	KeyBindingForChooseNewBranchTypePopUp                      []string
 	KeyBindingForCreateNewBranchPopUp                          []string
+	KeyBindingForWorktreeAddNewWorktreePopUp                   []string
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp             []string
+	KeyBindingForWorktreeLockReasonInputPopUp                  []string
+	KeyBindingForWorktreeRemoveConfirmationPopUp               []string
 	KeyBindingForChooseSwitchBranchTypePopUp                   []string
 	KeyBindingForSwitchBranchOutputPopUp                       []string
 	KeyBindingForChooseGitPullTypePopUp                        []string
@@ -225,6 +239,8 @@ type LanguageMapping struct {
 	TagComponentKeyBinding []KeyBindingMappingFormat
 	// Remote Component KeyBinding
 	RemoteComponentKeyBinding []KeyBindingMappingFormat
+	// Worktree Component KeyBinding
+	WorktreeComponentKeyBinding []KeyBindingMappingFormat
 	// Modified Files Component KeyBinding
 	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Commit Log Component KeyBinding
@@ -269,10 +285,19 @@ type LanguageMapping struct {
 	ForcePushSafe      string
 	ForcePushDangerous string
 	// Create New Branch
-	CreateNewBranchPrompt    string
-	EnterRemoteBranchPrompt  string
-	ChooseNewBranchTypeTitle string
-	NewBranchInvalidWarning  string
+	CreateNewBranchPrompt      string
+	EnterRemoteBranchPrompt    string
+	CreateNewWorktreePrompt    string
+	NewWorktreeBranchPrompt    string
+	WorktreeLockReasonPrompt   string
+	WorktreeLockReasonTitle    string
+	WorktreeRemoveConfirmation string
+	AddNewWorktreeTitle        string
+	NewWorktreeTitle           string
+	AddingNewWorktree          string
+	NewWorktreeBranchTitle     string
+	ChooseNewBranchTypeTitle   string
+	NewBranchInvalidWarning    string
 	// Create Branch Option
 	CreateNewBranchTitle                                 string
 	CreateNewBranchDescription                           string

@@ -19,7 +19,7 @@ import (
 )
 
 type GitDaemon struct {
-	repoPath                            string
+	mainGitRepoPath                     string
 	watcher                             *fsnotify.Watcher
 	debounceDur                         time.Duration
 	gitFilesActiveRefreshDur            time.Duration
@@ -41,7 +41,7 @@ type GitDaemon struct {
 	errorLog                            []error
 	updateChannel                       chan string // to communicate back to main thread for an update event
 	daemonReceiverChannel               chan string // this is used to receive signal from main thread by the daemon
-	gitOperations                       *GitOperations
+	gitOperations                       atomic.Pointer[GitOperations]
 	allowCommitGraphWrite               bool
 	gittiLogger                         *logging.GittiLogging
 }
@@ -53,7 +53,7 @@ var GITDAEMON *GitDaemon
 //	Initialize the file system watcher daemon for monitoring git repository changes
 //
 // ------------------------------------
-func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperations *GitOperations, allowCommitGraphWrite bool, daemonReceiverChannel chan string, gittiLogger *logging.GittiLogging) {
+func InitGitDaemon(absoluteMainGitPath string, updateChannel chan string, gitOperations *GitOperations, allowCommitGraphWrite bool, daemonReceiverChannel chan string, gittiLogger *logging.GittiLogging) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		// Log the critical error - this means file watching won't work
@@ -67,7 +67,7 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 	gitFilesActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitFilesActiveRefreshDurationMS) * time.Millisecond
 	gitRemoteSyncStatusActiveRefreshDur := time.Duration(settings.GITTICONFIGSETTINGS.GitRemoteSyncStatusDurationMS) * time.Millisecond
 	gd := &GitDaemon{
-		repoPath:                            absoluteGitPath,
+		mainGitRepoPath:                     absoluteMainGitPath,
 		watcher:                             w,
 		debounceDur:                         debounce,
 		gitFilesActiveRefreshDur:            gitFilesActiveRefreshDur,
@@ -78,11 +78,11 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 		stopChannel:                         make(chan struct{}),
 		errorLog:                            make([]error, 0),
 		updateChannel:                       updateChannel,
-		gitOperations:                       gitOperations,
 		daemonReceiverChannel:               daemonReceiverChannel,
 		allowCommitGraphWrite:               allowCommitGraphWrite,
 		gittiLogger:                         gittiLogger,
 	}
+	gd.gitOperations.Store(gitOperations)
 	gd.isGitFilesPassiveActiveRunning.Store(false)
 	gd.isGitRemoteSyncStatusActiveRunning.Store(false)
 	gd.isGitBranchPassiveRunning.Store(false)
@@ -101,16 +101,37 @@ func InitGitDaemon(absoluteGitPath string, updateChannel chan string, gitOperati
 
 // ------------------------------------
 //
+//	Swap the daemon's GitOperations reference, used after a worktree switch when a
+//	fresh GitOperations (with re-resolved paths) is rebuilt. Mirrors how the cmd
+//	executor's repo dir is updated.
+//
+// ------------------------------------
+func (gd *GitDaemon) UpdateGitOperations(gitOperations *GitOperations) {
+	gd.gitOperations.Store(gitOperations)
+}
+
+// ------------------------------------
+//
+//	Trigger one full latest-info fetch across all git operations (with remote fetch),
+//	used to repopulate state immediately after a worktree switch.
+//
+// ------------------------------------
+func (gd *GitDaemon) TriggerFullInfoFetch() {
+	gd.gitLatestInfoFetch(true)
+}
+
+// ------------------------------------
+//
 //	Register the repo directory paths for file watching, skipping noisy/irrelevant
 //	dirs (objects, hooks, lfs, rr-cache, lost-found)
 //
 // ------------------------------------
 func (gd *GitDaemon) watchPath() {
-	err := gd.watcher.Add(gd.repoPath)
+	err := gd.watcher.Add(gd.mainGitRepoPath)
 	if err != nil {
 		gd.errorLog = append(gd.errorLog, err)
 	}
-	err = filepath.WalkDir(gd.repoPath, func(path string, d fs.DirEntry, err error) error {
+	err = filepath.WalkDir(gd.mainGitRepoPath, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			if gd.isSkippableGitDir(path) {
 				return fs.SkipDir
@@ -183,8 +204,9 @@ func (gd *GitDaemon) Start() {
 					if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
 						// Mark as running
 						defer gd.isGitFilesPassiveActiveRunning.Store(false)
-						gd.gitOperations.GitFiles.GetGitFilesStatus()
-						gd.gitOperations.GitStateUniversalUtils.CheckCurrentGitState()
+						gitOps := gd.gitOperations.Load()
+						gitOps.GitFiles.GetGitFilesStatus()
+						gitOps.GitStateUniversalUtils.CheckCurrentGitState()
 						gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
 						gd.updateChannel <- git.GIT_STATE_UPDATE
 					}
@@ -195,8 +217,9 @@ func (gd *GitDaemon) Start() {
 				go func() {
 					if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 						defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
-						gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, false)
-						gd.gitOperations.GitBranch.GetLatestRemoteBranchesInfo()
+						gitOps := gd.gitOperations.Load()
+						gitOps.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, false)
+						gitOps.GitBranch.GetLatestRemoteBranchesInfo()
 						gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 					}
 				}()
@@ -206,8 +229,9 @@ func (gd *GitDaemon) Start() {
 					go func() {
 						if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 							defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
-							gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, true)
-							gd.gitOperations.GitBranch.GetLatestRemoteBranchesInfo()
+							gitOps := gd.gitOperations.Load()
+							gitOps.GitRemote.GetLatestRemoteSyncStatusAndUpstream(true, true)
+							gitOps.GitBranch.GetLatestRemoteBranchesInfo()
 							gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 						} else {
 							gd.gittiLogger.RegisterNewLog(logging.FETCH_OPS, "", logging.WARN, "[WARN]: A background process to fetch is already running", false)
@@ -246,8 +270,9 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 	go func() {
 		if gd.isGitFilesPassiveActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitFilesPassiveActiveRunning.Store(false)
-			gd.gitOperations.GitFiles.GetGitFilesStatus()
-			gd.gitOperations.GitStateUniversalUtils.CheckCurrentGitState()
+			gitOps := gd.gitOperations.Load()
+			gitOps.GitFiles.GetGitFilesStatus()
+			gitOps.GitStateUniversalUtils.CheckCurrentGitState()
 			gd.updateChannel <- git.GIT_FILES_STATUS_UPDATE
 			gd.updateChannel <- git.GIT_STATE_UPDATE
 		}
@@ -255,57 +280,59 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 	go func() {
 		if gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitBranchPassiveRunning.Store(false)
-			gd.gitOperations.GitBranch.GetLatestBranchesInfo()
+			gd.gitOperations.Load().GitBranch.GetLatestBranchesInfo()
 			gd.updateChannel <- git.GIT_BRANCH_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)
-			gd.gitOperations.GitRemote.GetLatestRemoteSyncStatusAndUpstream(needFetch, false)
-			gd.gitOperations.GitBranch.GetLatestRemoteBranchesInfo()
+			gitOps := gd.gitOperations.Load()
+			gitOps.GitRemote.GetLatestRemoteSyncStatusAndUpstream(needFetch, false)
+			gitOps.GitBranch.GetLatestRemoteBranchesInfo()
 			gd.updateChannel <- git.GIT_REMOTE_SYNC_STATUS_AND_UPSTREAM_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitCommitLogPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitCommitLogPassiveRunning.Store(false)
-			gd.gitOperations.GitCommitLog.GetCommitLogs()
+			gd.gitOperations.Load().GitCommitLog.GetCommitLogs()
 			gd.updateChannel <- git.GIT_COMMITLOG_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitRefLogPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRefLogPassiveRunning.Store(false)
-			gd.gitOperations.GitRefLog.GetLatestRefLog()
+			gd.gitOperations.Load().GitRefLog.GetLatestRefLog()
 			gd.updateChannel <- git.GIT_REFLOG_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitStashPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitStashPassiveRunning.Store(false)
-			gd.gitOperations.GitStash.GetLatestStashInfo()
+			gd.gitOperations.Load().GitStash.GetLatestStashInfo()
 			gd.updateChannel <- git.GIT_STASH_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitTagPassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitTagPassiveRunning.Store(false)
-			gd.gitOperations.GitTag.GetLatestGitTag()
+			gd.gitOperations.Load().GitTag.GetLatestGitTag()
 			gd.updateChannel <- git.GIT_TAG_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitRemotePassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRemotePassiveRunning.Store(false)
-			gd.gitOperations.GitRemote.CheckRemoteExist(true)
+			gd.gitOperations.Load().GitRemote.CheckRemoteExist(true)
 			gd.updateChannel <- git.GIT_REMOTE_UPDATE
 		}
 	}()
 	go func() {
 		if gd.isGitWorktreePassiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitWorktreePassiveRunning.Store(false)
-			gd.gitOperations.GitWorktree.GetLatestWorktreeInfos()
+			gd.gitOperations.Load().GitWorktree.GetLatestWorktreeInfos()
+			gd.updateChannel <- git.GIT_WORKTREE_UPDATE
 		}
 	}()
 }
@@ -317,7 +344,7 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 // ------------------------------------
 func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 	// Only watch .git subpaths
-	if !strings.Contains(event.Name, filepath.Join(gd.repoPath)) {
+	if !strings.Contains(event.Name, filepath.Join(gd.mainGitRepoPath)) {
 		return false
 	}
 
@@ -360,7 +387,7 @@ func (gd *GitDaemon) isRelevantEvent(event fsnotify.Event) bool {
 func (gd *GitDaemon) commitGraphWriteOnce() {
 	go func() {
 		if gd.allowCommitGraphWrite {
-			gd.gitOperations.GitCommitLog.WriteCommitGraph()
+			gd.gitOperations.Load().GitCommitLog.WriteCommitGraph()
 		}
 	}()
 }

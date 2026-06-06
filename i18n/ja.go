@@ -77,6 +77,12 @@ var jA = LanguageMapping{
 	Stash:                               "スタッシュ",
 	Tag:                                 "タグ",
 	Remote:                              "リモート",
+	Worktree:                            "ワークツリー",
+	WorktreeIsMain:                      "メイン",
+	WorktreeIsCurrent:                   "現在のワークツリー",
+	WorktreeIsLocked:                    "ロック",
+	WorktreeIsPrunable:                  "プルーン可能",
+	WorktreeLockedReason:                "ロック理由",
 	Fetch:                               "フェッチ",
 	Push:                                "プッシュ",
 	FileTypeUnSupportedPreview:          "現在選択されているファイル形式はプレビューに対応していません",
@@ -147,6 +153,37 @@ var jA = LanguageMapping{
 		"[d] リモートを削除",
 		"[e] リモートを編集",
 		"[enter] 上流として追跡を設定",
+		"[?] キー操作と説明",
+	},
+	KeyBindingWorktreeComponentMainWorktree: []string{
+		"[</>] コンポーネントを切り替え",
+		"[n] 新しいワークツリー",
+		"[ctrl+p] ワークツリーをプルーン",
+		"[?] キー操作と説明",
+	},
+	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
+		"[</>] コンポーネントを切り替え",
+		"[Enter] ワークツリーを切り替え",
+		"[n] 新しいワークツリー",
+		"[ctrl+p] ワークツリーをプルーン",
+		"[?] キー操作と説明",
+	},
+
+	KeyBindingWorktreeComponent: []string{
+		"[</>] コンポーネントを切り替え",
+		"[backspace] ワークツリーを削除",
+		"[n] 新しいワークツリー",
+		"[o] ワークツリーをロック/解除",
+		"[ctrl+p] ワークツリーをプルーン",
+		"[?] キー操作と説明",
+	},
+	KeyBindingWorktreeComponentSwitchable: []string{
+		"[</>] コンポーネントを切り替え",
+		"[Enter] ワークツリーを切り替え",
+		"[backspace] ワークツリーを削除",
+		"[n] 新しいワークツリー",
+		"[o] ワークツリーをロック/解除",
+		"[ctrl+p] ワークツリーをプルーン",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -282,6 +319,23 @@ var jA = LanguageMapping{
 	KeyBindingForCreateNewBranchPopUp: []string{
 		"[enter] ブランチを追加",
 		"[esc] キャンセルして閉じる",
+	},
+	KeyBindingForWorktreeAddNewWorktreePopUp: []string{
+		"[tab] 次の入力へ移動",
+		"[shift+tab] 前の入力へ移動",
+		"[enter] ワークツリーを追加",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForWorktreeAddNewWorktreeOutputPopUp: []string{
+		"[esc] 閉じる",
+	},
+	KeyBindingForWorktreeLockReasonInputPopUp: []string{
+		"[enter] ワークツリーをロック",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForWorktreeRemoveConfirmationPopUp: []string{
+		"[enter] ワークツリーを削除",
+		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForChooseSwitchBranchTypePopUp: []string{
 		"[↑/↓] 上下に移動",
@@ -530,6 +584,7 @@ var jA = LanguageMapping{
 	LocalBranchComponentKeyBinding:                                 jaLocalBranchComponentKeyBinding,
 	TagComponentKeyBinding:                                         jaTagComponentKeyBinding,
 	RemoteComponentKeyBinding:                                      jaRemoteComponentKeyBinding,
+	WorktreeComponentKeyBinding:                                    jaWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                               jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                   jaCommitLogComponentKeyBinding,
 	RefLogComponentKeyBinding:                                      jaRefLogComponentKeyBinding,
@@ -563,6 +618,15 @@ var jA = LanguageMapping{
 	ForcePushDangerous:                                             "強制プッシュ（危険）",
 	CreateNewBranchPrompt:                                          "新しいブランチ名を入力してください",
 	EnterRemoteBranchPrompt:                                        "リモートブランチ名を入力してください",
+	CreateNewWorktreePrompt:                                        "新しいワークツリー名を入力してください",
+	NewWorktreeBranchPrompt:                                        "任意: ブランチ名（remote/local）. origin/<branch> は detached HEAD",
+	WorktreeLockReasonPrompt:                                       "任意: このワークツリーをロックする理由",
+	WorktreeLockReasonTitle:                                        "ワークツリーのロック理由 (%s)",
+	WorktreeRemoveConfirmation:                                     "次のワークツリーを削除してもよろしいですか？",
+	AddNewWorktreeTitle:                                            "新しいワークツリー名",
+	NewWorktreeTitle:                                               "新しいワークツリーを追加",
+	AddingNewWorktree:                                              "新しいワークツリーを追加中...",
+	NewWorktreeBranchTitle:                                         "ワークツリーブランチ（任意）",
 	ChooseNewBranchTypeTitle:                                       "新しい Git ブランチを作成する際、どの方法で進めますか？",
 	NewBranchInvalidWarning:                                        "ブランチ名の命名が無効です。代わりに `%s` に置き換えられます",
 	CreateNewBranchTitle:                                           "新しいブランチを作成",
@@ -1044,6 +1108,55 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "上流として追跡を設定",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+}
+
+// Worktree Component Key Binding for ja
+var jaWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- ワークツリーコンポーネントパネル キー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "</>",
+		TitleOrInfoLine: "ローカルブランチ/タグ/リモート/ワークツリーを切り替え",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "ワークツリーを切り替え（現在または削除可能な場合は利用不可）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "backspace",
+		TitleOrInfoLine: "ワークツリーを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "n",
+		TitleOrInfoLine: "新しいワークツリー",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "ワークツリーをロック/解除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+p",
+		TitleOrInfoLine: "ワークツリーをプルーン",
 		LineType:        INFO,
 	},
 	{
@@ -1886,6 +1999,59 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 最も古い選択コミットとHEADの間のマージコミットも削除される",
 			"5. `enter` を押して drop 出力ポップアップへ進む",
 			"6. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーを追加 (add worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `n` を押して新規ワークツリー追加ポップアップを開く",
+			"3. ワークツリー名を入力",
+			"   - `tab` を押してブランチ欄に移動し、チェックアウトするブランチを設定",
+			"   - `shift+tab` を押して前の入力欄に戻る",
+			"4. `enter` を押してワークツリーを作成",
+			"5. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーを切り替え (switch worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `↑/↓` で対象のワークツリーを選択",
+			"3. `enter` を押して切り替え",
+			"   - 現在のワークツリーまたは削除可能なワークツリーの場合は利用不可",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーを削除 (remove worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `↑/↓` で削除するワークツリーを選択",
+			"3. `backspace` を押して削除確認ポップアップを開く",
+			"4. `enter` を押して削除を確定、または `esc` でキャンセル",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーをプルーン (prune worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `ctrl+p` を押して古いワークツリー管理ファイルをプルーン",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーをロック / 解除 (lock / unlock worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `↑/↓` で対象のワークツリーを選択",
+			"3. `o` を押してロック状態を切り替え",
+			"   - 現在ロック解除中の場合、ロック理由ポップアップが開く。任意で理由を入力し `enter` でロック",
+			"   - 現在ロック中の場合、即座にロック解除される",
+			"   - メインワークツリーはロック / 解除できない",
 		},
 		LineType: INFO,
 	},

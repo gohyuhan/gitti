@@ -69,6 +69,10 @@ const (
 	InteractiveRebaseRewordOutputPopUp            = "InteractiveRebaseRewordOutputPopUp"            // IsTyping will be false
 	InteractiveRebaseDropSelectionPopUp           = "InteractiveRebaseDropSelectionPopUp"           // IsTyping will be false
 	InteractiveRebaseDropOutputPopUp              = "InteractiveRebaseDropOutputPopUp"              // IsTyping will be false
+	WorktreeAddNewWorktreePopUp                   = "WorktreeAddNewWorktreePopUp"                   // IsTyping will be true
+	WorktreeAddNewWorktreeOutputPopUp             = "WorktreeAddNewWorktreeOutputPopUp"             // IsTyping will be false
+	WorktreeLockReasonInputPopUp                  = "WorktreeLockReasonInputPopUp"                  // IsTyping will be true
+	WorktreeRemoveWorktreeConfirmationPopUp       = "WorktreeRemoveWorktreeConfirmationPopUp"       // IsTyping will be false
 )
 
 const (
@@ -152,7 +156,11 @@ const (
 	MaxInteractiveRebaseRewordCommitPopUpWidth = 150
 	MaxInteractiveRebaseRewordOutputPopUpWidth = 150
 	// InteractiveRebaseDropSelectionPopUpWidth will not be set as it will always take up 90% of the width
-	MaxInteractiveRebaseDropOutputPopUpWidth = 150
+	MaxInteractiveRebaseDropOutputPopUpWidth        = 150
+	MaxWorktreeAddNewWorktreePopUpWidth             = 150
+	MaxWorktreeAddNewWorktreeOutputPopUpWidth       = 150
+	MaxWorktreeLockReasonInputPopUpWidth            = 150
+	MaxWorktreeRemoveWorktreeConfirmationPopUpWdith = 150
 
 	PopUpGlobalKeyBindingViewPortHeight                       = 18
 	PopUpGitCommitOutputViewPortHeight                        = 10
@@ -194,15 +202,16 @@ const (
 	PopUpInteractiveRebaseFixupSquashOutputviewportHeight     = 8
 	PopUpInteractiveRebaseRewordOutputviewportHeight          = 8
 	PopUpInteractiveRebaseDropOutputviewportHeight            = 8
+	PopUpWorktreeAddNewWorktreeOutputViewportHeight           = 8
 )
 
 // variables for indicating which component panel or whatever the hell you wanna call it that the user is currently landed or selected, so that they can do precious action related to the part of whatever the hell you wanna call it
 const (
-	GitStatusComponentPanel                = "C0" // component panel index 0
-	LocalBranchOrTagOrRemoteComponentPanel = "C1" // component panel index 1 (local branch component, tag component and remote component share the same panel)
-	ModifiedFilesComponentPanel            = "C2" // component panel index 2
-	CommitLogOrRefLogComponentPanel        = "C3" // component panel index 3 (commit log component and ref log component share the same panel)
-	StashComponentPanel                    = "C4" // component panel index 4
+	GitStatusComponentPanel                          = "C0" // component panel index 0
+	LocalBranchOrTagOrRemoteOrWorktreeComponentPanel = "C1" // component panel index 1 (local branch component, tag component, remote component and worktree component share the same panel)
+	ModifiedFilesComponentPanel                      = "C2" // component panel index 2
+	CommitLogOrRefLogComponentPanel                  = "C3" // component panel index 3 (commit log component and ref log component share the same panel)
+	StashComponentPanel                              = "C4" // component panel index 4
 
 	LogComponentPanel = "L0" // this can be selected by keybinding but not by number
 
@@ -215,7 +224,7 @@ const (
 // will be used by the key binding navigation of going to previous or next component panel
 var ComponentPanelNavigationList = []string{
 	GitStatusComponentPanel,
-	LocalBranchOrTagOrRemoteComponentPanel,
+	LocalBranchOrTagOrRemoteOrWorktreeComponentPanel,
 	ModifiedFilesComponentPanel,
 	CommitLogOrRefLogComponentPanel,
 	StashComponentPanel,
@@ -253,11 +262,12 @@ const (
 	APPLYCHERRYPICK = "APPLYCHERRYPICK"
 )
 
-// to indicate which component is showing in LocalBranchOrTagOrRemoteComponentPanel
+// to indicate which component is showing in LocalBranchOrTagOrRemoteOrWorktreeComponentPanel
 const (
 	SHOW_LOCAL_BRANCH = "SHOW_LOCAL_BRANCH"
 	SHOW_TAG          = "SHOW_TAG"
 	SHOW_REMOTE       = "SHOW_REMOTE"
+	SHOW_WORKTREE     = "SHOW_WORKTREE"
 )
 
 // to indicate which component is showing in CommitLogOrRefLogComponentPanel
@@ -293,4 +303,5 @@ const (
 	INTERACTIVE_REBASE_DROP_RESULT_EVENT                     = "INTERACTIVE_REBASE_DROP_RESULT_EVENT"
 	INTERACTIVE_REBASE_DROP_FETCH_COMMITS_INFO_EVENT         = "INTERACTIVE_REBASE_DROP_FETCH_COMMITS_INFO_EVENT"
 	REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT                   = "REINIT_CHERRY_PICKED_COMMIT_INFO_EVENT"
+	WORKTREE_NEW_WORKTREE_RESULT_EVENT                       = "WORKTREE_NEW_WORKTREE_RESULT_EVENT"
 )

@@ -68,6 +68,10 @@ func (gl *GittiLogging) GetFullLogs() []LogItem {
 	return gl.logs
 }
 
+func (gl *GittiLogging) ClearLogs() {
+	gl.logs = make([]LogItem, 0, gl.maxLogsCount)
+}
+
 // ------------------------------------
 //
 //	Create and append a new log entry, evicting the oldest entry if at capacity

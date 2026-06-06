@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
@@ -15,6 +16,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
 	"github.com/gohyuhan/gitti/tui/component/tag"
+	"github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -86,14 +88,16 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			theCurrentSelectedComponent = m.CurrentSelectedComponent
 		}
 		switch theCurrentSelectedComponent {
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
 				contentLine = generateAboutGittiContent()
 			case constant.SHOW_TAG:
 				contentLine = generateTagDetailPanelContent(ctx, m)
 			case constant.SHOW_REMOTE:
 				contentLine = generateRemoteDetailPanelContent(m)
+			case constant.SHOW_WORKTREE:
+				contentLine = generateWorktreeDetailPanelContent(m)
 			}
 		case constant.ModifiedFilesComponentPanel:
 			contentLine, contentLine2, ogDiffLine1, ogDiffLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
@@ -181,53 +185,119 @@ func generateRemoteDetailPanelContent(m *types.GittiModel) string {
 	vpLine.WriteString("]")
 	vpLine.WriteRune('\n')
 	vpLine.WriteRune('\n')
-	// Calculate the length of all labels to align URL, Fetch, and Push values
 	urlLabel := "URL:"
 	fetchLabel := i18n.LANGUAGEMAPPING.Fetch
 	pushLabel := i18n.LANGUAGEMAPPING.Push
-	urlLen := len([]rune(urlLabel))
-	fetchLen := len([]rune(fetchLabel))
-	pushLen := len([]rune(pushLabel))
-	maxLen := max(urlLen, max(fetchLen, pushLen)) + 1 // plus 1 for spacing
 
-	// Render URL with padding
-	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(urlLabel))
-	for i := 0; i < maxLen-urlLen; i++ {
+	writeCheckBox := func(isChecked bool) {
+		if isChecked {
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		} else {
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("[ ]"))
+		}
 		vpLine.WriteString(" ")
 	}
+
+	// URL has no checkbox; indent 4 to align with labels after the "[X] " prefix
+	vpLine.WriteString("    ")
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(urlLabel))
+	vpLine.WriteString(" ")
 	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(remoteItem.Url))
 	vpLine.WriteRune('\n')
 
-	// Render Fetch with padding
+	writeCheckBox(remoteItem.Fetch)
 	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(fetchLabel))
-	for i := 0; i < maxLen-fetchLen; i++ {
-		vpLine.WriteString(" ")
-	}
-	if remoteItem.Fetch {
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
-	} else {
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
-		vpLine.WriteString(" ")
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
-	}
 	vpLine.WriteRune('\n')
 
-	// Render Push with padding
+	writeCheckBox(remoteItem.Push)
 	vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(pushLabel))
-	for i := 0; i < maxLen-pushLen; i++ {
-		vpLine.WriteString(" ")
-	}
-	if remoteItem.Push {
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+	vpLine.WriteRune('\n')
+
+	return vpLine.String()
+}
+
+// ------------------------------------
+//
+//	Generate worktree detail panel content
+//
+// ------------------------------------
+func generateWorktreeDetailPanelContent(m *types.GittiModel) string {
+	currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
+	var worktreeItem worktree.GitWorktreeItem
+	if currentSelectedWorktree != nil {
+		worktreeItem = currentSelectedWorktree.(worktree.GitWorktreeItem)
 	} else {
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
-		vpLine.WriteString(" ")
-		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		return ""
 	}
+
+	var vpLine strings.Builder
+
+	vpLine.WriteRune('[')
+	vpLine.WriteString(style.NewStyle.Foreground(style.ColorYellowWarm).Render(worktreeItem.WorktreePath))
+	vpLine.WriteRune(']')
+	vpLine.WriteRune('\n')
+	vpLine.WriteRune('\n')
+
+	if utf8.RuneCountInString(worktreeItem.WorktreeHead) > 0 {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("HEAD "))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(worktreeItem.WorktreeHead))
+		vpLine.WriteRune('\n')
+	}
+
+	if utf8.RuneCountInString(worktreeItem.WorktreeBranch) > 0 {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("branch "))
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(worktreeItem.WorktreeBranch))
+		vpLine.WriteRune('\n')
+	}
+
+	vpLine.WriteRune('\n')
+
+	mainLabel := i18n.LANGUAGEMAPPING.WorktreeIsMain
+	currentLabel := i18n.LANGUAGEMAPPING.WorktreeIsCurrent
+	lockedLabel := i18n.LANGUAGEMAPPING.WorktreeIsLocked + " \uf456"
+	prunableLabel := i18n.LANGUAGEMAPPING.WorktreeIsPrunable + " \uea81"
+	lockedReasonLabel := i18n.LANGUAGEMAPPING.WorktreeLockedReason
+
+	writeLabel := func(label string) {
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render(label))
+	}
+
+	writeCheckBox := func(isChecked bool) {
+		if isChecked {
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("["))
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render("X"))
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("]"))
+		} else {
+			vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleVibrant).Render("[ ]"))
+		}
+		vpLine.WriteString(" ")
+	}
+
+	writeCheckBox(worktreeItem.IsMain)
+	writeLabel(mainLabel)
+	vpLine.WriteRune('\n')
+
+	writeCheckBox(worktreeItem.IsInCurrentWorktree)
+	writeLabel(currentLabel)
+	vpLine.WriteRune('\n')
+
+	writeCheckBox(worktreeItem.IsLocked)
+	writeLabel(lockedLabel)
+	vpLine.WriteRune('\n')
+
+	if worktreeItem.IsLocked && utf8.RuneCountInString(worktreeItem.LockReason) > 0 {
+		// indent 4 to align with labels that follow the "[X] " checkbox prefix
+		vpLine.WriteString("    ")
+		writeLabel(lockedReasonLabel + ":")
+		vpLine.WriteString(" ")
+		vpLine.WriteString(style.NewStyle.Foreground(style.ColorPurpleSoft).Render(worktreeItem.LockReason))
+		vpLine.WriteRune('\n')
+	}
+
+	writeCheckBox(worktreeItem.IsPrunable)
+	writeLabel(prunableLabel)
 	vpLine.WriteRune('\n')
 
 	return vpLine.String()

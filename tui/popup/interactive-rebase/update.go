@@ -104,7 +104,6 @@ func UpdateInteractiveRebaseFixupSquashResultEvent(m *types.GittiModel, updateDa
 			popUp.ProcessSuccess.Store(false)
 			popUp.HasError.Store(true)
 		}
-
 	}
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
+	worktreeComponent "github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
@@ -74,23 +75,25 @@ func renderGitStatusComponentPanel(m *types.GittiModel) string {
 
 // ------------------------------------
 //
-//	Render the left-column panel that switches between local branches, tags, and
-//	remotes based on m.CurrentLocalBranchOrTagOrRemoteComponentShowing.
+//	Render the left-column panel that switches between local branches, tags,
+//	remotes, and worktrees based on m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing.
 //
 // ------------------------------------
-func renderLocalBranchesOrTagOrRemoteComponentPanel(width int, height int, m *types.GittiModel) string {
+func renderLocalBranchesOrTagOrRemoteOrWorktreeComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteComponentPanel {
+	if m.CurrentSelectedComponent == constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 	var content string
-	switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+	switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 	case constant.SHOW_LOCAL_BRANCH:
 		content = m.CurrentRepoBranchesInfoList.View()
 	case constant.SHOW_TAG:
 		content = m.CurrentRepoTagInfoList.View()
 	case constant.SHOW_REMOTE:
 		content = m.CurrentRepoRemoteInfoList.View()
+	case constant.SHOW_WORKTREE:
+		content = m.CurrentRepoWorktreeInfoList.View()
 	}
 	return borderStyle.
 		Width(width).
@@ -339,6 +342,14 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseNewBranchTypePopUp
 		case constant.CreateNewBranchPopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForCreateNewBranchPopUp
+		case constant.WorktreeAddNewWorktreePopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeAddNewWorktreePopUp
+		case constant.WorktreeAddNewWorktreeOutputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeAddNewWorktreeOutputPopUp
+		case constant.WorktreeLockReasonInputPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeLockReasonInputPopUp
+		case constant.WorktreeRemoveWorktreeConfirmationPopUp:
+			keys = i18n.LANGUAGEMAPPING.KeyBindingForWorktreeRemoveConfirmationPopUp
 		case constant.ChooseSwitchBranchTypePopUp:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForChooseSwitchBranchTypePopUp
 		case constant.SwitchBranchOutputPopUp:
@@ -484,14 +495,14 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		switch m.CurrentSelectedComponent {
 		case constant.GitStatusComponentPanel:
 			keys = i18n.LANGUAGEMAPPING.KeyBindingForGitStatusComponent
-		case constant.LocalBranchOrTagOrRemoteComponentPanel:
-			switch m.CurrentLocalBranchOrTagOrRemoteComponentShowing {
+		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
 			case constant.SHOW_LOCAL_BRANCH:
-				CurrentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
-				if CurrentSelectedBranch == nil {
+				currentSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
+				if currentSelectedBranch == nil {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentNone
 				} else {
-					isCurrentSelectedBranchCheckedOutBranch := CurrentSelectedBranch.(branchComponent.GitBranchItem).IsCheckedOut
+					isCurrentSelectedBranchCheckedOutBranch := currentSelectedBranch.(branchComponent.GitBranchItem).IsCheckedOut
 					if isCurrentSelectedBranchCheckedOutBranch {
 						keys = i18n.LANGUAGEMAPPING.KeyBindingLocalBranchComponentIsCheckOut
 					} else {
@@ -499,18 +510,39 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 					}
 				}
 			case constant.SHOW_TAG:
-				CurrentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
-				if CurrentSelectedTag == nil {
+				currentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+				if currentSelectedTag == nil {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentNone
 				} else {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingTagComponentDefault
 				}
 			case constant.SHOW_REMOTE:
-				CurrentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
-				if CurrentSelectedRemote == nil {
+				currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
+				if currentSelectedRemote == nil {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingRemoteComponentNone
 				} else {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingRemoteComponentDefault
+				}
+			case constant.SHOW_WORKTREE:
+				currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if currentSelectedWorktree != nil {
+					selectedWorktree := currentSelectedWorktree.(worktreeComponent.GitWorktreeItem)
+					// switchable variants append the [enter] switch hint; used only when the
+					// worktree is a valid switch target (not current and not prunable). the main
+					// worktree can't be removed/locked so it keeps its own reduced key set.
+					if selectedWorktree.IsMain {
+						if selectedWorktree.IsInCurrentWorktree {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentMainWorktree
+						} else {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentMainWorktreeSwitchable
+						}
+					} else {
+						if selectedWorktree.IsInCurrentWorktree || selectedWorktree.IsPrunable {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponent
+						} else {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentSwitchable
+						}
+					}
 				}
 			}
 		case constant.ModifiedFilesComponentPanel:
