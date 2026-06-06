@@ -140,7 +140,7 @@ func main() {
 			return msg
 		}
 
-		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, gitRepoPathInfo.TopLevelRepoPath, gitRepoPathInfo.RepoName, gitOperations, gittiLogging, daemonUpdateChannel)
+		gittiAppModel := tui.NewGittiAppModel(tuiUpdateChannel, gitRepoPathInfo.TopLevelRepoPath, gitRepoPathInfo.RepoName, gitOperations, gittiLogging, daemonUpdateChannel, gitUpdateChannel)
 		gitti := tea.NewProgram(
 			gittiAppModel,
 			tea.WithFilter(mouseThrottle),

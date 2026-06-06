@@ -43,13 +43,13 @@ func IsGitInstalled(repoPath string) {
 //
 // ------------------------------------
 func IsRepoGitInitialized(repoPath string) GitRepoPath {
-	gitPathInfo, err := getGitPathInfo()
+	gitPathInfo, err := GetGitPathInfo()
 	if err != nil {
 		// .git does not exist or some other error
 		PromptUserForGitInitConfirmation(repoPath)
 
 		// reassign again if user choose to init the repo after prompt
-		gitPathInfo, err = getGitPathInfo()
+		gitPathInfo, err = GetGitPathInfo()
 	}
 
 	return gitPathInfo
@@ -187,7 +187,7 @@ func IsBranchNameValid(branchName string) (string, bool) {
 //	Get the top-level, absolute git path and the absolute worktree path
 //
 // ------------------------------------
-func getGitPathInfo() (GitRepoPath, error) {
+func GetGitPathInfo() (GitRepoPath, error) {
 	// get the most absolute git folder path
 	absGitPathArgs := []string{"rev-parse", "--absolute-git-dir"}
 	absGitPathCmd := executor.GittiCmdExecutor.RunGitCmd(absGitPathArgs, false)

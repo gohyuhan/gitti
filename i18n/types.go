@@ -145,7 +145,9 @@ type LanguageMapping struct {
 	KeyBindingRemoteComponentNone                              []string
 	KeyBindingRemoteComponentDefault                           []string
 	KeyBindingWorktreeComponentMainWorktree                    []string
+	KeyBindingWorktreeComponentMainWorktreeSwitchable          []string
 	KeyBindingWorktreeComponent                                []string
+	KeyBindingWorktreeComponentSwitchable                      []string
 	KeyBindingModifiedFilesComponentConflict                   []string
 	KeyBindingModifiedFilesComponentIsStaged                   []string
 	KeyBindingModifiedFilesComponentDefault                    []string

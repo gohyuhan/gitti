@@ -161,9 +161,25 @@ var zH_HANS = LanguageMapping{
 		"[ctrl+p] 清理工作树",
 		"[?] 快捷键与说明",
 	},
+	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
+		"[</>] 切换组件",
+		"[Enter] 切换工作树",
+		"[n] 新建工作树",
+		"[ctrl+p] 清理工作树",
+		"[?] 快捷键与说明",
+	},
 
 	KeyBindingWorktreeComponent: []string{
 		"[</>] 切换组件",
+		"[backspace] 删除工作树",
+		"[n] 新建工作树",
+		"[o] 锁定/解锁工作树",
+		"[ctrl+p] 清理工作树",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingWorktreeComponentSwitchable: []string{
+		"[</>] 切换组件",
+		"[Enter] 切换工作树",
 		"[backspace] 删除工作树",
 		"[n] 新建工作树",
 		"[o] 锁定/解锁工作树",
@@ -1118,6 +1134,11 @@ var zhHansWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "切换工作树（当前或可清理时不可用）",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "backspace",
 		TitleOrInfoLine: "删除工作树",
 		LineType:        INFO,
@@ -1977,6 +1998,59 @@ var zhHansFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 最旧所选提交与 HEAD 之间的合并提交也将被删除",
 			"5. 按 `enter` 进入 drop 输出弹窗",
 			"6. 按 `esc` 关闭输出弹窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "新建工作树 (add worktree)",
+		InstructionLines: []string{
+			"1. 导航到工作树组件（按 `1`，然后按 `< >` 直到显示工作树组件）",
+			"2. 按 `n` 打开新建工作树弹窗",
+			"3. 输入工作树名称",
+			"   - 按 `tab` 移动到分支输入框并设置检出分支",
+			"   - 按 `shift+tab` 返回上一个输入框",
+			"4. 按 `enter` 创建工作树",
+			"5. 按 `esc` 关闭输出弹窗",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "切换工作树 (switch worktree)",
+		InstructionLines: []string{
+			"1. 导航到工作树组件（按 `1`，然后按 `< >` 直到显示工作树组件）",
+			"2. 使用 `↑/↓` 选择目标工作树",
+			"3. 按 `enter` 切换到该工作树",
+			"   - 若为当前工作树或可清理工作树，则不可用",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "删除工作树 (remove worktree)",
+		InstructionLines: []string{
+			"1. 导航到工作树组件（按 `1`，然后按 `< >` 直到显示工作树组件）",
+			"2. 使用 `↑/↓` 选择要删除的工作树",
+			"3. 按 `backspace` 打开删除确认弹窗",
+			"4. 按 `enter` 确认删除，或按 `esc` 取消",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "清理工作树 (prune worktree)",
+		InstructionLines: []string{
+			"1. 导航到工作树组件（按 `1`，然后按 `< >` 直到显示工作树组件）",
+			"2. 按 `ctrl+p` 清理陈旧的工作树管理文件",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "锁定 / 解锁工作树 (lock / unlock worktree)",
+		InstructionLines: []string{
+			"1. 导航到工作树组件（按 `1`，然后按 `< >` 直到显示工作树组件）",
+			"2. 使用 `↑/↓` 选择目标工作树",
+			"3. 按 `o` 切换锁定状态",
+			"   - 若当前未锁定，将打开锁定原因弹窗；可选填原因后按 `enter` 锁定",
+			"   - 若当前已锁定，将立即解锁",
+			"   - 主工作树无法锁定或解锁",
 		},
 		LineType: INFO,
 	},

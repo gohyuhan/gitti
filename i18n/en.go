@@ -161,9 +161,24 @@ var eN = LanguageMapping{
 		"[ctrl+p] prune worktree",
 		"[?] keybinding and instructions",
 	},
-
+	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
+		"[</>] switch component",
+		"[Enter] switch worktree",
+		"[n] new worktree",
+		"[ctrl+p] prune worktree",
+		"[?] keybinding and instructions",
+	},
 	KeyBindingWorktreeComponent: []string{
 		"[</>] switch component",
+		"[backspace] remove worktree",
+		"[n] new worktree",
+		"[o] lock / unlock worktree",
+		"[ctrl+p] prune worktree",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingWorktreeComponentSwitchable: []string{
+		"[</>] switch component",
+		"[Enter] switch worktree",
 		"[backspace] remove worktree",
 		"[n] new worktree",
 		"[o] lock / unlock worktree",
@@ -1117,6 +1132,11 @@ var enWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "switch worktree (not available if current or prunable)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "backspace",
 		TitleOrInfoLine: "remove worktree",
 		LineType:        INFO,
@@ -1976,6 +1996,59 @@ var enFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - Any merge commits between the oldest selected commit and HEAD will also be dropped",
 			"5. Press `enter` to proceed to the drop output popup",
 			"6. Press `esc` to close the output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "add worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Press `n` to open the Add New Worktree popup",
+			"3. Enter the worktree name",
+			"   - Press `tab` to move to the branch field and set the checkout branch",
+			"   - Press `shift+tab` to move back to the previous input",
+			"4. Press `enter` to create the worktree",
+			"5. Press `esc` to close the output popup",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "switch worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Select the target worktree using `↑/↓`",
+			"3. Press `enter` to switch to it",
+			"   - Not available if the worktree is the current one or is prunable",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "remove worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Select the worktree to remove using `↑/↓`",
+			"3. Press `backspace` to open the remove confirmation popup",
+			"4. Press `enter` to confirm removal, or `esc` to cancel",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "prune worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Press `ctrl+p` to prune stale worktree administrative files",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "lock / unlock worktree",
+		InstructionLines: []string{
+			"1. Navigate to the Worktree component (press `1`, then `< >` until the Worktree component is shown)",
+			"2. Select the target worktree using `↑/↓`",
+			"3. Press `o` to toggle lock state",
+			"   - If currently unlocked, the Lock Reason popup opens; enter an optional reason and press `enter` to lock",
+			"   - If currently locked, it is unlocked immediately",
+			"   - The main worktree cannot be locked or unlocked",
 		},
 		LineType: INFO,
 	},

@@ -2,8 +2,13 @@ package services
 
 import (
 	"context"
+	"os"
 
+	"github.com/gohyuhan/gitti/api"
+	"github.com/gohyuhan/gitti/executor"
+	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/tui/constant"
+	"github.com/gohyuhan/gitti/tui/initialize"
 	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -106,4 +111,31 @@ func UnlockWorktreeService(m *types.GittiModel, worktreePath string) {
 	go func() {
 		m.GitOperations.GitWorktree.UnlockWorktree(worktreePath)
 	}()
+}
+
+func SwitchWorktreeService(m *types.GittiModel, worktreePath string) {
+	currentRepoPathBeforeSwitch, _ := os.Getwd()
+	os.Chdir(worktreePath)
+	executor.GittiCmdExecutor.UpdateRepoPath(worktreePath)
+
+	gitRepoPathInfo, gitRepoInfoErr := api.GetGitPathInfo()
+	if gitRepoInfoErr != nil {
+		os.Chdir(currentRepoPathBeforeSwitch)
+		executor.GittiCmdExecutor.UpdateRepoPath(m.RepoPath)
+		m.GittiLogger.RegisterNewLog(logging.SWITCH_WORKTREE_OPS, "", logging.ERROR, "[ERROR] fail to retrieve worktree info for switching", false)
+		return
+	}
+
+	executor.GittiCmdExecutor.UpdateRepoPath(gitRepoPathInfo.TopLevelRepoPath)
+
+	gitOperations := api.InitGitOperations(gitRepoPathInfo.AbsoluteGitRepoPath, gitRepoPathInfo.AbsoluteWorktreePath, m.GitUpdateChannel, m.GittiLogger)
+
+	initialize.ReinitGittiModel(m, gitRepoPathInfo.TopLevelRepoPath, gitRepoPathInfo.RepoName, gitOperations)
+
+	// rewire the daemon to the freshly rebuilt GitOperations, then trigger one full
+	// fetch so the new worktree's git state repopulates immediately
+	if api.GITDAEMON != nil {
+		api.GITDAEMON.UpdateGitOperations(gitOperations)
+		api.GITDAEMON.TriggerFullInfoFetch()
+	}
 }
