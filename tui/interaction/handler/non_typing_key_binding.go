@@ -1064,6 +1064,8 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						return m, nil
 					}
 					services.SwitchWorktreeService(m, selectedWorktree.WorktreePath)
+					layout.LeftPanelDynamicResize(m)
+					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 
 			}
