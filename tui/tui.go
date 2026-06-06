@@ -6,7 +6,6 @@ import (
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/logging"
-	"github.com/gohyuhan/gitti/settings"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
@@ -18,6 +17,7 @@ import (
 	worktreeComponent "github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/helper"
+	"github.com/gohyuhan/gitti/tui/initialize"
 	"github.com/gohyuhan/gitti/tui/interaction"
 	"github.com/gohyuhan/gitti/tui/layout"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
@@ -29,8 +29,6 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 
-	"charm.land/bubbles/v2/list"
-	"charm.land/bubbles/v2/viewport"
 	tea "charm.land/bubbletea/v2"
 )
 
@@ -42,104 +40,8 @@ import (
 //	for commit/tag/push operations.
 //
 // ------------------------------------
-func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string) *GittiAppModel {
-	vp := viewport.New()
-	vp.SoftWrap = false
-	vp.MouseWheelEnabled = true
-	vp.SetHorizontalStep(1)
-	vp.MouseWheelDelta = 1
-
-	vpTwo := viewport.New()
-	vpTwo.SoftWrap = false
-	vpTwo.MouseWheelEnabled = true
-	vpTwo.SetHorizontalStep(1)
-	vpTwo.MouseWheelDelta = 1
-
-	logVp := viewport.New()
-	logVp.SoftWrap = false
-	logVp.MouseWheelEnabled = false
-	logVp.SetHorizontalStep(1)
-	logVp.MouseWheelDelta = 1
-
-	lineEditingIndexCursorVp := viewport.New()
-	lineEditingIndexCursorVp.SoftWrap = false
-	lineEditingIndexCursorVp.MouseWheelEnabled = false
-	lineEditingIndexCursorVp.SetHorizontalStep(0)
-	lineEditingIndexCursorVp.MouseWheelDelta = 0
-
-	lineEditingIndexCursorVpTwo := viewport.New()
-	lineEditingIndexCursorVpTwo.SoftWrap = false
-	lineEditingIndexCursorVpTwo.MouseWheelEnabled = false
-	lineEditingIndexCursorVpTwo.SetHorizontalStep(0)
-	lineEditingIndexCursorVpTwo.MouseWheelDelta = 0
-
-	gittiModel := &types.GittiModel{
-		GittiLogger:                   gittiLogger,
-		DaemonUpdateChannel:           daemonUpdateChannel,
-		TuiUpdateChannel:              tuiUpdateChannel,
-		UserSetEditor:                 settings.GITTICONFIGSETTINGS.Editor,
-		CurrentSelectedComponent:      constant.ModifiedFilesComponentPanel,
-		CurrentSelectedComponentIndex: 2,
-		CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing: constant.SHOW_LOCAL_BRANCH,
-		CurrentCommitLogOrRefLogComponentShowing:                  constant.SHOW_COMMITLOG,
-		TotalComponentCount:                                       4,
-		RepoPath:                                                  repoPath,
-		RepoName:                                                  repoName,
-		CheckOutBranch:                                            "",
-		RemoteSyncLocalState:                                      "",
-		RemoteSyncRemoteState:                                     "",
-		CurrentGitRepoStatus:                                      "",
-		BranchUpStream:                                            "",
-		TrackedUpstreamOrBranchIcon:                               "",
-		Width:                                                     0,
-		Height:                                                    0,
-		WindowLeftPanelRatio:                                      settings.GITTICONFIGSETTINGS.LeftPanelWidthRatio,
-		CurrentRepoBranchesInfoList:                               list.New([]list.Item{}, branchComponent.GitBranchItemDelegate{}, 0, 0),
-		CurrentRepoTagInfoList:                                    list.New([]list.Item{}, tagComponent.GitTagItemDelegate{}, 0, 0),
-		CurrentRepoModifiedFilesInfoList:                          list.New([]list.Item{}, filesComponent.GitModifiedFilesItemDelegate{}, 0, 0),
-		CurrentRepoCommitLogInfoList:                              list.New([]list.Item{}, commitlogComponent.GitCommitLogItemDelegate{}, 0, 0),
-		CurrentRepoRefLogInfoList:                                 list.New([]list.Item{}, reflogComponent.GitRefLogItemDelegate{}, 0, 0),
-		CurrentRepoStashInfoList:                                  list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
-		CurrentRepoRemoteInfoList:                                 list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0),
-		CurrentRepoWorktreeInfoList:                               list.New([]list.Item{}, worktreeComponent.GitWorktreeItemDelegate{}, 0, 0),
-		DetailPanelParentComponent:                                "",
-		DetailPanelViewport:                                       vp,
-		DetailPanelViewportOffset:                                 0,
-		DetailPanelTwoViewport:                                    vpTwo,
-		DetailPanelTwoViewportOffset:                              0,
-		DetailComponentPanelLayout:                                constant.HORIZONTAL,
-		CurrentLogComponentViewport:                               logVp,
-		ListNavigationIndexPosition:                               types.GittiComponentsCurrentListNavigationIndexPosition{LocalBranchComponent: 0, ModifiedFilesComponent: 0, StashComponent: 0, RefLogComponent: 0, TagComponent: 0, RemoteComponent: 0, WorktreeComponent: 0},
-		PopUpType:                                                 constant.NoPopUp,
-		PopUpModel:                                                struct{}{},
-		GitOperations:                                             gitOperations,
-		GlobalKeyBindingKeyMapLargestLen:                          0,
-		LocalBranchComponentKeyBindingKeyMapLargestLen:            0,
-		TagComponentKeyBindingKeyMapLargestLen:                    0,
-		RemoteComponentKeyBindingKeyMapLargestLen:                 0,
-		ModifiedFilesComponentKeyBindingKeyMapLargestLen:          0,
-		CommitLogComponentKeyBindingKeyMapLargestLen:              0,
-		RefLogComponentKeyBindingKeyMapLargestLen:                 0,
-		StashComponentKeyBindingKeyMapLargestLen:                  0,
-		LogComponentKeyBindingKeyMapLargestLen:                    0,
-		DetailComponentKeyBindingKeyMapLargestLen:                 0,
-		LineEditingIndexPositionAndInfo:                           types.GittiLineEditingIndexPositionAndInfo{},
-		LineEditingIndexCursorViewport:                            lineEditingIndexCursorVp,
-		LineEditingIndexCursorTwoViewport:                         lineEditingIndexCursorVpTwo,
-		CherryPickedCommitInfo:                                    types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)},
-	}
-	gittiModel.IsRenderInit.Store(false)
-	gittiModel.ShowPopUp.Store(false)
-	gittiModel.IsTyping.Store(false)
-	gittiModel.IsDetailComponentPanelInfoFetchProcessing.Store(false)
-	gittiModel.ShowDetailPanelTwo.Store(false)
-	gittiModel.IsLineEditingState.Store(false)
-
-	commitRequireSigning, tagRequireSigning, pushRequireSigning := api.CheckSigningRequiredOperation()
-	gittiModel.GitCommitRequireSigning = commitRequireSigning
-	gittiModel.GitTagRequireSigning = tagRequireSigning
-	gittiModel.GitPushRequireSigning = pushRequireSigning
-
+func NewGittiAppModel(tuiUpdateChannel chan interface{}, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string, gitUpdateChannel chan string) *GittiAppModel {
+	gittiModel := initialize.InitGittiModel(tuiUpdateChannel, repoPath, repoName, gitOperations, gittiLogger, daemonUpdateChannel, gitUpdateChannel)
 	return &GittiAppModel{model: gittiModel}
 }
 

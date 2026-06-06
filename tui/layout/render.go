@@ -525,10 +525,24 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 				}
 			case constant.SHOW_WORKTREE:
 				currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
-				if currentSelectedWorktree != nil && currentSelectedWorktree.(worktreeComponent.GitWorktreeItem).IsMain {
-					keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentMainWorktree
-				} else {
-					keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponent
+				if currentSelectedWorktree != nil {
+					selectedWorktree := currentSelectedWorktree.(worktreeComponent.GitWorktreeItem)
+					// switchable variants append the [enter] switch hint; used only when the
+					// worktree is a valid switch target (not current and not prunable). the main
+					// worktree can't be removed/locked so it keeps its own reduced key set.
+					if selectedWorktree.IsMain {
+						if selectedWorktree.IsInCurrentWorktree {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentMainWorktree
+						} else {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentMainWorktreeSwitchable
+						}
+					} else {
+						if selectedWorktree.IsInCurrentWorktree || selectedWorktree.IsPrunable {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponent
+						} else {
+							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentSwitchable
+						}
+					}
 				}
 			}
 		case constant.ModifiedFilesComponentPanel:

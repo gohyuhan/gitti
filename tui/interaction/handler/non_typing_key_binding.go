@@ -1054,6 +1054,20 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.ShowPopUp.Store(true)
 					remotePopUp.InitRemoteAsTrackingUpstreamConfirmationPopUpModel(m, selectedRemote.Name, selectedRemote.Url)
 				}
+			case constant.SHOW_WORKTREE:
+				currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
+				if currentSelectedWorktree != nil {
+					selectedWorktree := currentSelectedWorktree.(worktree.GitWorktreeItem)
+					// can't switch into the worktree we're already in, and a prunable
+					// (stale/missing) worktree is not a valid switch target
+					if selectedWorktree.IsInCurrentWorktree || selectedWorktree.IsPrunable {
+						return m, nil
+					}
+					services.SwitchWorktreeService(m, selectedWorktree.WorktreePath)
+					layout.LeftPanelDynamicResize(m)
+					services.FetchDetailComponentPanelInfoService(m, true)
+				}
+
 			}
 		case constant.LogComponentPanel:
 			m.CurrentSelectedComponent = constant.DetailComponentPanel

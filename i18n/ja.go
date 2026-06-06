@@ -161,9 +161,25 @@ var jA = LanguageMapping{
 		"[ctrl+p] ワークツリーをプルーン",
 		"[?] キー操作と説明",
 	},
+	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
+		"[</>] コンポーネントを切り替え",
+		"[Enter] ワークツリーを切り替え",
+		"[n] 新しいワークツリー",
+		"[ctrl+p] ワークツリーをプルーン",
+		"[?] キー操作と説明",
+	},
 
 	KeyBindingWorktreeComponent: []string{
 		"[</>] コンポーネントを切り替え",
+		"[backspace] ワークツリーを削除",
+		"[n] 新しいワークツリー",
+		"[o] ワークツリーをロック/解除",
+		"[ctrl+p] ワークツリーをプルーン",
+		"[?] キー操作と説明",
+	},
+	KeyBindingWorktreeComponentSwitchable: []string{
+		"[</>] コンポーネントを切り替え",
+		"[Enter] ワークツリーを切り替え",
 		"[backspace] ワークツリーを削除",
 		"[n] 新しいワークツリー",
 		"[o] ワークツリーをロック/解除",
@@ -1119,6 +1135,11 @@ var jaWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "ワークツリーを切り替え（現在または削除可能な場合は利用不可）",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "backspace",
 		TitleOrInfoLine: "ワークツリーを削除",
 		LineType:        INFO,
@@ -1978,6 +1999,59 @@ var jaFeatureInstructions = []FeatureInstructionMappingFormat{
 			"   - 最も古い選択コミットとHEADの間のマージコミットも削除される",
 			"5. `enter` を押して drop 出力ポップアップへ進む",
 			"6. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーを追加 (add worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `n` を押して新規ワークツリー追加ポップアップを開く",
+			"3. ワークツリー名を入力",
+			"   - `tab` を押してブランチ欄に移動し、チェックアウトするブランチを設定",
+			"   - `shift+tab` を押して前の入力欄に戻る",
+			"4. `enter` を押してワークツリーを作成",
+			"5. `esc` を押して出力ポップアップを閉じる",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーを切り替え (switch worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `↑/↓` で対象のワークツリーを選択",
+			"3. `enter` を押して切り替え",
+			"   - 現在のワークツリーまたは削除可能なワークツリーの場合は利用不可",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーを削除 (remove worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `↑/↓` で削除するワークツリーを選択",
+			"3. `backspace` を押して削除確認ポップアップを開く",
+			"4. `enter` を押して削除を確定、または `esc` でキャンセル",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーをプルーン (prune worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `ctrl+p` を押して古いワークツリー管理ファイルをプルーン",
+		},
+		LineType: INFO,
+	},
+	{
+		Feature: "ワークツリーをロック / 解除 (lock / unlock worktree)",
+		InstructionLines: []string{
+			"1. ワークツリーコンポーネントに移動（`1` を押し、ワークツリーコンポーネントが表示されるまで `< >` を押す）",
+			"2. `↑/↓` で対象のワークツリーを選択",
+			"3. `o` を押してロック状態を切り替え",
+			"   - 現在ロック解除中の場合、ロック理由ポップアップが開く。任意で理由を入力し `enter` でロック",
+			"   - 現在ロック中の場合、即座にロック解除される",
+			"   - メインワークツリーはロック / 解除できない",
 		},
 		LineType: INFO,
 	},
