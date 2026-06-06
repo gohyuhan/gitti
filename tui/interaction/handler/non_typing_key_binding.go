@@ -1058,6 +1058,8 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
 				if currentSelectedWorktree != nil {
 					selectedWorktree := currentSelectedWorktree.(worktree.GitWorktreeItem)
+					// can't switch into the worktree we're already in, and a prunable
+					// (stale/missing) worktree is not a valid switch target
 					if selectedWorktree.IsInCurrentWorktree || selectedWorktree.IsPrunable {
 						return m, nil
 					}

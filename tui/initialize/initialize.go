@@ -22,6 +22,14 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
+// ------------------------------------
+//
+//	Build a fresh GittiModel for app startup: creates the detail/log/line-editing
+//	viewports, initialises every list component, wires the channels, git
+//	operations and logger, and checks whether git signing is required for
+//	commit/tag/push. Returns the newly allocated model.
+//
+// ------------------------------------
 func InitGittiModel(tuiUpdateChannel chan interface{}, repoPath string, repoName string, gitOperations *api.GitOperations, gittiLogger *logging.GittiLogging, daemonUpdateChannel chan string, gitUpdateChannel chan string) *types.GittiModel {
 	vp := viewport.New()
 	vp.SoftWrap = false
@@ -124,6 +132,15 @@ func InitGittiModel(tuiUpdateChannel chan interface{}, repoPath string, repoName
 	return gittiModel
 }
 
+// ------------------------------------
+//
+//	Reset an existing GittiModel in place for a worktree switch. Mutates the model
+//	through its pointer (the model holds atomic fields, so it cannot be replaced by
+//	a struct copy) so the running bubbletea program keeps the same reference. Every
+//	field is reset to its startup default to avoid cross-worktree state leaking,
+//	EXCEPT Width/Height which are preserved since the terminal size is unchanged.
+//
+// ------------------------------------
 func ReinitGittiModel(m *types.GittiModel, repoPath string, repoName string, gitOperations *api.GitOperations) {
 	vp := viewport.New()
 	vp.SoftWrap = false

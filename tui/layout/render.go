@@ -527,6 +527,9 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 				currentSelectedWorktree := m.CurrentRepoWorktreeInfoList.SelectedItem()
 				if currentSelectedWorktree != nil {
 					selectedWorktree := currentSelectedWorktree.(worktreeComponent.GitWorktreeItem)
+					// switchable variants append the [enter] switch hint; used only when the
+					// worktree is a valid switch target (not current and not prunable). the main
+					// worktree can't be removed/locked so it keeps its own reduced key set.
 					if selectedWorktree.IsMain {
 						if selectedWorktree.IsInCurrentWorktree {
 							keys = i18n.LANGUAGEMAPPING.KeyBindingWorktreeComponentMainWorktree
