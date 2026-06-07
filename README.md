@@ -54,6 +54,7 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 🫵 **Git Blame** - View line-by-line blame with commit author and message
 - 🕹️ **Interactive Rebase** - Drop, reword, fixup, and squash commits interactively
 - 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
+- 🌲 **Worktree Management** - Add, switch, remove, prune, and lock/unlock Git worktrees
 - 🪵 **Logging & Log Export** - Built-in logging panel with log export capability
 - 🌍 **Multi-language Support** - English, Japanese, 简体中文, 繁體中文
 - ⚡ **Real-time Updates** - File system monitoring for instant status updates
@@ -217,7 +218,17 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
-### [v0.7.1]
+### [v0.8.0]
+
+- feature: worktree management
+  - list and switch worktrees from within the app
+  - add new worktree (optionally from a branch)
+  - remove and prune worktrees
+  - lock/unlock worktrees with lock reason support
+- feature: keybinding to open the current repo with a user-defined editor
+- other: block bare git repos with clearer messaging on what is supported
+
+### [v0.7.2]
 
 - fix: fix pop up state not reset under the following condition:
   - after a successful git ops that require signing
