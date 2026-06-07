@@ -982,6 +982,11 @@ var zhHansGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "打开 blame 弹窗",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "O",
+		TitleOrInfoLine: "在编辑器中打开仓库",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for zh-hans

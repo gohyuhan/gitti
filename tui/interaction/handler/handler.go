@@ -280,6 +280,9 @@ func HandleNonTypingGlobalKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gi
 	case "o":
 		return handleNonTypingoKeyBindingInteraction(m)
 
+	case "O":
+		return handleNonTypingOKeyBindingInteraction(m)
+
 	case "p":
 		return handleNonTypingpKeyBindingInteraction(m)
 

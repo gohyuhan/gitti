@@ -665,6 +665,23 @@ func handleNonTypingoKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 	return m, nil
 }
 
+func handleNonTypingOKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if !m.ShowPopUp.Load() {
+		cmd, isNonTerminalEditor := utils.ReturnEditorLaunchCommand(m.RepoPath, m.UserSetEditor)
+		if isNonTerminalEditor {
+			cmd.Start()
+			return m, nil
+		} else {
+			return m, tea.ExecProcess(cmd, func(err error) tea.Msg {
+				return types.EditorFinishedMsg{
+					Err: err,
+				}
+			})
+		}
+	}
+	return m, nil
+}
+
 // ------------------------------------
 //
 //	Handle 'p' key interaction.
