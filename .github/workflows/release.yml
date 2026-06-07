@@ -7,8 +7,8 @@ on:
       - "v*.*.*-*"
 
 permissions:
-  contents: write      # for GitHub Release + uploading assets
-  packages: write      # optional, for GitHub Packages
+  contents: write # for GitHub Release + uploading assets
+  packages: write # optional, for GitHub Packages
   pull-requests: write # optional
 
 jobs:
@@ -17,20 +17,20 @@ jobs:
     steps:
       # ── 1. Checkout the actual project (with full history & tags) ─────────────────────
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           fetch-tags: true
 
       # ── 2. Set up Go ─────────────────────────────────────────────────────────────────────
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: stable
 
       # ── 3. Run GoReleaser (creates release + artifacts + checksums.txt) ───────────────
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           version: "~> v2"
           args: release --clean
@@ -58,7 +58,7 @@ jobs:
 
       # ── 5. Update Homebrew tap (gohyuhan/homebrew-gitti) ─────────────────────────────────
       - name: Checkout Homebrew tap
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: gohyuhan/homebrew-gitti
           token: ${{ secrets.GITTI_PAT }}
@@ -141,7 +141,7 @@ jobs:
 
       # ── 6. Update Scoop bucket (gohyuhan/scoop-gitti) ─────────────────────────────────────
       - name: Checkout Scoop bucket
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: gohyuhan/scoop-gitti
           token: ${{ secrets.GITTI_PAT }}
