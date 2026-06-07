@@ -980,6 +980,11 @@ var enGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "open blame popup",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "O",
+		TitleOrInfoLine: "open repository in editor",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for en

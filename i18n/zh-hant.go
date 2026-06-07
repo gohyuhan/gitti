@@ -982,6 +982,11 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "開啟 blame 彈出視窗",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "O",
+		TitleOrInfoLine: "在編輯器中開啟儲存庫",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for zh-hant

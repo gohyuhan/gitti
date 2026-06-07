@@ -983,6 +983,11 @@ var jaGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "blame ポップアップを開く",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "O",
+		TitleOrInfoLine: "リポジトリをエディタで開く",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for ja
