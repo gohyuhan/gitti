@@ -1,4 +1,4 @@
-package handler
+package keyutil
 
 import (
 	"charm.land/bubbles/v2/viewport"
