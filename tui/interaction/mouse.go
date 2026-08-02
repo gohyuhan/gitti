@@ -7,7 +7,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/constant"
-	"github.com/gohyuhan/gitti/tui/interaction/handler"
+	"github.com/gohyuhan/gitti/tui/interaction/handler/keyutil"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
 	filesPopUp "github.com/gohyuhan/gitti/tui/popup/files"
 	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
@@ -139,7 +139,7 @@ func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiM
 			}
 			return m, nil
 		} else {
-			return handler.UpDownMouseMsgUpdateForPopUp(msg, m)
+			return keyutil.UpDownMouseMsgUpdateForPopUp(msg, m)
 		}
 	}
 	return m, nil
