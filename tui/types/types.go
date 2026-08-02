@@ -89,6 +89,8 @@ type GittiModel struct {
 	DetailPanelViewportOGStringArray                          []string
 	DetailPanelTwoViewportOGStringArray                       []string
 	CherryPickedCommitInfo                                    CherryPickedCommitInfo
+	PanelFilterQuery                                          map[string]string // per panel list filter query, keyed by the showing component constant (e.g. SHOW_LOCAL_BRANCH, C2)
+	IsPanelFiltering                                          atomic.Bool       // to indicate the user is currently typing a panel list filter query
 	GitCommitRequireSigning                                   bool
 	GitTagRequireSigning                                      bool
 	GitPushRequireSigning                                     bool

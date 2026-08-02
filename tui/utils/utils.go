@@ -61,19 +61,74 @@ func TruncateString(s string, maxWidth int) string {
 
 // ------------------------------------
 //
-//	ListCounterHelper returns a function that generates a counter display e.g. ("3/10")
-//	showing the current item position in the list for the main left panel.
+//	CurrentPanelFilterKey returns the panel filter query map key for the list that is
+//	currently focused (resolving the shared branch/tag/remote/worktree and
+//	commitlog/reflog panel slots to the component actually showing). Returns ""
+//	when the focused component has no filterable list.
 //
 // ------------------------------------
-func ListCounterHelper(m *types.GittiModel, list *list.Model) func() []key.Binding {
+func CurrentPanelFilterKey(m *types.GittiModel) string {
+	switch m.CurrentSelectedComponent {
+	case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
+		return m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing
+	case constant.ModifiedFilesComponentPanel:
+		return constant.ModifiedFilesComponentPanel
+	case constant.CommitLogOrRefLogComponentPanel:
+		return m.CurrentCommitLogOrRefLogComponentShowing
+	case constant.StashComponentPanel:
+		return constant.StashComponentPanel
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	FilterListItems filters list items by a case-insensitive substring match of the
+//	query against each item's FilterValue(). It also recomputes the position of the
+//	previously selected item within the filtered result (matched by FilterValue, as
+//	some item types are not comparable). An empty query returns the input unchanged.
+//
+// ------------------------------------
+func FilterListItems(items []list.Item, query string, previousSelected list.Item, previousPosition int) ([]list.Item, int) {
+	if query == "" {
+		return items, previousPosition
+	}
+	loweredQuery := strings.ToLower(query)
+	filtered := make([]list.Item, 0, len(items))
+	position := -1
+	for _, item := range items {
+		if strings.Contains(strings.ToLower(item.FilterValue()), loweredQuery) {
+			if previousSelected != nil && item.FilterValue() == previousSelected.FilterValue() {
+				position = len(filtered)
+			}
+			filtered = append(filtered, item)
+		}
+	}
+	return filtered, position
+}
+
+// ------------------------------------
+//
+//	ListCounterHelper returns a function that generates a counter display e.g. ("3/10")
+//	showing the current item position in the list for the main left panel. When a panel
+//	filter query is set for filterKey, it is appended as "/query" (with a trailing block
+//	cursor while the query is being typed).
+//
+// ------------------------------------
+func ListCounterHelper(m *types.GittiModel, list *list.Model, filterKey string) func() []key.Binding {
 	return func() []key.Binding {
 		currentIndex := list.Index() + 1
 		totalCount := len(list.Items())
 		countStr := fmt.Sprintf("%d/%d", currentIndex, totalCount)
-		countStr = TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 		if totalCount == 0 {
 			countStr = "0/0"
 		}
+		if m.IsPanelFiltering.Load() && CurrentPanelFilterKey(m) == filterKey {
+			countStr = fmt.Sprintf("%s  /%s█", countStr, m.PanelFilterQuery[filterKey])
+		} else if query := m.PanelFilterQuery[filterKey]; query != "" {
+			countStr = fmt.Sprintf("%s  /%s", countStr, query)
+		}
+		countStr = TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 		return []key.Binding{
 			key.NewBinding(
 				key.WithKeys(countStr),

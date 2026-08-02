@@ -40,7 +40,7 @@ type (
 )
 
 func (i GitCommitLogItem) FilterValue() string {
-	return i.Hash
+	return i.Hash + " " + i.Message + " " + i.Author
 }
 
 func (d GitCommitLogItemDelegate) Height() int                             { return 1 }

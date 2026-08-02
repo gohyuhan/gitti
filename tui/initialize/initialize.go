@@ -116,6 +116,7 @@ func InitGittiModel(tuiUpdateChannel chan interface{}, repoPath string, repoName
 		LineEditingIndexCursorViewport:                            lineEditingIndexCursorVp,
 		LineEditingIndexCursorTwoViewport:                         lineEditingIndexCursorVpTwo,
 		CherryPickedCommitInfo:                                    types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)},
+		PanelFilterQuery:                                          make(map[string]string),
 	}
 	gittiModel.IsRenderInit.Store(false)
 	gittiModel.ShowPopUp.Store(false)
@@ -215,8 +216,10 @@ func ReinitGittiModel(m *types.GittiModel, repoPath string, repoName string, git
 	m.LineEditingIndexCursorViewport = lineEditingIndexCursorVp
 	m.LineEditingIndexCursorTwoViewport = lineEditingIndexCursorVpTwo
 	m.CherryPickedCommitInfo = types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)}
+	m.PanelFilterQuery = make(map[string]string)
 
 	m.IsRenderInit.Store(false)
+	m.IsPanelFiltering.Store(false)
 	m.ShowPopUp.Store(false)
 	m.IsTyping.Store(false)
 	m.IsDetailComponentPanelInfoFetchProcessing.Store(false)

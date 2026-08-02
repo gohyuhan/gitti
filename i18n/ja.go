@@ -116,6 +116,7 @@ var jA = LanguageMapping{
 		"[n] 新しいブランチ",
 		"[r] リベース",
 		"[</>] コンポーネントを切り替え",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
@@ -124,15 +125,18 @@ var jA = LanguageMapping{
 		"[n] 新しいブランチ",
 		"[d] ブランチを削除",
 		"[</>] コンポーネントを切り替え",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
 		"[</>] コンポーネントを切り替え",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] コンポーネントを切り替え",
 		"[f] タグをフェッチ",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingTagComponentDefault: []string{
@@ -140,11 +144,13 @@ var jA = LanguageMapping{
 		"[d] タグを削除",
 		"[ctrl+p] タグをプッシュ",
 		"[f] タグをフェッチ",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingRemoteComponentNone: []string{
 		"[</>] コンポーネントを切り替え",
 		"[n] 新しいリモート",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingRemoteComponentDefault: []string{
@@ -153,12 +159,14 @@ var jA = LanguageMapping{
 		"[d] リモートを削除",
 		"[e] リモートを編集",
 		"[enter] 上流として追跡を設定",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] コンポーネントを切り替え",
 		"[n] 新しいワークツリー",
 		"[ctrl+p] ワークツリーをプルーン",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
@@ -166,6 +174,7 @@ var jA = LanguageMapping{
 		"[Enter] ワークツリーを切り替え",
 		"[n] 新しいワークツリー",
 		"[ctrl+p] ワークツリーをプルーン",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 
@@ -175,6 +184,7 @@ var jA = LanguageMapping{
 		"[n] 新しいワークツリー",
 		"[o] ワークツリーをロック/解除",
 		"[ctrl+p] ワークツリーをプルーン",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingWorktreeComponentSwitchable: []string{
@@ -184,6 +194,7 @@ var jA = LanguageMapping{
 		"[n] 新しいワークツリー",
 		"[o] ワークツリーをロック/解除",
 		"[ctrl+p] ワークツリーをプルーン",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -191,6 +202,7 @@ var jA = LanguageMapping{
 		"[e] 編集",
 		"[r] 競合を解決",
 		"[enter] 変更内容を表示",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -200,6 +212,7 @@ var jA = LanguageMapping{
 		"[S] すべての変更をスタッシュ",
 		"[d] 変更を破棄",
 		"[enter] 変更内容を表示",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
@@ -209,13 +222,16 @@ var jA = LanguageMapping{
 		"[S] すべての変更をスタッシュ",
 		"[d] 変更を破棄",
 		"[enter] 変更内容を表示",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingCommitLogComponentNone: []string{
 		"[</>] コンポーネントを切り替え",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingCommitLogComponent: []string{
@@ -228,10 +244,12 @@ var jA = LanguageMapping{
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingRefLogComponentNone: []string{
 		"[</>] コンポーネントを切り替え",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingRefLogComponent: []string{
@@ -242,6 +260,7 @@ var jA = LanguageMapping{
 		"[n] コミットハッシュに基づいて新しいブランチを作成",
 		"[r] このコミットにリセット",
 		"[ctrl+p] チェリーピックして適用する",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingLogComponent: []string{
@@ -275,9 +294,11 @@ var jA = LanguageMapping{
 		"[backspace] ポップ",
 		"[d] 破棄",
 		"[enter] スタッシュ内容を表示",
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingKeyStashComponentNone: []string{
+		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
 	KeyBindingForCommitPopUp: []string{
@@ -1037,6 +1058,11 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "リストを上下に移動",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
 }
 
 // Tag Component Key Binding for ja
@@ -1074,6 +1100,11 @@ var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
 }
@@ -1118,6 +1149,11 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
 }
@@ -1167,6 +1203,11 @@ var jaWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
 }
@@ -1221,6 +1262,11 @@ var jaModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "リストを上下に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
 }
@@ -1282,6 +1328,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下に移動",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
 }
 
 // RefLog Component Key Binding for ja
@@ -1331,6 +1382,11 @@ var jaRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下に移動",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
 }
 
 // Stash Component Key Binding for ja
@@ -1368,6 +1424,11 @@ var jaStashComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
 }

@@ -18,13 +18,18 @@ import (
 // ------------------------------------
 //
 //	Handle mouse interactions.
-//	Responsibility: Translates mouse wheel events (up, down, left, right) into
+//	Responsibility: Translates left clicks into panel focus + list row selection
+//	(main page only), and mouse wheel events (up, down, left, right) into
 //	scrolling actions. Depending on the current view state:
 //	- Active Popup: Scrolls within popups (instructions, discard confirmation, interactive rebase fixup/squash detail viewport, etc.).
 //	- Detail Panels: Horizontally or vertically scrolls the main viewports.
 //
 // ------------------------------------
 func GittiMouseInteraction(msg tea.MouseMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
+	if clickMsg, ok := msg.(tea.MouseClickMsg); ok && clickMsg.Mouse().Button == tea.MouseLeft {
+		return handleLeftMouseClick(clickMsg, m)
+	}
+
 	switch msg.Mouse().Button {
 	case tea.MouseWheelLeft:
 		if !m.ShowPopUp.Load() {

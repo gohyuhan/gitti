@@ -40,6 +40,8 @@ func InitRemoteList(m *types.GittiModel) bool {
 		}
 	}
 
+	latestRemoteArray, selectedRemotePosition = utils.FilterListItems(latestRemoteArray, m.PanelFilterQuery[constant.SHOW_REMOTE], previousSelectedRemote, selectedRemotePosition)
+
 	previousRemoteCount := len(m.CurrentRepoRemoteInfoList.Items())
 
 	m.CurrentRepoRemoteInfoList = list.New(latestRemoteArray, GitRemoteItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
@@ -56,7 +58,7 @@ func InitRemoteList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoRemoteInfoList.SetShowHelp(true)
 	m.CurrentRepoRemoteInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoRemoteInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoRemoteInfoList)
+	m.CurrentRepoRemoteInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoRemoteInfoList, constant.SHOW_REMOTE)
 
 	if len(latestRemoteArray) < 1 {
 		return len(latestRemoteArray) != previousRemoteCount

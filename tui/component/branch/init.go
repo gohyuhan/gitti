@@ -49,6 +49,8 @@ func InitBranchList(m *types.GittiModel) {
 		}
 	}
 
+	latestBranchArray, selectedBranchPosition = utils.FilterListItems(latestBranchArray, m.PanelFilterQuery[constant.SHOW_LOCAL_BRANCH], previousSelectedBranch, selectedBranchPosition)
+
 	m.CurrentRepoBranchesInfoList = list.New(latestBranchArray, GitBranchItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
 	m.CurrentRepoBranchesInfoList.SetShowPagination(false)
 	m.CurrentRepoBranchesInfoList.SetShowStatusBar(false)
@@ -64,7 +66,11 @@ func InitBranchList(m *types.GittiModel) {
 	// Custom Help Model for Count Display
 	m.CurrentRepoBranchesInfoList.SetShowHelp(true)
 	m.CurrentRepoBranchesInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoBranchesInfoList)
+	m.CurrentRepoBranchesInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoBranchesInfoList, constant.SHOW_LOCAL_BRANCH)
+
+	if len(latestBranchArray) < 1 {
+		return
+	}
 
 	if selectedBranchPosition >= 0 {
 		m.CurrentRepoBranchesInfoList.Select(selectedBranchPosition)

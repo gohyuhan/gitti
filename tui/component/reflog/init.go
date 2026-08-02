@@ -40,6 +40,8 @@ func InitGitRefLogList(m *types.GittiModel) bool {
 		}
 	}
 
+	items, selectedRefLogPosition = utils.FilterListItems(items, m.PanelFilterQuery[constant.SHOW_REFLOG], previousSelectedRefLog, selectedRefLogPosition)
+
 	previousRefLogCount := len(m.CurrentRepoRefLogInfoList.Items())
 
 	m.CurrentRepoRefLogInfoList = list.New(items, GitRefLogItemDelegate{}, m.WindowLeftPanelWidth, m.RefLogComponentPanelHeight)
@@ -55,7 +57,7 @@ func InitGitRefLogList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoRefLogInfoList.SetShowHelp(true)
 	m.CurrentRepoRefLogInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoRefLogInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoRefLogInfoList)
+	m.CurrentRepoRefLogInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoRefLogInfoList, constant.SHOW_REFLOG)
 
 	if len(items) < 1 {
 		return len(items) != previousRefLogCount

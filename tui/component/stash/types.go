@@ -27,7 +27,7 @@ type (
 )
 
 func (i GitStashItem) FilterValue() string {
-	return i.Message
+	return i.Id + " " + i.Message
 }
 
 func (d GitStashItemDelegate) Height() int                             { return 1 }

@@ -74,6 +74,8 @@ func InitGitCommitLogList(m *types.GittiModel) bool {
 		}
 	}
 
+	latestGitCommitLogItemArray, selectedCommitLogPosition = utils.FilterListItems(latestGitCommitLogItemArray, m.PanelFilterQuery[constant.SHOW_COMMITLOG], previousSelectedCommitLog, selectedCommitLogPosition)
+
 	previousCommitLogCount := len(m.CurrentRepoCommitLogInfoList.Items())
 
 	m.CurrentRepoCommitLogInfoList = list.New(latestGitCommitLogItemArray, GitCommitLogItemDelegate{}, m.WindowLeftPanelWidth, m.CommitLogComponentPanelHeight)
@@ -90,10 +92,10 @@ func InitGitCommitLogList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoCommitLogInfoList.SetShowHelp(true)
 	m.CurrentRepoCommitLogInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoCommitLogInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoCommitLogInfoList)
+	m.CurrentRepoCommitLogInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoCommitLogInfoList, constant.SHOW_COMMITLOG)
 
-	if len(latestGitCommitLog) < 1 {
-		return len(latestGitCommitLog) != previousCommitLogCount
+	if len(latestGitCommitLogItemArray) < 1 {
+		return len(latestGitCommitLogItemArray) != previousCommitLogCount
 	}
 
 	if selectedCommitLogPosition >= 0 {

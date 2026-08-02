@@ -52,6 +52,7 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 📊 **Commit Log & Branch Graph** - Visualize commit history with branching graph
 - 🔎 **Reflog** - Browse and restore from Git reference logs
 - 🫵 **Git Blame** - View line-by-line blame with commit author and message
+- 🔦 **List Filtering** - Filter the branch, tag, remote, worktree, file, commit log, reflog, and stash lists with `F`
 - 🕹️ **Interactive Rebase** - Drop, reword, fixup, and squash commits interactively
 - 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
 - 🌲 **Worktree Management** - Add, switch, remove, prune, and lock/unlock Git worktrees
@@ -59,6 +60,7 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 🌍 **Multi-language Support** - English, Japanese, 简体中文, 繁體中文
 - ⚡ **Real-time Updates** - File system monitoring for instant status updates
 - ⌨️ **Keyboard-driven** - Efficient navigation without touching the mouse
+- 🖱️ **Mouse Support** - Optional click to focus a panel or select a list item
 
 ## Installation
 

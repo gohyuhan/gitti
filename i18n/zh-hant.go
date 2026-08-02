@@ -116,6 +116,7 @@ var zH_HANT = LanguageMapping{
 		"[n] 新增分支",
 		"[r] 變基 (rebase)",
 		"[</>] 切換元件",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
@@ -124,15 +125,18 @@ var zH_HANT = LanguageMapping{
 		"[n] 新增分支",
 		"[d] 刪除分支",
 		"[</>] 切換元件",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
 		"[</>] 切換元件",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] 切換元件",
 		"[f] 獲取標籤",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingTagComponentDefault: []string{
@@ -140,11 +144,13 @@ var zH_HANT = LanguageMapping{
 		"[d] 刪除標籤",
 		"[ctrl+p] 推送標籤",
 		"[f] 獲取標籤",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingRemoteComponentNone: []string{
 		"[</>] 切換元件",
 		"[n] 新增遠端",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingRemoteComponentDefault: []string{
@@ -153,12 +159,14 @@ var zH_HANT = LanguageMapping{
 		"[d] 移除遠端",
 		"[e] 編輯遠端",
 		"[enter] 設定為上游追蹤分支",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] 切換元件",
 		"[n] 新增工作樹",
 		"[ctrl+p] 清理工作樹",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
@@ -166,6 +174,7 @@ var zH_HANT = LanguageMapping{
 		"[Enter] 切換工作樹",
 		"[n] 新增工作樹",
 		"[ctrl+p] 清理工作樹",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 
@@ -175,6 +184,7 @@ var zH_HANT = LanguageMapping{
 		"[n] 新增工作樹",
 		"[o] 鎖定/解鎖工作樹",
 		"[ctrl+p] 清理工作樹",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingWorktreeComponentSwitchable: []string{
@@ -184,6 +194,7 @@ var zH_HANT = LanguageMapping{
 		"[n] 新增工作樹",
 		"[o] 鎖定/解鎖工作樹",
 		"[ctrl+p] 清理工作樹",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -191,6 +202,7 @@ var zH_HANT = LanguageMapping{
 		"[e] 編輯",
 		"[r] 解決衝突",
 		"[enter] 查看修改內容",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -200,6 +212,7 @@ var zH_HANT = LanguageMapping{
 		"[S] 儲藏所有變更",
 		"[d] 捨棄變更",
 		"[enter] 查看修改內容",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
@@ -209,13 +222,16 @@ var zH_HANT = LanguageMapping{
 		"[S] 儲藏所有變更",
 		"[d] 捨棄變更",
 		"[enter] 查看修改內容",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingCommitLogComponentNone: []string{
 		"[</>] 切換元件",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingCommitLogComponent: []string{
@@ -228,10 +244,12 @@ var zH_HANT = LanguageMapping{
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 揀選操作",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingRefLogComponentNone: []string{
 		"[</>] 切換元件",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingRefLogComponent: []string{
@@ -242,6 +260,7 @@ var zH_HANT = LanguageMapping{
 		"[n] 基於此提交哈希建立新分支",
 		"[r] 重置到此提交",
 		"[ctrl+p] 揀選並應用",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingLogComponent: []string{
@@ -275,9 +294,11 @@ var zH_HANT = LanguageMapping{
 		"[backspace] 彈出",
 		"[d] 丟棄",
 		"[enter] 查看儲藏內容",
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingKeyStashComponentNone: []string{
+		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
 	KeyBindingForCommitPopUp: []string{
@@ -1036,6 +1057,11 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下移動列表",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
+		LineType:        INFO,
+	},
 }
 
 // Tag Component Key Binding for zh-hant
@@ -1073,6 +1099,11 @@ var zhHantTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1117,6 +1148,11 @@ var zhHantRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1166,6 +1202,11 @@ var zhHantWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1220,6 +1261,11 @@ var zhHantModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移動列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1281,6 +1327,11 @@ var zhHantCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下移動",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
+		LineType:        INFO,
+	},
 }
 
 // RefLog Component Key Binding for zh-hant
@@ -1330,6 +1381,11 @@ var zhHantRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下移動",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
+		LineType:        INFO,
+	},
 }
 
 // Stash Component Key Binding for zh-hant
@@ -1367,6 +1423,11 @@ var zhHantStashComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
 		LineType:        INFO,
 	},
 }
