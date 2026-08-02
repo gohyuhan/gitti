@@ -111,8 +111,13 @@ func InitOrReadConfig() {
 		return
 	}
 
+	// track which keys are present in the file, as a false bool is
+	// indistinguishable from a missing field after unmarshal
+	var rawKeys map[string]json.RawMessage
+	_ = json.Unmarshal(data, &rawKeys)
+
 	// Validate and fix missing or invalid fields
-	changed := ensureConfigIntegrity(&cfg, &GittiDefaultConfigSettings)
+	changed := ensureConfigIntegrity(&cfg, &GittiDefaultConfigSettings, rawKeys)
 	if changed {
 		saveConfig(cfgPath, cfg)
 	}
@@ -147,7 +152,7 @@ func InitOrReadConfig() {
 //	Check every field against the default and assign default values if zero
 //
 // ------------------------------------
-func ensureConfigIntegrity(cfg *GittiConfigSettings, def *GittiConfigSettings) bool {
+func ensureConfigIntegrity(cfg *GittiConfigSettings, def *GittiConfigSettings, rawKeys map[string]json.RawMessage) bool {
 	cfgVal := reflect.ValueOf(cfg).Elem()
 	defVal := reflect.ValueOf(def).Elem()
 	changed := false
@@ -157,6 +162,14 @@ func ensureConfigIntegrity(cfg *GittiConfigSettings, def *GittiConfigSettings) b
 		defaultField := defVal.Field(i)
 
 		switch field.Kind() {
+		case reflect.Bool:
+			// false is a valid user value, only fall back to default when
+			// the key is missing from the config file
+			jsonKey := cfgVal.Type().Field(i).Tag.Get("json")
+			if _, ok := rawKeys[jsonKey]; !ok {
+				field.Set(defaultField)
+				changed = true
+			}
 		case reflect.String:
 			if field.String() == "" {
 				field.SetString(defaultField.String())

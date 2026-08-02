@@ -134,6 +134,10 @@ func (gCL *GitCommitLog) GetCommitLogs() {
 		gitCommitLogOutput = append(gitCommitLogOutput, cL)
 	}
 
+	if err := cmd.Wait(); err != nil {
+		gCL.logging.RegisterNewLog(logging.COMMIT_LOG_OPS, "", logging.ERROR, fmt.Sprintf("[WAIT ERROR]: %s", err.Error()), false)
+	}
+
 	gCL.gitCommitLogOutput = gitCommitLogOutput
 }
 
