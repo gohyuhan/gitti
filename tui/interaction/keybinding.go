@@ -44,6 +44,11 @@ func GittiKeyInteraction(msg tea.KeyPressMsg, m *types.GittiModel) (*types.Gitti
 		return m, nil
 	}
 
+	// panel list filter typing mode captures all remaining keys
+	if m.IsPanelFiltering.Load() {
+		return handlePanelFilterKeyInput(msg, m)
+	}
+
 	// for typing mode, it will always and must be a pop up
 	if m.IsTyping.Load() {
 		return handler.HandleTypingKeyBindingInteraction(msg, m)

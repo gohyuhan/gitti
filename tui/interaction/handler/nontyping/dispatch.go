@@ -54,6 +54,9 @@ func Handle(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cm
 	case "f":
 		return handleNonTypingfKeyBindingInteraction(m)
 
+	case "F":
+		return handleNonTypingFKeyBindingInteraction(m)
+
 	case "i":
 		return handleNonTypingiKeyBindingInteraction(m)
 

@@ -131,6 +131,10 @@ func main() {
 
 		// throttle mouse messages to ~60Hz cap (~62.5 events/sec at 16ms)
 		mouseThrottle := func(m tea.Model, msg tea.Msg) tea.Msg {
+			if _, ok := msg.(tea.MouseClickMsg); ok {
+				// clicks are discrete actions, dropping one loses user input
+				return msg
+			}
 			if _, ok := msg.(tea.MouseMsg); ok {
 				if time.Since(lastMouseSignal) < mouseThrottleFrequency {
 					return nil // Drop the message entirely

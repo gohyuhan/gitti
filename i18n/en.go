@@ -116,6 +116,7 @@ var eN = LanguageMapping{
 		"[n] new branch",
 		"[r] rebase",
 		"[</>] switch component",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
@@ -124,15 +125,18 @@ var eN = LanguageMapping{
 		"[n] new branch",
 		"[d] delete branch",
 		"[</>] switch component",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
 		"[</>] switch component",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] switch component",
 		"[f] fetch tag",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingTagComponentDefault: []string{
@@ -140,11 +144,13 @@ var eN = LanguageMapping{
 		"[d] delete tag",
 		"[ctrl+p] push tag",
 		"[f] fetch tag",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingRemoteComponentNone: []string{
 		"[</>] switch component",
 		"[n] new remote",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingRemoteComponentDefault: []string{
@@ -153,12 +159,14 @@ var eN = LanguageMapping{
 		"[d] remove remote",
 		"[e] edit remote",
 		"[enter] set as tracking upstream",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] switch component",
 		"[n] new worktree",
 		"[ctrl+p] prune worktree",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
@@ -166,6 +174,7 @@ var eN = LanguageMapping{
 		"[Enter] switch worktree",
 		"[n] new worktree",
 		"[ctrl+p] prune worktree",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingWorktreeComponent: []string{
@@ -174,6 +183,7 @@ var eN = LanguageMapping{
 		"[n] new worktree",
 		"[o] lock / unlock worktree",
 		"[ctrl+p] prune worktree",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingWorktreeComponentSwitchable: []string{
@@ -183,6 +193,7 @@ var eN = LanguageMapping{
 		"[n] new worktree",
 		"[o] lock / unlock worktree",
 		"[ctrl+p] prune worktree",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -190,6 +201,7 @@ var eN = LanguageMapping{
 		"[e] edit",
 		"[r] resolve conflict",
 		"[enter] view modified content",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -199,6 +211,7 @@ var eN = LanguageMapping{
 		"[S] stash all changes",
 		"[d] discard changes",
 		"[enter] view modified content",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
@@ -208,13 +221,16 @@ var eN = LanguageMapping{
 		"[S] stash all changes",
 		"[d] discard changes",
 		"[enter] view modified content",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingCommitLogComponentNone: []string{
 		"[</>] switch component",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingCommitLogComponent: []string{
@@ -227,10 +243,12 @@ var eN = LanguageMapping{
 		"[r] reset to this commit",
 		"[R] reset latest commit",
 		"[ctrl+p] cherry pick ops",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingRefLogComponentNone: []string{
 		"[</>] switch component",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingRefLogComponent: []string{
@@ -241,6 +259,7 @@ var eN = LanguageMapping{
 		"[n] new branch based on commit hash",
 		"[r] reset to this commit",
 		"[ctrl+p] cherry pick and apply",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingLogComponent: []string{
@@ -274,9 +293,11 @@ var eN = LanguageMapping{
 		"[backspace] pop",
 		"[d] discard",
 		"[enter] view stash content",
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingKeyStashComponentNone: []string{
+		"[F] filter",
 		"[?] keybinding and instructions",
 	},
 	KeyBindingForCommitPopUp: []string{
@@ -1034,6 +1055,11 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "move up or down the list",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
 }
 
 // Tag Component Key Binding for en
@@ -1071,6 +1097,11 @@ var enTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
 }
@@ -1115,6 +1146,11 @@ var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
 }
@@ -1164,6 +1200,11 @@ var enWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
 }
@@ -1218,6 +1259,11 @@ var enModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "move up or down the list",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
 }
@@ -1279,6 +1325,11 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "move up and down",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
 }
 
 // RefLog Component Key Binding for en
@@ -1328,6 +1379,11 @@ var enRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "move up and down",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
 }
 
 // Stash Component Key Binding for en
@@ -1365,6 +1421,11 @@ var enStashComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "move up and down",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
 }

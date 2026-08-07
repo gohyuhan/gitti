@@ -116,6 +116,7 @@ var zH_HANS = LanguageMapping{
 		"[n] 新建分支",
 		"[r] 变基 (rebase)",
 		"[</>] 切换组件",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
@@ -124,15 +125,18 @@ var zH_HANS = LanguageMapping{
 		"[n] 新建分支",
 		"[d] 删除分支",
 		"[</>] 切换组件",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLocalBranchComponentNone: []string{
 		"[</>] 切换组件",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingTagComponentNone: []string{
 		"[</>] 切换组件",
 		"[f] 获取标签",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingTagComponentDefault: []string{
@@ -140,11 +144,13 @@ var zH_HANS = LanguageMapping{
 		"[d] 删除标签",
 		"[ctrl+p] 推送标签",
 		"[f] 获取标签",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingRemoteComponentNone: []string{
 		"[</>] 切换组件",
 		"[n] 新建远程",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingRemoteComponentDefault: []string{
@@ -153,12 +159,14 @@ var zH_HANS = LanguageMapping{
 		"[d] 移除远程",
 		"[e] 编辑远程",
 		"[enter] 设置为上游追踪分支",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] 切换组件",
 		"[n] 新建工作树",
 		"[ctrl+p] 清理工作树",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
@@ -166,6 +174,7 @@ var zH_HANS = LanguageMapping{
 		"[Enter] 切换工作树",
 		"[n] 新建工作树",
 		"[ctrl+p] 清理工作树",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 
@@ -175,6 +184,7 @@ var zH_HANS = LanguageMapping{
 		"[n] 新建工作树",
 		"[o] 锁定/解锁工作树",
 		"[ctrl+p] 清理工作树",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingWorktreeComponentSwitchable: []string{
@@ -184,6 +194,7 @@ var zH_HANS = LanguageMapping{
 		"[n] 新建工作树",
 		"[o] 锁定/解锁工作树",
 		"[ctrl+p] 清理工作树",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
@@ -191,6 +202,7 @@ var zH_HANS = LanguageMapping{
 		"[e] 编辑",
 		"[r] 解决冲突",
 		"[enter] 查看修改内容",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
@@ -200,6 +212,7 @@ var zH_HANS = LanguageMapping{
 		"[S] 储藏所有更改",
 		"[d] 舍弃更改",
 		"[enter] 查看修改内容",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
@@ -209,13 +222,16 @@ var zH_HANS = LanguageMapping{
 		"[S] 储藏所有更改",
 		"[d] 舍弃更改",
 		"[enter] 查看修改内容",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingModifiedFilesComponentNone: []string{
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingCommitLogComponentNone: []string{
 		"[</>] 切换组件",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingCommitLogComponent: []string{
@@ -228,10 +244,12 @@ var zH_HANS = LanguageMapping{
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 遴选操作",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingRefLogComponentNone: []string{
 		"[</>] 切换组件",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingRefLogComponent: []string{
@@ -242,6 +260,7 @@ var zH_HANS = LanguageMapping{
 		"[n] 基于此提交哈希创建新分支",
 		"[r] 重置到此提交",
 		"[ctrl+p] 遴选并应用",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingLogComponent: []string{
@@ -275,9 +294,11 @@ var zH_HANS = LanguageMapping{
 		"[backspace] 弹出",
 		"[d] 丢弃",
 		"[enter] 查看储藏内容",
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingKeyStashComponentNone: []string{
+		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
 	KeyBindingForCommitPopUp: []string{
@@ -1036,6 +1057,11 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下移动列表",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
 }
 
 // Tag Component Key Binding for zh-hans
@@ -1073,6 +1099,11 @@ var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1117,6 +1148,11 @@ var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1166,6 +1202,11 @@ var zhHansWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1220,6 +1261,11 @@ var zhHansModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移动列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
 }
@@ -1281,6 +1327,11 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下移动",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
 }
 
 // RefLog Component Key Binding for zh-hans
@@ -1330,6 +1381,11 @@ var zhHansRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "上下移动",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
 }
 
 // Stash Component Key Binding for zh-hans
@@ -1367,6 +1423,11 @@ var zhHansStashComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "↑/↓",
 		TitleOrInfoLine: "上下移动",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
 }

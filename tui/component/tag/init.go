@@ -40,6 +40,8 @@ func InitTagList(m *types.GittiModel) bool {
 		}
 	}
 
+	latestTagArray, selectedTagPosition = utils.FilterListItems(latestTagArray, m.PanelFilterQuery[constant.SHOW_TAG], previousSelectedTag, selectedTagPosition)
+
 	previousTagsCount := len(m.CurrentRepoTagInfoList.Items())
 
 	m.CurrentRepoTagInfoList = list.New(latestTagArray, GitTagItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
@@ -56,7 +58,7 @@ func InitTagList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoTagInfoList.SetShowHelp(true)
 	m.CurrentRepoTagInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoTagInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoTagInfoList)
+	m.CurrentRepoTagInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoTagInfoList, constant.SHOW_TAG)
 
 	if len(latestTagArray) < 1 {
 		return len(latestTagArray) != previousTagsCount

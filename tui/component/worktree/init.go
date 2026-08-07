@@ -38,6 +38,8 @@ func InitWorktreeList(m *types.GittiModel) bool {
 		}
 	}
 
+	latestWorktreeArray, selectedWorktreePosition = utils.FilterListItems(latestWorktreeArray, m.PanelFilterQuery[constant.SHOW_WORKTREE], previousSelectedWorktree, selectedWorktreePosition)
+
 	previousWorktreeCount := len(m.CurrentRepoWorktreeInfoList.Items())
 
 	m.CurrentRepoWorktreeInfoList = list.New(latestWorktreeArray, GitWorktreeItemDelegate{}, m.WindowLeftPanelWidth, m.LocalBranchesComponentPanelHeight)
@@ -54,7 +56,7 @@ func InitWorktreeList(m *types.GittiModel) bool {
 	// Custom Help Model for Count Display
 	m.CurrentRepoWorktreeInfoList.SetShowHelp(true)
 	m.CurrentRepoWorktreeInfoList.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	m.CurrentRepoWorktreeInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoWorktreeInfoList)
+	m.CurrentRepoWorktreeInfoList.AdditionalShortHelpKeys = utils.ListCounterHelper(m, &m.CurrentRepoWorktreeInfoList, constant.SHOW_WORKTREE)
 
 	if len(latestWorktreeArray) < 1 {
 		return len(latestWorktreeArray) != previousWorktreeCount

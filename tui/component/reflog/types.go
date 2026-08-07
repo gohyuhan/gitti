@@ -33,7 +33,7 @@ type (
 )
 
 func (i GitRefLogItem) FilterValue() string {
-	return i.InfoDesc
+	return i.Hash + " " + i.InfoDesc
 }
 
 func (d GitRefLogItemDelegate) Height() int                             { return 1 }
