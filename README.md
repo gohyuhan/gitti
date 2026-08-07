@@ -220,6 +220,13 @@ gitti --init-dbranch main --global
 
 ## Changelog
 
+### [v0.9.0]
+
+- feature: list filtering with `F` for the branch, tag, remote, worktree, file, commit log, reflog, and stash lists
+- feature: mouse click to focus a panel or select a list item
+- other: split keybindings into their own files
+- other: update release CI for the Node.js 20 actions deprecation
+
 ### [v0.8.0]
 
 - feature: worktree management
