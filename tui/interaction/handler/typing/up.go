@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/tui/constant"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
+	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -25,6 +26,11 @@ func handleTypingUpKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel
 				} else {
 					popUp.BlameViewport.ScrollUp(1)
 				}
+			}
+		case constant.ChooseRemoteBranchOptionPopUp:
+			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseRemoteBranchOptionPopUpModel)
+			if ok {
+				popUp.RemoteBranchOptionList.CursorUp()
 			}
 		}
 	}

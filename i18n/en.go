@@ -532,6 +532,7 @@ var eN = LanguageMapping{
 	KeyBindingForChooseRemoteBranchOptionPopUp: []string{
 		"[↑/↓] move up and down",
 		"[enter] select remote branch option",
+		"[type <char>] branch name filter",
 		"[esc] cancel / close",
 	},
 	KeyBindingForChooseBranchOptionForMergePopUp: []string{
@@ -797,6 +798,7 @@ var eN = LanguageMapping{
 	BlameFilePathFilterPlaceholder:                                 "filter file path ...",
 	GitTrackedFileTitle:                                            "Git Tracked Files",
 	BlameViewportTitle:                                             "Blame: %s",
+	RemoteBranchFilterPlaceholder:                                  "filter remote branch ...",
 	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError:          "Interactive rebase requires at least 2 commits to be selected",
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "The fixup/squash target must not be a merge commit",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "The base commit of the selection cannot be a merge commit",

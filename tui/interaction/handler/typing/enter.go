@@ -118,6 +118,31 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 			}
 		}
 
+	case constant.ChooseRemoteBranchOptionPopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseRemoteBranchOptionPopUpModel)
+		if ok {
+			selectedRemoteBranch := popUp.RemoteBranchOptionList.SelectedItem()
+			if selectedRemoteBranch != nil {
+				branchName := selectedRemoteBranch.(branchPopUp.RemoteBranchItem).BranchName
+				if utf8.RuneCountInString(branchName) > 0 {
+					branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUpModel(m)
+					outputPopUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
+					if ok {
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.CreateBranchBasedOnRemoteOutputPopUp
+						outputPopUp.IsProcessing.Store(true)
+						services.CreateNewBranchBasedOnRemoteService(m, "", branchName, git.NEWBRANCHBASEDONREMOTEUSERSELECT)
+						return m, outputPopUp.Spinner.Tick
+					} else {
+						m.ShowPopUp.Store(false)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.NoPopUp
+					}
+				}
+			}
+		}
+
 	case constant.GitRebaseBranchInputPopUp:
 		popUp, ok := m.PopUpModel.(*rebasePopUp.GitRebaseBranchInputPopUpModel)
 		if ok {

@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/tui/constant"
 	blamePopUp "github.com/gohyuhan/gitti/tui/popup/blame"
+	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 )
@@ -28,6 +29,19 @@ func handleTypingESCKeyBindingInteraction(m *types.GittiModel) (*types.GittiMode
 		if ok {
 			if popUp.ShowingBlameInfo {
 				popUp.ResetSelectedBlameFile()
+			} else {
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
+		}
+	case constant.ChooseRemoteBranchOptionPopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseRemoteBranchOptionPopUpModel)
+		if ok {
+			if popUp.FilteringInput.Value() != "" {
+				popUp.FilteringInput.SetValue("")
+				popUp.RemoteBranchOptionList.SetFilterText("")
 			} else {
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)

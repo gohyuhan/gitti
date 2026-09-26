@@ -167,6 +167,13 @@ func Handle(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cm
 			popUp.CurrentGitTrackedFilesPathList.SetFilterText(popUp.FilterValue)
 			return m, cmd
 		}
+	case constant.ChooseRemoteBranchOptionPopUp:
+		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseRemoteBranchOptionPopUpModel)
+		if ok && msg.String() != "up" && msg.String() != "down" {
+			popUp.FilteringInput, cmd = popUp.FilteringInput.Update(msg)
+			popUp.RemoteBranchOptionList.SetFilterText(popUp.FilteringInput.Value())
+			return m, cmd
+		}
 	case constant.InteractiveRebaseFixupSquashCommitPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashCommitPopUpModel)
 		if ok {

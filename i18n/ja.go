@@ -533,6 +533,7 @@ var jA = LanguageMapping{
 	KeyBindingForChooseRemoteBranchOptionPopUp: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] リモートブランチオプションを選択",
+		"[type <char>] ブランチ名を絞り込み",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForChooseBranchOptionForMergePopUp: []string{
@@ -798,6 +799,7 @@ var jA = LanguageMapping{
 	BlameFilePathFilterPlaceholder:                                 "ファイルパスをフィルタ ...",
 	GitTrackedFileTitle:                                            "追跡ファイル一覧",
 	BlameViewportTitle:                                             "Blame: %s",
+	RemoteBranchFilterPlaceholder:                                  "リモートブランチをフィルタ ...",
 	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError:          "インタラクティブリベースには少なくとも2つのコミットを選択する必要があります",
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "fixup/squash ターゲットはマージコミットであってはなりません",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "選択のベースコミットはマージコミットであってはなりません",

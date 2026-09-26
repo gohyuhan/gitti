@@ -533,6 +533,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingForChooseRemoteBranchOptionPopUp: []string{
 		"[↑/↓] 上下移動",
 		"[enter] 選擇遠端分支選項",
+		"[type <char>] 過濾分支名稱",
 		"[esc] 取消 / 關閉",
 	},
 	KeyBindingForChooseBranchOptionForMergePopUp: []string{
@@ -798,6 +799,7 @@ var zH_HANT = LanguageMapping{
 	BlameFilePathFilterPlaceholder:                                 "過濾檔案路徑 ...",
 	GitTrackedFileTitle:                                            "已追蹤檔案",
 	BlameViewportTitle:                                             "Blame: %s",
+	RemoteBranchFilterPlaceholder:                                  "過濾遠端分支 ...",
 	InteractiveRebaseFixupMustHaveAtLeastTwoSelectedError:          "互動式變基至少需要選取 2 個提交",
 	InteractiveRebaseFixupBaseSelectionMustNotBeMergeCommitError:   "fixup/squash 目標不可為合併提交",
 	InteractiveRebaseFixupBaseCommitCannotBeAMergeCommit:           "所選內容的基礎提交不可為合併提交",

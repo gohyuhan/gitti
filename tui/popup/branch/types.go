@@ -240,6 +240,7 @@ func (d GitSwitchBranchTypeOptionDelegate) Render(w io.Writer, m list.Model, ind
 // ------------------------------------
 type ChooseRemoteBranchOptionPopUpModel struct {
 	RemoteBranchOptionList list.Model
+	FilteringInput         textinput.Model
 }
 
 // ------------------------------------

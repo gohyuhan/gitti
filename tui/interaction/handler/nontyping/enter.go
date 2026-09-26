@@ -211,7 +211,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				case git.NEWBRANCHBASEDONREMOTEUSERSELECT:
 					m.PopUpType = constant.ChooseRemoteBranchOptionPopUp
 					m.ShowPopUp.Store(true)
-					m.IsTyping.Store(false)
+					m.IsTyping.Store(true)
 					branchPopUp.InitChooseRemoteBranchOptionPopUpModel(m)
 				default:
 					m.PopUpType = constant.CreateNewBranchPopUp
