@@ -20,16 +20,16 @@ import (
 //	files offer a revert-rename action instead.
 //
 // ------------------------------------
-func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
+func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, fileDisplayName string, filePathName string, newlyAddedOrCopiedFile bool, renameFile bool) {
 	discardTypeOption := []GitDiscardTypeOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeInfo, filePathName),
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeInfo, fileDisplayName),
 			DiscardType: git.DISCARDWHOLE,
 		},
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, fileDisplayName),
 			DiscardType: git.DISCARDUNSTAGE,
 		},
 	}
@@ -38,12 +38,12 @@ func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, filePathName string
 		discardTypeOption = []GitDiscardTypeOptionItem{
 			{
 				Name:        i18n.LANGUAGEMAPPING.GitDiscardWhole,
-				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeInfo, filePathName),
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeInfo, fileDisplayName),
 				DiscardType: git.DISCARDNEWLYADDEDORCOPIED,
 			},
 			{
 				Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,
-				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, fileDisplayName),
 				DiscardType: git.DISCARDUNSTAGE,
 			},
 		}
@@ -53,12 +53,12 @@ func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, filePathName string
 		discardTypeOption = []GitDiscardTypeOptionItem{
 			{
 				Name:        i18n.LANGUAGEMAPPING.GitDiscardAndRevertRename,
-				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardAndRevertRenameInfo, filePathName),
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardAndRevertRenameInfo, fileDisplayName),
 				DiscardType: git.DISCARDANDREVERTRENAME,
 			},
 			{
 				Name:        i18n.LANGUAGEMAPPING.GitDiscardUnstage,
-				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, filePathName),
+				Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageInfo, fileDisplayName),
 				DiscardType: git.DISCARDUNSTAGE,
 			},
 		}
@@ -84,6 +84,7 @@ func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, filePathName string
 
 	popUpModel := &GitDiscardTypeOptionPopUpModel{
 		DiscardTypeOptionList: gDTOL,
+		FileDisplayName:       fileDisplayName,
 		FilePathName:          filePathName,
 	}
 
@@ -96,10 +97,11 @@ func InitGitDiscardTypeOptionPopUpModel(m *types.GittiModel, filePathName string
 //	and the chosen discard type, shown before the discard is executed.
 //
 // ------------------------------------
-func InitGitDiscardConfirmPromptPopUpModel(m *types.GittiModel, filePathName string, discardType string) {
+func InitGitDiscardConfirmPromptPopUpModel(m *types.GittiModel, fileDisplayName string, filePathName string, discardType string) {
 	popUpModel := &GitDiscardConfirmPromptPopUpModel{
-		FilePathName: filePathName,
-		DiscardType:  discardType,
+		FileDisplayName: fileDisplayName,
+		FilePathName:    filePathName,
+		DiscardType:     discardType,
 	}
 	m.PopUpModel = popUpModel
 }

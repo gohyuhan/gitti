@@ -27,7 +27,7 @@ func handleNonTypingsKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			if selectedFile.HasConflict {
 				return m, nil
 			}
-			filePathName = selectedFile.FilePathname
+			filePathName = selectedFile.NewFilePathname
 			m.PopUpType = constant.GitStashMessagePopUp
 			stashPopUp.InitGitStashMessagePopUpModel(m, filePathName, git.STASHFILE)
 			m.ShowPopUp.Store(true)

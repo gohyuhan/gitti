@@ -47,7 +47,11 @@ func RenderCreateNewBranchPopUp(m *types.GittiModel) string {
 	popUp, ok := m.PopUpModel.(*CreateNewBranchPopUpModel)
 	if ok {
 		popUpWidth := min(constant.MaxCreateNewBranchPopUpWidth, int(float64(m.Width)*0.8))
-		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.CreateNewBranchTitle)
+		titleText := i18n.LANGUAGEMAPPING.CreateNewBranchTitle
+		if popUp.CreateType == git.RENAMEBRANCH {
+			titleText = fmt.Sprintf(i18n.LANGUAGEMAPPING.RenameBranchTitle, popUp.OldBranchName)
+		}
+		title := style.TitleStyle.Render(titleText)
 		popUp.NewBranchNameInput.SetWidth(popUpWidth - 6)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,

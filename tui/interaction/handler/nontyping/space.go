@@ -34,7 +34,7 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			var filePathName string
 			if currentSelectedModifiedFile != nil {
-				filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+				filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).NewFilePathname
 				services.GitStageOrUnstageService(m, filePathName)
 			}
 
@@ -51,7 +51,7 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				var filePathName string
 				if currentSelectedModifiedFile != nil {
-					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).NewFilePathname
 					services.GitStageLineOrUnstageLineService(m, filePathName)
 				}
 			}

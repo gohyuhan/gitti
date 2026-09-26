@@ -23,10 +23,12 @@ import (
 type (
 	GitModifiedFilesItemDelegate struct{}
 	GitModifiedFilesItem         struct {
-		FilePathname string
-		IndexState   string
-		WorkTree     string
-		HasConflict  bool
+		FilePathname    string
+		OldFilePathname string
+		NewFilePathname string
+		IndexState      string
+		WorkTree        string
+		HasConflict     bool
 	}
 )
 

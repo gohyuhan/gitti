@@ -25,6 +25,7 @@ type GitDaemon struct {
 	gitFilesActiveRefreshDur            time.Duration
 	gitRemoteSyncStatusActiveRefreshDur time.Duration
 	isGitBranchPassiveRunning           atomic.Bool
+	isGitBranchFetchRequested           atomic.Bool // a branch fetch was asked for; see RequestBranchFetch
 	isGitFilesPassiveActiveRunning      atomic.Bool
 	isGitCommitLogPassiveRunning        atomic.Bool
 	isGitRefLogPassiveRunning           atomic.Bool
@@ -118,6 +119,26 @@ func (gd *GitDaemon) UpdateGitOperations(gitOperations *GitOperations) {
 // ------------------------------------
 func (gd *GitDaemon) TriggerFullInfoFetch() {
 	gd.gitLatestInfoFetch(true)
+}
+
+// ------------------------------------
+//
+//	Fetch the local branches and send GIT_BRANCH_UPDATE. A request never gets lost: if a fetch
+//	is running, it may have read the refs before the change that caused this request, so it
+//	fetches once more when it ends. The last update sent is always read after the last request.
+//
+// ------------------------------------
+func (gd *GitDaemon) RequestBranchFetch() {
+	gd.isGitBranchFetchRequested.Store(true)
+	go func() {
+		// the fetch that wins the flag handles every request made before it clears it
+		for gd.isGitBranchFetchRequested.Load() && gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
+			gd.isGitBranchFetchRequested.Store(false)
+			gd.gitOperations.Load().GitBranch.GetLatestBranchesInfo()
+			gd.updateChannel <- git.GIT_BRANCH_UPDATE
+			gd.isGitBranchPassiveRunning.Store(false)
+		}
+	}()
 }
 
 // ------------------------------------
@@ -277,13 +298,7 @@ func (gd *GitDaemon) gitLatestInfoFetch(needFetch bool) {
 			gd.updateChannel <- git.GIT_STATE_UPDATE
 		}
 	}()
-	go func() {
-		if gd.isGitBranchPassiveRunning.CompareAndSwap(false, true) {
-			defer gd.isGitBranchPassiveRunning.Store(false)
-			gd.gitOperations.Load().GitBranch.GetLatestBranchesInfo()
-			gd.updateChannel <- git.GIT_BRANCH_UPDATE
-		}
-	}()
+	gd.RequestBranchFetch()
 	go func() {
 		if gd.isGitRemoteSyncStatusActiveRunning.CompareAndSwap(false, true) {
 			defer gd.isGitRemoteSyncStatusActiveRunning.Store(false)

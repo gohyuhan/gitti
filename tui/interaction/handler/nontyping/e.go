@@ -1,10 +1,16 @@
 package nontyping
 
 import (
+	"fmt"
+	"path/filepath"
+
 	tea "charm.land/bubbletea/v2"
+	"github.com/gohyuhan/gitti/logging"
+	"github.com/gohyuhan/gitti/tui/component/branch"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/constant"
+	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
 	"github.com/gohyuhan/gitti/tui/types"
@@ -15,6 +21,7 @@ import (
 //	Handle 'e' key interaction.
 //	Responsibility: Contextual "edit" action.
 //	- In popups: Switches a cherry-pick view into "edit cherry-pick" mode.
+//	- In Local Branch Panel: Opens the prompt to rename the selected local branch.
 //	- In Remote Panel: Opens the prompt to edit an existing remote's URL/Name.
 //	- In Modified Files Panel: Launches the user's defined system editor (handling terminal/GUI diffs).
 //	- In Log Panel: Triggers exporting the internal application logs.
@@ -33,6 +40,20 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		switch m.CurrentSelectedComponent {
 		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel:
 			switch m.CurrentLocalBranchOrTagOrRemoteOrWorktreeComponentShowing {
+			case constant.SHOW_LOCAL_BRANCH:
+				selectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
+				if selectedBranch != nil {
+					// renaming in the middle of a merge, rebase, am, cherry-pick, revert or notes merge could break that operation
+					if m.CurrentGitRepoStatus != "" {
+						m.GittiLogger.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, "", logging.WARN, fmt.Sprintf("Cannot rename branch while %s is in progress", m.CurrentGitRepoStatus), false)
+						return m, nil
+					}
+					branchItem := selectedBranch.(branch.GitBranchItem)
+					branchPopUp.InitRenameBranchPopUpModel(m, branchItem.BranchName)
+					m.PopUpType = constant.CreateNewBranchPopUp
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(true)
+				}
 			case constant.SHOW_REMOTE:
 				selectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
 				if selectedRemote != nil {
@@ -47,7 +68,9 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if currentSelectedFileItem != nil {
 				currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
-				return launchEditor(m, currentSelectedFile.FilePathname)
+				// absolute path: the editor runs in gitti's start directory (maybe a subdirectory),
+				// and a name starting with "-" must not be read as an editor option
+				return launchEditor(m, filepath.Join(m.RepoPath, currentSelectedFile.NewFilePathname))
 			}
 		case constant.LogComponentPanel:
 			go func() {

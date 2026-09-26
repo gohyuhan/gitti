@@ -278,7 +278,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
 				selectedOption := selectedDiscardItem.(discardPopUp.GitDiscardTypeOptionItem)
-				discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, popUp.FilePathName, selectedOption.DiscardType)
+				discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, popUp.FileDisplayName, popUp.FilePathName, selectedOption.DiscardType)
 			}
 		case constant.GitDiscardConfirmPromptPopUp:
 			popUp, ok := m.PopUpModel.(*discardPopUp.GitDiscardConfirmPromptPopUpModel)
@@ -438,7 +438,7 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 				var filePathName string
 				if currentSelectedModifiedFile != nil {
-					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+					filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).NewFilePathname
 					services.GitDiscardLineFileChangeService(m, filePathName)
 					m.ShowPopUp.Store(false)
 					m.IsTyping.Store(false)

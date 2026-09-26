@@ -90,6 +90,7 @@ type GittiModel struct {
 	DetailPanelViewportOGStringArray                          []string
 	DetailPanelTwoViewportOGStringArray                       []string
 	CherryPickedCommitInfo                                    CherryPickedCommitInfo
+	PendingBranchRename                                       RenamedBranchInfo
 	PanelFilterQuery                                          map[string]string // per panel list filter query, keyed by the showing component constant (e.g. SHOW_LOCAL_BRANCH, C2)
 	IsPanelFiltering                                          atomic.Bool       // to indicate the user is currently typing a panel list filter query
 	PanelFilterInput                                          textinput.Model   // shared text input for typing a panel list filter query, loaded with the focused panel's query on 'F'
@@ -106,6 +107,18 @@ type GittiModel struct {
 type CherryPickedCommitInfo struct {
 	LatestSequenceCounter int // this counter will only increase or reinit to 0, this help us to sort the Map when showing in the UI (doesn't mean will apply to cherry pick in the order)
 	CherryPickedCommitMap map[string]git.CherryPickedCommitLog
+}
+
+// ---------------------------------
+//
+// to record a submitted branch rename until it resolves, so the branch list refresh can keep the
+// cursor on the renamed branch. It is cleared when a refresh shows the old name gone, when the rename
+// fails (BranchRenameFinishedMsg), or when the user picks another branch (key or mouse input)
+//
+// ---------------------------------
+type RenamedBranchInfo struct {
+	OldBranchName string
+	NewBranchName string
 }
 
 // ---------------------------------
@@ -147,6 +160,13 @@ type GittiLineEditingIndexPositionAndInfo struct {
 // ---------------------------------
 type EditorFinishedMsg struct {
 	Err error
+}
+
+// sent when a background branch rename ends; IsRenamed comes from the branch refs, not git's exit code
+type BranchRenameFinishedMsg struct {
+	OldBranchName string
+	NewBranchName string
+	IsRenamed     bool
 }
 
 type GitOperationRequiredSigningFinishedMsg struct {

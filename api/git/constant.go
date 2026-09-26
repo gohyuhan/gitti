@@ -32,6 +32,7 @@ const (
 	NEWBRANCHBASEDONREMOTEUSERINPUT  = "NEWBRANCHBASEDONREMOTEUSERINPUT"  // Create new branch based on a remote branch (user manual input)
 	NEWBRANCHBASEDONREMOTEUSERSELECT = "NEWBRANCHBASEDONREMOTEUSERSELECT" // Create new branch based on a remote branch (user selection from a list of remote branches)
 	NEWBRANCHBASEDONCOMMITHASH       = "NEWBRANCHBASEDONCOMMITHASH"       // Create new branch based on commit hash (commit hash was retrieved from reflog)
+	RENAMEBRANCH                     = "RENAMEBRANCH"                     // Rename local branch (reuses the create new branch popup)
 )
 
 // Branch switching operation types

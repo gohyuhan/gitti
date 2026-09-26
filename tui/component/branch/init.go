@@ -26,6 +26,26 @@ func InitBranchList(m *types.GittiModel) {
 	previousSelectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 	selectedBranchPosition := -1
 
+	// a submitted rename (PendingBranchRename): once the branch data shows it (old name gone), keep
+	// the cursor on the renamed branch if the old name is still the selection, then forget the
+	// rename. Data read before the rename still lists the old name, so the rename is kept for the
+	// next refresh. A failed rename or a newer user selection clears it earlier (see tui.go).
+	if m.PendingBranchRename.OldBranchName != "" {
+		oldBranchExists := currentCheckOut.BranchName == m.PendingBranchRename.OldBranchName
+		newBranchExists := currentCheckOut.BranchName == m.PendingBranchRename.NewBranchName
+		for _, branch := range m.GitOperations.GitBranch.AllBranches() {
+			oldBranchExists = oldBranchExists || branch.BranchName == m.PendingBranchRename.OldBranchName
+			newBranchExists = newBranchExists || branch.BranchName == m.PendingBranchRename.NewBranchName
+		}
+		if !oldBranchExists {
+			isOldBranchStillSelected := previousSelectedBranch != nil && previousSelectedBranch.(GitBranchItem).BranchName == m.PendingBranchRename.OldBranchName
+			if newBranchExists && isOldBranchStillSelected {
+				previousSelectedBranch = GitBranchItem{BranchName: m.PendingBranchRename.NewBranchName}
+			}
+			m.PendingBranchRename = types.RenamedBranchInfo{}
+		}
+	}
+
 	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
 
 	if previousSelectedBranch != nil {

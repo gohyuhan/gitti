@@ -114,6 +114,7 @@ var zH_HANS = LanguageMapping{
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[m] 合并",
 		"[n] 新建分支",
+		"[e] 重命名分支",
 		"[r] 变基 (rebase)",
 		"[</>] 切换组件",
 		"[F] 过滤",
@@ -123,6 +124,7 @@ var zH_HANS = LanguageMapping{
 		"[enter] 切换分支",
 		"[m] 合并",
 		"[n] 新建分支",
+		"[e] 重命名分支",
 		"[d] 删除分支",
 		"[</>] 切换组件",
 		"[F] 过滤",
@@ -651,6 +653,7 @@ var zH_HANS = LanguageMapping{
 	NewWorktreeBranchTitle:                                         "工作树分支（可选）",
 	ChooseNewBranchTypeTitle:                                       "您希望如何创建新的 Git 分支？",
 	NewBranchInvalidWarning:                                        "分支名称无效，将替换为 `%s`",
+	RenameBranchTitle:                                              "重命名分支 (%s)",
 	CreateNewBranchTitle:                                           "创建新分支",
 	CreateNewBranchDescription:                                     "创建新分支并停留在当前分支",
 	CreateNewBranchAndSwitchTitle:                                  "创建新分支并移动更改",
@@ -1037,6 +1040,11 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "删除分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "重命名分支 (仅限本地)",
 		LineType:        INFO,
 	},
 	{

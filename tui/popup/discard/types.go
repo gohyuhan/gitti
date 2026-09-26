@@ -21,7 +21,8 @@ import (
 // ------------------------------------
 type GitDiscardTypeOptionPopUpModel struct {
 	DiscardTypeOptionList list.Model
-	FilePathName          string
+	FileDisplayName       string // the files list label, for display only
+	FilePathName          string // the exact path, for the discard operation
 }
 
 // ------------------------------------
@@ -31,8 +32,9 @@ type GitDiscardTypeOptionPopUpModel struct {
 //
 // ------------------------------------
 type GitDiscardConfirmPromptPopUpModel struct {
-	DiscardType  string
-	FilePathName string
+	DiscardType     string
+	FileDisplayName string // the files list label, for display only
+	FilePathName    string // the exact path, for the discard operation
 }
 
 // ------------------------------------

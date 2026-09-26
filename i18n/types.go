@@ -298,6 +298,7 @@ type LanguageMapping struct {
 	NewWorktreeBranchTitle     string
 	ChooseNewBranchTypeTitle   string
 	NewBranchInvalidWarning    string
+	RenameBranchTitle          string
 	// Create Branch Option
 	CreateNewBranchTitle                                 string
 	CreateNewBranchDescription                           string
