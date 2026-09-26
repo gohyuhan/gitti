@@ -560,7 +560,7 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 				} else {
 					if file.IndexState == "?" && file.WorkTree == "?" {
 						// not tracked
-						keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault
+						keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentUntracked
 					} else if file.IndexState != " " && file.WorkTree != " " {
 						// staged but have modification later
 						keys = i18n.LANGUAGEMAPPING.KeyBindingModifiedFilesComponentDefault

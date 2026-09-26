@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -26,6 +27,7 @@ type LogItem struct {
 }
 
 type GittiLogging struct {
+	logsMu          sync.RWMutex
 	logs            []LogItem
 	maxLogsCount    int
 	updateChannel   chan string
@@ -52,11 +54,15 @@ func InitGittiLogging(maxLogsCount int, updateChannel chan string, showLatestXLo
 //
 // ------------------------------------
 func (gl *GittiLogging) GetLogs() []LogItem {
+	gl.logsMu.RLock()
+	defer gl.logsMu.RUnlock()
+	visible := gl.logs
 	if len(gl.logs) > gl.showLatestXLogs {
-		return gl.logs[len(gl.logs)-gl.showLatestXLogs-1:] // we get only the latest 3 log items
-	} else {
-		return gl.logs
+		visible = gl.logs[len(gl.logs)-gl.showLatestXLogs-1:] // we get only the latest 3 log items
 	}
+	copied := make([]LogItem, len(visible))
+	copy(copied, visible)
+	return copied
 }
 
 // ------------------------------------
@@ -65,10 +71,16 @@ func (gl *GittiLogging) GetLogs() []LogItem {
 //
 // ------------------------------------
 func (gl *GittiLogging) GetFullLogs() []LogItem {
-	return gl.logs
+	gl.logsMu.RLock()
+	defer gl.logsMu.RUnlock()
+	copied := make([]LogItem, len(gl.logs))
+	copy(copied, gl.logs)
+	return copied
 }
 
 func (gl *GittiLogging) ClearLogs() {
+	gl.logsMu.Lock()
+	defer gl.logsMu.Unlock()
 	gl.logs = make([]LogItem, 0, gl.maxLogsCount)
 }
 
@@ -91,13 +103,19 @@ func (gl *GittiLogging) RegisterNewLog(logOpsType string, logOpsCommand string, 
 		OpsSeverityLevel: logOpsSeverityLevel,
 		OpsDescription:   logOpsDescription,
 	}
+	gl.logsMu.Lock()
 	if len(gl.logs) < gl.maxLogsCount {
 		gl.logs = append(gl.logs, newLogItem)
 	} else {
 		gl.logs = append(gl.logs[1:], newLogItem)
 	}
+	gl.logsMu.Unlock()
 
-	gl.updateChannel <- NEW_LOG_UPDATE
+	// The UI rebuilds from the full log snapshot. A queued update covers newer logs too.
+	select {
+	case gl.updateChannel <- NEW_LOG_UPDATE:
+	default:
+	}
 }
 
 // ------------------------------------

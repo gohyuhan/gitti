@@ -89,7 +89,7 @@ func InitGitOperations(absoluteGitRepoPath string, absoluteWorktreePath string, 
 	return &GitOperations{
 		GitBranch:              git.InitGitBranch(gitProcessLock, settings.GITTICONFIGSETTINGS.FfMerge, gittiLogging),
 		GitCommit:              git.InitGitCommit(updateChannel, gitProcessLock, gittiLogging),
-		GitFiles:               git.InitGitFile(updateChannel, gitProcessLock, gittiLogging),
+		GitFiles:               git.InitGitFileAt(absoluteWorktreePath, updateChannel, gitProcessLock, gittiLogging),
 		GitPull:                git.InitGitPull(updateChannel, gitProcessLock, gittiLogging),
 		GitRebase:              git.InitGitRebase(updateChannel, gitProcessLock, gittiLogging),
 		GitStash:               git.InitGitStash(gitProcessLock, gittiLogging),

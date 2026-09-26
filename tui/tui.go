@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/gohyuhan/gitti/api"
@@ -195,6 +196,41 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.GittiLogger.RegisterNewLog(logging.COPY_VALUE_OPS, "", logging.WARN, fmt.Sprintf(i18n.LANGUAGEMAPPING.CopyFailed, coreutils.EscapeControlCharacters(msg.Err.Error())), false)
 		} else {
 			m.GittiLogger.RegisterNewLog(logging.COPY_VALUE_OPS, fmt.Sprintf(i18n.LANGUAGEMAPPING.CopySucceeded, coreutils.EscapeControlCharacters(msg.Value)), logging.INFO, "", false)
+		}
+		return gAM, nil
+	case types.IgnoreFinishedMsg:
+		if m.GitOperations.GitFiles != msg.GitFiles {
+			return gAM, nil
+		}
+		m.IgnoreInProgress = false
+		path := git.QuoteFilePathName(msg.FilePath)
+		labels := i18n.LANGUAGEMAPPING
+		switch {
+		case errors.Is(msg.Err, git.ErrIgnoreTracked):
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, "", logging.WARN, labels.IgnoreTracked, false)
+		case errors.Is(msg.Err, git.ErrIgnoreNotUntracked):
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, "", logging.WARN, labels.IgnoreNotUntracked, false)
+		case msg.Err != nil && msg.Result.Wrote:
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, "", logging.WARN, fmt.Sprintf(labels.IgnoreVerifyFailed, path, coreutils.EscapeControlCharacters(msg.Err.Error())), false)
+		case msg.Err != nil:
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, "", logging.WARN, fmt.Sprintf(labels.IgnoreFailed, path, coreutils.EscapeControlCharacters(msg.Err.Error())), false)
+		case msg.Result.AlreadyPresent:
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, fmt.Sprintf(labels.IgnoreAlreadyPresent, path, git.QuoteFilePathName(msg.Result.IgnorePath)), logging.INFO, "", false)
+			if msg.Result.StillVisible {
+				m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, "", logging.WARN, fmt.Sprintf(labels.IgnoreStillVisible, path), false)
+			}
+		case msg.Result.StillVisible:
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, "", logging.WARN, fmt.Sprintf(labels.IgnoreStillVisible, path), false)
+		default:
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, fmt.Sprintf(labels.IgnoreSucceeded, path, git.QuoteFilePathName(msg.Result.IgnorePath)), logging.INFO, "", false)
+		}
+		if msg.RefreshErr != nil {
+			m.GittiLogger.RegisterNewLog(logging.IGNORE_FILE_OPS, "", logging.WARN, fmt.Sprintf(labels.IgnoreRefreshFailed, coreutils.EscapeControlCharacters(msg.RefreshErr.Error())), false)
+		} else {
+			needReinit := filesComponent.InitModifiedFilesList(m)
+			if m.CurrentSelectedComponent == constant.ModifiedFilesComponentPanel || m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel {
+				services.FetchDetailComponentPanelInfoService(m, needReinit)
+			}
 		}
 		return gAM, nil
 	case types.GitOperationRequiredSigningFinishedMsg:
