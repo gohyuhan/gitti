@@ -11,13 +11,20 @@ import (
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/logging"
+	"github.com/gohyuhan/gitti/utils"
 )
 
+// FilePathname is the label for display only ("old -> new" for a rename/copy); labels can collide.
+// NewFilePathname is the exact current path and OldFilePathname the exact source path
+// of a rename/copy (empty otherwise). NewFilePathname identifies the file: callers pass it to
+// the file operations below, and git commands use these exact paths, never the label.
 type FileStatus struct {
-	FilePathname string
-	IndexState   string
-	WorkTree     string
-	HasConflict  bool
+	FilePathname    string
+	OldFilePathname string
+	NewFilePathname string
+	IndexState      string
+	WorkTree        string
+	HasConflict     bool
 }
 
 type GitFiles struct {
@@ -83,21 +90,26 @@ func (gf *GitFiles) GetGitFilesStatus() {
 
 		indexState := string(file[0])
 		worktree := string(file[1])
-		filePathName := file[3:]
+		newFilePathName := file[3:]
+		oldFilePathName := ""
+		filePathName := QuoteFilePathName(newFilePathName)
 		isRenameOrCopy := indexState == "R" || indexState == "C" || worktree == "R" || worktree == "C"
 		if isRenameOrCopy && fieldIndex+1 < len(files) {
-			// with -z the original path is the next entry; rebuild "old -> new" for the callers
+			// with -z the original path is the next entry
 			fieldIndex++
-			filePathName = files[fieldIndex] + " -> " + filePathName
+			oldFilePathName = files[fieldIndex]
+			filePathName = QuoteFilePathName(oldFilePathName) + " -> " + filePathName
 		}
 		hasConflict := isFilesInConflictState(indexState, worktree)
 
-		modifiedFilesPositionHashmap[filePathName] = len(modifiedFilesStatus)
+		modifiedFilesPositionHashmap[newFilePathName] = len(modifiedFilesStatus)
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
-			FilePathname: filePathName,
-			IndexState:   indexState,
-			WorkTree:     worktree,
-			HasConflict:  hasConflict,
+			FilePathname:    filePathName,
+			OldFilePathname: oldFilePathName,
+			NewFilePathname: newFilePathName,
+			IndexState:      indexState,
+			WorkTree:        worktree,
+			HasConflict:     hasConflict,
 		})
 	}
 
@@ -107,27 +119,61 @@ func (gf *GitFiles) GetGitFilesStatus() {
 
 // ------------------------------------
 //
+//	Return the path unchanged when it is plain, otherwise C-quoted the way git does
+//	("a\nb", "say \"hi\"", "\033[31m") when it holds a control character (C0, DEL, C1), an
+//	invalid UTF-8 byte, a double quote or a backslash. Non-ASCII stays raw, as with git's
+//	core.quotePath=false. The result is one line, safe to show in the terminal, unambiguous
+//	(a quoted form never equals a plain path), and git reads it back in patch headers.
+//
+// ------------------------------------
+func QuoteFilePathName(filePathName string) string {
+	isPlain := !strings.ContainsAny(filePathName, `"\`) && utils.EscapeControlCharacters(filePathName) == filePathName
+	if isPlain {
+		return filePathName
+	}
+	escapedFilePathName := strings.NewReplacer(`\`, `\\`, `"`, `\"`).Replace(filePathName)
+	return `"` + utils.EscapeControlCharacters(escapedFilePathName) + `"`
+}
+
+// ------------------------------------
+//
+//	Return the pathspec that matches exactly this path: no glob (* ? [), no pathspec magic
+//	(:!, :(top)), so a file named "[id].tsx" never also matches "i.tsx" or "d.tsx"
+//
+// ------------------------------------
+func literalPathspec(filePathName string) string {
+	return ":(literal)" + filePathName
+}
+
+// ------------------------------------
+//
+//	Return prefix+path the way git writes it on a ---/+++ patch line: C-quoted when needed, and
+//	followed by a tab when it holds a space, so git apply keeps the whole name (trailing spaces too)
+//
+// ------------------------------------
+func patchHeaderFilePathName(prefix string, filePathName string) string {
+	headerFilePathName := QuoteFilePathName(prefix + filePathName)
+	if strings.Contains(filePathName, " ") {
+		headerFilePathName += "\t"
+	}
+	return headerFilePathName
+}
+
+// ------------------------------------
+//
 //	get the file diff content
 //
 // ------------------------------------
 func (gf *GitFiles) GetFilesDiffInfo(ctx context.Context, fileStatus FileStatus, DiffType string) []string {
-	filePathName := fileStatus.FilePathname
-	if fileStatus.IndexState == "R" || fileStatus.IndexState == "C" {
-		if strings.Contains(filePathName, "->") {
-			parts := strings.Split(filePathName, "->")
-			if len(parts) >= 2 {
-				filePathName = strings.TrimSpace(parts[1])
-			}
-		}
-	}
+	filePathName := fileStatus.NewFilePathname
 	var gitArgs []string
 	switch DiffType {
 	case GETSTAGEDDIFF:
-		gitArgs = []string{"diff", "--cached", "--", filePathName}
+		gitArgs = []string{"diff", "--cached", "--", literalPathspec(filePathName)}
 	case GETUNSTAGEDDIFF:
-		gitArgs = []string{"diff", "--", filePathName}
+		gitArgs = []string{"diff", "--", literalPathspec(filePathName)}
 	case GETCOMBINEDDIFF:
-		gitArgs = []string{"diff", "HEAD", "--", filePathName}
+		gitArgs = []string{"diff", "HEAD", "--", literalPathspec(filePathName)}
 	}
 	// the file is untracked
 	isNewFile := fileStatus.WorkTree == "?" ||
@@ -181,29 +227,23 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
-		// "old -> new" format for both Renamed (R) and Copied (C)
-		// This covers IndexState R/C and the rare WorkTree R/C
-		if strings.Contains(filePathName, "->") &&
-			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
-			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
-		}
 
 		var gitArgs []string
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
-			gitArgs = []string{"add", "--", filePathName}
+			gitArgs = []string{"add", "--", literalPathspec(filePathName)}
 		} else if file.IndexState != " " && file.WorkTree != " " {
 			// staged but have modification later
-			gitArgs = []string{"add", "--", filePathName}
+			gitArgs = []string{"add", "--", literalPathspec(filePathName)}
 		} else if file.IndexState != " " && file.WorkTree == " " {
 			// staged and no latest modification, so we need to unstage it or revert back
-			gitArgs = []string{"reset", "--", filePathName}
+			gitArgs = []string{"reset", "--", literalPathspec(filePathName)}
 			if file.IndexState == "A" {
-				gitArgs = []string{"rm", "--cached", "--force", "--", filePathName}
+				gitArgs = []string{"rm", "--cached", "--force", "--", literalPathspec(filePathName)}
 			}
 		} else if file.IndexState == " " && file.WorkTree != " " {
 			// tracked but not staged
-			gitArgs = []string{"add", "--", filePathName}
+			gitArgs = []string{"add", "--", literalPathspec(filePathName)}
 		}
 
 		stageOrUnstageFileCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
@@ -283,16 +323,8 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 		return
 	}
 
-	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	_, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
-		file := gf.filesStatus[fileIndex]
-		// "old -> new" format for both Renamed (R) and Copied (C)
-		// This covers IndexState R/C and the rare WorkTree R/C
-		if strings.Contains(filePathName, "->") &&
-			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
-			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
-		}
-
 		// Create a temporary patch file.
 		// This file will hold the unified diff content for the specific line we want to stage.
 		tempPatchFile, err := os.CreateTemp("", "gitti-patch-stage-*")
@@ -369,8 +401,8 @@ func generateStageLinePatchString(diffContentStringArray []string, actualStageLi
 				continue
 			}
 			if strings.HasPrefix(diffLine, "+++ /dev/null") {
-				stageLinePatchString.WriteString("+++ b/")
-				stageLinePatchString.WriteString(filePathName)
+				stageLinePatchString.WriteString("+++ ")
+				stageLinePatchString.WriteString(patchHeaderFilePathName("b/", filePathName))
 				stageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue
@@ -444,12 +476,6 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
 	if fileIndexExist {
 		file := gf.filesStatus[fileIndex]
-		// "old -> new" format for both Renamed (R) and Copied (C)
-		// This covers IndexState R/C and the rare WorkTree R/C
-		if strings.Contains(filePathName, "->") &&
-			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
-			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
-		}
 
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
@@ -535,8 +561,8 @@ func generateUnstageLinePatchString(diffContentStringArray []string, actualUnSta
 				continue
 			}
 			if strings.HasPrefix(diffLine, "--- /dev/null") {
-				unStageLinePatchString.WriteString("--- a/")
-				unStageLinePatchString.WriteString(filePathName)
+				unStageLinePatchString.WriteString("--- ")
+				unStageLinePatchString.WriteString(patchHeaderFilePathName("a/", filePathName))
 				unStageLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue
@@ -596,41 +622,31 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 		if file.HasConflict {
 			return
 		}
-		filePathName = file.FilePathname
-		// Store the full name (e.g. "old -> new") for the rename logic later
-		fullFilePathName := file.FilePathname
-
-		// "old -> new" format for both Renamed (R) and Copied (C)
-		// This covers IndexState R/C and the rare WorkTree R/C
-		if strings.Contains(filePathName, "->") &&
-			(file.IndexState == "R" || file.IndexState == "C" || file.WorkTree == "R" || file.WorkTree == "C") {
-			filePathName = strings.TrimSpace(strings.Split(filePathName, "->")[1])
-		}
 
 		switch discardType {
 		case DISCARDWHOLE:
-			gitArgs = []string{"checkout", "HEAD", "--", filePathName}
+			gitArgs = []string{"checkout", "HEAD", "--", literalPathspec(filePathName)}
 		case DISCARDUNSTAGE:
-			gitArgs = []string{"checkout", "--", filePathName}
+			gitArgs = []string{"checkout", "--", literalPathspec(filePathName)}
 		case DISCARDUNTRACKED:
-			gitArgs = []string{"clean", "-f", "--", filePathName}
+			gitArgs = []string{"clean", "-f", "--", literalPathspec(filePathName)}
 			// although they are in worktree, they are actually tracked, therefore we need to use git rm -f <filename>
 			if file.WorkTree == "A" || file.WorkTree == "C" || file.WorkTree == "R" {
-				gitArgs = []string{"rm", "-f", filePathName}
+				gitArgs = []string{"rm", "-f", "--", literalPathspec(filePathName)}
 			}
 			// we are refetching it actively here is because the clean doesn't trigger any write in .git folder
 			// and therefore will not trigger the watcher event driven fetch for file status, so we trigger a fetch here
 			// to prevent a "lag" in the UI
 			needFilesStatusRefetch = true
 		case DISCARDNEWLYADDEDORCOPIED:
-			gitArgs = []string{"rm", "-f", filePathName}
+			gitArgs = []string{"rm", "-f", "--", literalPathspec(filePathName)}
 		case DISCARDANDREVERTRENAME:
 			needToRunExecutor = false
-			oldFilePathName := strings.TrimSpace(strings.Split(fullFilePathName, "->")[0])
-			newFilePathName := strings.TrimSpace(strings.Split(fullFilePathName, "->")[1])
+			oldFilePathName := file.OldFilePathname
+			newFilePathName := file.NewFilePathname
 
 			// retrieve back the original file
-			gitArgs = []string{"reset", "--", oldFilePathName}
+			gitArgs = []string{"reset", "--", literalPathspec(oldFilePathName)}
 			oldFileResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			err := oldFileResetCmdExecutor.Run()
 			gf.logging.RegisterNewLog(logging.RETRIEVE_ORIGINAL_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
@@ -640,7 +656,7 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 			}
 
 			// revert the original file
-			gitArgs = []string{"checkout", "--", oldFilePathName}
+			gitArgs = []string{"checkout", "--", literalPathspec(oldFilePathName)}
 			oldFileRevertCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			err = oldFileRevertCmdExecutor.Run()
 			gf.logging.RegisterNewLog(logging.REVERT_ORIGINAL_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
@@ -650,7 +666,7 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 			}
 
 			// revert and remove the "newly named" file
-			gitArgs = []string{"reset", "--", newFilePathName}
+			gitArgs = []string{"reset", "--", literalPathspec(newFilePathName)}
 			newFileResetCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			err = newFileResetCmdExecutor.Run()
 			gf.logging.RegisterNewLog(logging.REVERT_NEWLY_NAMED_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
@@ -660,7 +676,7 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 			}
 
 			// remove the "newly named" file
-			gitArgs = []string{"clean", "-f", "--", newFilePathName}
+			gitArgs = []string{"clean", "-f", "--", literalPathspec(newFilePathName)}
 			newFileDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 			err = newFileDiscardCmdExecutor.Run()
 			gf.logging.RegisterNewLog(logging.REMOVE_NEWLY_NAMED_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
@@ -708,14 +724,13 @@ func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) 
 		if !file.HasConflict {
 			return
 		}
-		filePathName = file.FilePathname
 		switch resolveType {
 		case RESETCONFLICT:
-			gitArgs = []string{"checkout", "-m", "--", filePathName}
+			gitArgs = []string{"checkout", "-m", "--", literalPathspec(filePathName)}
 		case CONFLICTACCEPTOURSCHANGES:
-			gitArgs = []string{"checkout", "--ours", "--", filePathName}
+			gitArgs = []string{"checkout", "--ours", "--", literalPathspec(filePathName)}
 		case CONFLICTACCEPTTHEIRSCHANGES:
-			gitArgs = []string{"checkout", "--theirs", "--", filePathName}
+			gitArgs = []string{"checkout", "--theirs", "--", literalPathspec(filePathName)}
 		}
 		changesDiscardCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 		err := changesDiscardCmdExecutor.Run()
@@ -840,8 +855,8 @@ func generateDiscardLinePatchString(diffContentStringArray []string, actualDisca
 			// Transform /dev/null paths for newly added files
 			// For discarding from the worktree, we need --- a/file, not --- /dev/null
 			if strings.HasPrefix(diffLine, "--- /dev/null") {
-				discardLinePatchString.WriteString("--- a/")
-				discardLinePatchString.WriteString(filePathName)
+				discardLinePatchString.WriteString("--- ")
+				discardLinePatchString.WriteString(patchHeaderFilePathName("a/", filePathName))
 				discardLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue
@@ -849,8 +864,8 @@ func generateDiscardLinePatchString(diffContentStringArray []string, actualDisca
 			// Transform /dev/null paths for deleted files
 			// For discarding deletions, we might need +++ b/file instead of +++ /dev/null
 			if strings.HasPrefix(diffLine, "+++ /dev/null") {
-				discardLinePatchString.WriteString("+++ b/")
-				discardLinePatchString.WriteString(filePathName)
+				discardLinePatchString.WriteString("+++ ")
+				discardLinePatchString.WriteString(patchHeaderFilePathName("b/", filePathName))
 				discardLinePatchString.WriteString("\n")
 				lastLineWasSkipped = false
 				continue

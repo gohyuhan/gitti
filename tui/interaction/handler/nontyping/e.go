@@ -2,6 +2,7 @@ package nontyping
 
 import (
 	"fmt"
+	"path/filepath"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/logging"
@@ -42,7 +43,7 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			case constant.SHOW_LOCAL_BRANCH:
 				selectedBranch := m.CurrentRepoBranchesInfoList.SelectedItem()
 				if selectedBranch != nil {
-					// renaming in the middle of a merge/rebase/cherry-pick/revert could break that operation
+					// renaming in the middle of a merge, rebase, am, cherry-pick, revert or notes merge could break that operation
 					if m.CurrentGitRepoStatus != "" {
 						m.GittiLogger.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, "", logging.WARN, fmt.Sprintf("Cannot rename branch while %s is in progress", m.CurrentGitRepoStatus), false)
 						return m, nil
@@ -67,7 +68,9 @@ func handleNonTypingeKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if currentSelectedFileItem != nil {
 				currentSelectedFile := currentSelectedFileItem.(files.GitModifiedFilesItem)
-				return launchEditor(m, currentSelectedFile.FilePathname)
+				// absolute path: the editor runs in gitti's start directory (maybe a subdirectory),
+				// and a name starting with "-" must not be read as an editor option
+				return launchEditor(m, filepath.Join(m.RepoPath, currentSelectedFile.NewFilePathname))
 			}
 		case constant.LogComponentPanel:
 			go func() {

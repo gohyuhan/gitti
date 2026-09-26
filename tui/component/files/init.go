@@ -26,21 +26,19 @@ func InitModifiedFilesList(m *types.GittiModel) bool {
 
 	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
 
+	for _, modifiedFile := range latestModifiedFilesArray {
+		items = append(items, GitModifiedFilesItem(modifiedFile))
+	}
+	items, _ = utils.FilterListItems(items, m.PanelFilterQuery[constant.ModifiedFilesComponentPanel], nil, -1)
+
+	// find the previous selected file by its exact path, which is unique (the display label can collide)
 	if previousSelectedFile != nil {
-		for index, modifiedFile := range latestModifiedFilesArray {
-			// we use filepath name here to determine if it was the same file as the filepath name is unique
-			if modifiedFile.FilePathname == previousSelectedFile.(GitModifiedFilesItem).FilePathname {
-				selectedFilesPosition = index
+		for modifiedFileIndex, modifiedFileItem := range items {
+			if modifiedFileItem.(GitModifiedFilesItem).NewFilePathname == previousSelectedFile.(GitModifiedFilesItem).NewFilePathname {
+				selectedFilesPosition = modifiedFileIndex
 			}
-			items = append(items, GitModifiedFilesItem(modifiedFile))
-		}
-	} else {
-		for _, modifiedFile := range latestModifiedFilesArray {
-			items = append(items, GitModifiedFilesItem(modifiedFile))
 		}
 	}
-
-	items, selectedFilesPosition = utils.FilterListItems(items, m.PanelFilterQuery[constant.ModifiedFilesComponentPanel], previousSelectedFile, selectedFilesPosition)
 
 	previousModifiedFilesCount := len(m.CurrentRepoModifiedFilesInfoList.Items())
 

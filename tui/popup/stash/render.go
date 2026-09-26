@@ -116,7 +116,7 @@ func RenderGitStashConfirmPromptPopUp(m *types.GittiModel) string {
 	if ok {
 		popUpWidth := min(constant.MaxGitStashConfirmPromptPopUpWidth, int(float64(m.Width)*0.8))
 		var content string
-		fpn := style.StashFilePathStyle.Render(popUp.FilePathName)
+		fpn := style.StashFilePathStyle.Render(git.QuoteFilePathName(popUp.FilePathName))
 		msg := style.StashMessageStyle.Render(popUp.StashMessage)
 		id := style.StashIdStyle.Render(popUp.StashId)
 		switch popUp.StashOperationType {

@@ -48,15 +48,15 @@ func RenderGitDiscardConfirmPromptPopup(m *types.GittiModel) string {
 		var content string
 		switch popUp.DiscardType {
 		case git.DISCARDWHOLE:
-			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeConfirmation, popUp.FilePathName))
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardWholeConfirmation, popUp.FileDisplayName))
 		case git.DISCARDUNSTAGE:
-			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageConfirmation, popUp.FilePathName))
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUnstageConfirmation, popUp.FileDisplayName))
 		case git.DISCARDUNTRACKED:
-			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUntrackedConfirmation, popUp.FilePathName))
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardUntrackedConfirmation, popUp.FileDisplayName))
 		case git.DISCARDNEWLYADDEDORCOPIED:
-			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardNewlyAddedorCopyConfirmation, popUp.FilePathName))
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardNewlyAddedorCopyConfirmation, popUp.FileDisplayName))
 		case git.DISCARDANDREVERTRENAME:
-			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardAndRevertRenameConfirmation, popUp.FilePathName))
+			content = style.NewStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.GitDiscardAndRevertRenameConfirmation, popUp.FileDisplayName))
 		}
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}

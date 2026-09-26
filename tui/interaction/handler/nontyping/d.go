@@ -92,31 +92,31 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				if (currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree != " ") || (currentSelectedFile.IndexState == "C" && currentSelectedFile.WorkTree != " ") {
 					// indicating the files is a newly added tracked / copied file with unstage modification (modified or delete )
 					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, true, false)
+					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, currentSelectedFile.NewFilePathname, true, false)
 				} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree != " " {
 					// a staged rename with unstaged modification
 					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, false, true)
+					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, currentSelectedFile.NewFilePathname, false, true)
 				} else if currentSelectedFile.IndexState == "?" && currentSelectedFile.WorkTree == "?" {
 					// newly added untracked file
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDUNTRACKED)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, currentSelectedFile.NewFilePathname, git.DISCARDUNTRACKED)
 				} else if currentSelectedFile.IndexState != "A" && currentSelectedFile.IndexState != "C" && currentSelectedFile.IndexState != "R" && currentSelectedFile.IndexState != "?" && currentSelectedFile.IndexState != " " && currentSelectedFile.WorkTree != " " {
 					// tracked file with both staged and unstaged modification (beside A, C and  )
 					m.PopUpType = constant.GitDiscardTypeOptionPopUp
-					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, false, false)
+					discardPopUp.InitGitDiscardTypeOptionPopUpModel(m, currentSelectedFile.FilePathname, currentSelectedFile.NewFilePathname, false, false)
 				} else if (currentSelectedFile.IndexState == "A" && currentSelectedFile.WorkTree == " ") || (currentSelectedFile.IndexState == "C" && currentSelectedFile.WorkTree == " ") {
 					// newly added tracked / copied file
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDNEWLYADDEDORCOPIED)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, currentSelectedFile.NewFilePathname, git.DISCARDNEWLYADDEDORCOPIED)
 				} else if currentSelectedFile.IndexState == "R" && currentSelectedFile.WorkTree == " " {
 					// a staged rename
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDANDREVERTRENAME)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, currentSelectedFile.NewFilePathname, git.DISCARDANDREVERTRENAME)
 				} else {
 					// tracked file with only unstaged modification
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, git.DISCARDWHOLE)
+					discardPopUp.InitGitDiscardConfirmPromptPopUpModel(m, currentSelectedFile.FilePathname, currentSelectedFile.NewFilePathname, git.DISCARDWHOLE)
 				}
 			}
 		case constant.DetailComponentPanel, constant.DetailComponentPanelTwo:
@@ -148,7 +148,7 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 						m.PopUpType = constant.GitDiscardFileLineChangeConfirmPopUp
 						filesPopUp.InitGitDiscardFileLineChangeConfirmPopUpModel(m)
 					} else {
-						filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).FilePathname
+						filePathName = currentSelectedModifiedFile.(files.GitModifiedFilesItem).NewFilePathname
 						services.GitDiscardLineFileChangeService(m, filePathName)
 					}
 				}

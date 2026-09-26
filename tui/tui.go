@@ -29,6 +29,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 
+	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
 )
 
@@ -81,8 +82,10 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			stashComponent.InitStashList(m)
 		}
 	case tea.KeyPressMsg:
+		selectedBranchBeforeInput := m.CurrentRepoBranchesInfoList.SelectedItem()
 		model, cmd := interaction.GittiKeyInteraction(msg, m)
 		gAM.model = model
+		forgetPendingBranchRenameIfSelectionChanged(model, selectedBranchBeforeInput)
 		return gAM, cmd
 	case GitUpdateMsg:
 		updateEvent := string(msg)
@@ -159,6 +162,20 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return gAM, nil
 	case types.EditorFinishedMsg:
 		return gAM, nil
+	case types.BranchRenameFinishedMsg:
+		// a rename that did not happen never shows up in the branch data, so forget it now;
+		// otherwise a later deletion of the old branch could be taken for this rename.
+		// A rename that happened is followed by the branch refresh (see InitBranchList).
+		isThisRenamePending := m.PendingBranchRename == types.RenamedBranchInfo{OldBranchName: msg.OldBranchName, NewBranchName: msg.NewBranchName}
+		if isThisRenamePending && !msg.IsRenamed {
+			m.PendingBranchRename = types.RenamedBranchInfo{}
+		}
+		// fetch the branches after git ends, never rely on the file watcher alone: a fetch that
+		// was running during the rename may send the branches read before it
+		if api.GITDAEMON != nil {
+			api.GITDAEMON.RequestBranchFetch()
+		}
+		return gAM, nil
 	case types.GitOperationRequiredSigningFinishedMsg:
 		if msg.Err != nil {
 			m.GittiLogger.RegisterNewLog(msg.GitOperationOpsTypeForLogging, "", logging.ERROR, fmt.Sprintf("[%s ERROR] %s", msg.GitOperationOpsTypeForLogging, msg.Err.Error()), false)
@@ -175,8 +192,10 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.CurrentLogComponentViewport.SetXOffset(0)
 		return gAM, nil
 	case tea.MouseMsg:
+		selectedBranchBeforeInput := m.CurrentRepoBranchesInfoList.SelectedItem()
 		model, cmd := interaction.GittiMouseInteraction(msg, m)
 		gAM.model = model
+		forgetPendingBranchRenameIfSelectionChanged(model, selectedBranchBeforeInput)
 		return gAM, cmd
 
 	case types.GittiTuiUpdateMsg:
@@ -217,6 +236,19 @@ func (gAM *GittiAppModel) updateGitRemoteStatusSyncLineStringAndUpStream() {
 	remoteSynsStatusInfo := m.GitOperations.GitRemote.RemoteSyncStatus()
 	m.RemoteSyncLocalState = remoteSynsStatusInfo.Local
 	m.RemoteSyncRemoteState = remoteSynsStatusInfo.Remote
+}
+
+// ------------------------------------
+//
+//	A submitted branch rename moves the cursor only while the user keeps the old branch
+//	selected: key or mouse input that changes the branch selection forgets the rename,
+//	so the user's own choice always wins, however long git takes
+//
+// ------------------------------------
+func forgetPendingBranchRenameIfSelectionChanged(m *types.GittiModel, selectedBranchBeforeInput list.Item) {
+	if m.CurrentRepoBranchesInfoList.SelectedItem() != selectedBranchBeforeInput {
+		m.PendingBranchRename = types.RenamedBranchInfo{}
+	}
 }
 
 // ------------------------------------

@@ -3,6 +3,7 @@ package git
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/gohyuhan/gitti/executor"
@@ -100,7 +101,6 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 
 	gitBranches := processGeneralGitOpsOutputIntoStringArray(gitOutput)
 
-	gb.allBranches = make([]BranchInfo, 0, max(0, len(gitBranches)-1))
 	// meaning this was a newly init repo with a uncommitted branch
 	if len(gitBranches) < 1 {
 		gitArgs := []string{"symbolic-ref", "--short", "HEAD"}
@@ -339,12 +339,14 @@ func (gb *GitBranch) DeleteLocalBranch(branchName string) ([]string, bool) {
 
 // ------------------------------------
 //
-//	Related to rename local branch
+//	Related to rename local branch. Return true when the branch refs show the rename (old
+//	name gone, new name present), whatever git's exit code: some failures, such as "Branch is
+//	renamed, but update of config-file failed", still rename the branch.
 //
 // ------------------------------------
-func (gb *GitBranch) GitRenameBranch(oldBranchName string, newBranchName string) {
+func (gb *GitBranch) GitRenameBranch(oldBranchName string, newBranchName string) bool {
 	if !gb.gitProcessLock.CanProceedWithGitOps() {
-		return
+		return false
 	}
 	defer gb.gitProcessLock.ReleaseGitOpsLock()
 
@@ -354,15 +356,27 @@ func (gb *GitBranch) GitRenameBranch(oldBranchName string, newBranchName string)
 	gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 	if renameErr != nil {
 		gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RENAME_LOCAL_BRANCH_OPS, strings.TrimSpace(string(renameOutput))), true)
-		return
+	} else {
+		// the rename is local only, so tell the user the branch still tracks the old remote branch
+		// (an INFO log shows only its command text, so the note goes there)
+		upstreamGitArgs := []string{"rev-parse", "--abbrev-ref", newBranchName + "@{u}"}
+		upstreamOutput, upstreamErr := executor.GittiCmdExecutor.RunGitCmd(upstreamGitArgs, false).Output()
+		if upstreamErr == nil {
+			gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, fmt.Sprintf("upstream still %s", strings.TrimSpace(string(upstreamOutput))), logging.INFO, "", false)
+		}
 	}
 
-	// the rename is local only, so tell the user the branch still tracks the old remote branch
-	upstreamGitArgs := []string{"rev-parse", "--abbrev-ref", newBranchName + "@{u}"}
-	upstreamOutput, upstreamErr := executor.GittiCmdExecutor.RunGitCmd(upstreamGitArgs, false).Output()
-	if upstreamErr == nil {
-		gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, strings.Join(upstreamGitArgs, " "), logging.INFO, fmt.Sprintf("upstream still %s", strings.TrimSpace(string(upstreamOutput))), true)
+	oldBranchRef := "refs/heads/" + oldBranchName
+	newBranchRef := "refs/heads/" + newBranchName
+	refGitArgs := []string{"for-each-ref", "--format=%(refname)", oldBranchRef, newBranchRef}
+	refOutput, refErr := executor.GittiCmdExecutor.RunGitCmd(refGitArgs, false).Output()
+	if refErr != nil {
+		gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, strings.Join(refGitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RENAME_LOCAL_BRANCH_OPS, refErr.Error()), true)
+		return false
 	}
+	// for-each-ref also lists refs below a pattern (refs/heads/a/b for refs/heads/a), so compare whole names
+	existingBranchRefs := strings.Split(strings.TrimSpace(string(refOutput)), "\n")
+	return !slices.Contains(existingBranchRefs, oldBranchRef) && slices.Contains(existingBranchRefs, newBranchRef)
 }
 
 // ------------------------------------

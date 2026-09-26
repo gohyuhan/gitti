@@ -19,21 +19,21 @@ import (
 //	Filtering and pagination are hidden; an item-count help key is attached.
 //
 // ------------------------------------
-func InitGitResolveConflictOptionPopUpModel(m *types.GittiModel, filePathName string) {
+func InitGitResolveConflictOptionPopUpModel(m *types.GittiModel, fileDisplayName string, filePathName string) {
 	resolveConflictOption := []GitResolveConflictOptionItem{
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictReset,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictResetInfo, filePathName),
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictResetInfo, fileDisplayName),
 			ResolveType: git.RESETCONFLICT,
 		},
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictAcceptOursChanges,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptOursChangesInfo, filePathName),
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptOursChangesInfo, fileDisplayName),
 			ResolveType: git.CONFLICTACCEPTOURSCHANGES,
 		},
 		{
 			Name:        i18n.LANGUAGEMAPPING.GitResolveConflictAcceptTheirsChanges,
-			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptTheirsChangesInfo, filePathName),
+			Info:        fmt.Sprintf(i18n.LANGUAGEMAPPING.GitResolveConflictAcceptTheirsChangesInfo, fileDisplayName),
 			ResolveType: git.CONFLICTACCEPTTHEIRSCHANGES,
 		},
 	}

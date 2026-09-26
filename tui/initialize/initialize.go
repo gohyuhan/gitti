@@ -223,6 +223,7 @@ func ReinitGittiModel(m *types.GittiModel, repoPath string, repoName string, git
 	m.LineEditingIndexCursorTwoViewport = lineEditingIndexCursorVpTwo
 	m.CherryPickedCommitInfo = types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)}
 	m.PanelFilterQuery = make(map[string]string)
+	m.PendingBranchRename = types.RenamedBranchInfo{}
 
 	m.IsRenderInit.Store(false)
 	m.IsPanelFiltering.Store(false)

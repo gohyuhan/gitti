@@ -1,10 +1,14 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
 // universal utils that can be used by any package
@@ -83,4 +87,47 @@ func GetDownloadsDir() (string, error) {
 		return "", makeDirErr
 	}
 	return dir, nil
+}
+
+// the named escapes git uses when it C-quotes a path; any other control character is written in octal
+var controlCharacterEscapes = map[rune]string{
+	'\a': `\a`,
+	'\b': `\b`,
+	'\t': `\t`,
+	'\n': `\n`,
+	'\v': `\v`,
+	'\f': `\f`,
+	'\r': `\r`,
+}
+
+// ------------------------------------
+//
+//	Replace every control character (C0, DEL, C1) and every invalid UTF-8 byte in s with a
+//	C escape the way git does (\n, \t, \033, \377), so s stays on one line and cannot send
+//	escape sequences to the terminal. Printable characters, including non-ASCII, stay as they are.
+//
+// ------------------------------------
+func EscapeControlCharacters(s string) string {
+	if utf8.ValidString(s) && strings.IndexFunc(s, unicode.IsControl) < 0 {
+		return s
+	}
+
+	var escaped strings.Builder
+	for index := 0; index < len(s); {
+		character, size := utf8.DecodeRuneInString(s[index:])
+		isInvalidByte := character == utf8.RuneError && size == 1
+		namedEscape, hasNamedEscape := controlCharacterEscapes[character]
+		switch {
+		case isInvalidByte || (unicode.IsControl(character) && !hasNamedEscape):
+			for _, characterByte := range []byte(s[index : index+size]) {
+				fmt.Fprintf(&escaped, `\%03o`, characterByte)
+			}
+		case hasNamedEscape:
+			escaped.WriteString(namedEscape)
+		default:
+			escaped.WriteString(s[index : index+size])
+		}
+		index += size
+	}
+	return escaped.String()
 }

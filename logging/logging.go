@@ -81,6 +81,9 @@ func (gl *GittiLogging) RegisterNewLog(logOpsType string, logOpsCommand string, 
 	if isGitOps {
 		logOpsCommand = "git " + logOpsCommand
 	}
+	// commands carry exact file paths and messages; escape control characters so a name with a
+	// newline or a terminal escape sequence stays on one line in the log panel and exported log
+	logOpsCommand = utils.EscapeControlCharacters(logOpsCommand)
 	newLogItem := LogItem{
 		OpsTimeString:    time.Now().Format("2006-01-02T15:04:05-0700"),
 		OpsType:          logOpsType,

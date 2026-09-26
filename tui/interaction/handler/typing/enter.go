@@ -1,6 +1,7 @@
 package typing
 
 import (
+	"fmt"
 	"unicode/utf8"
 
 	tea "charm.land/bubbletea/v2"
@@ -64,6 +65,7 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 			// we direclty close the pop up and trigger the branch creation operation
 			validBranchName, _ := api.IsBranchNameValid(popUp.NewBranchNameInput.Value())
 			if len(validBranchName) > 0 {
+				var renameBranchCmd tea.Cmd
 				switch popUp.CreateType {
 				case git.NEWBRANCH:
 					services.GitCreateNewBranchService(m, validBranchName)
@@ -72,15 +74,31 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 				case git.NEWBRANCHBASEDONCOMMITHASH:
 					services.GitCreateNewBranchBasedOnCommitHashService(m, validBranchName, popUp.CommitHash)
 				case git.RENAMEBRANCH:
+					// recheck: a merge, rebase, am, cherry-pick, revert or notes merge may have started while the popup was open
+					if m.CurrentGitRepoStatus != "" {
+						m.GittiLogger.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, "", logging.WARN, fmt.Sprintf("Cannot rename branch while %s is in progress", m.CurrentGitRepoStatus), false)
+						break
+					}
 					// same name: just close the popup
-					if validBranchName != popUp.OldBranchName {
-						services.GitRenameBranchService(m, popUp.OldBranchName, validBranchName)
+					if validBranchName == popUp.OldBranchName {
+						break
+					}
+					// record the rename before git runs, so a branch refresh that lands before the result can
+					// already follow it; run git in the background (a slow git hook must not freeze the UI)
+					oldBranchName := popUp.OldBranchName
+					newBranchName := validBranchName
+					gitBranch := m.GitOperations.GitBranch // read the model here, never from the background command
+					m.PendingBranchRename = types.RenamedBranchInfo{OldBranchName: oldBranchName, NewBranchName: newBranchName}
+					renameBranchCmd = func() tea.Msg {
+						isRenamed := gitBranch.GitRenameBranch(oldBranchName, newBranchName)
+						return types.BranchRenameFinishedMsg{OldBranchName: oldBranchName, NewBranchName: newBranchName, IsRenamed: isRenamed}
 					}
 				}
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp
 				m.PopUpModel = nil
+				return m, renameBranchCmd
 			}
 		}
 

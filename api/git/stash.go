@@ -125,20 +125,12 @@ func (gs *GitStash) GitStashFile(filePathName string, message string) ([]string,
 	}
 	defer gs.gitProcessLock.ReleaseGitOpsLock()
 
-	// Parse renamed/copied file format (old -> new)
-	actualFileName := filePathName
-	if strings.Contains(filePathName, "->") {
-		parts := strings.Split(filePathName, "->")
-		if len(parts) >= 2 {
-			actualFileName = strings.TrimSpace(parts[1])
-		}
-	}
-
+	// filePathName is the exact path (NewFilePathname for a renamed/copied file)
 	var gitArgs []string
 	if message == "" {
-		gitArgs = []string{"stash", "push", "-u", actualFileName}
+		gitArgs = []string{"stash", "push", "-u", "--", literalPathspec(filePathName)}
 	} else {
-		gitArgs = []string{"stash", "push", "-u", "-m", message, actualFileName}
+		gitArgs = []string{"stash", "push", "-u", "-m", message, "--", literalPathspec(filePathName)}
 	}
 
 	stashCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)

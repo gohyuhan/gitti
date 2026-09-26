@@ -78,17 +78,6 @@ func GitCreateNewBranchAndSwitchService(m *types.GittiModel, validBranchName str
 
 // ------------------------------------
 //
-//	For rename local branch
-//
-// ------------------------------------
-func GitRenameBranchService(m *types.GittiModel, oldBranchName string, validNewBranchName string) {
-	go func() {
-		m.GitOperations.GitBranch.GitRenameBranch(oldBranchName, validNewBranchName)
-	}()
-}
-
-// ------------------------------------
-//
 //	For branch delete
 //
 // ------------------------------------
