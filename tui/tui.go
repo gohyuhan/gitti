@@ -5,6 +5,7 @@ import (
 
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/logging"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
@@ -21,6 +22,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/interaction"
 	"github.com/gohyuhan/gitti/tui/layout"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	"github.com/gohyuhan/gitti/tui/popup/copypopup"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
 	pushPopUp "github.com/gohyuhan/gitti/tui/popup/push"
 	rebasePopUp "github.com/gohyuhan/gitti/tui/popup/rebase"
@@ -28,6 +30,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
+	coreutils "github.com/gohyuhan/gitti/utils"
 
 	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
@@ -174,6 +177,24 @@ func (gAM *GittiAppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// was running during the rename may send the branches read before it
 		if api.GITDAEMON != nil {
 			api.GITDAEMON.RequestBranchFetch()
+		}
+		return gAM, nil
+	case types.CopyValueResolvedMsg:
+		if m.PopUpType == constant.ChooseCopyValuePopUp {
+			if popUp, ok := m.PopUpModel.(*copypopup.Model); ok && popUp.ID == msg.PopupID {
+				popUp.Resolve(msg.Kind, msg.Value, msg.Err)
+				if msg.Err != nil {
+					m.GittiLogger.RegisterNewLog(logging.COPY_VALUE_OPS, "", logging.WARN, fmt.Sprintf(i18n.LANGUAGEMAPPING.CopyLookupFailed, coreutils.EscapeControlCharacters(msg.Err.Error())), false)
+				}
+			}
+		}
+		return gAM, nil
+	case types.CopyFinishedMsg:
+		m.CopyInProgress = false
+		if msg.Err != nil {
+			m.GittiLogger.RegisterNewLog(logging.COPY_VALUE_OPS, "", logging.WARN, fmt.Sprintf(i18n.LANGUAGEMAPPING.CopyFailed, coreutils.EscapeControlCharacters(msg.Err.Error())), false)
+		} else {
+			m.GittiLogger.RegisterNewLog(logging.COPY_VALUE_OPS, fmt.Sprintf(i18n.LANGUAGEMAPPING.CopySucceeded, coreutils.EscapeControlCharacters(msg.Value)), logging.INFO, "", false)
 		}
 		return gAM, nil
 	case types.GitOperationRequiredSigningFinishedMsg:

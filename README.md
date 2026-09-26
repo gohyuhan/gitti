@@ -22,7 +22,7 @@ A fast, lightweight terminal UI for Git operations that keeps you in your flow.
 ## Requirements
 
 - **Git 2.36+**
-- **xclip** or **xsel** (for linux only)
+- On Linux, **xclip**, **xsel**, or **wl-clipboard** for clipboard support
 
 ## Description
 
@@ -53,6 +53,7 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 🔎 **Reflog** - Browse and restore from Git reference logs
 - 🫵 **Git Blame** - View line-by-line blame with commit author and message
 - 🔦 **List Filtering** - Filter the branch, tag, remote, worktree, file, commit log, reflog, and stash lists with `F`
+- 📋 **Copy Popup** - Press `y` to copy details from a selected branch, tag, remote, worktree, file, commit, reflog entry, or stash
 - 🕹️ **Interactive Rebase** - Drop, reword, fixup, and squash commits interactively
 - 📦 **Basic Submodule Support** - Work with Git submodules in your repositories
 - 🌲 **Worktree Management** - Add, switch, remove, prune, and lock/unlock Git worktrees
@@ -222,8 +223,11 @@ gitti --init-dbranch main --global
 
 ### [v0.10.0]
 
+- feature: filter remote branch choices by typing (#82)
+- refactor: use one text input for list filters beside the list counter (#83)
 - feature: rename a local branch with `e` in the branch panel
 - fix: file paths with spaces or non-ASCII characters now work in the files panel
+- feature: copy selected row details to the clipboard with `y` in all eight list panels
 
 ### [v0.9.0]
 

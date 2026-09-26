@@ -6,6 +6,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	"github.com/gohyuhan/gitti/tui/popup/commitlog"
+	"github.com/gohyuhan/gitti/tui/popup/copypopup"
 	"github.com/gohyuhan/gitti/tui/popup/discard"
 	"github.com/gohyuhan/gitti/tui/popup/files"
 	interactiverebase "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
@@ -46,6 +47,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = remote.RenderChooseRemotePopUp(m)
 	case constant.ChoosePushTypePopUp:
 		popUp = push.RenderChoosePushTypePopUp(m)
+	case constant.ChooseCopyValuePopUp:
+		popUp = copypopup.Render(m)
 	case constant.ChooseNewBranchTypePopUp:
 		popUp = branch.RenderChooseNewBranchTypePopUp(m)
 	case constant.CreateNewBranchPopUp:
