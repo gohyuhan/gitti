@@ -2,7 +2,6 @@ package typing
 
 import (
 	tea "charm.land/bubbletea/v2"
-	"github.com/atotto/clipboard"
 	"github.com/gohyuhan/gitti/tui/constant"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
@@ -12,6 +11,7 @@ import (
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
 	tagPopUp "github.com/gohyuhan/gitti/tui/popup/tag"
 	worktreePopUp "github.com/gohyuhan/gitti/tui/popup/worktree"
+	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -122,10 +122,6 @@ func handleTypingCtrlyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMo
 		}
 	}
 
-	err := clipboard.WriteAll(content)
-	if err != nil {
-		// TODO: log the error
-	}
-
-	return m, nil
+	cmd, _ := services.StartCopy(m, content)
+	return m, cmd
 }

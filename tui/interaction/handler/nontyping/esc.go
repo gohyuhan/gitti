@@ -95,6 +95,7 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.PopUpModel = nil
 			}
 		case constant.KeybindingAndFeatureInstructionsPopUp,
+			constant.ChooseCopyValuePopUp,
 			constant.ChooseRemotePopUp,
 			constant.ChoosePushTypePopUp,
 			constant.ChooseNewBranchTypePopUp,

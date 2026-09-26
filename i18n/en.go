@@ -113,6 +113,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[m] merge",
+		"[y] copy",
 		"[n] new branch",
 		"[e] rename branch",
 		"[r] rebase",
@@ -122,6 +123,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] switch branch",
+		"[y] copy",
 		"[m] merge",
 		"[n] new branch",
 		"[e] rename branch",
@@ -143,6 +145,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[d] delete tag",
 		"[ctrl+p] push tag",
 		"[f] fetch tag",
@@ -157,6 +160,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingRemoteComponentDefault: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[n] new remote",
 		"[d] remove remote",
 		"[e] edit remote",
@@ -166,6 +170,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[n] new worktree",
 		"[ctrl+p] prune worktree",
 		"[F] filter",
@@ -173,6 +178,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[Enter] switch worktree",
 		"[n] new worktree",
 		"[ctrl+p] prune worktree",
@@ -181,6 +187,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingWorktreeComponent: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[backspace] remove worktree",
 		"[n] new worktree",
 		"[o] lock / unlock worktree",
@@ -190,6 +197,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentSwitchable: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[Enter] switch worktree",
 		"[backspace] remove worktree",
 		"[n] new worktree",
@@ -200,6 +208,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
 		"[space] stage this change",
+		"[y] copy",
 		"[e] edit",
 		"[r] resolve conflict",
 		"[enter] view modified content",
@@ -208,6 +217,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] unstage this change",
+		"[y] copy",
 		"[e] edit",
 		"[s] stash",
 		"[S] stash all changes",
@@ -218,6 +228,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] stage this change",
+		"[y] copy",
 		"[e] edit",
 		"[s] stash",
 		"[S] stash all changes",
@@ -237,6 +248,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingCommitLogComponent: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
 		"[t] create tag",
@@ -255,6 +267,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingRefLogComponent: []string{
 		"[</>] switch component",
+		"[y] copy",
 		"[↑/↓] move up and down",
 		"[enter] view reflog content",
 		"[i] interactive rebase",
@@ -291,6 +304,7 @@ var eN = LanguageMapping{
 	},
 	KeyBindingKeyStashComponent: []string{
 		"[↑/↓] move up and down",
+		"[y] copy",
 		"[space] apply",
 		"[backspace] pop",
 		"[d] discard",
@@ -331,6 +345,11 @@ var eN = LanguageMapping{
 	KeyBindingForChoosePushTypePopUp: []string{
 		"[↑/↓] move up and down",
 		"[enter] select push option and push",
+		"[esc] cancel / close",
+	},
+	KeyBindingForChooseCopyValuePopUp: []string{
+		"[↑/↓] move up and down",
+		"[enter] copy selected value",
 		"[esc] cancel / close",
 	},
 	KeyBindingForChooseNewBranchTypePopUp: []string{
@@ -635,6 +654,27 @@ var eN = LanguageMapping{
 	GitRemotePushPopUpTitle:                                        "Git Push",
 	GitRemotePushPopUpProcessing:                                   "Pushing...",
 	GitRemotePushOptionTitle:                                       "Push Option",
+	CopyPopupTitle:                                                 "Copy value",
+	CopyFullHash:                                                   "Full hash",
+	CopyShortHash:                                                  "Short hash",
+	CopySubject:                                                    "Subject",
+	CopyAuthor:                                                     "Author",
+	CopyBranchName:                                                 "Branch name",
+	CopyUpstreamName:                                               "Upstream name",
+	CopyRelativePath:                                               "Relative path",
+	CopyAbsolutePath:                                               "Absolute path",
+	CopyFileName:                                                   "File name",
+	CopyTagName:                                                    "Tag name",
+	CopyStashRef:                                                   "Stash ref",
+	CopyRemoteName:                                                 "Remote name",
+	CopyRemoteURL:                                                  "Remote URL",
+	CopyWorktreePath:                                               "Worktree path",
+	CopyLoading:                                                    "Loading…",
+	CopyUnavailable:                                                "Unavailable",
+	CopyInProgress:                                                 "Clipboard write in progress",
+	CopyLookupFailed:                                               "Could not load copy value: %s",
+	CopyFailed:                                                     "Copy failed: %s",
+	CopySucceeded:                                                  "Copied %s",
 	ChooseRemoteTitle:                                              "Choose a remote",
 	NormalPush:                                                     "Push",
 	ForcePushSafe:                                                  "Force Push (safe)",
@@ -1070,6 +1110,11 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
+		LineType:        INFO,
+	},
 }
 
 // Tag Component Key Binding for en
@@ -1112,6 +1157,11 @@ var enTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
 		LineType:        INFO,
 	},
 }
@@ -1161,6 +1211,11 @@ var enRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
 		LineType:        INFO,
 	},
 }
@@ -1215,6 +1270,11 @@ var enWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
 		LineType:        INFO,
 	},
 }
@@ -1274,6 +1334,11 @@ var enModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
 		LineType:        INFO,
 	},
 }
@@ -1340,6 +1405,11 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
+		LineType:        INFO,
+	},
 }
 
 // RefLog Component Key Binding for en
@@ -1394,6 +1464,11 @@ var enRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
+		LineType:        INFO,
+	},
 }
 
 // Stash Component Key Binding for en
@@ -1436,6 +1511,11 @@ var enStashComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected value",
 		LineType:        INFO,
 	},
 }

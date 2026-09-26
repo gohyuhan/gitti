@@ -113,6 +113,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[m] マージ",
+		"[y] コピー",
 		"[n] 新しいブランチ",
 		"[e] ブランチ名を変更",
 		"[r] リベース",
@@ -122,6 +123,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] ブランチ切り替え",
+		"[y] コピー",
 		"[m] マージ",
 		"[n] 新しいブランチ",
 		"[e] ブランチ名を変更",
@@ -143,6 +145,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[d] タグを削除",
 		"[ctrl+p] タグをプッシュ",
 		"[f] タグをフェッチ",
@@ -157,6 +160,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingRemoteComponentDefault: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[n] 新しいリモート",
 		"[d] リモートを削除",
 		"[e] リモートを編集",
@@ -166,6 +170,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[n] 新しいワークツリー",
 		"[ctrl+p] ワークツリーをプルーン",
 		"[F] 絞り込み",
@@ -173,6 +178,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[Enter] ワークツリーを切り替え",
 		"[n] 新しいワークツリー",
 		"[ctrl+p] ワークツリーをプルーン",
@@ -182,6 +188,7 @@ var jA = LanguageMapping{
 
 	KeyBindingWorktreeComponent: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[backspace] ワークツリーを削除",
 		"[n] 新しいワークツリー",
 		"[o] ワークツリーをロック/解除",
@@ -191,6 +198,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentSwitchable: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[Enter] ワークツリーを切り替え",
 		"[backspace] ワークツリーを削除",
 		"[n] 新しいワークツリー",
@@ -201,6 +209,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
 		"[space] この変更をステージ",
+		"[y] コピー",
 		"[e] 編集",
 		"[r] 競合を解決",
 		"[enter] 変更内容を表示",
@@ -209,6 +218,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] この変更のステージを解除",
+		"[y] コピー",
 		"[e] 編集",
 		"[s] スタッシュ",
 		"[S] すべての変更をスタッシュ",
@@ -219,6 +229,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] この変更をステージ",
+		"[y] コピー",
 		"[e] 編集",
 		"[s] スタッシュ",
 		"[S] すべての変更をスタッシュ",
@@ -238,6 +249,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingCommitLogComponent: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
 		"[t] タグを作成",
@@ -256,6 +268,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingRefLogComponent: []string{
 		"[</>] コンポーネントを切り替え",
+		"[y] コピー",
 		"[↑/↓] 上下に移動",
 		"[enter] 参照ログの内容を表示",
 		"[i] インタラクティブリベース",
@@ -292,6 +305,7 @@ var jA = LanguageMapping{
 	},
 	KeyBindingKeyStashComponent: []string{
 		"[↑/↓] 上下に移動",
+		"[y] コピー",
 		"[space] 適用",
 		"[backspace] ポップ",
 		"[d] 破棄",
@@ -332,6 +346,11 @@ var jA = LanguageMapping{
 	KeyBindingForChoosePushTypePopUp: []string{
 		"[↑/↓] 上下に移動",
 		"[enter] プッシュオプションを選択してプッシュ",
+		"[esc] キャンセル / 閉じる",
+	},
+	KeyBindingForChooseCopyValuePopUp: []string{
+		"[↑/↓] 上下に移動",
+		"[enter] 選択した値をコピー",
 		"[esc] キャンセル / 閉じる",
 	},
 	KeyBindingForChooseNewBranchTypePopUp: []string{
@@ -636,6 +655,27 @@ var jA = LanguageMapping{
 	GitRemotePushPopUpTitle:                                        "Gitプッシュ",
 	GitRemotePushPopUpProcessing:                                   "プッシュ中...",
 	GitRemotePushOptionTitle:                                       "プッシュオプション",
+	CopyPopupTitle:                                                 "コピーする項目",
+	CopyFullHash:                                                   "完全なハッシュ",
+	CopyShortHash:                                                  "短いハッシュ",
+	CopySubject:                                                    "件名",
+	CopyAuthor:                                                     "作成者",
+	CopyBranchName:                                                 "ブランチ名",
+	CopyUpstreamName:                                               "上流ブランチ名",
+	CopyRelativePath:                                               "相対パス",
+	CopyAbsolutePath:                                               "絶対パス",
+	CopyFileName:                                                   "ファイル名",
+	CopyTagName:                                                    "タグ名",
+	CopyStashRef:                                                   "スタッシュ参照",
+	CopyRemoteName:                                                 "リモート名",
+	CopyRemoteURL:                                                  "リモート URL",
+	CopyWorktreePath:                                               "ワークツリーのパス",
+	CopyLoading:                                                    "読み込み中…",
+	CopyUnavailable:                                                "利用できません",
+	CopyInProgress:                                                 "クリップボードに書き込み中",
+	CopyLookupFailed:                                               "コピー項目の取得に失敗: %s",
+	CopyFailed:                                                     "コピーに失敗: %s",
+	CopySucceeded:                                                  "コピーしました: %s",
 	ChooseRemoteTitle:                                              "リモートを選択",
 	NormalPush:                                                     "プッシュ",
 	ForcePushSafe:                                                  "強制プッシュ（安全）",
@@ -1073,6 +1113,11 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
+		LineType:        INFO,
+	},
 }
 
 // Tag Component Key Binding for ja
@@ -1115,6 +1160,11 @@ var jaTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
 		LineType:        INFO,
 	},
 }
@@ -1164,6 +1214,11 @@ var jaRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
 		LineType:        INFO,
 	},
 }
@@ -1218,6 +1273,11 @@ var jaWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
 		LineType:        INFO,
 	},
 }
@@ -1277,6 +1337,11 @@ var jaModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
 		LineType:        INFO,
 	},
 }
@@ -1343,6 +1408,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
+		LineType:        INFO,
+	},
 }
 
 // RefLog Component Key Binding for ja
@@ -1397,6 +1467,11 @@ var jaRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
+		LineType:        INFO,
+	},
 }
 
 // Stash Component Key Binding for ja
@@ -1439,6 +1514,11 @@ var jaStashComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した値をコピー",
 		LineType:        INFO,
 	},
 }

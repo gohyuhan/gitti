@@ -113,6 +113,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[m] 合并",
+		"[y] 复制",
 		"[n] 新建分支",
 		"[e] 重命名分支",
 		"[r] 变基 (rebase)",
@@ -122,6 +123,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingLocalBranchComponentDefault: []string{
 		"[enter] 切换分支",
+		"[y] 复制",
 		"[m] 合并",
 		"[n] 新建分支",
 		"[e] 重命名分支",
@@ -143,6 +145,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingTagComponentDefault: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[d] 删除标签",
 		"[ctrl+p] 推送标签",
 		"[f] 获取标签",
@@ -157,6 +160,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingRemoteComponentDefault: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[n] 新建远程",
 		"[d] 移除远程",
 		"[e] 编辑远程",
@@ -166,6 +170,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentMainWorktree: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[n] 新建工作树",
 		"[ctrl+p] 清理工作树",
 		"[F] 过滤",
@@ -173,6 +178,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentMainWorktreeSwitchable: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[Enter] 切换工作树",
 		"[n] 新建工作树",
 		"[ctrl+p] 清理工作树",
@@ -182,6 +188,7 @@ var zH_HANS = LanguageMapping{
 
 	KeyBindingWorktreeComponent: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[backspace] 删除工作树",
 		"[n] 新建工作树",
 		"[o] 锁定/解锁工作树",
@@ -191,6 +198,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingWorktreeComponentSwitchable: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[Enter] 切换工作树",
 		"[backspace] 删除工作树",
 		"[n] 新建工作树",
@@ -201,6 +209,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentConflict: []string{
 		"[space] 暂存此更改",
+		"[y] 复制",
 		"[e] 编辑",
 		"[r] 解决冲突",
 		"[enter] 查看修改内容",
@@ -209,6 +218,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentIsStaged: []string{
 		"[space] 取消暂存此更改",
+		"[y] 复制",
 		"[e] 编辑",
 		"[s] 储藏 (stash)",
 		"[S] 储藏所有更改",
@@ -219,6 +229,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingModifiedFilesComponentDefault: []string{
 		"[space] 暂存此更改",
+		"[y] 复制",
 		"[e] 编辑",
 		"[s] 储藏 (stash)",
 		"[S] 储藏所有更改",
@@ -238,6 +249,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingCommitLogComponent: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[↑/↓] 上下移动",
 		"[enter] 查看提交日志内容",
 		"[t] 创建标签",
@@ -256,6 +268,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingRefLogComponent: []string{
 		"[</>] 切换组件",
+		"[y] 复制",
 		"[↑/↓] 上下移动",
 		"[enter] 查看引用日志内容",
 		"[i] 交互式变基",
@@ -292,6 +305,7 @@ var zH_HANS = LanguageMapping{
 	},
 	KeyBindingKeyStashComponent: []string{
 		"[↑/↓] 上下移动",
+		"[y] 复制",
 		"[space] 应用",
 		"[backspace] 弹出",
 		"[d] 丢弃",
@@ -332,6 +346,11 @@ var zH_HANS = LanguageMapping{
 	KeyBindingForChoosePushTypePopUp: []string{
 		"[↑/↓] 上下移动",
 		"[enter] 选择推送选项并推送",
+		"[esc] 取消 / 关闭",
+	},
+	KeyBindingForChooseCopyValuePopUp: []string{
+		"[↑/↓] 上下移动",
+		"[enter] 复制所选内容",
 		"[esc] 取消 / 关闭",
 	},
 	KeyBindingForChooseNewBranchTypePopUp: []string{
@@ -636,6 +655,27 @@ var zH_HANS = LanguageMapping{
 	GitRemotePushPopUpTitle:                                        "Git 推送",
 	GitRemotePushPopUpProcessing:                                   "推送中...",
 	GitRemotePushOptionTitle:                                       "推送选项",
+	CopyPopupTitle:                                                 "复制内容",
+	CopyFullHash:                                                   "完整哈希",
+	CopyShortHash:                                                  "短哈希",
+	CopySubject:                                                    "主题",
+	CopyAuthor:                                                     "作者",
+	CopyBranchName:                                                 "分支名称",
+	CopyUpstreamName:                                               "上游分支名称",
+	CopyRelativePath:                                               "相对路径",
+	CopyAbsolutePath:                                               "绝对路径",
+	CopyFileName:                                                   "文件名",
+	CopyTagName:                                                    "标签名称",
+	CopyStashRef:                                                   "暂存引用",
+	CopyRemoteName:                                                 "远程名称",
+	CopyRemoteURL:                                                  "远程地址",
+	CopyWorktreePath:                                               "工作树路径",
+	CopyLoading:                                                    "加载中…",
+	CopyUnavailable:                                                "不可用",
+	CopyInProgress:                                                 "正在写入剪贴板",
+	CopyLookupFailed:                                               "无法获取复制内容：%s",
+	CopyFailed:                                                     "复制失败：%s",
+	CopySucceeded:                                                  "已复制 %s",
 	ChooseRemoteTitle:                                              "选择远程",
 	NormalPush:                                                     "推送",
 	ForcePushSafe:                                                  "强制推送（安全）",
@@ -1072,6 +1112,11 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
+		LineType:        INFO,
+	},
 }
 
 // Tag Component Key Binding for zh-hans
@@ -1114,6 +1159,11 @@ var zhHansTagComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
 		LineType:        INFO,
 	},
 }
@@ -1163,6 +1213,11 @@ var zhHansRemoteComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
 		LineType:        INFO,
 	},
 }
@@ -1217,6 +1272,11 @@ var zhHansWorktreeComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
 		LineType:        INFO,
 	},
 }
@@ -1276,6 +1336,11 @@ var zhHansModifiedFilesComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
 		LineType:        INFO,
 	},
 }
@@ -1342,6 +1407,11 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
+		LineType:        INFO,
+	},
 }
 
 // RefLog Component Key Binding for zh-hans
@@ -1396,6 +1466,11 @@ var zhHansRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
+		LineType:        INFO,
+	},
 }
 
 // Stash Component Key Binding for zh-hans
@@ -1438,6 +1513,11 @@ var zhHansStashComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "F",
 		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制所选内容",
 		LineType:        INFO,
 	},
 }

@@ -12,6 +12,7 @@ const (
 	CommitPopUp                                   = "CommitPopUp"                                   // IsTyping will be true
 	AddRemotePromptPopUp                          = "AddRemotePromptPopUp"                          // IsTyping will be true
 	ChoosePushTypePopUp                           = "ChoosePushTypePopUp"                           // IsTyping will be false
+	ChooseCopyValuePopUp                          = "ChooseCopyValuePopUp"                          // IsTyping will be false
 	ChooseRemotePopUp                             = "ChooseRemotePopUp"                             // IsTyping will be false
 	GitRemotePushPopUp                            = "GitRemotePushPopUp"                            // IsTyping will be false
 	ChooseNewBranchTypePopUp                      = "ChooseNewBranchTypePopUp"                      // IsTyping will be false
@@ -102,6 +103,7 @@ const (
 	MaxGitRemotePushPopUpWidth                            = 150
 	MaxChooseRemotePopUpWidth                             = 150
 	MaxChoosePushTypePopUpWidth                           = 150
+	MaxChooseCopyValuePopUpWidth                          = 150
 	MaxChooseNewBranchTypePopUpWidth                      = 150
 	MaxCreateNewBranchPopUpWidth                          = 150
 	MaxChooseSwitchBranchTypePopUpWidth                   = 150
@@ -169,6 +171,7 @@ const (
 	PopUpGitRemotePushOutputViewportHeight                    = 10
 	PopUpChooseRemoteHeight                                   = 10
 	PopUpChoosePushTypeHeight                                 = 8
+	PopUpChooseCopyValueHeight                                = 10
 	PopUpChooseNewBranchTypeHeight                            = 10
 	PopUpChooseSwitchBranchTypeHeight                         = 6
 	PopUpSwitchBranchOutputViewPortHeight                     = 10

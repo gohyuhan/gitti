@@ -6,6 +6,7 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api/git"
+	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/component/branch"
@@ -18,6 +19,7 @@ import (
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
+	"github.com/gohyuhan/gitti/tui/popup/copypopup"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	pullPopUp "github.com/gohyuhan/gitti/tui/popup/pull"
@@ -115,6 +117,30 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		}
 	} else {
 		switch m.PopUpType {
+		case constant.ChooseCopyValuePopUp:
+			popUp, ok := m.PopUpModel.(*copypopup.Model)
+			if !ok {
+				return m, nil
+			}
+			option, ok := popUp.Options.SelectedItem().(copypopup.Option)
+			if !ok {
+				return m, nil
+			}
+			if !option.Ready {
+				message := i18n.LANGUAGEMAPPING.CopyLoading
+				if option.Failed {
+					message = i18n.LANGUAGEMAPPING.CopyUnavailable
+				}
+				m.GittiLogger.RegisterNewLog(logging.COPY_VALUE_OPS, "", logging.WARN, message, false)
+				return m, nil
+			}
+			cmd, started := services.StartCopy(m, option.Value)
+			if started {
+				m.ShowPopUp.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
+			return m, cmd
 		case constant.ChooseRemotePopUp:
 			popUp, ok := m.PopUpModel.(*remotePopUp.ChooseRemotePopUpModel)
 			if ok {

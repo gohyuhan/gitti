@@ -168,6 +168,7 @@ type LanguageMapping struct {
 	KeyBindingForGitRemotePushPopUp                            []string
 	KeyBindingForChooseRemotePopUp                             []string
 	KeyBindingForChoosePushTypePopUp                           []string
+	KeyBindingForChooseCopyValuePopUp                          []string
 	KeyBindingForChooseNewBranchTypePopUp                      []string
 	KeyBindingForCreateNewBranchPopUp                          []string
 	KeyBindingForWorktreeAddNewWorktreePopUp                   []string
@@ -278,6 +279,27 @@ type LanguageMapping struct {
 	GitRemotePushPopUpTitle      string
 	GitRemotePushPopUpProcessing string
 	GitRemotePushOptionTitle     string
+	CopyPopupTitle               string
+	CopyFullHash                 string
+	CopyShortHash                string
+	CopySubject                  string
+	CopyAuthor                   string
+	CopyBranchName               string
+	CopyUpstreamName             string
+	CopyRelativePath             string
+	CopyAbsolutePath             string
+	CopyFileName                 string
+	CopyTagName                  string
+	CopyStashRef                 string
+	CopyRemoteName               string
+	CopyRemoteURL                string
+	CopyWorktreePath             string
+	CopyLoading                  string
+	CopyUnavailable              string
+	CopyInProgress               string
+	CopyLookupFailed             string
+	CopyFailed                   string
+	CopySucceeded                string
 	// Choose Remote
 	ChooseRemoteTitle string
 	// Choose push option

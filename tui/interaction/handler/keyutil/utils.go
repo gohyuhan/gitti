@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/commit"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
+	"github.com/gohyuhan/gitti/tui/popup/copypopup"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
 	interactiverebasePopUp "github.com/gohyuhan/gitti/tui/popup/interactive-rebase"
 	keybindingPopUp "github.com/gohyuhan/gitti/tui/popup/keybinding"
@@ -35,6 +36,21 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 	// for within pop up component
 	switch m.PopUpType {
 	// following is for list component
+	case constant.ChooseCopyValuePopUp:
+		popUp, ok := m.PopUpModel.(*copypopup.Model)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.Options.Index() > 0 {
+					popUp.Options.Select(popUp.Options.Index() - 1)
+				}
+			case "down", "j":
+				if popUp.Options.Index() < len(popUp.Options.Items())-1 {
+					popUp.Options.Select(popUp.Options.Index() + 1)
+				}
+			}
+			return m, nil
+		}
 	case constant.ChooseRemotePopUp:
 		popUp, ok := m.PopUpModel.(*remotePopUp.ChooseRemotePopUpModel)
 		if ok {

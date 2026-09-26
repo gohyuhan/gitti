@@ -68,6 +68,8 @@ type GittiModel struct {
 	ShowPopUp                                                 atomic.Bool
 	PopUpType                                                 string
 	PopUpModel                                                interface{}
+	CopyPopupSequence                                         uint64
+	CopyInProgress                                            bool
 	IsTyping                                                  atomic.Bool
 	GitOperations                                             *api.GitOperations
 	GlobalKeyBindingKeyMapLargestLen                          int                // this was use for global key binding pop up styling, we save it once so we don't have to recompute
@@ -167,6 +169,18 @@ type BranchRenameFinishedMsg struct {
 	OldBranchName string
 	NewBranchName string
 	IsRenamed     bool
+}
+
+type CopyValueResolvedMsg struct {
+	PopupID uint64
+	Kind    string
+	Value   string
+	Err     error
+}
+
+type CopyFinishedMsg struct {
+	Value string
+	Err   error
 }
 
 type GitOperationRequiredSigningFinishedMsg struct {
