@@ -339,6 +339,34 @@ func (gb *GitBranch) DeleteLocalBranch(branchName string) ([]string, bool) {
 
 // ------------------------------------
 //
+//	Related to rename local branch
+//
+// ------------------------------------
+func (gb *GitBranch) GitRenameBranch(oldBranchName string, newBranchName string) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
+	// -m (not -M) so git refuses when a branch named newBranchName already exists
+	gitArgs := []string{"branch", "-m", oldBranchName, newBranchName}
+	renameOutput, renameErr := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false).CombinedOutput()
+	gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if renameErr != nil {
+		gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.RENAME_LOCAL_BRANCH_OPS, strings.TrimSpace(string(renameOutput))), true)
+		return
+	}
+
+	// the rename is local only, so tell the user the branch still tracks the old remote branch
+	upstreamGitArgs := []string{"rev-parse", "--abbrev-ref", newBranchName + "@{u}"}
+	upstreamOutput, upstreamErr := executor.GittiCmdExecutor.RunGitCmd(upstreamGitArgs, false).Output()
+	if upstreamErr == nil {
+		gb.logging.RegisterNewLog(logging.RENAME_LOCAL_BRANCH_OPS, strings.Join(upstreamGitArgs, " "), logging.INFO, fmt.Sprintf("upstream still %s", strings.TrimSpace(string(upstreamOutput))), true)
+	}
+}
+
+// ------------------------------------
+//
 //		Related to get remote branch
 //	 * this run passively and will not be triggered by user manually, this will be trigger after passive and manual git fetch
 //

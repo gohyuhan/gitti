@@ -114,6 +114,7 @@ var eN = LanguageMapping{
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[m] merge",
 		"[n] new branch",
+		"[e] rename branch",
 		"[r] rebase",
 		"[</>] switch component",
 		"[F] filter",
@@ -123,6 +124,7 @@ var eN = LanguageMapping{
 		"[enter] switch branch",
 		"[m] merge",
 		"[n] new branch",
+		"[e] rename branch",
 		"[d] delete branch",
 		"[</>] switch component",
 		"[F] filter",
@@ -650,6 +652,7 @@ var eN = LanguageMapping{
 	NewWorktreeBranchTitle:                                         "Worktree Branch (Optional)",
 	ChooseNewBranchTypeTitle:                                       "How would you like to proceed with creating a new git branch",
 	NewBranchInvalidWarning:                                        "Invalid naming for a branch name, it will be replace with `%s` instead",
+	RenameBranchTitle:                                              "Rename branch (%s)",
 	CreateNewBranchTitle:                                           "Create new branch",
 	CreateNewBranchDescription:                                     "Create new branch and stay at current branch",
 	CreateNewBranchAndSwitchTitle:                                  "Create new branch and move changes",
@@ -1035,6 +1038,11 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "delete branch",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "rename branch (local only)",
 		LineType:        INFO,
 	},
 	{

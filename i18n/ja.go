@@ -114,6 +114,7 @@ var jA = LanguageMapping{
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[m] マージ",
 		"[n] 新しいブランチ",
+		"[e] ブランチ名を変更",
 		"[r] リベース",
 		"[</>] コンポーネントを切り替え",
 		"[F] 絞り込み",
@@ -123,6 +124,7 @@ var jA = LanguageMapping{
 		"[enter] ブランチ切り替え",
 		"[m] マージ",
 		"[n] 新しいブランチ",
+		"[e] ブランチ名を変更",
 		"[d] ブランチを削除",
 		"[</>] コンポーネントを切り替え",
 		"[F] 絞り込み",
@@ -651,6 +653,7 @@ var jA = LanguageMapping{
 	NewWorktreeBranchTitle:                                         "ワークツリーブランチ（任意）",
 	ChooseNewBranchTypeTitle:                                       "新しい Git ブランチを作成する際、どの方法で進めますか？",
 	NewBranchInvalidWarning:                                        "ブランチ名の命名が無効です。代わりに `%s` に置き換えられます",
+	RenameBranchTitle:                                              "ブランチ名を変更 (%s)",
 	CreateNewBranchTitle:                                           "新しいブランチを作成",
 	CreateNewBranchDescription:                                     "新しいブランチを作成し、現在のブランチに留まります",
 	CreateNewBranchAndSwitchTitle:                                  "新しいブランチを作成して変更を移動",
@@ -1038,6 +1041,11 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "ブランチを削除",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "ブランチ名を変更 (ローカルのみ)",
 		LineType:        INFO,
 	},
 	{

@@ -71,6 +71,11 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 					services.GitCreateNewBranchAndSwitchService(m, validBranchName)
 				case git.NEWBRANCHBASEDONCOMMITHASH:
 					services.GitCreateNewBranchBasedOnCommitHashService(m, validBranchName, popUp.CommitHash)
+				case git.RENAMEBRANCH:
+					// same name: just close the popup
+					if validBranchName != popUp.OldBranchName {
+						services.GitRenameBranchService(m, popUp.OldBranchName, validBranchName)
+					}
 				}
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)

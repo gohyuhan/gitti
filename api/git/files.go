@@ -60,7 +60,8 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 //
 // ------------------------------------
 func (gf *GitFiles) GetGitFilesStatus() {
-	gitArgs := []string{"status", "--porcelain", "--untracked-files=all"}
+	// -z keeps paths unquoted (spaces, non-ASCII) and NUL-terminates each entry
+	gitArgs := []string{"status", "--porcelain", "-z", "--untracked-files=all"}
 
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := cmdExecutor.Output()
@@ -69,28 +70,35 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		return
 	}
 
-	files := strings.Split(strings.TrimRight(string(gitOutput), "\n"), "\n")
+	files := strings.Split(strings.TrimSuffix(string(gitOutput), "\x00"), "\x00")
 
 	modifiedFilesStatus := []FileStatus{}
 	modifiedFilesPositionHashmap := make(map[string]int)
 
-	for index, file := range files {
+	for fieldIndex := 0; fieldIndex < len(files); fieldIndex++ {
+		file := files[fieldIndex]
 		if len(file) < 3 {
 			continue
 		}
 
 		indexState := string(file[0])
 		worktree := string(file[1])
-		filePathName := strings.TrimSpace(file[3:])
+		filePathName := file[3:]
+		isRenameOrCopy := indexState == "R" || indexState == "C" || worktree == "R" || worktree == "C"
+		if isRenameOrCopy && fieldIndex+1 < len(files) {
+			// with -z the original path is the next entry; rebuild "old -> new" for the callers
+			fieldIndex++
+			filePathName = files[fieldIndex] + " -> " + filePathName
+		}
 		hasConflict := isFilesInConflictState(indexState, worktree)
 
+		modifiedFilesPositionHashmap[filePathName] = len(modifiedFilesStatus)
 		modifiedFilesStatus = append(modifiedFilesStatus, FileStatus{
 			FilePathname: filePathName,
 			IndexState:   indexState,
 			WorkTree:     worktree,
 			HasConflict:  hasConflict,
 		})
-		modifiedFilesPositionHashmap[filePathName] = index
 	}
 
 	gf.filesPosition = modifiedFilesPositionHashmap

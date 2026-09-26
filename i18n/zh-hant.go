@@ -114,6 +114,7 @@ var zH_HANT = LanguageMapping{
 	KeyBindingLocalBranchComponentIsCheckOut: []string{
 		"[m] 合併",
 		"[n] 新增分支",
+		"[e] 重新命名分支",
 		"[r] 變基 (rebase)",
 		"[</>] 切換元件",
 		"[F] 過濾",
@@ -123,6 +124,7 @@ var zH_HANT = LanguageMapping{
 		"[enter] 切換分支",
 		"[m] 合併",
 		"[n] 新增分支",
+		"[e] 重新命名分支",
 		"[d] 刪除分支",
 		"[</>] 切換元件",
 		"[F] 過濾",
@@ -651,6 +653,7 @@ var zH_HANT = LanguageMapping{
 	NewWorktreeBranchTitle:                                         "工作樹分支（可選）",
 	ChooseNewBranchTypeTitle:                                       "您希望如何建立新的 Git 分支？",
 	NewBranchInvalidWarning:                                        "分支名稱無效，將替換為 `%s`",
+	RenameBranchTitle:                                              "重新命名分支 (%s)",
 	CreateNewBranchTitle:                                           "建立新分支",
 	CreateNewBranchDescription:                                     "建立新分支並停留在當前分支",
 	CreateNewBranchAndSwitchTitle:                                  "建立新分支並移動變更",
@@ -1037,6 +1040,11 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "d",
 		TitleOrInfoLine: "刪除分支",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "e",
+		TitleOrInfoLine: "重新命名分支 (僅限本地)",
 		LineType:        INFO,
 	},
 	{

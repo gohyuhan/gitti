@@ -36,6 +36,19 @@ func InitCreateNewBranchPopUpModel(m *types.GittiModel, createType string, commi
 
 // ------------------------------------
 //
+//	Initialize the rename-branch popup: the create-new-branch popup with the
+//	input pre-filled with the old branch name.
+//
+// ------------------------------------
+func InitRenameBranchPopUpModel(m *types.GittiModel, oldBranchName string) {
+	InitCreateNewBranchPopUpModel(m, git.RENAMEBRANCH, "")
+	popUp := m.PopUpModel.(*CreateNewBranchPopUpModel)
+	popUp.OldBranchName = oldBranchName
+	popUp.NewBranchNameInput.SetValue(oldBranchName)
+}
+
+// ------------------------------------
+//
 //	Initialize the new-branch type selection popup, populating a list with four
 //	creation options (create, create-and-switch, remote-input, remote-selection)
 //	and attaching an item-count help key.

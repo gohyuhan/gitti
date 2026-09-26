@@ -20,13 +20,15 @@ import (
 // ------------------------------------
 //
 //	CreateNewBranchPopUpModel holds a focused text input for the new branch name,
-//	the creation type constant, and an optional commit hash to branch from.
+//	the creation type constant, an optional commit hash to branch from, and the
+//	old branch name when the popup is used to rename a branch.
 //
 // ------------------------------------
 type CreateNewBranchPopUpModel struct {
 	NewBranchNameInput textinput.Model
 	CreateType         string
 	CommitHash         string
+	OldBranchName      string
 }
 
 // ------------------------------------

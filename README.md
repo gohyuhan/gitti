@@ -34,7 +34,7 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 
 ## Features
 
-- 🌳 **Branch Management** - View, switch, and manage branches with ease
+- 🌳 **Branch Management** - View, switch, rename, and manage branches with ease
 - 📝 **Interactive Staging** - Visually select and stage files, including line-level staging and unstaging
 - 🔍 **Diff Viewer** - Review changes with syntax-aware diff display
 - 💬 **Commit Interface** - Write commits with a dedicated UI
@@ -219,6 +219,11 @@ gitti --init-dbranch main --global
 ```
 
 ## Changelog
+
+### [v0.10.0]
+
+- feature: rename a local branch with `e` in the branch panel
+- fix: file paths with spaces or non-ASCII characters now work in the files panel
 
 ### [v0.9.0]
 
