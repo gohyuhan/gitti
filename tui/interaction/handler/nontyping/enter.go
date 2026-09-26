@@ -3,7 +3,6 @@ package nontyping
 import (
 	"context"
 	"slices"
-	"unicode/utf8"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api/git"
@@ -639,30 +638,6 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				} else {
 					services.GitCherryPickReflogHashService(m, popUp.Hash)
 					return m, nil
-				}
-			}
-		case constant.ChooseRemoteBranchOptionPopUp:
-			popUp, ok := m.PopUpModel.(*branchPopUp.ChooseRemoteBranchOptionPopUpModel)
-			if ok {
-				selectedRemoteBranch := popUp.RemoteBranchOptionList.SelectedItem()
-				if selectedRemoteBranch != nil {
-					branchName := selectedRemoteBranch.(branchPopUp.RemoteBranchItem).BranchName
-					if utf8.RuneCountInString(branchName) > 0 {
-						branchPopUp.InitCreateBranchBasedOnRemoteOutputPopUpModel(m)
-						popUp, ok := m.PopUpModel.(*branchPopUp.CreateBranchBasedOnRemoteOutputPopUpModel)
-						if ok {
-							m.ShowPopUp.Store(true)
-							m.IsTyping.Store(false)
-							m.PopUpType = constant.CreateBranchBasedOnRemoteOutputPopUp
-							popUp.IsProcessing.Store(true)
-							services.CreateNewBranchBasedOnRemoteService(m, "", branchName, git.NEWBRANCHBASEDONREMOTEUSERSELECT)
-							return m, popUp.Spinner.Tick
-						} else {
-							m.ShowPopUp.Store(false)
-							m.IsTyping.Store(false)
-							m.PopUpType = constant.NoPopUp
-						}
-					}
 				}
 			}
 		case constant.ChooseBranchOptionForMergePopUp:

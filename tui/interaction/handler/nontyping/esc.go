@@ -124,7 +124,6 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.GitRevertParentOptionSelectionPopUp,
 			constant.GitRevertConfirmationPopUp,
 			constant.GitCherryPickFromRefLogApplyConfirmationPopUp,
-			constant.ChooseRemoteBranchOptionPopUp,
 			constant.ChooseBranchOptionForMergePopUp,
 			constant.InteractiveRebaseOptionPopUp,
 			constant.InteractiveRebaseFixupSquashSelectionPopUp,

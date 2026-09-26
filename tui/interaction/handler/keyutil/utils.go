@@ -344,25 +344,6 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			popUp.GitRevertParentOption.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.GitRevertParentOption, constant.MaxGitRevertParentOptionSelectionPopUpWidth)
 			return m, nil
 		}
-	case constant.ChooseRemoteBranchOptionPopUp:
-		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseRemoteBranchOptionPopUpModel)
-		if ok {
-			switch msg.String() {
-			case "up", "k":
-				if popUp.RemoteBranchOptionList.Index() > 0 {
-					latestIndex := popUp.RemoteBranchOptionList.Index() - 1
-					popUp.RemoteBranchOptionList.Select(latestIndex)
-				}
-			case "down", "j":
-				if popUp.RemoteBranchOptionList.Index() < len(popUp.RemoteBranchOptionList.Items())-1 {
-					latestIndex := popUp.RemoteBranchOptionList.Index() + 1
-					popUp.RemoteBranchOptionList.Select(latestIndex)
-				}
-			}
-			popUp.RemoteBranchOptionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.RemoteBranchOptionList, constant.MaxChooseRemoteBranchOptionPopUpWidth)
-			return m, nil
-		}
-
 	case constant.ChooseBranchOptionForMergePopUp:
 		popUp, ok := m.PopUpModel.(*branchPopUp.ChooseBranchOptionForMergePopUpModel)
 		if ok {

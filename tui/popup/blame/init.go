@@ -5,9 +5,7 @@ import (
 	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
 	"github.com/gohyuhan/gitti/i18n"
-	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
-	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // ------------------------------------
@@ -39,11 +37,7 @@ func InitBlamePopUpModel(m *types.GittiModel) {
 	filterInput.Focus()
 	filterInput.SetVirtualCursor(true)
 
-	// Custom Help Model for Count Display
-	cGTFPL.SetShowHelp(true)
-	cGTFPL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	cGTFPL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
-	cGTFPL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cGTFPL, width)
+	cGTFPL.SetShowHelp(false) // the item counter is rendered beside the filter input instead
 
 	vp := viewport.New()
 	vp.SoftWrap = false

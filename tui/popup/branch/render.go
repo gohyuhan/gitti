@@ -9,6 +9,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 
 	"charm.land/lipgloss/v2"
 )
@@ -308,12 +309,11 @@ func RenderChooseRemoteBranchOptionPopUp(m *types.GittiModel) string {
 		popUpWidth := min(constant.MaxChooseRemoteBranchOptionPopUpWidth, int(float64(m.Width)*0.8))
 		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChooseRemoteBranchOptionTitle)
 		popUp.RemoteBranchOptionList.SetWidth(popUpWidth - 4)
-		popUp.FilteringInput.SetWidth(popUpWidth - 6)
 		content := lipgloss.JoinVertical(
 			lipgloss.Left,
 			title,
 			popUp.RemoteBranchOptionList.View(),
-			popUp.FilteringInput.View(),
+			utils.ListCounterWithFilterInput(&popUp.RemoteBranchOptionList, &popUp.FilteringInput, popUpWidth),
 		)
 		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
 	}

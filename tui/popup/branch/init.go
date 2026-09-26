@@ -262,8 +262,8 @@ func InitCreateBranchBasedOnRemoteOutputPopUpModel(m *types.GittiModel) {
 // ------------------------------------
 //
 //	Initialize the remote-branch selection popup model, populating a list with
-//	all known remote branches so the user can pick one to track locally. Attaches
-//	an item-count help key; filtering and pagination are hidden.
+//	all known remote branches so the user can pick one to track locally, plus a
+//	focused filter text input. Help, status bar, and pagination are hidden.
 //
 // ------------------------------------
 func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
@@ -286,11 +286,7 @@ func InitChooseRemoteBranchOptionPopUpModel(m *types.GittiModel) {
 	filterInput.Focus()
 	filterInput.SetVirtualCursor(true)
 
-	// Custom Help Model for Count Display
-	cRBOL.SetShowHelp(true)
-	cRBOL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
-	cRBOL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
-	cRBOL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &cRBOL, constant.MaxChooseRemoteBranchOptionPopUpWidth)
+	cRBOL.SetShowHelp(false) // the item counter is rendered beside the filter input instead
 
 	m.PopUpModel = &ChooseRemoteBranchOptionPopUpModel{
 		RemoteBranchOptionList: cRBOL,

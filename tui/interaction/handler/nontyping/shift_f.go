@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // ------------------------------------
@@ -25,6 +26,8 @@ func handleNonTypingFKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			if m.PanelFilterQuery == nil {
 				m.PanelFilterQuery = make(map[string]string)
 			}
+			m.PanelFilterInput.SetValue(m.PanelFilterQuery[utils.CurrentPanelFilterKey(m)])
+			m.PanelFilterInput.CursorEnd()
 			m.IsPanelFiltering.Store(true)
 		}
 	}
