@@ -164,6 +164,8 @@ func Handle(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cm
 		return handleNonTypingCtrlpKeyBindingInteraction(m)
 	case "ctrl+k":
 		return handleNonTypingCtrlkKeyBindingInteraction(m)
+	case "ctrl+o":
+		return handleNonTypingCtrloKeyBindingInteraction(m)
 	case "ctrl+r":
 		return handleNonTypingCtrlrKeyBindingInteraction(m)
 	}

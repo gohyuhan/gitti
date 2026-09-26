@@ -118,3 +118,10 @@ const (
 	REWORD      = "REWORD"      // interactive rebase reword
 	DROP        = "DROP"        // interactive rebase drop
 )
+
+// Web page types opened in the browser
+const (
+	WEBPAGECOMMIT      = "WEBPAGECOMMIT"      // Commit page
+	WEBPAGEBRANCH      = "WEBPAGEBRANCH"      // Branch page
+	WEBPAGEPULLREQUEST = "WEBPAGEPULLREQUEST" // New pull request (GitLab: merge request) page
+)

@@ -81,7 +81,7 @@ const (
 )
 
 const (
-	MinWidth  = 80
+	MinWidth  = 60
 	MinHeight = 24
 
 	TextAreaInputMinHeight = 3

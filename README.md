@@ -47,6 +47,7 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 🔙 **Revert Commit** - Revert commits safely
 - 🏷️ **Tag Management** - Create and manage Git tags
 - 🌐 **Remote Management** - View and manage remotes
+- 🔗 **Open in Browser** - Open the commit, branch, or new pull request page on GitHub, GitLab, or Bitbucket
 - 📡 **Manual Fetch** - Trigger fetch all on demand
 - 🔏 **Commit & Tag Signing** - GPG and SSH signing support
 - 📊 **Commit Log & Branch Graph** - Visualize commit history with branching graph
@@ -223,7 +224,9 @@ gitti --init-dbranch main --global
 ### [v0.10.0]
 
 - feature: rename a local branch with `e` in the branch panel
+- feature: open the commit page (`o` in the commit log and reflog), the branch page (`o` in the branch panel), or a new pull request (`ctrl+o` in the branch panel) in the browser, for GitHub, GitLab, and Bitbucket
 - fix: file paths with spaces or non-ASCII characters now work in the files panel
+- other: lower the minimum terminal width from 80 to 60 columns
 
 ### [v0.9.0]
 

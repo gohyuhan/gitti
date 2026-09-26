@@ -115,6 +115,8 @@ var eN = LanguageMapping{
 		"[m] merge",
 		"[n] new branch",
 		"[e] rename branch",
+		"[o] open in browser",
+		"[ctrl+o] new pull request",
 		"[r] rebase",
 		"[</>] switch component",
 		"[F] filter",
@@ -125,6 +127,8 @@ var eN = LanguageMapping{
 		"[m] merge",
 		"[n] new branch",
 		"[e] rename branch",
+		"[o] open in browser",
+		"[ctrl+o] new pull request",
 		"[d] delete branch",
 		"[</>] switch component",
 		"[F] filter",
@@ -239,6 +243,7 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[↑/↓] move up and down",
 		"[enter] view commit log content",
+		"[o] open in browser",
 		"[t] create tag",
 		"[ctrl+r] revert this commit",
 		"[i] interactive rebase",
@@ -257,6 +262,7 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[↑/↓] move up and down",
 		"[enter] view reflog content",
+		"[o] open in browser",
 		"[i] interactive rebase",
 		"[n] new branch based on commit hash",
 		"[r] reset to this commit",
@@ -1046,6 +1052,16 @@ var enLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "open branch page in browser (branch must be pushed)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+o",
+		TitleOrInfoLine: "open new pull request / merge request page in browser (branch must be pushed)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "rebase (only for current checked out branch)",
 		LineType:        INFO,
@@ -1301,6 +1317,11 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "open commit page in browser (commit must be pushed)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "t",
 		TitleOrInfoLine: "create tag",
 		LineType:        INFO,
@@ -1362,6 +1383,11 @@ var enRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "view reflog content",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "open commit page in browser (commit must be pushed)",
 		LineType:        INFO,
 	},
 	{

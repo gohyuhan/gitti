@@ -48,7 +48,8 @@ func OpenBrowser(url string) {
 			cmdExecutor = exec.Command("xdg-open", url)
 		}
 
-		cmdExecutor.Start()
+		// Run, not Start: waiting reaps the launcher, so it does not stay a zombie process until gitti exits
+		cmdExecutor.Run()
 	}()
 }
 

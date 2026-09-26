@@ -115,6 +115,8 @@ var zH_HANS = LanguageMapping{
 		"[m] 合并",
 		"[n] 新建分支",
 		"[e] 重命名分支",
+		"[o] 在浏览器中打开",
+		"[ctrl+o] 新建拉取请求",
 		"[r] 变基 (rebase)",
 		"[</>] 切换组件",
 		"[F] 过滤",
@@ -125,6 +127,8 @@ var zH_HANS = LanguageMapping{
 		"[m] 合并",
 		"[n] 新建分支",
 		"[e] 重命名分支",
+		"[o] 在浏览器中打开",
+		"[ctrl+o] 新建拉取请求",
 		"[d] 删除分支",
 		"[</>] 切换组件",
 		"[F] 过滤",
@@ -240,6 +244,7 @@ var zH_HANS = LanguageMapping{
 		"[</>] 切换组件",
 		"[↑/↓] 上下移动",
 		"[enter] 查看提交日志内容",
+		"[o] 在浏览器中打开",
 		"[t] 创建标签",
 		"[ctrl+r] 还原此提交",
 		"[i] 交互式变基",
@@ -258,6 +263,7 @@ var zH_HANS = LanguageMapping{
 		"[</>] 切换组件",
 		"[↑/↓] 上下移动",
 		"[enter] 查看引用日志内容",
+		"[o] 在浏览器中打开",
 		"[i] 交互式变基",
 		"[n] 基于此提交哈希创建新分支",
 		"[r] 重置到此提交",
@@ -1048,6 +1054,16 @@ var zhHansLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "在浏览器中打开分支页面 (分支需已推送)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+o",
+		TitleOrInfoLine: "在浏览器中打开新建拉取请求 / 合并请求页面 (分支需已推送)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "变基 (仅适用于当前检出的分支)",
 		LineType:        INFO,
@@ -1303,6 +1319,11 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "在浏览器中打开提交页面 (提交需已推送)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "t",
 		TitleOrInfoLine: "创建标签",
 		LineType:        INFO,
@@ -1364,6 +1385,11 @@ var zhHansRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "查看引用日志内容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "在浏览器中打开提交页面 (提交需已推送)",
 		LineType:        INFO,
 	},
 	{

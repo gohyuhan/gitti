@@ -115,6 +115,8 @@ var zH_HANT = LanguageMapping{
 		"[m] 合併",
 		"[n] 新增分支",
 		"[e] 重新命名分支",
+		"[o] 在瀏覽器中開啟",
+		"[ctrl+o] 新增拉取請求",
 		"[r] 變基 (rebase)",
 		"[</>] 切換元件",
 		"[F] 過濾",
@@ -125,6 +127,8 @@ var zH_HANT = LanguageMapping{
 		"[m] 合併",
 		"[n] 新增分支",
 		"[e] 重新命名分支",
+		"[o] 在瀏覽器中開啟",
+		"[ctrl+o] 新增拉取請求",
 		"[d] 刪除分支",
 		"[</>] 切換元件",
 		"[F] 過濾",
@@ -240,6 +244,7 @@ var zH_HANT = LanguageMapping{
 		"[</>] 切換元件",
 		"[↑/↓] 上下移動",
 		"[enter] 查看提交日誌內容",
+		"[o] 在瀏覽器中開啟",
 		"[t] 建立標籤",
 		"[ctrl+r] 還原此提交",
 		"[i] 互動式變基",
@@ -258,6 +263,7 @@ var zH_HANT = LanguageMapping{
 		"[</>] 切換元件",
 		"[↑/↓] 上下移動",
 		"[enter] 查看引用日誌內容",
+		"[o] 在瀏覽器中開啟",
 		"[i] 互動式變基",
 		"[n] 基於此提交哈希建立新分支",
 		"[r] 重置到此提交",
@@ -1048,6 +1054,16 @@ var zhHantLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "在瀏覽器中開啟分支頁面 (分支需已推送)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+o",
+		TitleOrInfoLine: "在瀏覽器中開啟新增拉取請求 / 合併請求頁面 (分支需已推送)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "變基 (僅適用於目前簽出的分支)",
 		LineType:        INFO,
@@ -1303,6 +1319,11 @@ var zhHantCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "在瀏覽器中開啟提交頁面 (提交需已推送)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "t",
 		TitleOrInfoLine: "建立標籤",
 		LineType:        INFO,
@@ -1364,6 +1385,11 @@ var zhHantRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "查看引用日誌內容",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "在瀏覽器中開啟提交頁面 (提交需已推送)",
 		LineType:        INFO,
 	},
 	{

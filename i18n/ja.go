@@ -115,6 +115,8 @@ var jA = LanguageMapping{
 		"[m] マージ",
 		"[n] 新しいブランチ",
 		"[e] ブランチ名を変更",
+		"[o] ブラウザで開く",
+		"[ctrl+o] 新しいプルリクエスト",
 		"[r] リベース",
 		"[</>] コンポーネントを切り替え",
 		"[F] 絞り込み",
@@ -125,6 +127,8 @@ var jA = LanguageMapping{
 		"[m] マージ",
 		"[n] 新しいブランチ",
 		"[e] ブランチ名を変更",
+		"[o] ブラウザで開く",
+		"[ctrl+o] 新しいプルリクエスト",
 		"[d] ブランチを削除",
 		"[</>] コンポーネントを切り替え",
 		"[F] 絞り込み",
@@ -240,6 +244,7 @@ var jA = LanguageMapping{
 		"[</>] コンポーネントを切り替え",
 		"[↑/↓] 上下に移動",
 		"[enter] コミットログの内容を表示",
+		"[o] ブラウザで開く",
 		"[t] タグを作成",
 		"[ctrl+r] このコミットをリバート",
 		"[i] インタラクティブリベース",
@@ -258,6 +263,7 @@ var jA = LanguageMapping{
 		"[</>] コンポーネントを切り替え",
 		"[↑/↓] 上下に移動",
 		"[enter] 参照ログの内容を表示",
+		"[o] ブラウザで開く",
 		"[i] インタラクティブリベース",
 		"[n] コミットハッシュに基づいて新しいブランチを作成",
 		"[r] このコミットにリセット",
@@ -1049,6 +1055,16 @@ var jaLocalBranchComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "ブランチのページをブラウザで開く (プッシュ済みのブランチのみ)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "ctrl+o",
+		TitleOrInfoLine: "新しいプルリクエスト / マージリクエストのページをブラウザで開く (プッシュ済みのブランチのみ)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "r",
 		TitleOrInfoLine: "リベース (現在チェックアウト中のブランチに対してのみ適用)",
 		LineType:        INFO,
@@ -1304,6 +1320,11 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 		LineType:        INFO,
 	},
 	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "コミットのページをブラウザで開く (プッシュ済みのコミットのみ)",
+		LineType:        INFO,
+	},
+	{
 		KeyBindingLine:  "t",
 		TitleOrInfoLine: "タグを作成",
 		LineType:        INFO,
@@ -1365,6 +1386,11 @@ var jaRefLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "enter",
 		TitleOrInfoLine: "参照ログの内容を表示する",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "o",
+		TitleOrInfoLine: "コミットのページをブラウザで開く (プッシュ済みのコミットのみ)",
 		LineType:        INFO,
 	},
 	{
