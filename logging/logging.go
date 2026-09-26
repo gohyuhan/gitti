@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -26,6 +27,10 @@ type LogItem struct {
 }
 
 type GittiLogging struct {
+	// guards logs: the log panel reads them on the UI thread while services log from goroutines. The
+	// getters return no copy: RegisterNewLog only appends past the end of a returned slice, and
+	// ClearLogs allocates a new array, so no entry a caller holds changes.
+	logsMutex       sync.Mutex
 	logs            []LogItem
 	maxLogsCount    int
 	updateChannel   chan string
@@ -52,6 +57,8 @@ func InitGittiLogging(maxLogsCount int, updateChannel chan string, showLatestXLo
 //
 // ------------------------------------
 func (gl *GittiLogging) GetLogs() []LogItem {
+	gl.logsMutex.Lock()
+	defer gl.logsMutex.Unlock()
 	if len(gl.logs) > gl.showLatestXLogs {
 		return gl.logs[len(gl.logs)-gl.showLatestXLogs-1:] // we get only the latest 3 log items
 	} else {
@@ -65,10 +72,14 @@ func (gl *GittiLogging) GetLogs() []LogItem {
 //
 // ------------------------------------
 func (gl *GittiLogging) GetFullLogs() []LogItem {
+	gl.logsMutex.Lock()
+	defer gl.logsMutex.Unlock()
 	return gl.logs
 }
 
 func (gl *GittiLogging) ClearLogs() {
+	gl.logsMutex.Lock()
+	defer gl.logsMutex.Unlock()
 	gl.logs = make([]LogItem, 0, gl.maxLogsCount)
 }
 
@@ -91,11 +102,14 @@ func (gl *GittiLogging) RegisterNewLog(logOpsType string, logOpsCommand string, 
 		OpsSeverityLevel: logOpsSeverityLevel,
 		OpsDescription:   logOpsDescription,
 	}
+	gl.logsMutex.Lock()
 	if len(gl.logs) < gl.maxLogsCount {
 		gl.logs = append(gl.logs, newLogItem)
 	} else {
 		gl.logs = append(gl.logs[1:], newLogItem)
 	}
+	// unlock before the send: a full update channel must not block the other callers
+	gl.logsMutex.Unlock()
 
 	gl.updateChannel <- NEW_LOG_UPDATE
 }

@@ -18,7 +18,11 @@ var GittiCmdExecutor *CmdExecutor
 //
 // ------------------------------------
 func InitCmdExecutor(repoPath string) {
-	GittiCmdExecutor = &CmdExecutor{
+	GittiCmdExecutor = NewCmdExecutor(repoPath)
+}
+
+func NewCmdExecutor(repoPath string) *CmdExecutor {
+	return &CmdExecutor{
 		repoPath: repoPath,
 	}
 }

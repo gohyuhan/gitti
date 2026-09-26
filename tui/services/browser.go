@@ -15,8 +15,9 @@ import (
 // ------------------------------------
 func OpenCommitWebPageService(m *types.GittiModel, commitHash string) {
 	checkedOutBranchName := m.CheckOutBranch
+	repoPath := m.RepoPath
 	go func() {
-		webPageURL, err := git.GetCommitWebPageURL(commitHash, checkedOutBranchName)
+		webPageURL, err := git.GetCommitWebPageURL(commitHash, checkedOutBranchName, repoPath)
 		openWebPage(m, webPageURL, err)
 	}()
 }
@@ -28,8 +29,9 @@ func OpenCommitWebPageService(m *types.GittiModel, commitHash string) {
 //
 // ------------------------------------
 func OpenBranchWebPageService(m *types.GittiModel, branchName string, pageType string) {
+	repoPath := m.RepoPath
 	go func() {
-		webPageURL, err := git.GetBranchWebPageURL(branchName, pageType)
+		webPageURL, err := git.GetBranchWebPageURL(branchName, pageType, repoPath)
 		openWebPage(m, webPageURL, err)
 	}()
 }
