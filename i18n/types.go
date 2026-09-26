@@ -151,6 +151,7 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentConflict                   []string
 	KeyBindingModifiedFilesComponentIsStaged                   []string
 	KeyBindingModifiedFilesComponentDefault                    []string
+	KeyBindingModifiedFilesComponentUntracked                  []string
 	KeyBindingModifiedFilesComponentNone                       []string
 	KeyBindingCommitLogComponentNone                           []string
 	KeyBindingCommitLogComponent                               []string
@@ -300,6 +301,15 @@ type LanguageMapping struct {
 	CopyLookupFailed             string
 	CopyFailed                   string
 	CopySucceeded                string
+	IgnoreTracked                string
+	IgnoreNotUntracked           string
+	IgnoreAlreadyPresent         string
+	IgnoreSucceeded              string
+	IgnoreFailed                 string
+	IgnoreVerifyFailed           string
+	IgnoreRefreshFailed          string
+	IgnoreStillVisible           string
+	IgnoreInProgress             string
 	// Choose Remote
 	ChooseRemoteTitle string
 	// Choose push option

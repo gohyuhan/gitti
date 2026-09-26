@@ -19,6 +19,7 @@ type TagInfo struct {
 
 type GitTag struct {
 	updateChannel    chan string
+	allTagMu         sync.RWMutex
 	allTag           []TagInfo
 	logging          *logging.GittiLogging
 	gitProcessLock   *GitProcessLock
@@ -48,7 +49,11 @@ func InitGitTag(updateChannel chan string, gitProcessLock *GitProcessLock, loggi
 //
 // ------------------------------------
 func (gt *GitTag) AllTag() []TagInfo {
-	return gt.allTag
+	gt.allTagMu.RLock()
+	defer gt.allTagMu.RUnlock()
+	copied := make([]TagInfo, len(gt.allTag))
+	copy(copied, gt.allTag)
+	return copied
 }
 
 // ------------------------------------
@@ -98,7 +103,9 @@ func (gt *GitTag) GetLatestGitTag() {
 
 	parsedOutput := processGeneralGitOpsOutputIntoStringArray(getLatestGitTagCmdOutput)
 	if len(parsedOutput) < 1 {
+		gt.allTagMu.Lock()
 		gt.allTag = []TagInfo{}
+		gt.allTagMu.Unlock()
 		return
 	}
 	for index := range parsedOutput {
@@ -109,7 +116,9 @@ func (gt *GitTag) GetLatestGitTag() {
 		latestTags = append(latestTags, tag)
 	}
 
+	gt.allTagMu.Lock()
 	gt.allTag = latestTags
+	gt.allTagMu.Unlock()
 }
 
 // ------------------------------------

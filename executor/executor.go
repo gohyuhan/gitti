@@ -29,6 +29,11 @@ func InitCmdExecutor(repoPath string) {
 //
 // ------------------------------------
 func (c *CmdExecutor) RunGitCmd(gitArgs []string, colorized bool) *exec.Cmd {
+	return RunGitCmdAt(c.repoPath, gitArgs, colorized)
+}
+
+// RunGitCmdAt runs Git in a fixed worktree even if the global executor switches worktrees.
+func RunGitCmdAt(repoPath string, gitArgs []string, colorized bool) *exec.Cmd {
 	if colorized {
 		gitArgs = append([]string{"-c", "color.ui=always"}, gitArgs...)
 	}
@@ -40,7 +45,7 @@ func (c *CmdExecutor) RunGitCmd(gitArgs []string, colorized bool) *exec.Cmd {
 		"--no-optional-locks",
 	}, gitArgs...)
 	cmd := exec.Command("git", gitArgs...)
-	cmd.Dir = c.repoPath
+	cmd.Dir = repoPath
 
 	cmd.Env = append(os.Environ(), "GIT_ASKPASS=true", "GIT_TERMINAL_PROMPT=0")
 	return cmd

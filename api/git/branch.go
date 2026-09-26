@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/logging"
@@ -16,6 +17,7 @@ type BranchInfo struct {
 }
 
 type GitBranch struct {
+	stateMu         sync.RWMutex
 	isRepoUnborn    bool // meaning this is a newly init repo, no commit on any branch yet
 	currentCheckOut BranchInfo
 	allBranches     []BranchInfo // this refer to all local branch
@@ -46,6 +48,8 @@ func InitGitBranch(gitProcessLock *GitProcessLock, ffMerge bool, logging *loggin
 //
 // ------------------------------------
 func (gb *GitBranch) CurrentCheckOut() BranchInfo {
+	gb.stateMu.RLock()
+	defer gb.stateMu.RUnlock()
 	return gb.currentCheckOut
 }
 
@@ -55,6 +59,8 @@ func (gb *GitBranch) CurrentCheckOut() BranchInfo {
 //
 // ------------------------------------
 func (gb *GitBranch) AllBranches() []BranchInfo {
+	gb.stateMu.RLock()
+	defer gb.stateMu.RUnlock()
 	copied := make([]BranchInfo, len(gb.allBranches))
 	copy(copied, gb.allBranches)
 	return copied
@@ -66,6 +72,8 @@ func (gb *GitBranch) AllBranches() []BranchInfo {
 //
 // ------------------------------------
 func (gb *GitBranch) RemoteBranches() []BranchInfo {
+	gb.stateMu.RLock()
+	defer gb.stateMu.RUnlock()
 	copied := make([]BranchInfo, len(gb.remoteBranches))
 	copy(copied, gb.remoteBranches)
 	return copied
@@ -77,6 +85,8 @@ func (gb *GitBranch) RemoteBranches() []BranchInfo {
 //
 // ------------------------------------
 func (gb *GitBranch) IsRepoUnborn() bool {
+	gb.stateMu.RLock()
+	defer gb.stateMu.RUnlock()
 	return gb.isRepoUnborn
 }
 
@@ -89,8 +99,8 @@ func (gb *GitBranch) IsRepoUnborn() bool {
 func (gb *GitBranch) GetLatestBranchesInfo() {
 	gitArgs := []string{"branch"}
 	allBranches := []BranchInfo{}
-
-	gb.isRepoUnborn = false
+	var currentCheckOut BranchInfo
+	isRepoUnborn := false
 
 	branchCmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	gitOutput, err := branchCmdExecutor.Output()
@@ -111,18 +121,18 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 			return
 		}
 		gitBranches = processGeneralGitOpsOutputIntoStringArray(gitOutput)
-		gb.currentCheckOut = BranchInfo{
+		currentCheckOut = BranchInfo{
 			BranchName:   gitBranches[0],
 			IsCheckedOut: true,
 		}
-		gb.isRepoUnborn = true
+		isRepoUnborn = true
 	} else {
 		for _, branch := range gitBranches {
 			branch = strings.TrimSpace(branch)
 
 			if strings.HasPrefix(branch, "*") {
 				branch = strings.TrimSpace(strings.TrimPrefix(branch, "*"))
-				gb.currentCheckOut = BranchInfo{
+				currentCheckOut = BranchInfo{
 					BranchName:   branch,
 					IsCheckedOut: true,
 				}
@@ -135,7 +145,11 @@ func (gb *GitBranch) GetLatestBranchesInfo() {
 		}
 	}
 
+	gb.stateMu.Lock()
+	gb.currentCheckOut = currentCheckOut
+	gb.isRepoUnborn = isRepoUnborn
 	gb.allBranches = allBranches
+	gb.stateMu.Unlock()
 }
 
 // ------------------------------------
@@ -163,7 +177,7 @@ func (gb *GitBranch) GitCreateNewBranch(branchName string) {
 
 	gitArgs := []string{"branch", branchName}
 
-	if gb.isRepoUnborn {
+	if gb.IsRepoUnborn() {
 		gitArgs = []string{"branch", "-M", branchName}
 	}
 
@@ -410,7 +424,9 @@ func (gb *GitBranch) GetLatestRemoteBranchesInfo() {
 		remoteBranches = append(remoteBranches, remoteBranch)
 	}
 
+	gb.stateMu.Lock()
 	gb.remoteBranches = remoteBranches
+	gb.stateMu.Unlock()
 }
 
 // ------------------------------------

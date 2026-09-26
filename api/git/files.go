@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+	"sync"
 	"unicode/utf8"
 
 	"github.com/gohyuhan/gitti/executor"
@@ -28,11 +29,14 @@ type FileStatus struct {
 }
 
 type GitFiles struct {
-	filesStatus    []FileStatus
-	filesPosition  map[string]int
-	gitProcessLock *GitProcessLock
-	updateChannel  chan string
-	logging        *logging.GittiLogging
+	statusMu        sync.RWMutex
+	statusRefreshMu sync.Mutex
+	repoPath        string
+	filesStatus     []FileStatus
+	filesPosition   map[string]int
+	gitProcessLock  *GitProcessLock
+	updateChannel   chan string
+	logging         *logging.GittiLogging
 }
 
 // ------------------------------------
@@ -41,7 +45,13 @@ type GitFiles struct {
 //
 // ------------------------------------
 func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitFiles {
+	return InitGitFileAt("", updateChannel, gitProcessLock, logging)
+}
+
+// InitGitFileAt binds file-status reads to one worktree.
+func InitGitFileAt(repoPath string, updateChannel chan string, gitProcessLock *GitProcessLock, logging *logging.GittiLogging) *GitFiles {
 	gitFiles := GitFiles{
+		repoPath:       repoPath,
 		filesStatus:    make([]FileStatus, 0),
 		gitProcessLock: gitProcessLock,
 		updateChannel:  updateChannel,
@@ -56,9 +66,21 @@ func InitGitFile(updateChannel chan string, gitProcessLock *GitProcessLock, logg
 //
 // ------------------------------------
 func (gf *GitFiles) FilesStatus() []FileStatus {
+	gf.statusMu.RLock()
+	defer gf.statusMu.RUnlock()
 	copied := make([]FileStatus, len(gf.filesStatus))
 	copy(copied, gf.filesStatus)
 	return copied
+}
+
+func (gf *GitFiles) fileStatusByPath(path string) (FileStatus, bool) {
+	gf.statusMu.RLock()
+	defer gf.statusMu.RUnlock()
+	index, ok := gf.filesPosition[path]
+	if !ok {
+		return FileStatus{}, false
+	}
+	return gf.filesStatus[index], true
 }
 
 // ------------------------------------
@@ -67,14 +89,26 @@ func (gf *GitFiles) FilesStatus() []FileStatus {
 //
 // ------------------------------------
 func (gf *GitFiles) GetGitFilesStatus() {
+	_ = gf.RefreshFilesStatus()
+}
+
+// RefreshFilesStatus returns an error when Git cannot refresh the file list.
+func (gf *GitFiles) RefreshFilesStatus() error {
+	gf.statusRefreshMu.Lock()
+	defer gf.statusRefreshMu.Unlock()
 	// -z keeps paths unquoted (spaces, non-ASCII) and NUL-terminates each entry
 	gitArgs := []string{"status", "--porcelain", "-z", "--untracked-files=all"}
 
-	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
-	gitOutput, err := cmdExecutor.Output()
+	var cmd *exec.Cmd
+	if gf.repoPath == "" {
+		cmd = executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	} else {
+		cmd = executor.RunGitCmdAt(gf.repoPath, gitArgs, false)
+	}
+	gitOutput, err := cmd.Output()
 	if err != nil {
 		gf.logging.RegisterNewLog(logging.FILES_STATUS_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s", logging.FILES_STATUS_OPS, err.Error()), true)
-		return
+		return err
 	}
 
 	files := strings.Split(strings.TrimSuffix(string(gitOutput), "\x00"), "\x00")
@@ -113,8 +147,11 @@ func (gf *GitFiles) GetGitFilesStatus() {
 		})
 	}
 
+	gf.statusMu.Lock()
 	gf.filesPosition = modifiedFilesPositionHashmap
 	gf.filesStatus = modifiedFilesStatus
+	gf.statusMu.Unlock()
+	return nil
 }
 
 // ------------------------------------
@@ -224,9 +261,8 @@ func (gf *GitFiles) StageOrUnstageFile(filePathName string) {
 	}
 	defer gf.gitProcessLock.ReleaseGitOpsLock()
 
-	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	file, fileIndexExist := gf.fileStatusByPath(filePathName)
 	if fileIndexExist {
-		file := gf.filesStatus[fileIndex]
 
 		var gitArgs []string
 		if file.IndexState == "?" && file.WorkTree == "?" {
@@ -323,7 +359,7 @@ func (gf *GitFiles) StageLine(filePathName string, diffContentStringArray []stri
 		return
 	}
 
-	_, fileIndexExist := gf.filesPosition[filePathName]
+	_, fileIndexExist := gf.fileStatusByPath(filePathName)
 	if fileIndexExist {
 		// Create a temporary patch file.
 		// This file will hold the unified diff content for the specific line we want to stage.
@@ -473,9 +509,8 @@ func (gf *GitFiles) UnstageLine(filePathName string, diffContentStringArray []st
 		return
 	}
 
-	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	file, fileIndexExist := gf.fileStatusByPath(filePathName)
 	if fileIndexExist {
-		file := gf.filesStatus[fileIndex]
 
 		if file.IndexState == "?" && file.WorkTree == "?" {
 			// not tracked
@@ -616,9 +651,8 @@ func (gf *GitFiles) DiscardFileChanges(filePathName string, discardType string) 
 	needToRunExecutor := true
 	var gitArgs []string
 
-	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	file, fileIndexExist := gf.fileStatusByPath(filePathName)
 	if fileIndexExist {
-		file := gf.filesStatus[fileIndex]
 		if file.HasConflict {
 			return
 		}
@@ -718,9 +752,8 @@ func (gf *GitFiles) GitResolveConflict(filePathName string, resolveType string) 
 
 	var gitArgs []string
 
-	fileIndex, fileIndexExist := gf.filesPosition[filePathName]
+	file, fileIndexExist := gf.fileStatusByPath(filePathName)
 	if fileIndexExist {
-		file := gf.filesStatus[fileIndex]
 		if !file.HasConflict {
 			return
 		}
@@ -771,7 +804,7 @@ func (gf *GitFiles) GitDiscardFileLineChange(filePathName string, diffContentStr
 		return
 	}
 
-	_, fileIndexExist := gf.filesPosition[filePathName]
+	_, fileIndexExist := gf.fileStatusByPath(filePathName)
 	if fileIndexExist {
 		// Create a temporary patch file.
 		// This file will hold the unified diff content for the specific line we want to reverse.

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"sync"
 
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/i18n"
@@ -12,6 +13,7 @@ import (
 )
 
 type GitRemote struct {
+	stateMu                       sync.RWMutex
 	updateChannel                 chan string
 	gitProcessLock                *GitProcessLock
 	remote                        []GitRemoteInfo // all remote info
@@ -62,7 +64,9 @@ func InitGitRemote(updateChannel chan string, gitProcessLock *GitProcessLock, lo
 //
 // ------------------------------------
 func (gr *GitRemote) Remote() []GitRemoteInfo {
-	return gr.remote
+	gr.stateMu.RLock()
+	defer gr.stateMu.RUnlock()
+	return append([]GitRemoteInfo(nil), gr.remote...)
 }
 
 // ------------------------------------
@@ -71,7 +75,9 @@ func (gr *GitRemote) Remote() []GitRemoteInfo {
 //
 // ------------------------------------
 func (gr *GitRemote) FetchRemote() []GitRemoteInfo {
-	return gr.fetchRemote
+	gr.stateMu.RLock()
+	defer gr.stateMu.RUnlock()
+	return append([]GitRemoteInfo(nil), gr.fetchRemote...)
 }
 
 // ------------------------------------
@@ -80,7 +86,9 @@ func (gr *GitRemote) FetchRemote() []GitRemoteInfo {
 //
 // ------------------------------------
 func (gr *GitRemote) PushRemote() []GitRemoteInfo {
-	return gr.pushRemote
+	gr.stateMu.RLock()
+	defer gr.stateMu.RUnlock()
+	return append([]GitRemoteInfo(nil), gr.pushRemote...)
 }
 
 // ------------------------------------
@@ -89,6 +97,8 @@ func (gr *GitRemote) PushRemote() []GitRemoteInfo {
 //
 // ------------------------------------
 func (gr *GitRemote) RemoteSyncStatus() RemoteSyncStatus {
+	gr.stateMu.RLock()
+	defer gr.stateMu.RUnlock()
 	return gr.remoteSyncStatus
 }
 
@@ -98,6 +108,8 @@ func (gr *GitRemote) RemoteSyncStatus() RemoteSyncStatus {
 //
 // ------------------------------------
 func (gr *GitRemote) UpStreamRemoteIcon() string {
+	gr.stateMu.RLock()
+	defer gr.stateMu.RUnlock()
 	return gr.upStreamRemoteIcon
 }
 
@@ -107,6 +119,8 @@ func (gr *GitRemote) UpStreamRemoteIcon() string {
 //
 // ------------------------------------
 func (gr *GitRemote) CurrentBranchUpStream() string {
+	gr.stateMu.RLock()
+	defer gr.stateMu.RUnlock()
 	return gr.currentBranchUpStream
 }
 
@@ -328,10 +342,12 @@ func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 			pushRemoteStruct = append(pushRemoteStruct, r)
 		}
 	}
+	gr.stateMu.Lock()
 	gr.remote = remoteStruct
 	gr.fetchRemote = fetchRemoteStruct
 	gr.pushRemote = pushRemoteStruct
-	return len(gr.remote) > 0
+	gr.stateMu.Unlock()
+	return len(remoteStruct) > 0
 }
 
 // ------------------------------------
@@ -341,8 +357,10 @@ func (gr *GitRemote) CheckRemoteExist(passiveRunning bool) bool {
 // ------------------------------------
 func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool, userTriggered bool) {
 	upstreamIcon, upstream, _ := hasUpstreamWithIcon()
+	gr.stateMu.Lock()
 	gr.upStreamRemoteIcon = upstreamIcon
 	gr.currentBranchUpStream = upstream
+	gr.stateMu.Unlock()
 
 	if needFetch {
 		gitFetch(gr.logging, userTriggered)
@@ -353,7 +371,9 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool, userTr
 	remoteSyncStatusCmd := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
 	remoteSyncStatusOutput, remoteSyncStatusErr := remoteSyncStatusCmd.Output()
 	if remoteSyncStatusErr != nil {
+		gr.stateMu.Lock()
 		gr.remoteSyncStatus = RemoteSyncStatus{}
+		gr.stateMu.Unlock()
 		return
 	}
 
@@ -362,12 +382,16 @@ func (gr *GitRemote) GetLatestRemoteSyncStatusAndUpstream(needFetch bool, userTr
 
 	if len(parts) < 2 {
 		gr.logging.RegisterNewLog(logging.CHECK_REMOTE_SYNC_STATUS_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: Invalid output format", logging.CHECK_REMOTE_SYNC_STATUS_OPS), true)
+		gr.stateMu.Lock()
 		gr.remoteSyncStatus = RemoteSyncStatus{}
+		gr.stateMu.Unlock()
 		return
 	}
 
+	gr.stateMu.Lock()
 	gr.remoteSyncStatus = RemoteSyncStatus{
 		Local:  parts[0],
 		Remote: parts[1],
 	}
+	gr.stateMu.Unlock()
 }

@@ -70,6 +70,7 @@ type GittiModel struct {
 	PopUpModel                                                interface{}
 	CopyPopupSequence                                         uint64
 	CopyInProgress                                            bool
+	IgnoreInProgress                                          bool
 	IsTyping                                                  atomic.Bool
 	GitOperations                                             *api.GitOperations
 	GlobalKeyBindingKeyMapLargestLen                          int                // this was use for global key binding pop up styling, we save it once so we don't have to recompute
@@ -181,6 +182,14 @@ type CopyValueResolvedMsg struct {
 type CopyFinishedMsg struct {
 	Value string
 	Err   error
+}
+
+type IgnoreFinishedMsg struct {
+	GitFiles   *git.GitFiles
+	FilePath   string
+	Result     git.IgnoreResult
+	Err        error
+	RefreshErr error
 }
 
 type GitOperationRequiredSigningFinishedMsg struct {
