@@ -5,6 +5,7 @@ import (
 	"sync/atomic"
 
 	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/api/git"
@@ -91,6 +92,7 @@ type GittiModel struct {
 	CherryPickedCommitInfo                                    CherryPickedCommitInfo
 	PanelFilterQuery                                          map[string]string // per panel list filter query, keyed by the showing component constant (e.g. SHOW_LOCAL_BRANCH, C2)
 	IsPanelFiltering                                          atomic.Bool       // to indicate the user is currently typing a panel list filter query
+	PanelFilterInput                                          textinput.Model   // shared text input for typing a panel list filter query, loaded with the focused panel's query on 'F'
 	GitCommitRequireSigning                                   bool
 	GitTagRequireSigning                                      bool
 	GitPushRequireSigning                                     bool

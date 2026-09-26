@@ -1,8 +1,6 @@
 package interaction
 
 import (
-	"unicode/utf8"
-
 	tea "charm.land/bubbletea/v2"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
@@ -21,9 +19,9 @@ import (
 // ------------------------------------
 //
 //	Handle key presses while the user is typing a panel list filter query
-//	(entered with 'F'). Printable runes append to the query, backspace deletes
-//	the last rune, enter exits typing mode keeping the query applied, and esc
-//	clears the query and exits. The focused list is rebuilt on every edit.
+//	(entered with 'F'). Other keys edit the query through the panel filter text
+//	input, enter exits typing mode keeping the query applied, and esc clears the
+//	query and exits. The focused list is rebuilt whenever the query changes.
 //
 // ------------------------------------
 func handlePanelFilterKeyInput(msg tea.KeyPressMsg, m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -42,21 +40,14 @@ func handlePanelFilterKeyInput(msg tea.KeyPressMsg, m *types.GittiModel) (*types
 			reinitFilteredList(m, filterKey)
 		}
 		m.IsPanelFiltering.Store(false)
-	case "backspace":
-		query := []rune(m.PanelFilterQuery[filterKey])
-		if len(query) > 0 {
-			m.PanelFilterQuery[filterKey] = string(query[:len(query)-1])
-			reinitFilteredList(m, filterKey)
-		}
-	case "space":
-		m.PanelFilterQuery[filterKey] += " "
-		reinitFilteredList(m, filterKey)
 	default:
-		key := msg.String()
-		if utf8.RuneCountInString(key) == 1 {
-			m.PanelFilterQuery[filterKey] += key
+		var cmd tea.Cmd
+		m.PanelFilterInput, cmd = m.PanelFilterInput.Update(msg)
+		if query := m.PanelFilterInput.Value(); query != m.PanelFilterQuery[filterKey] {
+			m.PanelFilterQuery[filterKey] = query
 			reinitFilteredList(m, filterKey)
 		}
+		return m, cmd
 	}
 	return m, nil
 }

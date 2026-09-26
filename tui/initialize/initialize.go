@@ -11,6 +11,7 @@ import (
 	worktreeComponent "github.com/gohyuhan/gitti/tui/component/worktree"
 
 	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/textinput"
 	"charm.land/bubbles/v2/viewport"
 
 	"github.com/gohyuhan/gitti/api"
@@ -60,6 +61,10 @@ func InitGittiModel(tuiUpdateChannel chan interface{}, repoPath string, repoName
 	lineEditingIndexCursorVpTwo.MouseWheelEnabled = false
 	lineEditingIndexCursorVpTwo.SetHorizontalStep(0)
 	lineEditingIndexCursorVpTwo.MouseWheelDelta = 0
+
+	panelFilterInput := textinput.New()
+	panelFilterInput.Prompt = "/"
+	panelFilterInput.Focus()
 
 	gittiModel := &types.GittiModel{
 		GittiLogger:                   gittiLogger,
@@ -117,6 +122,7 @@ func InitGittiModel(tuiUpdateChannel chan interface{}, repoPath string, repoName
 		LineEditingIndexCursorTwoViewport:                         lineEditingIndexCursorVpTwo,
 		CherryPickedCommitInfo:                                    types.CherryPickedCommitInfo{LatestSequenceCounter: 0, CherryPickedCommitMap: make(map[string]git.CherryPickedCommitLog)},
 		PanelFilterQuery:                                          make(map[string]string),
+		PanelFilterInput:                                          panelFilterInput,
 	}
 	gittiModel.IsRenderInit.Store(false)
 	gittiModel.ShowPopUp.Store(false)

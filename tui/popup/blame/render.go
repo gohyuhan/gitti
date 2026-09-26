@@ -7,6 +7,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
+	"github.com/gohyuhan/gitti/tui/utils"
 )
 
 // ------------------------------------
@@ -33,7 +34,7 @@ func RenderBlamePopUp(m *types.GittiModel) string {
 				lipgloss.Left,
 				i18n.LANGUAGEMAPPING.GitTrackedFileTitle,
 				popUp.CurrentGitTrackedFilesPathList.View(),
-				popUp.FilterInput.View(),
+				utils.ListCounterWithFilterInput(&popUp.CurrentGitTrackedFilesPathList, &popUp.FilterInput, width),
 			)
 		} else {
 			content = lipgloss.JoinVertical(

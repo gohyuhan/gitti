@@ -12,6 +12,7 @@ import (
 
 	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/list"
+	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/gohyuhan/gitti/api/git"
@@ -111,8 +112,8 @@ func FilterListItems(items []list.Item, query string, previousSelected list.Item
 //
 //	ListCounterHelper returns a function that generates a counter display e.g. ("3/10")
 //	showing the current item position in the list for the main left panel. When a panel
-//	filter query is set for filterKey, it is appended as "/query" (with a trailing block
-//	cursor while the query is being typed).
+//	filter query is set for filterKey, it is appended as "/query". While the query is
+//	being typed, the panel filter text input is shown beside the counter instead.
 //
 // ------------------------------------
 func ListCounterHelper(m *types.GittiModel, list *list.Model, filterKey string) func() []key.Binding {
@@ -124,11 +125,13 @@ func ListCounterHelper(m *types.GittiModel, list *list.Model, filterKey string) 
 			countStr = "0/0"
 		}
 		if m.IsPanelFiltering.Load() && CurrentPanelFilterKey(m) == filterKey {
-			countStr = fmt.Sprintf("%s  /%s█", countStr, m.PanelFilterQuery[filterKey])
-		} else if query := m.PanelFilterQuery[filterKey]; query != "" {
-			countStr = fmt.Sprintf("%s  /%s", countStr, query)
+			countStr = ListCounterWithFilterInput(list, &m.PanelFilterInput, m.WindowLeftPanelWidth)
+		} else {
+			if query := m.PanelFilterQuery[filterKey]; query != "" {
+				countStr = fmt.Sprintf("%s /%s", countStr, query)
+			}
+			countStr = TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 		}
-		countStr = TruncateString(countStr, m.WindowLeftPanelWidth-constant.ListItemOrTitleWidthPad-2)
 		return []key.Binding{
 			key.NewBinding(
 				key.WithKeys(countStr),
@@ -136,6 +139,29 @@ func ListCounterHelper(m *types.GittiModel, list *list.Model, filterKey string) 
 			),
 		}
 	}
+}
+
+// ------------------------------------
+//
+//	ListCounterWithFilterInput returns the counter e.g. ("3/10") of the list's visible
+//	(filtered) items with the filter text input beside it. The input width is set to
+//	maxWidth - 6 - counter width - 1 space, so the line stays within the panel or
+//	pop-up width given as maxWidth.
+//
+// ------------------------------------
+func ListCounterWithFilterInput(list *list.Model, filterInput *textinput.Model, maxWidth int) string {
+	countStr := "0/0"
+	if totalCount := len(list.VisibleItems()); totalCount > 0 {
+		countStr = fmt.Sprintf("%d/%d", list.Index()+1, totalCount)
+	}
+	// floor of 1: textinput treats width 0 as unlimited, and a negative width panics in its placeholder view
+	filterInput.SetWidth(max(1, maxWidth-6-len(countStr)-1))
+	// textinput only refits its horizontal scroll window to the width when the cursor
+	// moves, so move it to the end and back to refit the window to the width just set
+	cursorPosition := filterInput.Position()
+	filterInput.CursorEnd()
+	filterInput.SetCursor(cursorPosition)
+	return countStr + " " + filterInput.View()
 }
 
 // ------------------------------------

@@ -56,7 +56,7 @@ const (
 	GitCherryPickFromRefLogApplyConfirmationPopUp = "GitCherryPickFromRefLogApplyConfirmationPopUp" // IsTyping will be false
 	GitRebaseBranchInputPopUp                     = "GitRebaseBranchInputPopUp"                     // IsTyping will be true
 	GitRebaseOutputPopUp                          = "GitRebaseOutputPopUp"                          // IsTyping will be false
-	ChooseRemoteBranchOptionPopUp                 = "ChooseRemoteBranchOptionPopUp"                 // IsTyping will be false
+	ChooseRemoteBranchOptionPopUp                 = "ChooseRemoteBranchOptionPopUp"                 // IsTyping will be true
 	ChooseBranchOptionForMergePopUp               = "ChooseBranchOptionForMergePopUp"               // IsTyping will be false
 	BranchMergeOutputPopUp                        = "BranchMergeOutputPopUp"                        // IsTyping will be false
 	BlamePopUp                                    = "BlamePopUp"                                    // IsTyping will be true
