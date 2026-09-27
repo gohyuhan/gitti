@@ -220,6 +220,46 @@ gitti --init-dbranch main
 gitti --init-dbranch main --global
 ```
 
+Show the version or update Gitti:
+
+```bash
+gitti --version            # Print the installed version
+gitti --update             # Update to the latest version
+gitti --auto-update false  # Turn off the check for a new version on launch (default: true)
+```
+
+Choose the editor that Gitti opens files and the repo with (pick from a numbered list):
+
+```bash
+gitti --editor
+```
+
+Commit log and reflog:
+
+```bash
+gitti --max-commit-log-count 5000       # Max commit log entries to load (default: 2500)
+gitti --max-reflog-count 5000           # Max reflog entries to load (default: 2500)
+gitti --allow-commit-graph-write false  # Turn off commit-graph writes that speed up the log on large repos (default: true)
+```
+
+Log panel:
+
+```bash
+gitti --max-log-count 500  # Max Gitti log entries to keep (default: 300)
+gitti --show-x-log 5       # Log entries shown in the log panel (default: 3, must not exceed --max-log-count)
+```
+
+Merge and signing:
+
+```bash
+gitti --ff-merge true                     # Fast-forward merge, no merge commit (default: false)
+gitti --override-signing-ui-suspend true  # Do not suspend the UI for signing (default: false)
+```
+
+Only turn on `--override-signing-ui-suspend` if signing needs no passphrase or another tool enters it for you.
+
+Each flag above runs, then exits without opening the TUI. Pass one flag per command. The only pair is `--init-dbranch` with `--global`.
+
 ## Changelog
 
 ### [v0.10.0]
@@ -308,7 +348,7 @@ gitti --init-dbranch main --global
 ### [v0.4.0]
 
 - feature: introduce copy and paste for input field
-- feature: add config for max count retrieval for commit logs (--max-commit-count)
+- feature: add config for max count retrieval for commit logs (`--max-commit-log-count`)
 - feature: universal `--skip`
 - feature: build commit-graph goroutine function so large repo benefit from it to speed up git log retrieval
 - feature: add logging component panel and logging and log exporting feature
