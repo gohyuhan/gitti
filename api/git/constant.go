@@ -32,7 +32,14 @@ const (
 	NEWBRANCHBASEDONREMOTEUSERINPUT  = "NEWBRANCHBASEDONREMOTEUSERINPUT"  // Create new branch based on a remote branch (user manual input)
 	NEWBRANCHBASEDONREMOTEUSERSELECT = "NEWBRANCHBASEDONREMOTEUSERSELECT" // Create new branch based on a remote branch (user selection from a list of remote branches)
 	NEWBRANCHBASEDONCOMMITHASH       = "NEWBRANCHBASEDONCOMMITHASH"       // Create new branch based on commit hash (commit hash was retrieved from reflog)
+	NEWBRANCHBASEDONTAG              = "NEWBRANCHBASEDONTAG"              // Create new branch based on tag
 	RENAMEBRANCH                     = "RENAMEBRANCH"                     // Rename local branch (reuses the create new branch popup)
+)
+
+// Tag action types (for ChooseTagActionPopUp)
+const (
+	TAGACTIONCHECKOUT     = "TAGACTIONCHECKOUT"     // Checkout tag directly in detached HEAD state
+	TAGACTIONCREATEBRANCH = "TAGACTIONCREATEBRANCH" // Create and checkout new branch from tag
 )
 
 // Branch switching operation types

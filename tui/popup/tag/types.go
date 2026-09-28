@@ -379,3 +379,83 @@ type FetchTagOutputPopUpModel struct {
 	// CancelFunc is used to cancel the git delete tag operation
 	CancelFunc context.CancelFunc
 }
+
+// ------------------------------------
+//
+//	ChooseTagActionPopUpModel holds the tag name and action list (checkout detached HEAD vs create branch)
+//
+// ------------------------------------
+type ChooseTagActionPopUpModel struct {
+	TagName       string
+	TagActionList list.Model
+}
+
+// ------------------------------------
+//
+//	TagActionOptionDelegate renders each tag action row (name + info)
+//
+// ------------------------------------
+type (
+	TagActionOptionDelegate struct{}
+	TagActionOptionItem     struct {
+		Name          string
+		Info          string
+		TagActionType string
+	}
+)
+
+func (i TagActionOptionItem) FilterValue() string {
+	return i.Name
+}
+
+func (d TagActionOptionDelegate) Height() int                             { return 2 }
+func (d TagActionOptionDelegate) Spacing() int                            { return 0 }
+func (d TagActionOptionDelegate) Update(_ tea.Msg, _ *list.Model) tea.Cmd { return nil }
+func (d TagActionOptionDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
+	i, ok := listItem.(TagActionOptionItem)
+	if !ok {
+		return
+	}
+
+	nameStr := fmt.Sprintf("   %s", i.Name)
+	infoStr := fmt.Sprintf("    %s", i.Info)
+
+	componentWidth := m.Width() - constant.ListItemOrTitleWidthPad - 2
+
+	nameStr = utils.TruncateString(nameStr, componentWidth)
+	infoStr = utils.TruncateString(infoStr, componentWidth)
+
+	nameRendered := style.ItemStyle.Render(nameStr)
+	infoRendered := style.ItemStyle.Faint(true).Render(infoStr)
+	fullStr := nameRendered + "\n" + "  " + infoRendered
+
+	var fn func(...string) string
+	if index == m.Index() {
+		fn = func(s ...string) string {
+			return style.SelectedItemStyle.Render("❯ " + strings.Join(s, " "))
+		}
+	} else {
+		fn = func(s ...string) string {
+			return style.ItemStyle.Render("  " + strings.Join(s, " "))
+		}
+	}
+
+	fmt.Fprint(w, fn(fullStr))
+}
+
+// ------------------------------------
+//
+//	CheckoutTagOutputPopUpModel holds the output viewport and spinner for tag checkout
+//
+// ------------------------------------
+type CheckoutTagOutputPopUpModel struct {
+	TagName                   string
+	CheckoutTagOutputViewport viewport.Model
+	Spinner                   spinner.Model
+	IsProcessing              atomic.Bool
+	HasError                  atomic.Bool
+	ProcessSuccess            atomic.Bool
+	IsCancelled               atomic.Bool
+	CancelFunc                context.CancelFunc
+}
+

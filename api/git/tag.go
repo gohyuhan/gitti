@@ -484,3 +484,27 @@ func (gt *GitTag) GitDeleteTag(ctx context.Context, originName string, tagName s
 func (gt *GitTag) GitDeleteRemoteTagWithSigning(originName string, tagName string) []string {
 	return []string{"push", originName, "--delete", tagName}
 }
+
+// ------------------------------------
+//
+//	Checkout tag directly into detached HEAD state
+//
+// ------------------------------------
+func (gt *GitTag) GitCheckoutTag(tagName string) ([]string, bool) {
+	if !gt.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gt.gitProcessLock.OtherProcessRunningWarning()}, false
+	}
+	defer gt.gitProcessLock.ReleaseGitOpsLock()
+
+	gitArgs := []string{"checkout", "tags/" + tagName, "--"}
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	output, err := cmdExecutor.CombinedOutput()
+	outputLines := processGeneralGitOpsOutputIntoStringArray(output)
+	gt.logging.RegisterNewLog(logging.CHECKOUT_TAG_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gt.logging.RegisterNewLog(logging.CHECKOUT_TAG_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.CHECKOUT_TAG_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+		return outputLines, false
+	}
+	return outputLines, true
+}
+

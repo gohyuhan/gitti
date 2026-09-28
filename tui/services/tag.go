@@ -206,3 +206,61 @@ func GitFetchTagCancelService(m *types.GittiModel) {
 		popUp.ProcessSuccess.Store(false)
 	}
 }
+
+// ------------------------------------
+//
+//	For Tag checkout (detached HEAD)
+//
+// ------------------------------------
+func GitCheckoutTagService(m *types.GittiModel, tagName string) {
+	popUp, ok := m.PopUpModel.(*tagPopUp.CheckoutTagOutputPopUpModel)
+	if ok {
+		ctx, cancel := context.WithCancel(context.Background())
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+		popUp.IsProcessing.Store(true)
+		popUp.IsCancelled.Store(false)
+		popUp.CancelFunc = cancel
+
+		go func(ctx context.Context) {
+			defer cancel()
+
+			if m.GitOperations == nil || m.GitOperations.GitTag == nil {
+				return
+			}
+			output, success := m.GitOperations.GitTag.GitCheckoutTag(tagName)
+			data := types.GitCheckoutTagResultEventDataStructure{
+				Result:  output,
+				Success: success,
+			}
+			m.TuiUpdateChannel <- types.GittiTuiUpdateMsg{
+				Event: constant.GIT_CHECKOUT_TAG_RESULT_EVENT,
+				Data:  data,
+			}
+		}(ctx)
+	}
+}
+
+// ------------------------------------
+//
+//	For Cancelling tag checkout
+//
+// ------------------------------------
+func CheckoutTagCancelService(m *types.GittiModel) {
+	popUp, ok := m.PopUpModel.(*tagPopUp.CheckoutTagOutputPopUpModel)
+	if ok {
+		popUp.IsCancelled.Store(true) // set cancellation flag first to prevent race condition
+		if popUp.CancelFunc != nil {
+			popUp.CancelFunc() // Cancel the context, which terminates the command and goroutine
+		}
+
+		popUp.CheckoutTagOutputViewport.SetContent("") // set the checkout tag output viewport to nothing
+		popUp.IsProcessing.Store(false)
+		popUp.HasError.Store(false)
+		popUp.ProcessSuccess.Store(false)
+	}
+
+	m.ShowPopUp.Store(false) // close the pop up
+	m.IsTyping.Store(false)  // reset typing mode
+	m.PopUpType = constant.NoPopUp
+}

@@ -49,6 +49,8 @@ const (
 	PushTagOutputPopUp                            = "PushTagOutputPopUp"                            // IsTyping will be false
 	ChooseFetchTagOptionPopUp                     = "ChooseFetchTagOptionPopUp"                     // IsTyping will be false
 	FetchTagOutputPopUp                           = "FetchTagOutputPopUp"                           // IsTyping will be false
+	ChooseTagActionPopUp                          = "ChooseTagActionPopUp"                          // IsTyping will be false
+	CheckoutTagOutputPopUp                        = "CheckoutTagOutputPopUp"                        // IsTyping will be false
 	RemoveRemoteConfirmationPopUp                 = "RemoveRemoteConfirmationPopUp"                 // IsTyping will be false
 	RemoteAsTrackingUpstreamConfirmationPopUp     = "RemoteAsTrackingUpstreamConfirmationPopUp"     // IsTyping will be false
 	EditRemotePromptPopUp                         = "EditRemotePromptPopUp"                         // IsTyping will be true
@@ -138,6 +140,8 @@ const (
 	MaxPushTagOutputPopUpWidth                            = 150
 	MaxChooseFetchTagOptionPopUpWidth                     = 150
 	MaxFetchTagOutputPopUpWidth                           = 150
+	MaxChooseTagActionPopUpWidth                          = 150
+	MaxCheckoutTagOutputPopUpWidth                        = 150
 	MaxRemoveRemoteConfirmationPopUpWidth                 = 150
 	MaxRemoteAsTrackingUpstreamConfirmationPopUpWidth     = 150
 	MaxEditRemotePromptPopUpWidth                         = 150
@@ -195,6 +199,8 @@ const (
 	PopUpPushTagOutputViewportHeight                          = 10
 	PopUpChooseFetchTagOptionHeight                           = 10
 	PopUpFetchTagOutputViewportHeight                         = 10
+	PopUpChooseTagActionHeight                                = 6
+	PopUpCheckoutTagOutputViewportHeight                      = 10
 	PopUpGitRevertParentOptionSelectionHeight                 = 10
 	PopUpGitRebaseOutputViewportHeight                        = 10
 	PopUpChooseRemoteBranchOptionHeight                       = 10
@@ -290,6 +296,7 @@ const (
 	GIT_CREATE_NEW_BRANCH_BASED_ON_REMOTE_INVALID_EVENT      = "GIT_CREATE_NEW_BRANCH_BASED_ON_REMOTE_INVALID_EVENT"
 	GIT_MERGE_RESULT_EVENT                                   = "GIT_MERGE_RESULT_EVENT"
 	GIT_DELETE_TAG_RESULT_EVENT                              = "GIT_DELETE_TAG_RESULT_EVENT"
+	GIT_CHECKOUT_TAG_RESULT_EVENT                            = "GIT_CHECKOUT_TAG_RESULT_EVENT"
 	GIT_PUSH_TAG_RESULT_EVENT                                = "GIT_PUSH_TAG_RESULT_EVENT"
 	GIT_FETCH_TAG_RESULT_EVENT                               = "GIT_FETCH_TAG_RESULT_EVENT"
 	GIT_STASH_OPERATION_RESULT_EVENT                         = "GIT_STASH_OPERATION_RESULT_EVENT"
