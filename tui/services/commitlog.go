@@ -1,7 +1,9 @@
 package services
 
 import (
+	"context"
 	"slices"
+	"time"
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/constant"
@@ -69,4 +71,30 @@ func GitRevertCommitService(m *types.GittiModel, commitHash string, parentOrder 
 // ------------------------------------
 func GetCommitHashParentInfoService(m *types.GittiModel, commitHash string) []git.CommitHashParentInfo {
 	return m.GitOperations.GitCommitLog.GetCommitHashParentInfo(commitHash)
+}
+
+// ------------------------------------
+//
+//	Checkout a single file from a commit into the working directory
+//
+// ------------------------------------
+func CheckoutCommitFileService(m *types.GittiModel, commitHash, filePath string) {
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		_ = m.GitOperations.GitCommitLog.CheckoutFileFromCommit(ctx, commitHash, filePath)
+	}()
+}
+
+// ------------------------------------
+//
+//	Discard / revert changes for a file from a commit into the working directory
+//
+// ------------------------------------
+func DiscardCommitFileService(m *types.GittiModel, commitHash, filePath string) {
+	go func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		_ = m.GitOperations.GitCommitLog.DiscardFileFromCommit(ctx, commitHash, filePath)
+	}()
 }

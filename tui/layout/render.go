@@ -126,16 +126,21 @@ func renderModifiedFilesComponentPanel(width int, height int, m *types.GittiMode
 // ------------------------------------
 func renderCommitLogOrRefLogComponentPanel(width int, height int, m *types.GittiModel) string {
 	borderStyle := style.PanelBorderStyle
-	if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel {
+	if m.CurrentSelectedComponent == constant.CommitLogOrRefLogComponentPanel || m.CurrentSelectedComponent == constant.CommitFilesComponentPanel {
 		borderStyle = style.SelectedBorderStyle
 	}
 
 	var content string
-	switch m.CurrentCommitLogOrRefLogComponentShowing {
-	case constant.SHOW_COMMITLOG:
-		content = m.CurrentRepoCommitLogInfoList.View()
-	case constant.SHOW_REFLOG:
-		content = m.CurrentRepoRefLogInfoList.View()
+	if m.CurrentSelectedComponent == constant.CommitFilesComponentPanel ||
+		(m.CurrentSelectedComponent == constant.DetailComponentPanel && m.DetailPanelParentComponent == constant.CommitFilesComponentPanel) {
+		content = m.CurrentRepoCommitFilesList.View()
+	} else {
+		switch m.CurrentCommitLogOrRefLogComponentShowing {
+		case constant.SHOW_COMMITLOG:
+			content = m.CurrentRepoCommitLogInfoList.View()
+		case constant.SHOW_REFLOG:
+			content = m.CurrentRepoRefLogInfoList.View()
+		}
 	}
 
 	return borderStyle.
@@ -587,6 +592,12 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 				} else {
 					keys = i18n.LANGUAGEMAPPING.KeyBindingRefLogComponentNone
 				}
+			}
+		case constant.CommitFilesComponentPanel:
+			if len(m.CurrentRepoCommitFilesList.Items()) > 0 {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingCommitFilesComponent
+			} else {
+				keys = i18n.LANGUAGEMAPPING.KeyBindingCommitFilesComponentNone
 			}
 		case constant.DetailComponentPanel:
 			if m.IsLineEditingState.Load() {

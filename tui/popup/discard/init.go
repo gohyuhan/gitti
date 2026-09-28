@@ -105,3 +105,20 @@ func InitGitDiscardConfirmPromptPopUpModel(m *types.GittiModel, fileDisplayName 
 	}
 	m.PopUpModel = popUpModel
 }
+
+// ------------------------------------
+//
+//	Initialize the discard confirmation prompt popup for a file from a commit,
+//	shown before the commit-file discard is executed.
+//
+// ------------------------------------
+func InitGitDiscardCommitFileConfirmPromptPopUpModel(m *types.GittiModel, fileDisplayName string, filePathName string, commitHash string) {
+	popUpModel := &GitDiscardConfirmPromptPopUpModel{
+		FileDisplayName: fileDisplayName,
+		FilePathName:    filePathName,
+		DiscardType:     git.DISCARDCOMMITFILE,
+		CommitHash:      commitHash,
+	}
+	m.PopUpModel = popUpModel
+}
+

@@ -56,6 +56,9 @@ type GittiModel struct {
 	CurrentRepoStashInfoList                                  list.Model
 	CurrentRepoRemoteInfoList                                 list.Model
 	CurrentRepoWorktreeInfoList                               list.Model
+	CurrentRepoCommitFilesList                                list.Model
+	CurrentDrillDownCommitHash                                string
+	CurrentDrillDownCommitSubject                             string
 	DetailPanelParentComponent                                string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
 	DetailPanelViewport                                       viewport.Model
 	DetailPanelViewportOffset                                 int
@@ -84,6 +87,7 @@ type GittiModel struct {
 	StashComponentKeyBindingKeyMapLargestLen                  int                // this was use for stash component key binding pop up styling, we save it once so we don't have to recompute
 	LogComponentKeyBindingKeyMapLargestLen                    int                // this was use for log component key binding pop up styling, we save it once so we don't have to recompute
 	DetailComponentKeyBindingKeyMapLargestLen                 int                // this was use for detail component key binding pop up styling, we save it once so we don't have to recompute
+	CommitFilesComponentKeyBindingKeyMapLargestLen            int                // this was use for commit files component key binding pop up styling, we save it once so we don't have to recompute
 	DetailComponentPanelInfoFetchCancelFunc                   context.CancelFunc // this was to cancel the fetch detail oepration
 	IsDetailComponentPanelInfoFetchProcessing                 atomic.Bool
 	IsLineEditingState                                        atomic.Bool
@@ -138,6 +142,7 @@ type GittiComponentsCurrentListNavigationIndexPosition struct {
 	TagComponent           int
 	RemoteComponent        int
 	WorktreeComponent      int
+	CommitFilesComponent   int
 }
 
 // ---------------------------------

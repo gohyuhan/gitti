@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/commitfiles"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/stash"
@@ -77,6 +78,18 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
 			}
+		case constant.CommitFilesComponentPanel:
+			selectedItem := m.CurrentRepoCommitFilesList.SelectedItem()
+			if selectedItem != nil {
+				fileItem, ok := selectedItem.(commitfiles.GitCommitFileItem)
+				if ok {
+					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
+					discardPopUp.InitGitDiscardCommitFileConfirmPromptPopUpModel(m, fileItem.FilePathname, fileItem.FilePathname, m.CurrentDrillDownCommitHash)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
+				}
+			}
+			return m, nil
 		case constant.ModifiedFilesComponentPanel:
 			currentSelectedFileItem := m.CurrentRepoModifiedFilesInfoList.SelectedItem()
 			if currentSelectedFileItem != nil {

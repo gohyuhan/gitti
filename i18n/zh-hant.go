@@ -263,13 +263,28 @@ var zH_HANT = LanguageMapping{
 		"[</>] 切換元件",
 		"[y] 複製",
 		"[↑/↓] 上下移動",
-		"[enter] 查看提交日誌內容",
+		"[enter] 查看變動檔案列表",
 		"[t] 建立標籤",
 		"[ctrl+r] 還原此提交",
 		"[i] 互動式變基",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 揀選操作",
+		"[F] 過濾",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingCommitFilesComponentNone: []string{
+		"[esc] 返回提交列表",
+		"[F] 過濾",
+		"[?] 快捷鍵與說明",
+	},
+	KeyBindingCommitFilesComponent: []string{
+		"[esc] 返回提交列表",
+		"[y] 複製",
+		"[↑/↓] 上下移動",
+		"[enter] 查看檔案差異",
+		"[c] 簽出檔案",
+		"[d] 放棄變更",
 		"[F] 過濾",
 		"[?] 快捷鍵與說明",
 	},
@@ -642,10 +657,15 @@ var zH_HANT = LanguageMapping{
 	WorktreeComponentKeyBinding:                                  zhHantWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                             zhHantModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                 zhHantCommitLogComponentKeyBinding,
+	CommitFilesComponentKeyBinding:                               zhHantCommitFilesComponentKeyBinding,
 	RefLogComponentKeyBinding:                                    zhHantRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                     zhHantStashComponentKeyBinding,
 	LogComponentKeyBinding:                                       zhHantLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                    zhHantDetailComponentKeyBinding,
+	CheckoutCommitFileSucceeded:                                  "已成功從提交 %s 簽出檔案 %s",
+	CheckoutCommitFileFailed:                                     "簽出檔案 %s 失敗: %s",
+	DiscardCommitFileSucceeded:                                   "已成功放棄提交 %s 中 %s 的變更",
+	DiscardCommitFileFailed:                                      "放棄 %s 的變更失敗: %s",
 	FeatureInstructions:                                          zhHantFeatureInstructions,
 	CommitPopUpMessageTitle:                                      "* 提交訊息",
 	CommitPopUpMessageInputPlaceHolder:                           "輸入提交訊息",
@@ -756,6 +776,7 @@ var zH_HANT = LanguageMapping{
 	GitDiscardUntrackedConfirmation:                              "確定要捨棄 [%s] 的未追蹤變更嗎？",
 	GitDiscardNewlyAddedorCopyConfirmation:                       "確定要捨棄 [%s] 的新追蹤或複製變更嗎？ \n * 這也將移除未追蹤的變更",
 	GitDiscardAndRevertRenameConfirmation:                        "您確定要放棄 [%s] 的變更並復原重新命名嗎？",
+	GitDiscardCommitFileConfirmation:                             "您確定要捨棄此提交中 [%s] 的變更嗎？",
 	GitStashAllTitle:                                             "儲藏所有檔案",
 	GitStashFileTitle:                                            "儲藏檔案",
 	GitStashApplyTitle:                                           "套用儲藏",
@@ -1390,7 +1411,7 @@ var zhHantCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "enter",
-		TitleOrInfoLine: "查看提交日誌內容",
+		TitleOrInfoLine: "查看提交中變動的檔案列表",
 		LineType:        INFO,
 	},
 	{
@@ -1436,6 +1457,55 @@ var zhHantCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "y",
 		TitleOrInfoLine: "複製所選內容",
+		LineType:        INFO,
+	},
+}
+
+// Commit Files Component Key Binding for zh-hant
+var zhHantCommitFilesComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 變動檔案元件面板快捷鍵 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "返回提交列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "聚焦詳細面板查看檔案差異",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "c",
+		TitleOrInfoLine: "從該提交簽出檔案 (git checkout <sha> -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "放棄該提交的檔案變更 (git checkout <sha>~1 -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "過濾列表（輸入以過濾，enter 確認，esc 清除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "複製檔案路徑",
 		LineType:        INFO,
 	},
 }

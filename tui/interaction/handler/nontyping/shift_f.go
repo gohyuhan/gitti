@@ -22,6 +22,7 @@ func handleNonTypingFKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel,
 			constant.ModifiedFilesComponentPanel,
 			constant.CommitLogOrRefLogComponentPanel,
+			constant.CommitFilesComponentPanel,
 			constant.StashComponentPanel:
 			if m.PanelFilterQuery == nil {
 				m.PanelFilterQuery = make(map[string]string)
