@@ -131,7 +131,8 @@ func renderCommitLogOrRefLogComponentPanel(width int, height int, m *types.Gitti
 	}
 
 	var content string
-	if m.CurrentSelectedComponent == constant.CommitFilesComponentPanel {
+	if m.CurrentSelectedComponent == constant.CommitFilesComponentPanel ||
+		(m.CurrentSelectedComponent == constant.DetailComponentPanel && m.DetailPanelParentComponent == constant.CommitFilesComponentPanel) {
 		content = m.CurrentRepoCommitFilesList.View()
 	} else {
 		switch m.CurrentCommitLogOrRefLogComponentShowing {
@@ -601,7 +602,7 @@ func renderKeyBindingComponentPanel(width int, m *types.GittiModel) string {
 		case constant.DetailComponentPanel:
 			if m.IsLineEditingState.Load() {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditing
-			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel || m.DetailPanelParentComponent == constant.CommitFilesComponentPanel {
+			} else if m.DetailPanelParentComponent == constant.ModifiedFilesComponentPanel {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponentLineEditingEligible
 			} else {
 				keys = i18n.LANGUAGEMAPPING.KeyBindingKeyDetailComponent

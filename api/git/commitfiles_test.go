@@ -144,6 +144,16 @@ func TestCommitTouchedFilesAndOperations(t *testing.T) {
 		t.Errorf("expected file1.txt to have root commit content after discard, got %s", string(content))
 	}
 
+	// 5b. Test DiscardFileFromCommit for newly added file in non-root commit:
+	// Discarding file3.txt (added in second commit) should remove it from working directory
+	err = commitLog.DiscardFileFromCommit(ctx, secondHash, "file3.txt")
+	if err != nil {
+		t.Fatalf("DiscardFileFromCommit on added file in second commit failed: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "file3.txt")); !os.IsNotExist(err) {
+		t.Errorf("expected file3.txt to be removed after discard, but it exists")
+	}
+
 	// 6. Test DiscardFileFromCommit on root commit:
 	// Discarding a file added in root commit should remove the file from working directory
 	err = commitLog.DiscardFileFromCommit(ctx, rootHash, "file1.txt")

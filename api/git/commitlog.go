@@ -699,13 +699,18 @@ func (gCL *GitCommitLog) CheckoutFileFromCommit(ctx context.Context, commitHash,
 //
 // ------------------------------------
 func (gCL *GitCommitLog) DiscardFileFromCommit(ctx context.Context, commitHash, filePath string) error {
-	parentTarget := commitHash + "~1"
 	parents := gCL.GetCommitHashParentInfo(commitHash)
 	var gitArgs []string
 	if len(parents) == 0 {
 		gitArgs = []string{"rm", "-f", "--", filePath}
 	} else {
-		gitArgs = []string{"checkout", parentTarget, "--", filePath}
+		parentTarget := commitHash + "~1"
+		checkCmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, []string{"cat-file", "-e", fmt.Sprintf("%s:%s", parentTarget, filePath)}, false)
+		if err := checkCmd.Run(); err != nil {
+			gitArgs = []string{"rm", "-f", "--", filePath}
+		} else {
+			gitArgs = []string{"checkout", parentTarget, "--", filePath}
+		}
 	}
 
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
