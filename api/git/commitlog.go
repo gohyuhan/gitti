@@ -665,7 +665,7 @@ func (gCL *GitCommitLog) GetCommitTouchedFiles(ctx context.Context, commitHash s
 //
 // ------------------------------------
 func (gCL *GitCommitLog) GetCommitFileDiff(ctx context.Context, commitHash, filePath string) []string {
-	gitArgs := []string{"show", commitHash, "--stat", "-p", "--", filePath}
+	gitArgs := []string{"show", commitHash, "--stat", "-p", "--", literalPathspec(filePath)}
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	gitOutput, err := cmdExecutor.Output()
 	if err != nil {
@@ -681,7 +681,7 @@ func (gCL *GitCommitLog) GetCommitFileDiff(ctx context.Context, commitHash, file
 //
 // ------------------------------------
 func (gCL *GitCommitLog) CheckoutFileFromCommit(ctx context.Context, commitHash, filePath string) error {
-	gitArgs := []string{"checkout", commitHash, "--", filePath}
+	gitArgs := []string{"checkout", commitHash, "--", literalPathspec(filePath)}
 	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
 	gCL.logging.RegisterNewLog(logging.CHECKOUT_COMMIT_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 
@@ -702,14 +702,14 @@ func (gCL *GitCommitLog) DiscardFileFromCommit(ctx context.Context, commitHash, 
 	parents := gCL.GetCommitHashParentInfo(commitHash)
 	var gitArgs []string
 	if len(parents) == 0 {
-		gitArgs = []string{"rm", "-f", "--", filePath}
+		gitArgs = []string{"rm", "-f", "--", literalPathspec(filePath)}
 	} else {
 		parentTarget := commitHash + "~1"
 		checkCmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, []string{"cat-file", "-e", fmt.Sprintf("%s:%s", parentTarget, filePath)}, false)
 		if err := checkCmd.Run(); err != nil {
-			gitArgs = []string{"rm", "-f", "--", filePath}
+			gitArgs = []string{"rm", "-f", "--", literalPathspec(filePath)}
 		} else {
-			gitArgs = []string{"checkout", parentTarget, "--", filePath}
+			gitArgs = []string{"checkout", parentTarget, "--", literalPathspec(filePath)}
 		}
 	}
 

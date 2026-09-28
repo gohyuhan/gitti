@@ -775,6 +775,7 @@ var eN = LanguageMapping{
 	GitDiscardUntrackedConfirmation:                              "Are you sure you want to discard untracked changes for [%s] ?",
 	GitDiscardNewlyAddedorCopyConfirmation:                       "Are you sure you want to discard newly tracked or copied changes for [%s] ? \n * This will remove untracked changes also",
 	GitDiscardAndRevertRenameConfirmation:                        "Are you sure you want to discard changes and revert rename for [%s] ?",
+	GitDiscardCommitFileConfirmation:                             "Are you sure you want to discard changes for [%s] from this commit?",
 	GitStashAllTitle:                                             "Stash All File(s)",
 	GitStashFileTitle:                                            "Stash File",
 	GitStashApplyTitle:                                           "Apply Stash",

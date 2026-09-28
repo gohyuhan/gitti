@@ -29,6 +29,12 @@ func handleLeftMouseClick(msg tea.MouseClickMsg, m *types.GittiModel) (*types.Gi
 	// left column: each panel renders with a 1-cell border on every side,
 	// so a panel's total footprint is its content height + 2
 	if x <= m.WindowLeftPanelWidth+1 {
+		panel3Component := constant.CommitLogOrRefLogComponentPanel
+		if m.CurrentSelectedComponent == constant.CommitFilesComponentPanel ||
+			(m.CurrentSelectedComponent == constant.DetailComponentPanel && m.DetailPanelParentComponent == constant.CommitFilesComponentPanel) {
+			panel3Component = constant.CommitFilesComponentPanel
+		}
+
 		leftPanels := []struct {
 			component string
 			index     int
@@ -37,7 +43,7 @@ func handleLeftMouseClick(msg tea.MouseClickMsg, m *types.GittiModel) (*types.Gi
 			{constant.GitStatusComponentPanel, 0, 1 + 2},
 			{constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel, 1, m.LocalBranchesComponentPanelHeight + 2},
 			{constant.ModifiedFilesComponentPanel, 2, m.ModifiedFilesComponentPanelHeight + 2},
-			{constant.CommitLogOrRefLogComponentPanel, 3, m.CommitLogComponentPanelHeight + 2},
+			{panel3Component, 3, m.CommitLogComponentPanelHeight + 2},
 			{constant.StashComponentPanel, 4, m.StashComponentPanelHeight + 2},
 		}
 
@@ -77,6 +83,7 @@ func handleLeftMouseClick(msg tea.MouseClickMsg, m *types.GittiModel) (*types.Gi
 		case constant.LocalBranchOrTagOrRemoteOrWorktreeComponentPanel,
 			constant.ModifiedFilesComponentPanel,
 			constant.CommitLogOrRefLogComponentPanel,
+			constant.CommitFilesComponentPanel,
 			constant.StashComponentPanel,
 			constant.LogComponentPanel:
 			m.DetailPanelParentComponent = m.CurrentSelectedComponent
@@ -128,6 +135,9 @@ func selectListItemFromClick(m *types.GittiModel, component string, itemRow int)
 			clickedList = &m.CurrentRepoRefLogInfoList
 			navigationIndex = &m.ListNavigationIndexPosition.RefLogComponent
 		}
+	case constant.CommitFilesComponentPanel:
+		clickedList = &m.CurrentRepoCommitFilesList
+		navigationIndex = &m.ListNavigationIndexPosition.CommitFilesComponent
 	case constant.StashComponentPanel:
 		clickedList = &m.CurrentRepoStashInfoList
 		navigationIndex = &m.ListNavigationIndexPosition.StashComponent

@@ -776,6 +776,7 @@ var zH_HANS = LanguageMapping{
 	GitDiscardUntrackedConfirmation:                              "确定要丢弃 [%s] 的未跟踪更改吗？",
 	GitDiscardNewlyAddedorCopyConfirmation:                       "确定要丢弃 [%s] 的新跟踪或复制更改吗？ \n * 这也将移除未跟踪的更改",
 	GitDiscardAndRevertRenameConfirmation:                        "您确定要放弃 [%s] 的更改并撤销重命名吗？",
+	GitDiscardCommitFileConfirmation:                             "您确定要舍弃此提交中 [%s] 的更改吗？",
 	GitStashAllTitle:                                             "储藏所有文件",
 	GitStashFileTitle:                                            "储藏文件",
 	GitStashApplyTitle:                                           "应用储藏",

@@ -325,7 +325,11 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.GitDiscardConfirmPromptPopUp:
 			popUp, ok := m.PopUpModel.(*discardPopUp.GitDiscardConfirmPromptPopUpModel)
 			if ok {
-				services.GitDiscardFileChangesService(m, popUp.FilePathName, popUp.DiscardType)
+				if popUp.DiscardType == git.DISCARDCOMMITFILE {
+					services.DiscardCommitFileService(m, popUp.CommitHash, popUp.FilePathName)
+				} else {
+					services.GitDiscardFileChangesService(m, popUp.FilePathName, popUp.DiscardType)
+				}
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp

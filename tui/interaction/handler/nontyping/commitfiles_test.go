@@ -180,10 +180,19 @@ func TestCommitFilesCheckoutAndDiscard(t *testing.T) {
 		t.Errorf("expected 'c' on CommitFilesComponentPanel not to open CommitPopUp")
 	}
 
-	// Pressing 'd' should not open GitDiscardConfirmPromptPopUp
+	// Pressing 'd' should open GitDiscardConfirmPromptPopUp
 	m, _ = handleNonTypingdKeyBindingInteraction(m)
-	if m.PopUpType == constant.GitDiscardConfirmPromptPopUp {
-		t.Errorf("expected 'd' on CommitFilesComponentPanel not to open GitDiscardConfirmPromptPopUp")
+	if m.PopUpType != constant.GitDiscardConfirmPromptPopUp {
+		t.Fatalf("expected 'd' on CommitFilesComponentPanel to open GitDiscardConfirmPromptPopUp, got %s", m.PopUpType)
+	}
+
+	// Pressing Enter in GitDiscardConfirmPromptPopUp should confirm discard and close popup
+	m, _ = handleNonTypingEnterKeyBindingInteraction(m)
+	if m.PopUpType != constant.NoPopUp {
+		t.Errorf("expected PopUpType to be NoPopUp after Enter, got %s", m.PopUpType)
+	}
+	if m.ShowPopUp.Load() {
+		t.Errorf("expected ShowPopUp to be false after Enter")
 	}
 }
 

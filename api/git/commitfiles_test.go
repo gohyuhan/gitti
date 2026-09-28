@@ -208,3 +208,57 @@ func TestCommitTouchedFilesRename(t *testing.T) {
 		t.Errorf("expected OldPathname 'old_name.txt', got '%s'", files[0].OldPathname)
 	}
 }
+
+func TestCommitFilesSpecialCharactersPathspec(t *testing.T) {
+	dir, commitLog := setupTestGitRepo(t)
+	ctx := context.Background()
+
+	run := func(args ...string) string {
+		cmd := exec.Command("git", args...)
+		cmd.Dir = dir
+		cmd.Env = append(os.Environ(),
+			"GIT_AUTHOR_NAME=Test",
+			"GIT_AUTHOR_EMAIL=test@example.com",
+			"GIT_COMMITTER_NAME=Test",
+			"GIT_COMMITTER_EMAIL=test@example.com",
+		)
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			t.Fatalf("git %s failed: %v, output: %s", strings.Join(args, " "), err, string(out))
+		}
+		return strings.TrimSpace(string(out))
+	}
+
+	specialFile := "[id].tsx"
+	os.WriteFile(filepath.Join(dir, specialFile), []byte("export default function Post() {}\n"), 0o644)
+	run("add", specialFile)
+	run("commit", "-m", "Add bracketed filename")
+	commit1 := run("rev-parse", "HEAD")
+
+	// GetCommitFileDiff should succeed
+	diff := commitLog.GetCommitFileDiff(ctx, commit1, specialFile)
+	if len(diff) == 0 {
+		t.Errorf("expected non-empty diff for bracketed file")
+	}
+
+	// Modify file in working tree and checkout
+	os.WriteFile(filepath.Join(dir, specialFile), []byte("modified content\n"), 0o644)
+	err := commitLog.CheckoutFileFromCommit(ctx, commit1, specialFile)
+	if err != nil {
+		t.Fatalf("checkout failed for bracketed file: %v", err)
+	}
+	content, _ := os.ReadFile(filepath.Join(dir, specialFile))
+	if string(content) != "export default function Post() {}\n" {
+		t.Errorf("checkout did not restore original content: %s", string(content))
+	}
+
+	// Discard from commit 1 (added in commit 1) -> should be removed
+	err = commitLog.DiscardFileFromCommit(ctx, commit1, specialFile)
+	if err != nil {
+		t.Fatalf("discard failed for bracketed file: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, specialFile)); !os.IsNotExist(err) {
+		t.Errorf("expected file to be removed after discarding root commit addition")
+	}
+}
+

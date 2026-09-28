@@ -35,6 +35,7 @@ type GitDiscardConfirmPromptPopUpModel struct {
 	DiscardType     string
 	FileDisplayName string // the files list label, for display only
 	FilePathName    string // the exact path, for the discard operation
+	CommitHash      string // for commit file discard
 }
 
 // ------------------------------------

@@ -776,6 +776,7 @@ var jA = LanguageMapping{
 	GitDiscardUntrackedConfirmation:                              "[%s] の追跡対象外の変更を破棄してもよろしいですか？",
 	GitDiscardNewlyAddedorCopyConfirmation:                       "[%s] の新規追加またはコピーされた変更を破棄してもよろしいですか？ \n * これにより, 追跡対象外の変更も削除されます",
 	GitDiscardAndRevertRenameConfirmation:                        "ファイル [%s] の変更を破棄し、名前変更を取り消してもよろしいですか？",
+	GitDiscardCommitFileConfirmation:                             "このコミットから [%s] への変更を破棄してもよろしいですか？",
 	GitStashAllTitle:                                             "すべてのファイルをスタッシュ",
 	GitStashFileTitle:                                            "ファイルをスタッシュ",
 	GitStashApplyTitle:                                           "スタッシュを適用",

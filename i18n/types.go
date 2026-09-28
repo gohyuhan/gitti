@@ -390,6 +390,7 @@ type LanguageMapping struct {
 	GitDiscardUntrackedConfirmation        string
 	GitDiscardNewlyAddedorCopyConfirmation string
 	GitDiscardAndRevertRenameConfirmation  string
+	GitDiscardCommitFileConfirmation       string
 	// for stash operation title (used in output pop up)
 	GitStashAllTitle   string
 	GitStashFileTitle  string
