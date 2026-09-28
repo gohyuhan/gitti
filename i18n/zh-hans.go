@@ -1074,6 +1074,11 @@ var zhHansGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "在编辑器中打开仓库",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制选中项到剪贴板",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for zh-hans
@@ -1627,6 +1632,11 @@ var zhHansDetailComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "space",
 		TitleOrInfoLine: "暂存/取消暂存",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制差异行到剪贴板",
 		LineType:        INFO,
 	},
 	{

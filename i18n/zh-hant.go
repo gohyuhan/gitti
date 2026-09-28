@@ -1074,6 +1074,11 @@ var zhHantGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "在編輯器中開啟儲存庫",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "複製選中項至剪貼簿",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for zh-hant
@@ -1627,6 +1632,11 @@ var zhHantDetailComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "space",
 		TitleOrInfoLine: "暫存/取消暫存",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "複製差異行至剪貼簿",
 		LineType:        INFO,
 	},
 	{

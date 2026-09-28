@@ -1075,6 +1075,11 @@ var jaGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "リポジトリをエディタで開く",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "選択した項目をクリップボードにコピー",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for ja
@@ -1628,6 +1633,11 @@ var jaDetailComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "space",
 		TitleOrInfoLine: "ステージ/アンステージ",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "差分行をクリップボードにコピー",
 		LineType:        INFO,
 	},
 	{

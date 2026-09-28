@@ -1072,6 +1072,11 @@ var enGlobalKeyBinding = []KeyBindingMappingFormat{
 		TitleOrInfoLine: "open repository in editor",
 		LineType:        INFO,
 	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy selected item to clipboard",
+		LineType:        INFO,
+	},
 }
 
 // Local Branch Component Key Binding for en
@@ -1625,6 +1630,11 @@ var enDetailComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "space",
 		TitleOrInfoLine: "stage/unstage",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy diff line to clipboard",
 		LineType:        INFO,
 	},
 	{

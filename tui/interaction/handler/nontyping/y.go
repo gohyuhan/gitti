@@ -9,6 +9,7 @@ import (
 	"time"
 
 	tea "charm.land/bubbletea/v2"
+	"github.com/charmbracelet/x/ansi"
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/tui/component/branch"
@@ -21,17 +22,37 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/worktree"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/popup/copypopup"
+	"github.com/gohyuhan/gitti/tui/services"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
 func handleNonTypingyKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
-	if m.ShowPopUp.Load() {
+	if m.ShowPopUp.Load() || m.IsPanelFiltering.Load() {
 		return m, nil
 	}
 	if m.CopyInProgress {
 		m.GittiLogger.RegisterNewLog(logging.COPY_VALUE_OPS, "", logging.WARN, i18n.LANGUAGEMAPPING.CopyInProgress, false)
 		return m, nil
 	}
+
+	if (m.CurrentSelectedComponent == constant.DetailComponentPanel || m.CurrentSelectedComponent == constant.DetailComponentPanelTwo) && m.IsLineEditingState.Load() {
+		var ogArray []string
+		var actualIndex int
+		if m.CurrentSelectedComponent == constant.DetailComponentPanel {
+			ogArray = m.DetailPanelViewportOGStringArray
+			actualIndex = m.LineEditingIndexPositionAndInfo.DetailPanelViewportActualCurrentIndex
+		} else {
+			ogArray = m.DetailPanelTwoViewportOGStringArray
+			actualIndex = m.LineEditingIndexPositionAndInfo.DetailPanelTwoViewportActualCurrentIndex
+		}
+		if actualIndex >= 0 && actualIndex < len(ogArray) {
+			cleanLine := ansi.Strip(ogArray[actualIndex])
+			cmd, _ := services.StartCopy(m, cleanLine)
+			return m, cmd
+		}
+		return m, nil
+	}
+
 	labels := i18n.LANGUAGEMAPPING
 	ready := func(label, value string) copypopup.Option {
 		return copypopup.Option{Label: label, Value: value, Ready: true}
