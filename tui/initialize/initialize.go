@@ -113,6 +113,7 @@ func InitGittiModel(tuiUpdateChannel chan interface{}, repoPath string, repoName
 		RemoteComponentKeyBindingKeyMapLargestLen:                 0,
 		ModifiedFilesComponentKeyBindingKeyMapLargestLen:          0,
 		CommitLogComponentKeyBindingKeyMapLargestLen:              0,
+		CommitFilesComponentKeyBindingKeyMapLargestLen:            0,
 		RefLogComponentKeyBindingKeyMapLargestLen:                 0,
 		StashComponentKeyBindingKeyMapLargestLen:                  0,
 		LogComponentKeyBindingKeyMapLargestLen:                    0,
@@ -214,6 +215,7 @@ func ReinitGittiModel(m *types.GittiModel, repoPath string, repoName string, git
 	m.RemoteComponentKeyBindingKeyMapLargestLen = 0
 	m.ModifiedFilesComponentKeyBindingKeyMapLargestLen = 0
 	m.CommitLogComponentKeyBindingKeyMapLargestLen = 0
+	m.CommitFilesComponentKeyBindingKeyMapLargestLen = 0
 	m.RefLogComponentKeyBindingKeyMapLargestLen = 0
 	m.StashComponentKeyBindingKeyMapLargestLen = 0
 	m.LogComponentKeyBindingKeyMapLargestLen = 0

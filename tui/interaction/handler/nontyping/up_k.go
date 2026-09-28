@@ -81,6 +81,13 @@ func handleNonTypingUpkKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Gitti
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
+		case constant.CommitFilesComponentPanel:
+			if m.CurrentRepoCommitFilesList.Index() > 0 {
+				latestIndex := m.CurrentRepoCommitFilesList.Index() - 1
+				m.CurrentRepoCommitFilesList.Select(latestIndex)
+				m.ListNavigationIndexPosition.CommitFilesComponent = latestIndex
+				services.FetchDetailComponentPanelInfoService(m, true)
+			}
 		case constant.StashComponentPanel:
 			// we don't use the list native Update() because we need to also track the current selected index
 			if m.CurrentRepoStashInfoList.Index() > 0 {

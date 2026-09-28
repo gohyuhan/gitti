@@ -263,13 +263,28 @@ var jA = LanguageMapping{
 		"[</>] コンポーネントを切り替え",
 		"[y] コピー",
 		"[↑/↓] 上下に移動",
-		"[enter] コミットログの内容を表示",
+		"[enter] 変更されたファイルを表示",
 		"[t] タグを作成",
 		"[ctrl+r] このコミットをリバート",
 		"[i] インタラクティブリベース",
 		"[r] このコミットにリセット",
 		"[R] 最新のコミットをリセット",
 		"[ctrl+p] チェリーピック操作",
+		"[F] 絞り込み",
+		"[?] キー操作と説明",
+	},
+	KeyBindingCommitFilesComponentNone: []string{
+		"[esc] コミット一覧に戻る",
+		"[F] 絞り込み",
+		"[?] キー操作と説明",
+	},
+	KeyBindingCommitFilesComponent: []string{
+		"[esc] コミット一覧に戻る",
+		"[y] コピー",
+		"[↑/↓] 上下に移動",
+		"[enter] ファイル差分を表示",
+		"[c] ファイルをチェックアウト",
+		"[d] 変更を破棄",
 		"[F] 絞り込み",
 		"[?] キー操作と説明",
 	},
@@ -642,10 +657,15 @@ var jA = LanguageMapping{
 	WorktreeComponentKeyBinding:                                  jaWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                             jaModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                 jaCommitLogComponentKeyBinding,
+	CommitFilesComponentKeyBinding:                               jaCommitFilesComponentKeyBinding,
 	RefLogComponentKeyBinding:                                    jaRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                     jaStashComponentKeyBinding,
 	LogComponentKeyBinding:                                       jaLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                    jaDetailComponentKeyBinding,
+	CheckoutCommitFileSucceeded:                                  "コミット %s からファイル %s のチェックアウトに成功しました",
+	CheckoutCommitFileFailed:                                     "ファイル %s のチェックアウトに失敗しました: %s",
+	DiscardCommitFileSucceeded:                                   "コミット %s の %s に対する変更を正常に破棄しました",
+	DiscardCommitFileFailed:                                      "%s の変更の破棄に失敗しました: %s",
 	FeatureInstructions:                                          jaFeatureInstructions,
 	CommitPopUpMessageTitle:                                      "* コミットメッセージ",
 	CommitPopUpMessageInputPlaceHolder:                           "コミットメッセージを入力",
@@ -1391,7 +1411,7 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "enter",
-		TitleOrInfoLine: "コミットログの内容を表示",
+		TitleOrInfoLine: "コミットで変更されたファイル一覧を表示",
 		LineType:        INFO,
 	},
 	{
@@ -1437,6 +1457,55 @@ var jaCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "y",
 		TitleOrInfoLine: "選択した値をコピー",
+		LineType:        INFO,
+	},
+}
+
+// Commit Files Component Key Binding for ja
+var jaCommitFilesComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 変更ファイルコンポーネントパネルのキー操作 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "コミット一覧に戻る",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "詳細パネルでファイル差分を表示",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "c",
+		TitleOrInfoLine: "このコミットからファイルをチェックアウト (git checkout <sha> -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "このコミットの変更を破棄 (git checkout <sha>~1 -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下に移動",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "リストを絞り込む（入力で絞り込み、enter で確定、esc で解除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "ファイルパスをコピー",
 		LineType:        INFO,
 	},
 }

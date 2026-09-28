@@ -262,13 +262,28 @@ var eN = LanguageMapping{
 		"[</>] switch component",
 		"[y] copy",
 		"[↑/↓] move up and down",
-		"[enter] view commit log content",
+		"[enter] touched files",
 		"[t] create tag",
 		"[ctrl+r] revert this commit",
 		"[i] interactive rebase",
 		"[r] reset to this commit",
 		"[R] reset latest commit",
 		"[ctrl+p] cherry pick ops",
+		"[F] filter",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingCommitFilesComponentNone: []string{
+		"[esc] back to commits",
+		"[F] filter",
+		"[?] keybinding and instructions",
+	},
+	KeyBindingCommitFilesComponent: []string{
+		"[esc] back to commits",
+		"[y] copy",
+		"[↑/↓] move up and down",
+		"[enter] view file diff",
+		"[c] checkout file",
+		"[d] discard changes",
 		"[F] filter",
 		"[?] keybinding and instructions",
 	},
@@ -641,10 +656,15 @@ var eN = LanguageMapping{
 	WorktreeComponentKeyBinding:                                  enWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                             enModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                 enCommitLogComponentKeyBinding,
+	CommitFilesComponentKeyBinding:                               enCommitFilesComponentKeyBinding,
 	RefLogComponentKeyBinding:                                    enRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                     enStashComponentKeyBinding,
 	LogComponentKeyBinding:                                       enLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                    enDetailComponentKeyBinding,
+	CheckoutCommitFileSucceeded:                                  "Successfully checked out file %s from commit %s",
+	CheckoutCommitFileFailed:                                     "Failed to checkout file %s: %s",
+	DiscardCommitFileSucceeded:                                   "Successfully discarded changes for %s from commit %s",
+	DiscardCommitFileFailed:                                      "Failed to discard changes for %s: %s",
 	FeatureInstructions:                                          enFeatureInstructions,
 	CommitPopUpMessageTitle:                                      "* Commit Message",
 	CommitPopUpMessageInputPlaceHolder:                           "Enter commit message",
@@ -1388,7 +1408,7 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "enter",
-		TitleOrInfoLine: "view commit log content",
+		TitleOrInfoLine: "view touched files in commit",
 		LineType:        INFO,
 	},
 	{
@@ -1434,6 +1454,55 @@ var enCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "y",
 		TitleOrInfoLine: "copy selected value",
+		LineType:        INFO,
+	},
+}
+
+// Commit Files Component Key Binding for en
+var enCommitFilesComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- Commit Files Component Panel Key Binding --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "back to commit log",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "focus detail panel for file diff",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "c",
+		TitleOrInfoLine: "checkout this file from commit (git checkout <sha> -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "discard changes from commit (git checkout <sha>~1 -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "move up and down",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "filter the list (type to filter, enter to apply, esc to clear)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "copy file path",
 		LineType:        INFO,
 	},
 }

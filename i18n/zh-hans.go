@@ -263,13 +263,28 @@ var zH_HANS = LanguageMapping{
 		"[</>] 切换组件",
 		"[y] 复制",
 		"[↑/↓] 上下移动",
-		"[enter] 查看提交日志内容",
+		"[enter] 查看变动文件列表",
 		"[t] 创建标签",
 		"[ctrl+r] 还原此提交",
 		"[i] 交互式变基",
 		"[r] 重置到此提交",
 		"[R] 重置最新提交",
 		"[ctrl+p] 遴选操作",
+		"[F] 过滤",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingCommitFilesComponentNone: []string{
+		"[esc] 返回提交列表",
+		"[F] 过滤",
+		"[?] 快捷键与说明",
+	},
+	KeyBindingCommitFilesComponent: []string{
+		"[esc] 返回提交列表",
+		"[y] 复制",
+		"[↑/↓] 上下移动",
+		"[enter] 查看文件差异",
+		"[c] 检出文件",
+		"[d] 放弃更改",
 		"[F] 过滤",
 		"[?] 快捷键与说明",
 	},
@@ -642,10 +657,15 @@ var zH_HANS = LanguageMapping{
 	WorktreeComponentKeyBinding:                                  zhHansWorktreeComponentKeyBinding,
 	ModifiedFilesComponentKeyBinding:                             zhHansModifiedFilesComponentKeyBinding,
 	CommitLogComponentKeyBinding:                                 zhHansCommitLogComponentKeyBinding,
+	CommitFilesComponentKeyBinding:                               zhHansCommitFilesComponentKeyBinding,
 	RefLogComponentKeyBinding:                                    zhHansRefLogComponentKeyBinding,
 	StashComponentKeyBinding:                                     zhHansStashComponentKeyBinding,
 	LogComponentKeyBinding:                                       zhHansLogComponentKeyBinding,
 	DetailComponentKeyBinding:                                    zhHansDetailComponentKeyBinding,
+	CheckoutCommitFileSucceeded:                                  "已成功从提交 %s 检出文件 %s",
+	CheckoutCommitFileFailed:                                     "检出文件 %s 失败: %s",
+	DiscardCommitFileSucceeded:                                   "已成功放弃提交 %s 中 %s 的更改",
+	DiscardCommitFileFailed:                                      "放弃 %s 的更改失败: %s",
 	FeatureInstructions:                                          zhHansFeatureInstructions,
 	CommitPopUpMessageTitle:                                      "* 提交信息",
 	CommitPopUpMessageInputPlaceHolder:                           "输入提交信息",
@@ -1390,7 +1410,7 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	},
 	{
 		KeyBindingLine:  "enter",
-		TitleOrInfoLine: "查看提交日志内容",
+		TitleOrInfoLine: "查看提交中变动的文件列表",
 		LineType:        INFO,
 	},
 	{
@@ -1436,6 +1456,55 @@ var zhHansCommitLogComponentKeyBinding = []KeyBindingMappingFormat{
 	{
 		KeyBindingLine:  "y",
 		TitleOrInfoLine: "复制所选内容",
+		LineType:        INFO,
+	},
+}
+
+// Commit Files Component Key Binding for zh-hans
+var zhHansCommitFilesComponentKeyBinding = []KeyBindingMappingFormat{
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "-- 变动文件组件面板快捷键 --",
+		LineType:        TITLE,
+	},
+	{
+		KeyBindingLine:  "",
+		TitleOrInfoLine: "",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "esc",
+		TitleOrInfoLine: "返回提交列表",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "enter",
+		TitleOrInfoLine: "聚焦详细面板查看文件差异",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "c",
+		TitleOrInfoLine: "从该提交检出文件 (git checkout <sha> -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "d",
+		TitleOrInfoLine: "放弃该提交的文件更改 (git checkout <sha>~1 -- <file>)",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "↑/↓",
+		TitleOrInfoLine: "上下移动",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "F",
+		TitleOrInfoLine: "过滤列表（输入以过滤，enter 确认，esc 清除）",
+		LineType:        INFO,
+	},
+	{
+		KeyBindingLine:  "y",
+		TitleOrInfoLine: "复制文件路径",
 		LineType:        INFO,
 	},
 }

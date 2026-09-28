@@ -150,6 +150,12 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.CurrentSelectedComponent = m.DetailPanelParentComponent
 				m.DetailPanelParentComponent = ""
 			}
+		case constant.CommitFilesComponentPanel:
+			m.CurrentSelectedComponent = constant.CommitLogOrRefLogComponentPanel
+			m.CurrentDrillDownCommitHash = ""
+			m.CurrentDrillDownCommitSubject = ""
+			services.FetchDetailComponentPanelInfoService(m, true)
+			return m, nil
 		}
 	}
 	return m, nil

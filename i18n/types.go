@@ -155,6 +155,8 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentNone                       []string
 	KeyBindingCommitLogComponentNone                           []string
 	KeyBindingCommitLogComponent                               []string
+	KeyBindingCommitFilesComponentNone                         []string
+	KeyBindingCommitFilesComponent                             []string
 	KeyBindingRefLogComponentNone                              []string
 	KeyBindingRefLogComponent                                  []string
 	KeyBindingLogComponent                                     []string
@@ -247,6 +249,8 @@ type LanguageMapping struct {
 	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Commit Log Component KeyBinding
 	CommitLogComponentKeyBinding []KeyBindingMappingFormat
+	// Commit Files Component KeyBinding
+	CommitFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Ref Log Component KeyBinding
 	RefLogComponentKeyBinding []KeyBindingMappingFormat
 	// Stash Component KeyBinding
@@ -255,6 +259,11 @@ type LanguageMapping struct {
 	LogComponentKeyBinding []KeyBindingMappingFormat
 	// Detail Component KeyBinding
 	DetailComponentKeyBinding []KeyBindingMappingFormat
+	// Commit file operations messages
+	CheckoutCommitFileSucceeded string
+	CheckoutCommitFileFailed    string
+	DiscardCommitFileSucceeded  string
+	DiscardCommitFileFailed     string
 	// Feature Instructions
 	FeatureInstructions []FeatureInstructionMappingFormat
 	// commit

@@ -10,6 +10,8 @@ import (
 	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/commitfiles"
+	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/tag"
@@ -57,15 +59,29 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
 			case constant.SHOW_COMMITLOG:
-				if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
-					m.CurrentSelectedComponent = constant.DetailComponentPanel
-					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
+				selectedItem := m.CurrentRepoCommitLogInfoList.SelectedItem()
+				if selectedItem != nil {
+					commitItem, ok := selectedItem.(commitlog.GitCommitLogItem)
+					if ok {
+						m.CurrentDrillDownCommitHash = commitItem.Hash
+						m.CurrentDrillDownCommitSubject = commitItem.Message
+						m.CurrentSelectedComponent = constant.CommitFilesComponentPanel
+						ctx := context.Background()
+						commitfiles.InitCommitFilesList(ctx, m, commitItem.Hash, commitItem.Message)
+						services.FetchDetailComponentPanelInfoService(m, true)
+						return m, nil
+					}
 				}
 			case constant.SHOW_REFLOG:
 				if len(m.CurrentRepoRefLogInfoList.Items()) > 0 {
 					m.CurrentSelectedComponent = constant.DetailComponentPanel
 					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
 				}
+			}
+		case constant.CommitFilesComponentPanel:
+			if len(m.CurrentRepoCommitFilesList.Items()) > 0 {
+				m.CurrentSelectedComponent = constant.DetailComponentPanel
+				m.DetailPanelParentComponent = constant.CommitFilesComponentPanel
 			}
 		case constant.StashComponentPanel:
 			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
