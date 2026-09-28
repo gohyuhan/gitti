@@ -2,6 +2,7 @@ package initialize
 
 import (
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
+	commitfilesComponent "github.com/gohyuhan/gitti/tui/component/commitfiles"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
 	reflogComponent "github.com/gohyuhan/gitti/tui/component/reflog"
@@ -96,6 +97,7 @@ func InitGittiModel(tuiUpdateChannel chan interface{}, repoPath string, repoName
 		CurrentRepoStashInfoList:                                  list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0),
 		CurrentRepoRemoteInfoList:                                 list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0),
 		CurrentRepoWorktreeInfoList:                               list.New([]list.Item{}, worktreeComponent.GitWorktreeItemDelegate{}, 0, 0),
+		CurrentRepoCommitFilesList:                                list.New([]list.Item{}, commitfilesComponent.GitCommitFileItemDelegate{}, 0, 0),
 		DetailPanelParentComponent:                                "",
 		DetailPanelViewport:                                       vp,
 		DetailPanelViewportOffset:                                 0,
@@ -199,6 +201,9 @@ func ReinitGittiModel(m *types.GittiModel, repoPath string, repoName string, git
 	m.CurrentRepoStashInfoList = list.New([]list.Item{}, stashComponent.GitStashItemDelegate{}, 0, 0)
 	m.CurrentRepoRemoteInfoList = list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0)
 	m.CurrentRepoWorktreeInfoList = list.New([]list.Item{}, worktreeComponent.GitWorktreeItemDelegate{}, 0, 0)
+	m.CurrentRepoCommitFilesList = list.New([]list.Item{}, commitfilesComponent.GitCommitFileItemDelegate{}, 0, 0)
+	m.CurrentDrillDownCommitHash = ""
+	m.CurrentDrillDownCommitSubject = ""
 	m.DetailPanelParentComponent = ""
 	m.DetailPanelViewport = vp
 	m.DetailPanelViewportOffset = 0
