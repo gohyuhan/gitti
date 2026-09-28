@@ -49,6 +49,17 @@ func InitRenameBranchPopUpModel(m *types.GittiModel, oldBranchName string) {
 
 // ------------------------------------
 //
+//	Initialize the create-new-branch-based-on-tag popup model with the tag name stored
+//
+// ------------------------------------
+func InitCreateNewBranchBasedOnTagPopUpModel(m *types.GittiModel, tagName string) {
+	InitCreateNewBranchPopUpModel(m, git.NEWBRANCHBASEDONTAG, "")
+	popUp := m.PopUpModel.(*CreateNewBranchPopUpModel)
+	popUp.BasedOnTagName = tagName
+}
+
+// ------------------------------------
+//
 //	Initialize the new-branch type selection popup, populating a list with four
 //	creation options (create, create-and-switch, remote-input, remote-selection)
 //	and attaching an item-count help key.

@@ -29,6 +29,7 @@ type CreateNewBranchPopUpModel struct {
 	CreateType         string
 	CommitHash         string
 	OldBranchName      string
+	BasedOnTagName     string
 }
 
 // ------------------------------------

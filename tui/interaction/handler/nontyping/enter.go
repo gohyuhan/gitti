@@ -87,6 +87,15 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 						branchPopUp.InitChooseSwitchBranchTypePopUpModel(m, currentSelectedLocalBranch.BranchName)
 					}
 				}
+			case constant.SHOW_TAG:
+				currentSelectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+				if currentSelectedTag != nil {
+					selectedTag := currentSelectedTag.(tag.GitTagItem)
+					m.PopUpType = constant.ChooseTagActionPopUp
+					m.IsTyping.Store(false)
+					m.ShowPopUp.Store(true)
+					tagPopUp.InitChooseTagActionPopUpModel(m, selectedTag.TagName)
+				}
 			case constant.SHOW_REMOTE:
 				currentSelectedRemote := m.CurrentRepoRemoteInfoList.SelectedItem()
 				if currentSelectedRemote != nil {
@@ -484,6 +493,33 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 					m.ShowPopUp.Store(false)
 					m.IsTyping.Store(false)
 					return m, nil
+				}
+			}
+		case constant.ChooseTagActionPopUp:
+			popUp, ok := m.PopUpModel.(*tagPopUp.ChooseTagActionPopUpModel)
+			if ok {
+				selectedAction := popUp.TagActionList.SelectedItem()
+				if selectedAction != nil {
+					actionType := selectedAction.(tagPopUp.TagActionOptionItem).TagActionType
+					switch actionType {
+					case git.TAGACTIONCHECKOUT:
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(false)
+						m.PopUpType = constant.CheckoutTagOutputPopUp
+						tagPopUp.InitCheckoutTagOutputPopUpModel(m, popUp.TagName)
+						services.GitCheckoutTagService(m, popUp.TagName)
+
+						checkoutPopUp, ok := m.PopUpModel.(*tagPopUp.CheckoutTagOutputPopUpModel)
+						if ok {
+							return m, checkoutPopUp.Spinner.Tick
+						}
+					case git.TAGACTIONCREATEBRANCH:
+						m.ShowPopUp.Store(true)
+						m.IsTyping.Store(true)
+						m.PopUpType = constant.CreateNewBranchPopUp
+						branchPopUp.InitCreateNewBranchBasedOnTagPopUpModel(m, popUp.TagName)
+						return m, nil
+					}
 				}
 			}
 		case constant.ChooseDeleteTagOptionPopUp:

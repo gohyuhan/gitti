@@ -73,6 +73,8 @@ func handleTypingEnterKeyBindingInteraction(m *types.GittiModel, msg tea.KeyPres
 					services.GitCreateNewBranchAndSwitchService(m, validBranchName)
 				case git.NEWBRANCHBASEDONCOMMITHASH:
 					services.GitCreateNewBranchBasedOnCommitHashService(m, validBranchName, popUp.CommitHash)
+				case git.NEWBRANCHBASEDONTAG:
+					services.GitCreateNewBranchBasedOnTagAndSwitchService(m, validBranchName, popUp.BasedOnTagName)
 				case git.RENAMEBRANCH:
 					// recheck: a merge, rebase, am, cherry-pick, revert or notes merge may have started while the popup was open
 					if m.CurrentGitRepoStatus != "" {

@@ -343,3 +343,71 @@ func InitFetchTagOutputPopUpModel(m *types.GittiModel) {
 
 	m.PopUpModel = popUpModel
 }
+
+// ------------------------------------
+//
+//	Initialize the choose tag action popup model (checkout detached HEAD vs create branch)
+//
+// ------------------------------------
+func InitChooseTagActionPopUpModel(m *types.GittiModel, tagName string) {
+	items := make([]list.Item, 0, 2)
+	items = append(items, TagActionOptionItem{
+		Name:          fmt.Sprintf(i18n.LANGUAGEMAPPING.ChooseTagActionCheckoutOption, tagName),
+		Info:          fmt.Sprintf(i18n.LANGUAGEMAPPING.ChooseTagActionCheckoutOptionInfo, tagName),
+		TagActionType: git.TAGACTIONCHECKOUT,
+	})
+	items = append(items, TagActionOptionItem{
+		Name:          fmt.Sprintf(i18n.LANGUAGEMAPPING.ChooseTagActionCreateBranchOption, tagName),
+		Info:          fmt.Sprintf(i18n.LANGUAGEMAPPING.ChooseTagActionCreateBranchOptionInfo, tagName),
+		TagActionType: git.TAGACTIONCREATEBRANCH,
+	})
+	width := (min(constant.MaxChooseTagActionPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+	tL := list.New(items, TagActionOptionDelegate{}, width, constant.PopUpChooseTagActionHeight)
+	tL.SetShowPagination(false)
+	tL.SetShowStatusBar(false)
+	tL.SetFilteringEnabled(false)
+	tL.SetShowTitle(false)
+
+	// Custom Help Model for Count Display
+	tL.SetShowHelp(true)
+	tL.KeyMap = list.KeyMap{} // Clear default keybindings to hide them
+	tL.Styles.HelpStyle = style.NewStyle.MarginTop(0).MarginBottom(0).PaddingTop(0).PaddingBottom(0)
+	tL.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &tL, constant.MaxChooseTagActionPopUpWidth)
+
+	m.PopUpModel = &ChooseTagActionPopUpModel{
+		TagName:       tagName,
+		TagActionList: tL,
+	}
+}
+
+// ------------------------------------
+//
+//	Initialize the checkout tag output popup model
+//
+// ------------------------------------
+func InitCheckoutTagOutputPopUpModel(m *types.GittiModel, tagName string) {
+	vp := viewport.New()
+	vp.SoftWrap = true
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 1
+	vp.SetHeight(constant.PopUpCheckoutTagOutputViewportHeight)
+	vp.SetWidth(min(constant.MaxCheckoutTagOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+
+	s := spinner.New()
+	s.Spinner = spinner.Dot
+	s.Style = style.SpinnerStyle
+
+	popUpModel := &CheckoutTagOutputPopUpModel{
+		TagName:                   tagName,
+		CheckoutTagOutputViewport: vp,
+		Spinner:                   s,
+		CancelFunc:                nil,
+	}
+
+	popUpModel.IsProcessing.Store(false)
+	popUpModel.HasError.Store(false)
+	popUpModel.ProcessSuccess.Store(false)
+	popUpModel.IsCancelled.Store(false)
+
+	m.PopUpModel = popUpModel
+}

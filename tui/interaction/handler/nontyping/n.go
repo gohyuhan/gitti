@@ -4,6 +4,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/tui/component/reflog"
+	"github.com/gohyuhan/gitti/tui/component/tag"
 	"github.com/gohyuhan/gitti/tui/constant"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	remotePopUp "github.com/gohyuhan/gitti/tui/popup/remote"
@@ -16,6 +17,7 @@ import (
 //	Handle 'n' key interaction.
 //	Responsibility: Contextual "new" operation. Depending on the focused view:
 //	- In Local Branch View: Opens popup to create a new branch (optionally based on a remote).
+//	- In Tag View: Opens popup to create a new branch based on the selected tag.
 //	- In Remote View: Opens a prompt to add a new remote connection to the repository.
 //
 // ------------------------------------
@@ -30,6 +32,15 @@ func handleNonTypingnKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				m.ShowPopUp.Store(true)
 				if _, ok := m.PopUpModel.(*branchPopUp.ChooseNewBranchTypeOptionPopUpModel); !ok {
 					branchPopUp.InitChooseNewBranchTypePopUpModel(m)
+				}
+			case constant.SHOW_TAG:
+				selectedTag := m.CurrentRepoTagInfoList.SelectedItem()
+				if selectedTag != nil {
+					parsedTag := selectedTag.(tag.GitTagItem)
+					m.PopUpType = constant.CreateNewBranchPopUp
+					m.IsTyping.Store(true)
+					m.ShowPopUp.Store(true)
+					branchPopUp.InitCreateNewBranchBasedOnTagPopUpModel(m, parsedTag.TagName)
 				}
 			case constant.SHOW_REMOTE:
 				m.PopUpType = constant.AddRemotePromptPopUp

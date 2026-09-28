@@ -268,6 +268,24 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			popUp.CherryPickedCommitLog.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.CherryPickedCommitLog, constant.MaxGitEditCherryPickPopUpWidth)
 			return m, nil
 		}
+	case constant.ChooseTagActionPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.ChooseTagActionPopUpModel)
+		if ok {
+			switch msg.String() {
+			case "up", "k":
+				if popUp.TagActionList.Index() > 0 {
+					latestIndex := popUp.TagActionList.Index() - 1
+					popUp.TagActionList.Select(latestIndex)
+				}
+			case "down", "j":
+				if popUp.TagActionList.Index() < len(popUp.TagActionList.Items())-1 {
+					latestIndex := popUp.TagActionList.Index() + 1
+					popUp.TagActionList.Select(latestIndex)
+				}
+			}
+			popUp.TagActionList.AdditionalShortHelpKeys = utils.PopUpListCounterHelper(m, &popUp.TagActionList, constant.MaxChooseTagActionPopUpWidth)
+			return m, nil
+		}
 	case constant.ChooseDeleteTagOptionPopUp:
 		popUp, ok := m.PopUpModel.(*tagPopUp.ChooseDeleteTagOptionPopUpModel)
 		if ok {
@@ -504,6 +522,12 @@ func UpDownKeyPressMsgUpdateForPopUp(msg tea.KeyPressMsg, m *types.GittiModel) (
 			triggerViewportVerticalScrollFromKey(msg, &popUp.BranchMergeOutputViewport)
 			return m, nil
 		}
+	case constant.CheckoutTagOutputPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CheckoutTagOutputPopUpModel)
+		if ok {
+			triggerViewportVerticalScrollFromKey(msg, &popUp.CheckoutTagOutputViewport)
+			return m, nil
+		}
 
 	case constant.InteractiveRebaseFixupSquashOutputPopUp:
 		popUp, ok := m.PopUpModel.(*interactiverebasePopUp.InteractiveRebaseFixupSquashOutputPopUpModel)
@@ -614,6 +638,12 @@ func UpDownMouseMsgUpdateForPopUp(msg tea.MouseMsg, m *types.GittiModel) (*types
 		popUp, ok := m.PopUpModel.(*branchPopUp.BranchMergeOutputPopUpModel)
 		if ok {
 			triggerViewportVerticalScrollFromMouse(msg, &popUp.BranchMergeOutputViewport)
+			return m, nil
+		}
+	case constant.CheckoutTagOutputPopUp:
+		popUp, ok := m.PopUpModel.(*tagPopUp.CheckoutTagOutputPopUpModel)
+		if ok {
+			triggerViewportVerticalScrollFromMouse(msg, &popUp.CheckoutTagOutputViewport)
 			return m, nil
 		}
 	case constant.BlamePopUp:

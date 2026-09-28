@@ -117,6 +117,10 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = tag.RenderFetchTagOptionPopUp(m)
 	case constant.FetchTagOutputPopUp:
 		popUp = tag.RenderFetchTagOutputPopUp(m)
+	case constant.ChooseTagActionPopUp:
+		popUp = tag.RenderChooseTagActionPopUp(m)
+	case constant.CheckoutTagOutputPopUp:
+		popUp = tag.RenderCheckoutTagOutputPopUp(m)
 	case constant.RemoveRemoteConfirmationPopUp:
 		popUp = remote.RenderRemoveRemoteConfirmationPopUp(m)
 	case constant.RemoteAsTrackingUpstreamConfirmationPopUp:

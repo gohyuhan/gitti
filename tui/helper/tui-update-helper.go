@@ -48,6 +48,8 @@ func GittiTuiUpdateEventHelper(m *types.GittiModel, msg types.GittiTuiUpdateMsg)
 		branchPopUp.UpdateMergeViewport(m, updateMsg.Data.(types.MergeResultEventDataStructure))
 	case constant.GIT_DELETE_TAG_RESULT_EVENT:
 		tagPopUp.UpdateDeleteTagResultEvent(m, updateMsg.Data.(types.GitDeleteTagResultEventDataStructure))
+	case constant.GIT_CHECKOUT_TAG_RESULT_EVENT:
+		tagPopUp.UpdateCheckoutTagResultEvent(m, updateMsg.Data.(types.GitCheckoutTagResultEventDataStructure))
 	case constant.GIT_PUSH_TAG_RESULT_EVENT:
 		tagPopUp.UpdatePushTagResultEvent(m, updateMsg.Data.(types.GitPushTagResultEventDataStructure))
 	case constant.GIT_FETCH_TAG_RESULT_EVENT:

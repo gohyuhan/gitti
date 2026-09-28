@@ -301,3 +301,72 @@ func RenderFetchTagOutputPopUp(m *types.GittiModel) string {
 	}
 	return ""
 }
+
+// ------------------------------------
+//
+//	Render the choose tag action popup
+//
+// ------------------------------------
+func RenderChooseTagActionPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*ChooseTagActionPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxChooseTagActionPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(i18n.LANGUAGEMAPPING.ChooseTagActionTitle)
+		popUp.TagActionList.SetWidth(popUpWidth - 4)
+		popUp.TagActionList.SetHeight(constant.PopUpChooseTagActionHeight)
+		content := lipgloss.JoinVertical(
+			lipgloss.Left,
+			title,
+			popUp.TagActionList.View(),
+		)
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}
+
+// ------------------------------------
+//
+//	Render the checkout tag output popup
+//
+// ------------------------------------
+func RenderCheckoutTagOutputPopUp(m *types.GittiModel) string {
+	popUp, ok := m.PopUpModel.(*CheckoutTagOutputPopUpModel)
+	if ok {
+		popUpWidth := min(constant.MaxCheckoutTagOutputPopUpWidth, int(float64(m.Width)*0.8))
+		title := style.TitleStyle.Render(fmt.Sprintf(i18n.LANGUAGEMAPPING.CheckoutTagOutputPopUpTitle, popUp.TagName))
+		logViewPortStyle := style.PanelBorderStyle.
+			Width(popUpWidth - 2).
+			Height(constant.PopUpCheckoutTagOutputViewportHeight + 2)
+		if popUp.HasError.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorError)
+		} else if popUp.ProcessSuccess.Load() {
+			logViewPortStyle = style.PanelBorderStyle.
+				BorderForeground(style.ColorGreenSoft)
+		}
+		popUp.CheckoutTagOutputViewport.SetWidth(popUpWidth - 4)
+		popUp.CheckoutTagOutputViewport.SetYOffset(popUp.CheckoutTagOutputViewport.YOffset())
+		logViewPort := logViewPortStyle.Render(popUp.CheckoutTagOutputViewport.View())
+
+		var content string
+		// Show spinner above viewport when processing
+		if popUp.IsProcessing.Load() {
+			processingText := style.SpinnerStyle.Render(popUp.Spinner.View() + " " + i18n.LANGUAGEMAPPING.CheckoutTagCheckingOut)
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				"",
+				processingText,
+				logViewPort,
+			)
+		} else {
+			content = lipgloss.JoinVertical(
+				lipgloss.Left,
+				title,
+				logViewPort,
+			)
+		}
+		return style.PopUpBorderStyle.Width(popUpWidth).Render(content)
+	}
+	return ""
+}

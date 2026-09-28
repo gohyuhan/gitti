@@ -478,3 +478,27 @@ func (gb *GitBranch) GitMergeWithSigning(branchesName []string) []string {
 
 	return gitArgs
 }
+
+// ------------------------------------
+//
+//	Create a new branch based on a tag and switch to it
+//
+// ------------------------------------
+func (gb *GitBranch) GitCreateNewBranchBasedOnTagAndSwitch(branchName string, tagName string) ([]string, bool) {
+	if !gb.gitProcessLock.CanProceedWithGitOps() {
+		return []string{gb.gitProcessLock.OtherProcessRunningWarning()}, false
+	}
+	defer gb.gitProcessLock.ReleaseGitOpsLock()
+
+	gitArgs := []string{"checkout", "-b", branchName, "tags/" + tagName}
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmd(gitArgs, false)
+	output, err := cmdExecutor.CombinedOutput()
+	outputLines := processGeneralGitOpsOutputIntoStringArray(output)
+	gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_AND_SWITCH_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+	if err != nil {
+		gb.logging.RegisterNewLog(logging.CREATE_NEW_BRANCH_AND_SWITCH_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.CREATE_NEW_BRANCH_AND_SWITCH_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+		return outputLines, false
+	}
+	return outputLines, true
+}
+

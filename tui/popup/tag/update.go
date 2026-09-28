@@ -142,3 +142,44 @@ func UpdateFetchTagResultEvent(m *types.GittiModel, updateData types.GitFetchTag
 		}
 	}
 }
+
+// ------------------------------------
+//
+//	Refresh the checkout tag output viewport
+//
+// ------------------------------------
+func UpdateCheckoutTagOutputViewPort(m *types.GittiModel, checkoutTagOutput []string) {
+	popUp, ok := m.PopUpModel.(*CheckoutTagOutputPopUpModel)
+	if ok {
+		popUp.CheckoutTagOutputViewport.SetWidth(min(constant.MaxCheckoutTagOutputPopUpWidth, int(float64(m.Width)*0.8)) - 4)
+		popUp.CheckoutTagOutputViewport.SetYOffset(popUp.CheckoutTagOutputViewport.YOffset())
+		var gitOpsOutputLogString strings.Builder
+		for _, line := range checkoutTagOutput {
+			logLine := style.NewStyle.Render(line)
+			gitOpsOutputLogString.WriteString(logLine)
+			gitOpsOutputLogString.WriteRune('\n')
+		}
+		popUp.CheckoutTagOutputViewport.SetContent(gitOpsOutputLogString.String())
+		popUp.CheckoutTagOutputViewport.PageDown()
+	}
+}
+
+// ------------------------------------
+//
+//	Handle the async checkout tag result event
+//
+// ------------------------------------
+func UpdateCheckoutTagResultEvent(m *types.GittiModel, updateData types.GitCheckoutTagResultEventDataStructure) {
+	popUp, ok := m.PopUpModel.(*CheckoutTagOutputPopUpModel)
+	if ok && !popUp.IsCancelled.Load() {
+		popUp.IsProcessing.Store(false)
+		UpdateCheckoutTagOutputViewPort(m, updateData.Result)
+		if updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(true)
+			popUp.HasError.Store(false)
+		} else if !updateData.Success && !popUp.IsProcessing.Load() {
+			popUp.ProcessSuccess.Store(false)
+			popUp.HasError.Store(true)
+		}
+	}
+}

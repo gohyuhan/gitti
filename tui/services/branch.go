@@ -165,6 +165,23 @@ func GitCreateNewBranchBasedOnCommitHashService(m *types.GittiModel, validBranch
 
 // ------------------------------------
 //
+//	For create new branch based on tag and switch
+//
+// ------------------------------------
+func GitCreateNewBranchBasedOnTagAndSwitchService(m *types.GittiModel, validBranchName string, tagName string) {
+	go func() {
+		if utf8.RuneCountInString(validBranchName) < 1 || utf8.RuneCountInString(tagName) < 1 {
+			return
+		}
+		if m.GitOperations == nil || m.GitOperations.GitBranch == nil {
+			return
+		}
+		m.GitOperations.GitBranch.GitCreateNewBranchBasedOnTagAndSwitch(validBranchName, tagName)
+	}()
+}
+
+// ------------------------------------
+//
 //	For Git Merge
 //
 // ------------------------------------
