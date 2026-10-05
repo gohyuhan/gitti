@@ -6,32 +6,56 @@ import (
 
 	"charm.land/bubbles/v2/list"
 	"github.com/charmbracelet/x/ansi"
+	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/tui/constant"
 	"github.com/gohyuhan/gitti/tui/style"
 	"github.com/gohyuhan/gitti/tui/types"
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
+var (
+	cachedCommitFiles []list.Item
+	cachedCommitHash  string
+)
+
 // ------------------------------------
 //
-//	Initialize or update the commit files list for the currently drilled-down commit.
+//	Load touched files for a commit into memory
 //
 // ------------------------------------
-func InitCommitFilesList(ctx context.Context, m *types.GittiModel, commitHash string, commitSubject string) bool {
+func LoadCommitFiles(ctx context.Context, m *types.GittiModel, commitHash string) {
+	cachedCommitHash = commitHash
 	touchedFiles := m.GitOperations.GitCommitLog.GetCommitTouchedFiles(ctx, commitHash)
-	items := make([]list.Item, 0, len(touchedFiles))
+	cachedCommitFiles = make([]list.Item, 0, len(touchedFiles))
 
 	for _, file := range touchedFiles {
-		items = append(items, GitCommitFileItem{
+		cachedCommitFiles = append(cachedCommitFiles, GitCommitFileItem{
 			CommitHash:   commitHash,
 			Status:       file.Status,
 			FilePathname: file.FilePathname,
 			OldPathname:  file.OldPathname,
 		})
 	}
+}
 
-	m.CurrentDrillDownCommitHash = commitHash
-	m.CurrentDrillDownCommitSubject = commitSubject
+// ------------------------------------
+//
+//	Clear cached commit files when exiting the panel
+//
+// ------------------------------------
+func ClearCachedCommitFiles() {
+	cachedCommitFiles = nil
+	cachedCommitHash = ""
+}
+
+// ------------------------------------
+//
+//	Initialize or update the commit files list from in-memory cache.
+//
+// ------------------------------------
+func InitCommitFilesList(m *types.GittiModel) bool {
+	items := make([]list.Item, len(cachedCommitFiles))
+	copy(items, cachedCommitFiles)
 
 	previousPosition := m.ListNavigationIndexPosition.CommitFilesComponent
 	var previousSelected list.Item
@@ -42,13 +66,13 @@ func InitCommitFilesList(ctx context.Context, m *types.GittiModel, commitHash st
 	// Apply panel filtering if active
 	items, selectedPosition := utils.FilterListItems(items, m.PanelFilterQuery[constant.CommitFilesComponentPanel], previousSelected, previousPosition)
 
-	shortHash := commitHash
+	shortHash := cachedCommitHash
 	if len(shortHash) > 7 {
 		shortHash = shortHash[:7]
 	}
 
 	titleWidthLimit := m.WindowLeftPanelWidth - constant.ListItemOrTitleWidthPad - 2
-	titleText := fmt.Sprintf("Commit Files: %s (%d files)", shortHash, len(items))
+	titleText := fmt.Sprintf(i18n.LANGUAGEMAPPING.CommitFilesTitleFormat, shortHash, len(items))
 
 	m.CurrentRepoCommitFilesList = list.New(items, GitCommitFileItemDelegate{}, m.WindowLeftPanelWidth, m.CommitLogComponentPanelHeight)
 	m.CurrentRepoCommitFilesList.SetShowPagination(false)

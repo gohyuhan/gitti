@@ -1,8 +1,6 @@
 package interaction
 
 import (
-	"context"
-
 	tea "charm.land/bubbletea/v2"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
 	commitfilesComponent "github.com/gohyuhan/gitti/tui/component/commitfiles"
@@ -83,7 +81,7 @@ func reinitFilteredList(m *types.GittiModel, filterKey string) {
 		needReinit := commitlogComponent.InitGitCommitLogList(m)
 		services.FetchDetailComponentPanelInfoService(m, needReinit)
 	case constant.CommitFilesComponentPanel:
-		commitfilesComponent.InitCommitFilesList(context.Background(), m, m.CurrentDrillDownCommitHash, m.CurrentDrillDownCommitSubject)
+		commitfilesComponent.InitCommitFilesList(m)
 		services.FetchDetailComponentPanelInfoService(m, true)
 	case constant.SHOW_REFLOG:
 		needReinit := reflogComponent.InitGitRefLogList(m)

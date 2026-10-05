@@ -47,7 +47,6 @@ func TestClickOnCommitFilesComponentPanel(t *testing.T) {
 	}
 	m.CurrentRepoCommitFilesList = list.New(items, commitfiles.GitCommitFileItemDelegate{}, 48, 10)
 	m.CurrentSelectedComponent = constant.CommitFilesComponentPanel
-	m.CurrentDrillDownCommitHash = "c1"
 
 	// 1. Click on second item of commit files panel
 	// Panel 0: 3 rows (top 0 to 2)

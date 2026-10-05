@@ -2,6 +2,7 @@ package git
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"slices"
@@ -624,35 +625,44 @@ func (gCL *GitCommitLog) GitRevertCommitWithSigning(commitHash string, parentOrd
 //
 // ------------------------------------
 func (gCL *GitCommitLog) GetCommitTouchedFiles(ctx context.Context, commitHash string) []CommitTouchedFile {
-	gitArgs := []string{"diff-tree", "--no-commit-id", "--name-status", "-r", "-M", "--root", commitHash}
-	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
+	gitArgs := []string{"diff-tree", "--no-commit-id", "--name-status", "-r", "-M", "--root", "-z", commitHash}
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
 	output, err := cmdExecutor.Output()
 	if err != nil {
 		return nil
 	}
 
-	lines := processGeneralGitOpsOutputIntoStringArray(output)
+	parts := bytes.Split(output, []byte{0})
 	var touchedFiles []CommitTouchedFile
 
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
+	i := 0
+	for i < len(parts) {
+		status := string(parts[i])
+		if status == "" {
+			break
 		}
-		parts := strings.Split(line, "\t")
-		if len(parts) >= 2 {
-			status := parts[0]
-			filePath := parts[1]
-			oldPath := ""
-			if len(parts) >= 3 {
-				oldPath = parts[1]
-				filePath = parts[2]
+		if strings.HasPrefix(status, "R") || strings.HasPrefix(status, "C") {
+			if i+2 >= len(parts) {
+				break
 			}
+			oldPath := string(parts[i+1])
+			filePath := string(parts[i+2])
 			touchedFiles = append(touchedFiles, CommitTouchedFile{
 				Status:       status,
 				FilePathname: filePath,
 				OldPathname:  oldPath,
 			})
+			i += 3
+		} else {
+			if i+1 >= len(parts) {
+				break
+			}
+			filePath := string(parts[i+1])
+			touchedFiles = append(touchedFiles, CommitTouchedFile{
+				Status:       status,
+				FilePathname: filePath,
+			})
+			i += 2
 		}
 	}
 
@@ -681,8 +691,13 @@ func (gCL *GitCommitLog) GetCommitFileDiff(ctx context.Context, commitHash, file
 //
 // ------------------------------------
 func (gCL *GitCommitLog) CheckoutFileFromCommit(ctx context.Context, commitHash, filePath string) error {
+	if !gCL.gitProcessLock.CanProceedWithGitOps() {
+		return fmt.Errorf("%s", gCL.gitProcessLock.OtherProcessRunningWarning())
+	}
+	defer gCL.gitProcessLock.ReleaseGitOpsLock()
+
 	gitArgs := []string{"checkout", commitHash, "--", literalPathspec(filePath)}
-	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
 	gCL.logging.RegisterNewLog(logging.CHECKOUT_COMMIT_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 
 	output, err := cmdExecutor.CombinedOutput()
@@ -698,8 +713,33 @@ func (gCL *GitCommitLog) CheckoutFileFromCommit(ctx context.Context, commitHash,
 //	Discard / Revert changes to a file from a commit into the working directory
 //
 // ------------------------------------
-func (gCL *GitCommitLog) DiscardFileFromCommit(ctx context.Context, commitHash, filePath string) error {
+func (gCL *GitCommitLog) DiscardFileFromCommit(ctx context.Context, commitHash, filePath, oldPath string) error {
+	if !gCL.gitProcessLock.CanProceedWithGitOps() {
+		return fmt.Errorf("%s", gCL.gitProcessLock.OtherProcessRunningWarning())
+	}
+	defer gCL.gitProcessLock.ReleaseGitOpsLock()
+
 	parents := gCL.GetCommitHashParentInfo(commitHash)
+	if oldPath != "" && len(parents) > 0 {
+		parentTarget := commitHash + "~1"
+		checkoutArgs := []string{"checkout", parentTarget, "--", literalPathspec(oldPath)}
+		checkoutExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, checkoutArgs, false)
+		gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(checkoutArgs, " "), logging.INFO, "", true)
+		if output, err := checkoutExecutor.CombinedOutput(); err != nil {
+			gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(checkoutArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.DISCARD_COMMIT_FILE_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+			return err
+		}
+
+		rmArgs := []string{"rm", "-f", "--", literalPathspec(filePath)}
+		rmExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, rmArgs, false)
+		gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(rmArgs, " "), logging.INFO, "", true)
+		if output, err := rmExecutor.CombinedOutput(); err != nil {
+			gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(rmArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.DISCARD_COMMIT_FILE_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+			return err
+		}
+		return nil
+	}
+
 	var gitArgs []string
 	if len(parents) == 0 {
 		gitArgs = []string{"rm", "-f", "--", literalPathspec(filePath)}
@@ -713,7 +753,7 @@ func (gCL *GitCommitLog) DiscardFileFromCommit(ctx context.Context, commitHash, 
 		}
 	}
 
-	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
 	gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
 
 	output, err := cmdExecutor.CombinedOutput()

@@ -86,7 +86,7 @@ func setupTestModel(t *testing.T) (*types.GittiModel, string, string) {
 		GitOperations: &api.GitOperations{
 			GitCommitLog: gitCommitLog,
 		},
-		CurrentSelectedComponent:                  constant.CommitLogOrRefLogComponentPanel,
+		CurrentSelectedComponent:                 constant.CommitLogOrRefLogComponentPanel,
 		CurrentCommitLogOrRefLogComponentShowing: constant.SHOW_COMMITLOG,
 		CurrentRepoCommitLogInfoList:             commitList,
 		CurrentRepoCommitFilesList:               filesList,
@@ -102,18 +102,12 @@ func setupTestModel(t *testing.T) (*types.GittiModel, string, string) {
 }
 
 func TestCommitFilesDrillDownEnterAndEsc(t *testing.T) {
-	m, _, hash := setupTestModel(t)
+	m, _, _ := setupTestModel(t)
 
 	// 1. Press Enter on commit log item -> should drill down to CommitFilesComponentPanel
 	m, _ = handleNonTypingEnterKeyBindingInteraction(m)
 	if m.CurrentSelectedComponent != constant.CommitFilesComponentPanel {
 		t.Fatalf("expected CurrentSelectedComponent to be CommitFilesComponentPanel, got %s", m.CurrentSelectedComponent)
-	}
-	if m.CurrentDrillDownCommitHash != hash {
-		t.Errorf("expected CurrentDrillDownCommitHash %s, got %s", hash, m.CurrentDrillDownCommitHash)
-	}
-	if m.CurrentDrillDownCommitSubject != "initial commit" {
-		t.Errorf("expected CurrentDrillDownCommitSubject 'initial commit', got %s", m.CurrentDrillDownCommitSubject)
 	}
 
 	// 2. Press Enter on commit file item -> should focus DetailComponentPanel with parent CommitFilesComponentPanel
@@ -131,13 +125,16 @@ func TestCommitFilesDrillDownEnterAndEsc(t *testing.T) {
 		t.Fatalf("expected CurrentSelectedComponent to return to CommitFilesComponentPanel, got %s", m.CurrentSelectedComponent)
 	}
 
+	// Set a filter query to test that Esc clears it
+	m.PanelFilterQuery[constant.CommitFilesComponentPanel] = "test"
+
 	// 4. Press Esc in CommitFilesComponentPanel -> should return to CommitLogOrRefLogComponentPanel
 	m, _ = handleNonTypingEscKeyBindingInteraction(m)
 	if m.CurrentSelectedComponent != constant.CommitLogOrRefLogComponentPanel {
 		t.Fatalf("expected CurrentSelectedComponent to return to CommitLogOrRefLogComponentPanel, got %s", m.CurrentSelectedComponent)
 	}
-	if m.CurrentDrillDownCommitHash != "" {
-		t.Errorf("expected CurrentDrillDownCommitHash to be cleared, got %s", m.CurrentDrillDownCommitHash)
+	if _, ok := m.PanelFilterQuery[constant.CommitFilesComponentPanel]; ok {
+		t.Errorf("expected PanelFilterQuery for CommitFilesComponentPanel to be cleared")
 	}
 }
 
@@ -169,15 +166,23 @@ func TestCommitFilesNavigation(t *testing.T) {
 }
 
 func TestCommitFilesCheckoutAndDiscard(t *testing.T) {
-	m, _, hash := setupTestModel(t)
+	m, _, _ := setupTestModel(t)
 	m.CurrentSelectedComponent = constant.CommitFilesComponentPanel
-	m.CurrentDrillDownCommitHash = hash
 	m.CurrentRepoCommitFilesList.Select(0)
 
-	// Pressing 'c' should not open CommitPopUp
+	// Pressing 'c' should open GitCheckoutCommitFileConfirmPromptPopUp
 	m, _ = handleNonTypingcKeyBindingInteraction(m)
-	if m.PopUpType == constant.CommitPopUp {
-		t.Errorf("expected 'c' on CommitFilesComponentPanel not to open CommitPopUp")
+	if m.PopUpType != constant.GitCheckoutCommitFileConfirmPromptPopUp {
+		t.Fatalf("expected 'c' on CommitFilesComponentPanel to open GitCheckoutCommitFileConfirmPromptPopUp, got %s", m.PopUpType)
+	}
+
+	// Pressing Enter in GitCheckoutCommitFileConfirmPromptPopUp should confirm checkout and close popup
+	m, _ = handleNonTypingEnterKeyBindingInteraction(m)
+	if m.PopUpType != constant.NoPopUp {
+		t.Errorf("expected PopUpType to be NoPopUp after Enter, got %s", m.PopUpType)
+	}
+	if m.ShowPopUp.Load() {
+		t.Errorf("expected ShowPopUp to be false after Enter")
 	}
 
 	// Pressing 'd' should open GitDiscardConfirmPromptPopUp
@@ -193,6 +198,20 @@ func TestCommitFilesCheckoutAndDiscard(t *testing.T) {
 	}
 	if m.ShowPopUp.Load() {
 		t.Errorf("expected ShowPopUp to be false after Enter")
+	}
+}
+
+func TestCommitLogSpaceFocusDetail(t *testing.T) {
+	m, _, _ := setupTestModel(t)
+	m.CurrentSelectedComponent = constant.CommitLogOrRefLogComponentPanel
+	m.CurrentCommitLogOrRefLogComponentShowing = constant.SHOW_COMMITLOG
+
+	m, _ = handleNonTypingSpaceKeyBindingInteraction(m)
+	if m.CurrentSelectedComponent != constant.DetailComponentPanel {
+		t.Errorf("expected CurrentSelectedComponent to be DetailComponentPanel, got %s", m.CurrentSelectedComponent)
+	}
+	if m.DetailPanelParentComponent != constant.CommitLogOrRefLogComponentPanel {
+		t.Errorf("expected DetailPanelParentComponent to be CommitLogOrRefLogComponentPanel, got %s", m.DetailPanelParentComponent)
 	}
 }
 

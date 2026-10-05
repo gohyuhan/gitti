@@ -20,6 +20,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	commitfilesPopUp "github.com/gohyuhan/gitti/tui/popup/commitfiles"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	"github.com/gohyuhan/gitti/tui/popup/copypopup"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
@@ -63,11 +64,10 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				if selectedItem != nil {
 					commitItem, ok := selectedItem.(commitlog.GitCommitLogItem)
 					if ok {
-						m.CurrentDrillDownCommitHash = commitItem.Hash
-						m.CurrentDrillDownCommitSubject = commitItem.Message
 						m.CurrentSelectedComponent = constant.CommitFilesComponentPanel
-						ctx := context.Background()
-						commitfiles.InitCommitFilesList(ctx, m, commitItem.Hash, commitItem.Message)
+						commitfiles.LoadCommitFiles(context.Background(), m, commitItem.Hash)
+						m.ListNavigationIndexPosition.CommitFilesComponent = 0
+						commitfiles.InitCommitFilesList(m)
 						services.FetchDetailComponentPanelInfoService(m, true)
 						return m, nil
 					}
@@ -326,10 +326,19 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 			popUp, ok := m.PopUpModel.(*discardPopUp.GitDiscardConfirmPromptPopUpModel)
 			if ok {
 				if popUp.DiscardType == git.DISCARDCOMMITFILE {
-					services.DiscardCommitFileService(m, popUp.CommitHash, popUp.FilePathName)
+					services.DiscardCommitFileService(m, popUp.CommitHash, popUp.FilePathName, popUp.OldFilePathName)
 				} else {
 					services.GitDiscardFileChangesService(m, popUp.FilePathName, popUp.DiscardType)
 				}
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
+		case constant.GitCheckoutCommitFileConfirmPromptPopUp:
+			popUp, ok := m.PopUpModel.(*commitfilesPopUp.GitCheckoutCommitFileConfirmPromptPopUpModel)
+			if ok {
+				services.CheckoutCommitFileService(m, popUp.CommitHash, popUp.FilePathName)
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp

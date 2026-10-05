@@ -128,7 +128,8 @@ func TestInitCommitFilesList(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	hasFiles := InitCommitFilesList(ctx, m, hash, "add alpha and beta")
+	LoadCommitFiles(ctx, m, hash)
+	hasFiles := InitCommitFilesList(m)
 	if !hasFiles {
 		t.Fatalf("expected InitCommitFilesList to return true")
 	}
@@ -136,14 +137,20 @@ func TestInitCommitFilesList(t *testing.T) {
 		t.Errorf("expected 2 items, got %d", len(m.CurrentRepoCommitFilesList.Items()))
 	}
 
-	// Test with filter query active
+	// Test with filter query active (reads from memory cache)
 	m.PanelFilterQuery[constant.CommitFilesComponentPanel] = "alpha"
-	InitCommitFilesList(ctx, m, hash, "add alpha and beta")
+	InitCommitFilesList(m)
 	if len(m.CurrentRepoCommitFilesList.Items()) != 1 {
 		t.Errorf("expected 1 item after filtering, got %d", len(m.CurrentRepoCommitFilesList.Items()))
 	}
 	filteredItem, ok := m.CurrentRepoCommitFilesList.SelectedItem().(GitCommitFileItem)
 	if !ok || filteredItem.FilePathname != "alpha.go" {
 		t.Errorf("expected selected item 'alpha.go', got %+v", filteredItem)
+	}
+
+	ClearCachedCommitFiles()
+	InitCommitFilesList(m)
+	if len(m.CurrentRepoCommitFilesList.Items()) != 0 {
+		t.Errorf("expected 0 items after ClearCachedCommitFiles, got %d", len(m.CurrentRepoCommitFilesList.Items()))
 	}
 }

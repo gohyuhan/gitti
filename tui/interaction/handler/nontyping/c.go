@@ -5,7 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/component/commitfiles"
 	"github.com/gohyuhan/gitti/tui/constant"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
-	"github.com/gohyuhan/gitti/tui/services"
+	commitfilesPopUp "github.com/gohyuhan/gitti/tui/popup/commitfiles"
 	"github.com/gohyuhan/gitti/tui/types"
 )
 
@@ -15,7 +15,7 @@ import (
 //	Responsibility: Initiates the "New Commit" flow. Opens the standard commit popup,
 //	resets the commit output view, initializes the input model if necessary,
 //	and places the user in typing mode to enter commit details.
-//	When on CommitFilesComponentPanel, checks out the selected file from that commit.
+//	When on CommitFilesComponentPanel, prompts confirmation to checkout the selected file.
 //
 // ------------------------------------
 func handleNonTypingcKeyBindingInteraction(m *types.GittiModel) (*types.GittiModel, tea.Cmd) {
@@ -25,7 +25,10 @@ func handleNonTypingcKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 			if selectedItem != nil {
 				fileItem, ok := selectedItem.(commitfiles.GitCommitFileItem)
 				if ok {
-					services.CheckoutCommitFileService(m, m.CurrentDrillDownCommitHash, fileItem.FilePathname)
+					m.PopUpType = constant.GitCheckoutCommitFileConfirmPromptPopUp
+					commitfilesPopUp.InitGitCheckoutCommitFileConfirmPromptPopUpModel(m, fileItem.FilePathname, fileItem.FilePathname, fileItem.CommitHash)
+					m.ShowPopUp.Store(true)
+					m.IsTyping.Store(false)
 				}
 			}
 			return m, nil

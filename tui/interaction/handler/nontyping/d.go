@@ -84,7 +84,7 @@ func handleNonTypingdKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 				fileItem, ok := selectedItem.(commitfiles.GitCommitFileItem)
 				if ok {
 					m.PopUpType = constant.GitDiscardConfirmPromptPopUp
-					discardPopUp.InitGitDiscardCommitFileConfirmPromptPopUpModel(m, fileItem.FilePathname, fileItem.FilePathname, m.CurrentDrillDownCommitHash)
+					discardPopUp.InitGitDiscardCommitFileConfirmPromptPopUpModel(m, fileItem.FilePathname, fileItem.FilePathname, fileItem.OldPathname, fileItem.CommitHash)
 					m.ShowPopUp.Store(true)
 					m.IsTyping.Store(false)
 				}

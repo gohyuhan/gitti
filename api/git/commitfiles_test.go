@@ -135,7 +135,7 @@ func TestCommitTouchedFilesAndOperations(t *testing.T) {
 
 	// 5. Test DiscardFileFromCommit:
 	// Discarding file1.txt from second commit should restore it to root commit state (HEAD~1)
-	err = commitLog.DiscardFileFromCommit(ctx, secondHash, "file1.txt")
+	err = commitLog.DiscardFileFromCommit(ctx, secondHash, "file1.txt", "")
 	if err != nil {
 		t.Fatalf("DiscardFileFromCommit failed: %v", err)
 	}
@@ -146,7 +146,7 @@ func TestCommitTouchedFilesAndOperations(t *testing.T) {
 
 	// 5b. Test DiscardFileFromCommit for newly added file in non-root commit:
 	// Discarding file3.txt (added in second commit) should remove it from working directory
-	err = commitLog.DiscardFileFromCommit(ctx, secondHash, "file3.txt")
+	err = commitLog.DiscardFileFromCommit(ctx, secondHash, "file3.txt", "")
 	if err != nil {
 		t.Fatalf("DiscardFileFromCommit on added file in second commit failed: %v", err)
 	}
@@ -156,7 +156,7 @@ func TestCommitTouchedFilesAndOperations(t *testing.T) {
 
 	// 6. Test DiscardFileFromCommit on root commit:
 	// Discarding a file added in root commit should remove the file from working directory
-	err = commitLog.DiscardFileFromCommit(ctx, rootHash, "file1.txt")
+	err = commitLog.DiscardFileFromCommit(ctx, rootHash, "file1.txt", "")
 	if err != nil {
 		t.Fatalf("DiscardFileFromCommit on root commit failed: %v", err)
 	}
@@ -207,6 +207,19 @@ func TestCommitTouchedFilesRename(t *testing.T) {
 	if files[0].OldPathname != "old_name.txt" {
 		t.Errorf("expected OldPathname 'old_name.txt', got '%s'", files[0].OldPathname)
 	}
+
+	// Discard rename commit: should restore old_name.txt and remove new_name.txt
+	err := commitLog.DiscardFileFromCommit(ctx, renameCommitHash, "new_name.txt", "old_name.txt")
+	if err != nil {
+		t.Fatalf("discard rename failed: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "new_name.txt")); !os.IsNotExist(err) {
+		t.Errorf("expected new_name.txt to be removed after discarding rename")
+	}
+	oldContent, err := os.ReadFile(filepath.Join(dir, "old_name.txt"))
+	if err != nil || string(oldContent) != "content for rename test\n" {
+		t.Errorf("expected old_name.txt to be restored after discarding rename, got %s (err: %v)", string(oldContent), err)
+	}
 }
 
 func TestCommitFilesSpecialCharactersPathspec(t *testing.T) {
@@ -253,12 +266,30 @@ func TestCommitFilesSpecialCharactersPathspec(t *testing.T) {
 	}
 
 	// Discard from commit 1 (added in commit 1) -> should be removed
-	err = commitLog.DiscardFileFromCommit(ctx, commit1, specialFile)
+	err = commitLog.DiscardFileFromCommit(ctx, commit1, specialFile, "")
 	if err != nil {
 		t.Fatalf("discard failed for bracketed file: %v", err)
 	}
 	if _, err := os.Stat(filepath.Join(dir, specialFile)); !os.IsNotExist(err) {
 		t.Errorf("expected file to be removed after discarding root commit addition")
 	}
-}
 
+	// Non-ASCII and space filename test with -z
+	unicodeFile := "日本語 文件 with space.txt"
+	os.WriteFile(filepath.Join(dir, unicodeFile), []byte("unicode content\n"), 0o644)
+	run("add", unicodeFile)
+	run("commit", "-m", "Add unicode file with space")
+	commitUnicode := run("rev-parse", "HEAD")
+
+	touched := commitLog.GetCommitTouchedFiles(ctx, commitUnicode)
+	foundUnicode := false
+	for _, f := range touched {
+		if f.FilePathname == unicodeFile && f.Status == "A" {
+			foundUnicode = true
+			break
+		}
+	}
+	if !foundUnicode {
+		t.Fatalf("expected to find unicodeFile in touched files, got %+v", touched)
+	}
+}

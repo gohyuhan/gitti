@@ -100,6 +100,7 @@ type LanguageMapping struct {
 	Branches                    string
 	ModifiedFiles               string
 	CommitLog                   string
+	CommitFilesTitleFormat      string
 	RefLog                      string
 	Stash                       string
 	Tag                         string
@@ -185,6 +186,7 @@ type LanguageMapping struct {
 	KeyBindingForGitStashMessagePopUp                          []string
 	KeyBindingForGitDiscardTypeOptionPopUp                     []string
 	KeyBindingForGitDiscardConfirmPromptPopUp                  []string
+	KeyBindingForGitCheckoutCommitFileConfirmPromptPopUp       []string
 	KeyBindingForGitStashOperationOutputPopUp                  []string
 	KeyBindingForGitStashConfirmPromptPopUp                    []string
 	KeyBindingForGitDeleteBranchOutputPopUp                    []string
@@ -259,11 +261,6 @@ type LanguageMapping struct {
 	LogComponentKeyBinding []KeyBindingMappingFormat
 	// Detail Component KeyBinding
 	DetailComponentKeyBinding []KeyBindingMappingFormat
-	// Commit file operations messages
-	CheckoutCommitFileSucceeded string
-	CheckoutCommitFileFailed    string
-	DiscardCommitFileSucceeded  string
-	DiscardCommitFileFailed     string
 	// Feature Instructions
 	FeatureInstructions []FeatureInstructionMappingFormat
 	// commit
@@ -391,6 +388,7 @@ type LanguageMapping struct {
 	GitDiscardNewlyAddedorCopyConfirmation string
 	GitDiscardAndRevertRenameConfirmation  string
 	GitDiscardCommitFileConfirmation       string
+	GitCheckoutCommitFileConfirmation      string
 	// for stash operation title (used in output pop up)
 	GitStashAllTitle   string
 	GitStashFileTitle  string
