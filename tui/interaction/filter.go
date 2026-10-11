@@ -3,6 +3,7 @@ package interaction
 import (
 	tea "charm.land/bubbletea/v2"
 	branchComponent "github.com/gohyuhan/gitti/tui/component/branch"
+	commitfilesComponent "github.com/gohyuhan/gitti/tui/component/commitfiles"
 	commitlogComponent "github.com/gohyuhan/gitti/tui/component/commitlog"
 	filesComponent "github.com/gohyuhan/gitti/tui/component/files"
 	reflogComponent "github.com/gohyuhan/gitti/tui/component/reflog"
@@ -79,6 +80,9 @@ func reinitFilteredList(m *types.GittiModel, filterKey string) {
 	case constant.SHOW_COMMITLOG:
 		needReinit := commitlogComponent.InitGitCommitLogList(m)
 		services.FetchDetailComponentPanelInfoService(m, needReinit)
+	case constant.CommitFilesComponentPanel:
+		commitfilesComponent.InitCommitFilesList(m)
+		services.FetchDetailComponentPanelInfoService(m, true)
 	case constant.SHOW_REFLOG:
 		needReinit := reflogComponent.InitGitRefLogList(m)
 		services.FetchDetailComponentPanelInfoService(m, needReinit)

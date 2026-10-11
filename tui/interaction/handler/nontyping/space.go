@@ -46,6 +46,13 @@ func handleNonTypingSpaceKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 				m.ShowPopUp.Store(true)
 				m.IsTyping.Store(false)
 			}
+		case constant.CommitLogOrRefLogComponentPanel:
+			if m.CurrentCommitLogOrRefLogComponentShowing == constant.SHOW_COMMITLOG {
+				if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
+					m.CurrentSelectedComponent = constant.DetailComponentPanel
+					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
+				}
+			}
 		case constant.DetailComponentPanel, constant.DetailComponentPanelTwo:
 			if m.IsLineEditingState.Load() {
 				currentSelectedModifiedFile := m.CurrentRepoModifiedFilesInfoList.SelectedItem()

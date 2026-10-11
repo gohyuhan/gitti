@@ -50,10 +50,10 @@ Gitti is built for terminal-focused developers who need visual Git operations wi
 - 🌐 **Remote Management** - View and manage remotes
 - 📡 **Manual Fetch** - Trigger fetch all on demand
 - 🔏 **Commit & Tag Signing** - GPG and SSH signing support
-- 📊 **Commit Log & Branch Graph** - Visualize commit history with branching graph
+- 📊 **Commit Log & Branch Graph** - Visualize commit history with branching graph; press Enter to drill down into touched files, view individual file diffs, checkout (`c`), or discard (`d`) changes
 - 🔎 **Reflog** - Browse and restore from Git reference logs
 - 🫵 **Git Blame** - View line-by-line blame with commit author and message
-- 🔦 **List Filtering** - Filter the branch, tag, remote, worktree, file, commit log, reflog, and stash lists with `F`
+- 🔦 **List Filtering** - Filter the branch, tag, remote, worktree, file, commit log, commit files, reflog, and stash lists with `F`
 - 📋 **Copy Popup** - Press `y` to copy details from a selected branch, tag, remote, worktree, file, commit, reflog entry, or stash
 - 🕹️ **Interactive Rebase** - Drop, reword, fixup, and squash commits interactively
 - 📦 **Basic Submodule Support** - Work with Git submodules in your repositories

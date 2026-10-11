@@ -12,6 +12,7 @@ import (
 	"github.com/gohyuhan/gitti/i18n"
 	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/commitfiles"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/reflog"
@@ -67,6 +68,16 @@ func handleNonTypingyKeyBindingInteraction(m *types.GittiModel) (*types.GittiMod
 		item, ok := m.CurrentRepoModifiedFilesInfoList.SelectedItem().(files.GitModifiedFilesItem)
 		if ok {
 			path := item.NewFilePathname
+			options = []copypopup.Option{
+				ready(labels.CopyRelativePath, path),
+				ready(labels.CopyAbsolutePath, filepath.Join(m.RepoPath, path)),
+				ready(labels.CopyFileName, filepath.Base(path)),
+			}
+		}
+	case constant.CommitFilesComponentPanel:
+		item, ok := m.CurrentRepoCommitFilesList.SelectedItem().(commitfiles.GitCommitFileItem)
+		if ok {
+			path := item.FilePathname
 			options = []copypopup.Option{
 				ready(labels.CopyRelativePath, path),
 				ready(labels.CopyAbsolutePath, filepath.Join(m.RepoPath, path)),

@@ -76,6 +76,8 @@ func CurrentPanelFilterKey(m *types.GittiModel) string {
 		return constant.ModifiedFilesComponentPanel
 	case constant.CommitLogOrRefLogComponentPanel:
 		return m.CurrentCommitLogOrRefLogComponentShowing
+	case constant.CommitFilesComponentPanel:
+		return constant.CommitFilesComponentPanel
 	case constant.StashComponentPanel:
 		return constant.StashComponentPanel
 	}

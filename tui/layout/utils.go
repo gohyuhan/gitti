@@ -126,7 +126,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 		m.WorktreeComponentPanelHeight = selectedComponentPanelHeight
 	case constant.ModifiedFilesComponentPanel:
 		m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-	case constant.CommitLogOrRefLogComponentPanel:
+	case constant.CommitLogOrRefLogComponentPanel, constant.CommitFilesComponentPanel:
 		m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 		m.RefLogComponentPanelHeight = selectedComponentPanelHeight
 	case constant.StashComponentPanel:
@@ -147,7 +147,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.WorktreeComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.CommitLogOrRefLogComponentPanel:
+		case constant.CommitLogOrRefLogComponentPanel, constant.CommitFilesComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 			m.RefLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponentPanel:
@@ -162,7 +162,7 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 			m.WorktreeComponentPanelHeight = selectedComponentPanelHeight
 		case constant.ModifiedFilesComponentPanel:
 			m.ModifiedFilesComponentPanelHeight = selectedComponentPanelHeight
-		case constant.CommitLogOrRefLogComponentPanel:
+		case constant.CommitLogOrRefLogComponentPanel, constant.CommitFilesComponentPanel:
 			m.CommitLogComponentPanelHeight = selectedComponentPanelHeight
 			m.RefLogComponentPanelHeight = selectedComponentPanelHeight
 		case constant.StashComponentPanel:
@@ -188,6 +188,9 @@ func LeftPanelDynamicResize(m *types.GittiModel) {
 
 	m.CurrentRepoCommitLogInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoCommitLogInfoList.SetHeight(m.CommitLogComponentPanelHeight)
+
+	m.CurrentRepoCommitFilesList.SetWidth(m.WindowLeftPanelWidth - 2)
+	m.CurrentRepoCommitFilesList.SetHeight(m.CommitLogComponentPanelHeight)
 
 	m.CurrentRepoRefLogInfoList.SetWidth(m.WindowLeftPanelWidth - 2)
 	m.CurrentRepoRefLogInfoList.SetHeight(m.RefLogComponentPanelHeight)

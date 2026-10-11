@@ -81,6 +81,13 @@ func handleNonTypingDownjKeyBindingInteraction(msg tea.KeyPressMsg, m *types.Git
 					services.FetchDetailComponentPanelInfoService(m, true)
 				}
 			}
+		case constant.CommitFilesComponentPanel:
+			if m.CurrentRepoCommitFilesList.Index() < len(m.CurrentRepoCommitFilesList.Items())-1 {
+				latestIndex := m.CurrentRepoCommitFilesList.Index() + 1
+				m.CurrentRepoCommitFilesList.Select(latestIndex)
+				m.ListNavigationIndexPosition.CommitFilesComponent = latestIndex
+				services.FetchDetailComponentPanelInfoService(m, true)
+			}
 		case constant.StashComponentPanel:
 			// we don't use the list native Update() because we need to also track the current selected index
 			if m.CurrentRepoStashInfoList.Index() < len(m.CurrentRepoStashInfoList.Items())-1 {

@@ -1,7 +1,9 @@
 package nontyping
 
 import (
+	"charm.land/bubbles/v2/list"
 	tea "charm.land/bubbletea/v2"
+	"github.com/gohyuhan/gitti/tui/component/commitfiles"
 	"github.com/gohyuhan/gitti/tui/constant"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	stashPopUp "github.com/gohyuhan/gitti/tui/popup/stash"
@@ -130,7 +132,8 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			constant.InteractiveRebaseFixupSquashSelectionPopUp,
 			constant.InteractiveRebaseRewordSelectionPopUp,
 			constant.InteractiveRebaseDropSelectionPopUp,
-			constant.WorktreeRemoveWorktreeConfirmationPopUp:
+			constant.WorktreeRemoveWorktreeConfirmationPopUp,
+			constant.GitCheckoutCommitFileConfirmPromptPopUp:
 			// simple closing of the pop up
 			m.ShowPopUp.Store(false)
 			m.IsTyping.Store(false)
@@ -150,6 +153,14 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 				m.CurrentSelectedComponent = m.DetailPanelParentComponent
 				m.DetailPanelParentComponent = ""
 			}
+		case constant.CommitFilesComponentPanel:
+			delete(m.PanelFilterQuery, constant.CommitFilesComponentPanel)
+			m.CurrentSelectedComponent = constant.CommitLogOrRefLogComponentPanel
+			m.CurrentRepoCommitFilesList = list.New(nil, commitfiles.GitCommitFileItemDelegate{}, 0, 0)
+			m.ListNavigationIndexPosition.CommitFilesComponent = 0
+			commitfiles.ClearCachedCommitFiles(m)
+			services.FetchDetailComponentPanelInfoService(m, true)
+			return m, nil
 		}
 	}
 	return m, nil

@@ -10,6 +10,8 @@ import (
 	"github.com/gohyuhan/gitti/logging"
 	"github.com/gohyuhan/gitti/settings"
 	"github.com/gohyuhan/gitti/tui/component/branch"
+	"github.com/gohyuhan/gitti/tui/component/commitfiles"
+	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/remote"
 	"github.com/gohyuhan/gitti/tui/component/tag"
@@ -18,6 +20,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/layout"
 	branchPopUp "github.com/gohyuhan/gitti/tui/popup/branch"
 	commitPopUp "github.com/gohyuhan/gitti/tui/popup/commit"
+	commitfilesPopUp "github.com/gohyuhan/gitti/tui/popup/commitfiles"
 	commitLogPopUp "github.com/gohyuhan/gitti/tui/popup/commitlog"
 	"github.com/gohyuhan/gitti/tui/popup/copypopup"
 	discardPopUp "github.com/gohyuhan/gitti/tui/popup/discard"
@@ -57,15 +60,28 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.CommitLogOrRefLogComponentPanel:
 			switch m.CurrentCommitLogOrRefLogComponentShowing {
 			case constant.SHOW_COMMITLOG:
-				if len(m.CurrentRepoCommitLogInfoList.Items()) > 0 {
-					m.CurrentSelectedComponent = constant.DetailComponentPanel
-					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
+				selectedItem := m.CurrentRepoCommitLogInfoList.SelectedItem()
+				if selectedItem != nil {
+					commitItem, ok := selectedItem.(commitlog.GitCommitLogItem)
+					if ok {
+						m.CurrentSelectedComponent = constant.CommitFilesComponentPanel
+						commitfiles.LoadCommitFiles(context.Background(), m, commitItem.Hash)
+						m.ListNavigationIndexPosition.CommitFilesComponent = 0
+						commitfiles.InitCommitFilesList(m)
+						services.FetchDetailComponentPanelInfoService(m, true)
+						return m, nil
+					}
 				}
 			case constant.SHOW_REFLOG:
 				if len(m.CurrentRepoRefLogInfoList.Items()) > 0 {
 					m.CurrentSelectedComponent = constant.DetailComponentPanel
 					m.DetailPanelParentComponent = constant.CommitLogOrRefLogComponentPanel
 				}
+			}
+		case constant.CommitFilesComponentPanel:
+			if len(m.CurrentRepoCommitFilesList.Items()) > 0 {
+				m.CurrentSelectedComponent = constant.DetailComponentPanel
+				m.DetailPanelParentComponent = constant.CommitFilesComponentPanel
 			}
 		case constant.StashComponentPanel:
 			if len(m.CurrentRepoStashInfoList.Items()) > 0 {
@@ -309,7 +325,20 @@ func handleNonTypingEnterKeyBindingInteraction(m *types.GittiModel) (*types.Gitt
 		case constant.GitDiscardConfirmPromptPopUp:
 			popUp, ok := m.PopUpModel.(*discardPopUp.GitDiscardConfirmPromptPopUpModel)
 			if ok {
-				services.GitDiscardFileChangesService(m, popUp.FilePathName, popUp.DiscardType)
+				if popUp.DiscardType == git.DISCARDCOMMITFILE {
+					services.DiscardCommitFileService(m, popUp.CommitHash, popUp.FilePathName, popUp.OldFilePathName)
+				} else {
+					services.GitDiscardFileChangesService(m, popUp.FilePathName, popUp.DiscardType)
+				}
+				m.ShowPopUp.Store(false)
+				m.IsTyping.Store(false)
+				m.PopUpType = constant.NoPopUp
+				m.PopUpModel = nil
+			}
+		case constant.GitCheckoutCommitFileConfirmPromptPopUp:
+			popUp, ok := m.PopUpModel.(*commitfilesPopUp.GitCheckoutCommitFileConfirmPromptPopUpModel)
+			if ok {
+				services.CheckoutCommitFileService(m, popUp.CommitHash, popUp.FilePathName)
 				m.ShowPopUp.Store(false)
 				m.IsTyping.Store(false)
 				m.PopUpType = constant.NoPopUp

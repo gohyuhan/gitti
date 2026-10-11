@@ -78,6 +78,7 @@ const (
 	DISCARDUNTRACKED          = "DISCARDUNTRACKED"          // Delete untracked file (git clean -f)
 	DISCARDNEWLYADDEDORCOPIED = "DISCARDNEWLYADDEDORCOPIED" // Discard newly added or copied file (git rm -f)
 	DISCARDANDREVERTRENAME    = "DISCARDANDREVERTRENAME"    // Discard and revert rename operation
+	DISCARDCOMMITFILE         = "DISCARDCOMMITFILE"         // Discard changes to a file from a specific commit
 )
 
 // Conflict resolution operation types
