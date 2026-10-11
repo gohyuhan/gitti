@@ -158,7 +158,7 @@ func handleNonTypingEscKeyBindingInteraction(m *types.GittiModel) (*types.GittiM
 			m.CurrentSelectedComponent = constant.CommitLogOrRefLogComponentPanel
 			m.CurrentRepoCommitFilesList = list.New(nil, commitfiles.GitCommitFileItemDelegate{}, 0, 0)
 			m.ListNavigationIndexPosition.CommitFilesComponent = 0
-			commitfiles.ClearCachedCommitFiles()
+			commitfiles.ClearCachedCommitFiles(m)
 			services.FetchDetailComponentPanelInfoService(m, true)
 			return m, nil
 		}

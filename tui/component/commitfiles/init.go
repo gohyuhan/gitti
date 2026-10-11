@@ -13,23 +13,18 @@ import (
 	"github.com/gohyuhan/gitti/tui/utils"
 )
 
-var (
-	cachedCommitFiles []list.Item
-	cachedCommitHash  string
-)
-
 // ------------------------------------
 //
 //	Load touched files for a commit into memory
 //
 // ------------------------------------
 func LoadCommitFiles(ctx context.Context, m *types.GittiModel, commitHash string) {
-	cachedCommitHash = commitHash
+	m.CommitFilesCommitHash = commitHash
 	touchedFiles := m.GitOperations.GitCommitLog.GetCommitTouchedFiles(ctx, commitHash)
-	cachedCommitFiles = make([]list.Item, 0, len(touchedFiles))
+	m.CommitFilesCache = make([]list.Item, 0, len(touchedFiles))
 
 	for _, file := range touchedFiles {
-		cachedCommitFiles = append(cachedCommitFiles, GitCommitFileItem{
+		m.CommitFilesCache = append(m.CommitFilesCache, GitCommitFileItem{
 			CommitHash:   commitHash,
 			Status:       file.Status,
 			FilePathname: file.FilePathname,
@@ -43,9 +38,9 @@ func LoadCommitFiles(ctx context.Context, m *types.GittiModel, commitHash string
 //	Clear cached commit files when exiting the panel
 //
 // ------------------------------------
-func ClearCachedCommitFiles() {
-	cachedCommitFiles = nil
-	cachedCommitHash = ""
+func ClearCachedCommitFiles(m *types.GittiModel) {
+	m.CommitFilesCache = nil
+	m.CommitFilesCommitHash = ""
 }
 
 // ------------------------------------
@@ -54,8 +49,8 @@ func ClearCachedCommitFiles() {
 //
 // ------------------------------------
 func InitCommitFilesList(m *types.GittiModel) bool {
-	items := make([]list.Item, len(cachedCommitFiles))
-	copy(items, cachedCommitFiles)
+	items := make([]list.Item, len(m.CommitFilesCache))
+	copy(items, m.CommitFilesCache)
 
 	previousPosition := m.ListNavigationIndexPosition.CommitFilesComponent
 	var previousSelected list.Item
@@ -66,7 +61,7 @@ func InitCommitFilesList(m *types.GittiModel) bool {
 	// Apply panel filtering if active
 	items, selectedPosition := utils.FilterListItems(items, m.PanelFilterQuery[constant.CommitFilesComponentPanel], previousSelected, previousPosition)
 
-	shortHash := cachedCommitHash
+	shortHash := m.CommitFilesCommitHash
 	if len(shortHash) > 7 {
 		shortHash = shortHash[:7]
 	}

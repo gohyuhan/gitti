@@ -3,6 +3,7 @@ package initialize_test
 import (
 	"testing"
 
+	"charm.land/bubbles/v2/list"
 	"github.com/gohyuhan/gitti/api"
 	"github.com/gohyuhan/gitti/executor"
 	"github.com/gohyuhan/gitti/logging"
@@ -37,7 +38,17 @@ func TestInitGittiModelCommitFilesListInitialized(t *testing.T) {
 
 	layout.LeftPanelDynamicResize(m)
 
+	// Set cache values to verify ReinitGittiModel clears them
+	m.CommitFilesCache = make([]list.Item, 1)
+	m.CommitFilesCommitHash = "abcdef123"
+
 	// Test ReinitGittiModel
 	initialize.ReinitGittiModel(m, ".", "gitti", gitOps)
+	if m.CommitFilesCache != nil {
+		t.Errorf("expected CommitFilesCache to be nil after ReinitGittiModel, got %v", m.CommitFilesCache)
+	}
+	if m.CommitFilesCommitHash != "" {
+		t.Errorf("expected CommitFilesCommitHash to be empty after ReinitGittiModel, got %q", m.CommitFilesCommitHash)
+	}
 	layout.LeftPanelDynamicResize(m)
 }

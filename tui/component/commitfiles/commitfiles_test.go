@@ -148,7 +148,15 @@ func TestInitCommitFilesList(t *testing.T) {
 		t.Errorf("expected selected item 'alpha.go', got %+v", filteredItem)
 	}
 
-	ClearCachedCommitFiles()
+	if len(m.CommitFilesCache) != 2 || m.CommitFilesCommitHash != hash {
+		t.Errorf("expected model cache to hold 2 items for hash %s, got %d items and hash %s", hash, len(m.CommitFilesCache), m.CommitFilesCommitHash)
+	}
+
+	ClearCachedCommitFiles(m)
+	if m.CommitFilesCache != nil || m.CommitFilesCommitHash != "" {
+		t.Errorf("expected CommitFilesCache to be nil and CommitFilesCommitHash to be empty, got cache=%v hash=%q", m.CommitFilesCache, m.CommitFilesCommitHash)
+	}
+
 	InitCommitFilesList(m)
 	if len(m.CurrentRepoCommitFilesList.Items()) != 0 {
 		t.Errorf("expected 0 items after ClearCachedCommitFiles, got %d", len(m.CurrentRepoCommitFilesList.Items()))

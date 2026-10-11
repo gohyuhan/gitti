@@ -202,6 +202,8 @@ func ReinitGittiModel(m *types.GittiModel, repoPath string, repoName string, git
 	m.CurrentRepoRemoteInfoList = list.New([]list.Item{}, remoteComponent.GitRemoteItemDelegate{}, 0, 0)
 	m.CurrentRepoWorktreeInfoList = list.New([]list.Item{}, worktreeComponent.GitWorktreeItemDelegate{}, 0, 0)
 	m.CurrentRepoCommitFilesList = list.New([]list.Item{}, commitfilesComponent.GitCommitFileItemDelegate{}, 0, 0)
+	m.CommitFilesCache = nil
+	m.CommitFilesCommitHash = ""
 	m.DetailPanelParentComponent = ""
 	m.DetailPanelViewport = vp
 	m.DetailPanelViewportOffset = 0

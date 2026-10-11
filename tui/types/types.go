@@ -57,6 +57,8 @@ type GittiModel struct {
 	CurrentRepoRemoteInfoList                                 list.Model
 	CurrentRepoWorktreeInfoList                               list.Model
 	CurrentRepoCommitFilesList                                list.Model
+	CommitFilesCache                                          []list.Item
+	CommitFilesCommitHash                                     string
 	DetailPanelParentComponent                                string // this is to store the parent component that cause a move into the detail panel component, so that we can return back to the correct one
 	DetailPanelViewport                                       viewport.Model
 	DetailPanelViewportOffset                                 int
