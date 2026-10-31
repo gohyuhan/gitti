@@ -9,6 +9,7 @@ import (
 
 	"github.com/gohyuhan/gitti/api/git"
 	"github.com/gohyuhan/gitti/i18n"
+	"github.com/gohyuhan/gitti/tui/component/commitfiles"
 	"github.com/gohyuhan/gitti/tui/component/commitlog"
 	"github.com/gohyuhan/gitti/tui/component/files"
 	"github.com/gohyuhan/gitti/tui/component/log"
@@ -103,6 +104,8 @@ func FetchDetailComponentPanelInfoService(m *types.GittiModel, reinit bool) {
 			contentLine, contentLine2, ogDiffLine1, ogDiffLine2, setForDetailComponentTwo = generateBothModifiedFileDetailPanelContent(ctx, m)
 		case constant.CommitLogOrRefLogComponentPanel:
 			contentLine = generateCommitLogOrRefLogDetailPanelContent(ctx, m)
+		case constant.CommitFilesComponentPanel:
+			contentLine, ogDiffLine1 = generateCommitFilesDetailPanelContent(ctx, m)
 		case constant.StashComponentPanel:
 			contentLine = generateStashDetailPanelContent(ctx, m)
 		case constant.LogComponentPanel:
@@ -403,6 +406,35 @@ func generateCommitLogOrRefLogDetailPanelContent(ctx context.Context, m *types.G
 		vpLine.WriteRune('\n')
 	}
 	return vpLine.String()
+}
+
+// ------------------------------------
+//
+//	for commit files detail panel view (file-by-file diff)
+//
+// ------------------------------------
+func generateCommitFilesDetailPanelContent(ctx context.Context, m *types.GittiModel) (string, []string) {
+	currentSelectedFile := m.CurrentRepoCommitFilesList.SelectedItem()
+	if currentSelectedFile == nil {
+		return "", nil
+	}
+	item, ok := currentSelectedFile.(commitfiles.GitCommitFileItem)
+	if !ok {
+		return "", nil
+	}
+
+	diffLines := m.GitOperations.GitCommitLog.GetCommitFileDiff(ctx, item.CommitHash, item.FilePathname)
+	if len(diffLines) < 1 {
+		return "", nil
+	}
+
+	var vpLine strings.Builder
+	for _, line := range diffLines {
+		styledLine := style.NewStyle.Render(line)
+		vpLine.WriteString(styledLine)
+		vpLine.WriteRune('\n')
+	}
+	return vpLine.String(), diffLines
 }
 
 // ------------------------------------

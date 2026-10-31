@@ -100,6 +100,7 @@ type LanguageMapping struct {
 	Branches                    string
 	ModifiedFiles               string
 	CommitLog                   string
+	CommitFilesTitleFormat      string
 	RefLog                      string
 	Stash                       string
 	Tag                         string
@@ -155,6 +156,8 @@ type LanguageMapping struct {
 	KeyBindingModifiedFilesComponentNone                       []string
 	KeyBindingCommitLogComponentNone                           []string
 	KeyBindingCommitLogComponent                               []string
+	KeyBindingCommitFilesComponentNone                         []string
+	KeyBindingCommitFilesComponent                             []string
 	KeyBindingRefLogComponentNone                              []string
 	KeyBindingRefLogComponent                                  []string
 	KeyBindingLogComponent                                     []string
@@ -183,6 +186,7 @@ type LanguageMapping struct {
 	KeyBindingForGitStashMessagePopUp                          []string
 	KeyBindingForGitDiscardTypeOptionPopUp                     []string
 	KeyBindingForGitDiscardConfirmPromptPopUp                  []string
+	KeyBindingForGitCheckoutCommitFileConfirmPromptPopUp       []string
 	KeyBindingForGitStashOperationOutputPopUp                  []string
 	KeyBindingForGitStashConfirmPromptPopUp                    []string
 	KeyBindingForGitDeleteBranchOutputPopUp                    []string
@@ -247,6 +251,8 @@ type LanguageMapping struct {
 	ModifiedFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Commit Log Component KeyBinding
 	CommitLogComponentKeyBinding []KeyBindingMappingFormat
+	// Commit Files Component KeyBinding
+	CommitFilesComponentKeyBinding []KeyBindingMappingFormat
 	// Ref Log Component KeyBinding
 	RefLogComponentKeyBinding []KeyBindingMappingFormat
 	// Stash Component KeyBinding
@@ -381,6 +387,8 @@ type LanguageMapping struct {
 	GitDiscardUntrackedConfirmation        string
 	GitDiscardNewlyAddedorCopyConfirmation string
 	GitDiscardAndRevertRenameConfirmation  string
+	GitDiscardCommitFileConfirmation       string
+	GitCheckoutCommitFileConfirmation      string
 	// for stash operation title (used in output pop up)
 	GitStashAllTitle   string
 	GitStashFileTitle  string

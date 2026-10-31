@@ -2,6 +2,7 @@ package git
 
 import (
 	"bufio"
+	"bytes"
 	"context"
 	"fmt"
 	"slices"
@@ -44,6 +45,12 @@ type CommitHashParentInfo struct {
 	ParentCommitHash    string
 	ParentCommitMessage string
 	ParentOrder         int
+}
+
+type CommitTouchedFile struct {
+	Status       string // "M", "A", "D", "R", etc.
+	FilePathname string
+	OldPathname  string // for renames
 }
 
 // ------------------------------------
@@ -610,4 +617,149 @@ func (gCL *GitCommitLog) GitRevertCommitWithSigning(commitHash string, parentOrd
 		gitArgs = []string{"revert", "--no-edit", commitHash}
 	}
 	return gitArgs
+}
+
+// ------------------------------------
+//
+//	Get touched files for a commit
+//
+// ------------------------------------
+func (gCL *GitCommitLog) GetCommitTouchedFiles(ctx context.Context, commitHash string) []CommitTouchedFile {
+	gitArgs := []string{"diff-tree", "--no-commit-id", "--name-status", "-r", "-M", "--root", "-z", commitHash}
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	output, err := cmdExecutor.Output()
+	if err != nil {
+		return nil
+	}
+
+	parts := bytes.Split(output, []byte{0})
+	var touchedFiles []CommitTouchedFile
+
+	i := 0
+	for i < len(parts) {
+		status := string(parts[i])
+		if status == "" {
+			break
+		}
+		if strings.HasPrefix(status, "R") || strings.HasPrefix(status, "C") {
+			if i+2 >= len(parts) {
+				break
+			}
+			oldPath := string(parts[i+1])
+			filePath := string(parts[i+2])
+			touchedFiles = append(touchedFiles, CommitTouchedFile{
+				Status:       status,
+				FilePathname: filePath,
+				OldPathname:  oldPath,
+			})
+			i += 3
+		} else {
+			if i+1 >= len(parts) {
+				break
+			}
+			filePath := string(parts[i+1])
+			touchedFiles = append(touchedFiles, CommitTouchedFile{
+				Status:       status,
+				FilePathname: filePath,
+			})
+			i += 2
+		}
+	}
+
+	return touchedFiles
+}
+
+// ------------------------------------
+//
+//	Get diff of a single file in a commit
+//
+// ------------------------------------
+func (gCL *GitCommitLog) GetCommitFileDiff(ctx context.Context, commitHash, filePath string) []string {
+	gitArgs := []string{"show", commitHash, "--stat", "-p", "--", literalPathspec(filePath)}
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, true)
+	gitOutput, err := cmdExecutor.Output()
+	if err != nil {
+		return nil
+	}
+
+	return processGeneralGitOpsOutputIntoStringArray(gitOutput)
+}
+
+// ------------------------------------
+//
+//	Checkout a single file from a commit into the working directory
+//
+// ------------------------------------
+func (gCL *GitCommitLog) CheckoutFileFromCommit(ctx context.Context, commitHash, filePath string) error {
+	if !gCL.gitProcessLock.CanProceedWithGitOps() {
+		return fmt.Errorf("%s", gCL.gitProcessLock.OtherProcessRunningWarning())
+	}
+	defer gCL.gitProcessLock.ReleaseGitOpsLock()
+
+	gitArgs := []string{"checkout", commitHash, "--", literalPathspec(filePath)}
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	gCL.logging.RegisterNewLog(logging.CHECKOUT_COMMIT_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	output, err := cmdExecutor.CombinedOutput()
+	if err != nil {
+		gCL.logging.RegisterNewLog(logging.CHECKOUT_COMMIT_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.CHECKOUT_COMMIT_FILE_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+		return err
+	}
+	return nil
+}
+
+// ------------------------------------
+//
+//	Discard / Revert changes to a file from a commit into the working directory
+//
+// ------------------------------------
+func (gCL *GitCommitLog) DiscardFileFromCommit(ctx context.Context, commitHash, filePath, oldPath string) error {
+	if !gCL.gitProcessLock.CanProceedWithGitOps() {
+		return fmt.Errorf("%s", gCL.gitProcessLock.OtherProcessRunningWarning())
+	}
+	defer gCL.gitProcessLock.ReleaseGitOpsLock()
+
+	parents := gCL.GetCommitHashParentInfo(commitHash)
+	if oldPath != "" && len(parents) > 0 {
+		parentTarget := commitHash + "~1"
+		checkoutArgs := []string{"checkout", parentTarget, "--", literalPathspec(oldPath)}
+		checkoutExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, checkoutArgs, false)
+		gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(checkoutArgs, " "), logging.INFO, "", true)
+		if output, err := checkoutExecutor.CombinedOutput(); err != nil {
+			gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(checkoutArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.DISCARD_COMMIT_FILE_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+			return err
+		}
+
+		rmArgs := []string{"rm", "-f", "--", literalPathspec(filePath)}
+		rmExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, rmArgs, false)
+		gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(rmArgs, " "), logging.INFO, "", true)
+		if output, err := rmExecutor.CombinedOutput(); err != nil {
+			gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(rmArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.DISCARD_COMMIT_FILE_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+			return err
+		}
+		return nil
+	}
+
+	var gitArgs []string
+	if len(parents) == 0 {
+		gitArgs = []string{"rm", "-f", "--", literalPathspec(filePath)}
+	} else {
+		parentTarget := commitHash + "~1"
+		checkCmd := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, []string{"cat-file", "-e", fmt.Sprintf("%s:%s", parentTarget, filePath)}, false)
+		if err := checkCmd.Run(); err != nil {
+			gitArgs = []string{"rm", "-f", "--", literalPathspec(filePath)}
+		} else {
+			gitArgs = []string{"checkout", parentTarget, "--", literalPathspec(filePath)}
+		}
+	}
+
+	cmdExecutor := executor.GittiCmdExecutor.RunGitCmdWithContext(ctx, gitArgs, false)
+	gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(gitArgs, " "), logging.INFO, "", true)
+
+	output, err := cmdExecutor.CombinedOutput()
+	if err != nil {
+		gCL.logging.RegisterNewLog(logging.DISCARD_COMMIT_FILE_OPS, strings.Join(gitArgs, " "), logging.ERROR, fmt.Sprintf("[%s ERROR]: %s (%s)", logging.DISCARD_COMMIT_FILE_OPS, err.Error(), strings.TrimSpace(string(output))), true)
+		return err
+	}
+	return nil
 }

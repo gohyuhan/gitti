@@ -5,6 +5,7 @@ import (
 	"github.com/gohyuhan/gitti/tui/popup/blame"
 	"github.com/gohyuhan/gitti/tui/popup/branch"
 	"github.com/gohyuhan/gitti/tui/popup/commit"
+	commitfilesPopUp "github.com/gohyuhan/gitti/tui/popup/commitfiles"
 	"github.com/gohyuhan/gitti/tui/popup/commitlog"
 	"github.com/gohyuhan/gitti/tui/popup/copypopup"
 	"github.com/gohyuhan/gitti/tui/popup/discard"
@@ -67,6 +68,8 @@ func RenderPopUpComponent(m *types.GittiModel) string {
 		popUp = discard.RenderGitDiscardTypeOptionPopUp(m)
 	case constant.GitDiscardConfirmPromptPopUp:
 		popUp = discard.RenderGitDiscardConfirmPromptPopup(m)
+	case constant.GitCheckoutCommitFileConfirmPromptPopUp:
+		popUp = commitfilesPopUp.RenderGitCheckoutCommitFileConfirmPromptPopup(m)
 	case constant.GitStashOperationOutputPopUp:
 		popUp = stash.RenderGitStashOperationOutputPopUp(m)
 	case constant.GitStashConfirmPromptPopUp:
